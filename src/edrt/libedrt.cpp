@@ -10,41 +10,51 @@
 
 #include <vector>
 
+#include "../neighbor/CoverTree.hpp"
 #include <eigen3/Eigen/SparseCore>
 
-template <class PairwiseCallback, class ResultInsertIterator>
+typedef std::vector<int> LocalNeighbors;
+typedef std::vector<LocalNeighbors> Neighbors;
+typedef Eigen::SparseMatrix<double> WeightMatrix;
+typedef Eigen::MatrixXd EmbeddingMatrix;
+
+template <class ForwardIterator, class PairwiseCallback>
+Neighbors find_neighbors(ForwardIterator begin, ForwardIterator end, PairwiseCallback callback, unsigned int k)
+{
+}
+
+template <class ForwardIterator, class PairwiseCallback>
+WeightMatrix klle_weight_matrix(ForwardIterator begin, ForwardIterator end, PairwiseCallback callback)
+{
+
+}
+
+EmbeddingMatrix eigen_embedding(WeightMatrix wm, unsigned int target_dimension)
+{
+
+}
+
+template <class ForwardIterator, class PairwiseCallback, class ResultInsertIterator>
 int embed(
+		ForwardIterator begin,
+		ForwardIterator end,
 		const edrt_options_t& options,
 		const int target_dimension,
 		const int N,
 		const int dimension,
 		const int k)
 {
-	typedef std::vector<int> LocalNeighbors;
-	typedef std::vector<LocalNeighbors> Neighbors;
-	typedef Eigen::SparseMatrix<double> WeightMatrix;
-
 	Neighbors neighbors;
 	WeightMatrix weight_matrix;
+	EmbeddingMatrix embedding_matrix;
 
 	switch (options.method)
 	{
 		case KERNEL_LOCALLY_LINEAR_EMBEDDING:
-/*
-			neighborhood_matrix = neighbors_matrix(N, k, NULL, kernel, user_data);
-			REQUIRE(neighborhood_matrix);
-
-			weight_matrix = klle_weight_matrix(neighborhood_matrix, N, k, k, 
-			                                   options.num_threads, 
-			                                   options.klle_reconstruction_shift,
-			                                   kernel, user_data);
-			REQUIRE(weight_matrix);
-
-			*output = eigendecomposition_embedding(weight_matrix, N, 
-			                                       target_dimension, 
-			                                       options.use_arpack,
-			                                       options.nullspace_shift);
-*/
+			PairwiseCallback kernel_callback = PairwiseCallback();
+			neighbors = find_neighbors(begin,end,kernel_callback,k);
+			weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback);
+			embedding_matrix = eigen_embedding(weight_matrix,target_dimension);
 			break;
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			break;
