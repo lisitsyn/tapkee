@@ -48,11 +48,13 @@ struct edrt_options_t
 	double nullspace_shift;
 };
 
-template <class PairwiseCallback, class ResultInsertIterator>
+template <class RandomAccessIterator, class PairwiseCallback, class ResultInsertIterator>
 int embed(
+		RandomAccessIterator begin,
+		RandomAccessIterator end,
+		PairwiseCallback callback,
 		const edrt_options_t& options,
-		const int target_dimension, /* target dimensionality of embedding */
-		const int N, /* number of vectors to embed */
-		const int dimension, /* dimension of feature vectors */
-		const int k /* number of neighbors */);
+		const int target_dimension,
+		const int dimension,
+		const int k);
 #endif /* libedrt_h_ */
