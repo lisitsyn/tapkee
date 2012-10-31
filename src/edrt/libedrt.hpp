@@ -1,11 +1,11 @@
 #ifndef libedrt_h_
 #define libedrt_h_
 
-#include "libedrt.hpp"
-#include "libedrt_methods.hpp"
-#include "libedrt_neighbors.hpp"
-#include "libedrt_embedding.hpp"
-
+#define HAVE_LAPACK
+#define HAVE_ARPACK
+#include <shogun/mathematics/lapack.h>
+#include <shogun/mathematics/arpack.h>
+#include <shogun/lib/Time.h>
 #include <vector>
 #include <map>
 #include <stdlib.h>
@@ -15,17 +15,17 @@
 #include <algorithm>
 #include <iostream>
 
-using std::cout;
-using std::endl;
-
 #include <eigen3/Eigen/SparseCore>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/SuperLUSupport>
+#include "libedrt_defines.hpp"
+#include "libedrt_methods.hpp"
+#include "libedrt_neighbors.hpp"
+#include "libedrt_embedding.hpp"
 
-typedef std::vector<int> LocalNeighbors;
-typedef std::vector<LocalNeighbors> Neighbors;
-typedef Eigen::SparseMatrix<double> WeightMatrix;
-typedef Eigen::MatrixXd EmbeddingMatrix;
+using std::cout;
+using std::endl;
+
 
 enum edrt_method_t
 {
@@ -74,107 +74,55 @@ struct edrt_options_t
 	double nullspace_shift;
 };
 
-template <class DistanceRecord>
-struct distances_comparator
-{
-	bool operator()(const DistanceRecord& l, const DistanceRecord& r) 
-	{
-		return (l.second < r.second);
-	}
-};
-
-template <class RandomAccessIterator, class PairwiseCallback>
-Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback, unsigned int k)
-{
-	typedef std::pair<RandomAccessIterator, double> DistanceRecord;
-	typedef std::vector<DistanceRecord> Distances;
-
-	Neighbors neighbors;
-	neighbors.reserve(end-begin);
-	Distances distances;
-	distances.reserve(end-begin);
-	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-	{
-		distances.clear();
-		for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
-			distances.push_back(make_pair(around_iter, callback(*iter,*around_iter)));
-		
-		std::partial_sort(distances.begin(),distances.begin()+k+1,distances.end(),distances_comparator<DistanceRecord>());
-
-		LocalNeighbors local_neighbors;
-		local_neighbors.reserve(k);
-		for (typename Distances::const_iterator neighbors_iter=distances.begin()+1; 
-				neighbors_iter!=distances.begin()+k+1; ++neighbors_iter)
-			local_neighbors.push_back(neighbors_iter->first - begin);
-		neighbors.push_back(local_neighbors);
-	}
-
-	return neighbors;
-}
-
-template <class RandomAccessIterator, class PairwiseCallback>
-WeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, Neighbors neighbors, PairwiseCallback callback)
-{
-	typedef Eigen::VectorXd DenseVector;
-	typedef Eigen::MatrixXd DenseMatrix;
-	typedef Eigen::Triplet<double> SparseTriplet;
-	typedef std::vector<SparseTriplet> SparseTriplets;
-	
-	int k = neighbors[0].size();
-
-	cout << "K = " << k << endl;
-	cout << "begin - end = " << (end-begin) << endl;
-
-	SparseTriplets sparse_triplets;
-	sparse_triplets.reserve(k*k*(end-begin));
-
-	RandomAccessIterator iter;
-	RandomAccessIterator iter_begin = begin, iter_end = end;
-#pragma omp parallel for private(iter) shared(iter_begin, iter_end)
-	for (RandomAccessIterator iter=iter_begin; iter!=iter_end; ++iter)
-	{
-		double kernel_value = callback(*iter,*iter);
-		LocalNeighbors& current_neighbors = neighbors[iter-begin];
-		
-		DenseVector dots(k);
-		for (int i=0; i<k; ++i)
-			dots[i] = callback(*iter, begin[current_neighbors[i]]);
-
-		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
-		gram_matrix.fill(kernel_value);
-		for (int i=0; i<k; ++i)
-		{
-			gram_matrix.row(i).array() -= dots(i);
-			gram_matrix.col(i).array() -= dots(i);
-			for (int j=0; j<k; ++j)
-				gram_matrix(i,j) += callback(begin[i],begin[j]);
-		}
-		gram_matrix.diagonal().array() += 1e-3*gram_matrix.trace();
-		DenseVector rhs = DenseVector::Ones(k);
-		DenseVector weights = gram_matrix.ldlt().solve(rhs);
-		weights /= weights.sum();
-
-		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1.0));
-		for (int i=0; i<k; ++i)
-		{
-			sparse_triplets.push_back(SparseTriplet(current_neighbors[i],iter-begin,
-			                                        -weights[i]));
-			sparse_triplets.push_back(SparseTriplet(iter-begin,current_neighbors[i],
-			                                        -weights[i]));
-			for (int j=0; j<k; ++j)
-				sparse_triplets.push_back(SparseTriplet(current_neighbors[i],current_neighbors[j],
-				                                        +gram_matrix(i,j)));
-		}
-	}
-
-	WeightMatrix weight_matrix(end-begin,end-begin);
-	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
-	return weight_matrix;
-}
-
 EmbeddingMatrix eigen_embedding(WeightMatrix wm, unsigned int target_dimension)
 {
-	Eigen::MatrixXd O(wm.rows(), target_dimension);
+	/*
+	/// ARPACK based eigendecomposition
+	int N = wm.cols();
+	double* eigenvalues_vector = SG_MALLOC(double, N);
+	double* eigenvectors = SG_MALLOC(double, (target_dimension+1)*N);
+	int eigenproblem_status = 0;
+	Eigen::MatrixXd weight_matrix = Eigen::MatrixXd::Zero(N,N);
+	weight_matrix += wm;
+	shogun::arpack_dsxupd(weight_matrix.data(), NULL, false, N, target_dimension+1,
+	                      "LA", true, 3, true, false, -1e-3, 0.0,
+	                      eigenvalues_vector, weight_matrix.data(), eigenproblem_status);
+	Eigen::MatrixXd embedding_feature_matrix = Eigen::MatrixXd::Zero(N,target_dimension);
+	for (int i=0; i<target_dimension; i++)
+	{
+		for (int j=0; j<N; j++)
+			embedding_feature_matrix(j,i) = 
+				weight_matrix.data()[j*(target_dimension+1)+i+1];
+	}
+	SG_FREE(eigenvalues_vector);
+	SG_FREE(eigenvectors);
+	return embedding_feature_matrix;
+	*/
+	/*
+	/// LAPACK based eigendecomposition
+	int N = wm.cols();
+	double* eigenvalues_vector = SG_MALLOC(double, N);
+	double* eigenvectors = SG_MALLOC(double, (target_dimension+1)*N);
+	int eigenproblem_status = 0;
+	Eigen::MatrixXd weight_matrix = Eigen::MatrixXd::Zero(N,N);
+	weight_matrix += wm;
+	weight_matrix.diagonal().array() -= 1e-5;
+	shogun::wrap_dsyevr('V','U',N,weight_matrix.data(),N,2,target_dimension+2,
+	                    eigenvalues_vector,eigenvectors,&eigenproblem_status);
+	EmbeddingMatrix embedding_feature_matrix(target_dimension,N);
+	for (int i=0; i<target_dimension; i++)
+	{
+		for (int j=0; j<N; j++)
+			embedding_feature_matrix(i,j) = eigenvectors[i*N+j];
+	}
+	SG_FREE(eigenvectors);
+	SG_FREE(eigenvalues_vector);
+	return embedding_feature_matrix.transpose();
+	*/
+
+	cout << "Embedding" << endl;
+	shogun::CTime time(true);
+	Eigen::MatrixXd O(wm.rows(), target_dimension+1);
 	for (int i=0; i<O.rows(); ++i)
 	{
 		int j=0;
@@ -194,10 +142,13 @@ EmbeddingMatrix eigen_embedding(WeightMatrix wm, unsigned int target_dimension)
 			O(i,j) = len*cos(2.f*M_PI*v2);
 		}
 	}
+	cout << "Solver creation" << endl;
 	Eigen::SuperLU<WeightMatrix> solver;
 	solver.compute(wm);
+	cout << "Factorized" << endl;
 
 	Eigen::MatrixXd Y = solver.solve(O);
+	cout << "Solved" << endl;
 	for (int i=0; i<Y.cols(); i++)
 	{
 		for (int j=0; j<i; j++)
@@ -214,10 +165,15 @@ EmbeddingMatrix eigen_embedding(WeightMatrix wm, unsigned int target_dimension)
 		Y.col(i) *= (1.f / norm);
 	}
 
-	Eigen::MatrixXd B1 = solver.solve(Y);
-	Eigen::MatrixXd B = Y.householderQr().solve(B1);
+	DenseMatrix B1 = solver.solve(Y);
+	DenseMatrix B = Y.householderQr().solve(B1);
 	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenOfB(B);
-	return Y*eigenOfB.eigenvectors();
+	Eigen::MatrixXd embedding = Y*eigenOfB.eigenvectors();
+	cout << "eigenproblem took " << time.cur_time_diff() << endl;
+	cout << "embedding # cols " << embedding.cols() << endl;
+	cout << "embedding # rows " << embedding.rows() << endl;
+	return embedding.block(0, 1, wm.cols(), target_dimension);
+
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
@@ -244,6 +200,9 @@ Eigen::MatrixXd embed(
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			break;
 		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT:
+			neighbors = find_neighbors(begin,end,callback,k);
+			weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
+			embedding_matrix = eigen_embedding(weight_matrix,target_dimension);
 			break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
 			break;
@@ -258,6 +217,8 @@ Eigen::MatrixXd embed(
 		case ISOMAP:
 			break;
 		case MULTIDIMENSIONAL_SCALING:
+			break;
+		default:
 			break;
 	}
 	return embedding_matrix;

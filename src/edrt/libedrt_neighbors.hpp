@@ -1,54 +1,52 @@
 #ifndef libedrt_neighbors_h_
 #define libedrt_neighbors_h_
-struct covertree_point_t
+
+template <class DistanceRecord>
+struct distances_comparator
 {
-public:
-
-	covertree_point_t(int index, double (*measure)(int, int, const void*), const void* udata)
+	bool operator()(const DistanceRecord& l, const DistanceRecord& r) 
 	{
-		point_index = index;
-		distance_measure = measure;
-		user_data = udata;
-	}
-
-	inline bool operator==(const covertree_point_t& p) const
-	{ 
-		return (p.point_index==point_index); 
-	}
-
-	int point_index;
-	double (*distance_measure)(int, int, const void*);
-	const void* user_data;
-};
-
-struct covertree_kernel_point_t : covertree_point_t
-{
-	covertree_kernel_point_t(int index, double (*kernel_f)(int, int, const void*), const void* udata) :
-		covertree_point_t(index,kernel_f,udata)
-	{
-		kii = distance_measure(point_index, point_index, user_data);
-	}
-	inline double distance(const covertree_kernel_point_t& p) const
-	{
-		return kii+p.kii-2.0*distance_measure(point_index, p.point_index, user_data); 
-	}
-	double kii;
-};
-
-struct covertree_distance_point_t : covertree_point_t
-{
-	covertree_distance_point_t(int index, double (*distance_f)(int, int, const void*), const void* udata) :
-		covertree_point_t(index,distance_f,udata) { };
-	inline double distance(const covertree_distance_point_t& p) const
-	{
-		return distance_measure(point_index, p.point_index, user_data); 
+		return (l.second < r.second);
 	}
 };
 
-int* neighbors_matrix(
-		int N, 
-		int k,
-		double (*distance)(int, int, const void*),
-		double (*kernel)(int, int, const void*), 
-		const void* user_data);
+template <class RandomAccessIterator, class PairwiseCallback>
+Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, 
+                         PairwiseCallback callback, unsigned int k)
+{
+	typedef std::pair<RandomAccessIterator, double> DistanceRecord;
+	typedef std::vector<DistanceRecord> Distances;
+	
+	cout << "K = " << k << endl;
+
+	Neighbors neighbors;
+	neighbors.reserve(end-begin);
+	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+	{
+		Distances distances;
+		for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
+		distances.push_back(make_pair(around_iter, callback(*around_iter,*around_iter) + callback(*iter,*iter) - 2*callback(*iter,*around_iter)));
+		
+		std::sort(distances.begin(),distances.end(),
+		                  distances_comparator<DistanceRecord>());
+
+		/*
+		for (typename Distances::iterator it=distances.begin(); it!=distances.begin()+k+1; ++it)
+		{
+			cout << "[" << it->second << "," << *(it->first) << "],";
+		}
+		cout << endl;
+		*/
+
+		LocalNeighbors local_neighbors;
+		local_neighbors.reserve(k);
+		for (typename Distances::const_iterator neighbors_iter=distances.begin()+1; 
+				neighbors_iter!=distances.begin()+k+1; ++neighbors_iter)
+			local_neighbors.push_back(neighbors_iter->first - begin);
+		neighbors.push_back(local_neighbors);
+	}
+
+	return neighbors;
+}
+
 #endif

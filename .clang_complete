@@ -1,1 +1,3 @@
 -I/usr/include/superlu
+-I/usr/include/atlas
+
