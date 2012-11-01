@@ -98,13 +98,9 @@ Eigen::MatrixXd embed(
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			break;
 		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT:
-		{
-			shogun::CTime time(true);
 			neighbors = find_neighbors(begin,end,callback,k);
 			weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
 			embedding_matrix = eigen_embedding<arpack_dsxupd>()(weight_matrix,target_dimension);
-			cout << "Embedding took " << time.cur_time_diff() << endl;
-		}
 			break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
 			break;
