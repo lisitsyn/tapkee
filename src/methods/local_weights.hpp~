@@ -1,7 +1,7 @@
 #ifndef libedrt_methods_h_
 #define libedrt_methods_h_
 
-#include "libedrt_defines.hpp"
+#include "defines.hpp"
 #include <iostream>
 #include <shogun/lib/SGMatrix.h>
 
@@ -76,6 +76,7 @@ WeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterato
 		//for (int i=0; i<target_dimension; ++i)
 		//	cout << sae_solver.eigenvalues()[k-target_dimension+i] << ", ";
 		//cout << " ]" << endl;
+		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1e-8));
 		for (int i=0; i<k; ++i)
 		{
 			sparse_triplets.push_back(SparseTriplet(current_neighbors[i],current_neighbors[i],1.0));

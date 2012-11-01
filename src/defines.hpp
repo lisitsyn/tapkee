@@ -8,7 +8,6 @@
 typedef Eigen::MatrixXd DenseMatrix;
 typedef std::vector<int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
-//typedef Eigen::MatrixXd WeightMatrix;
 typedef Eigen::SparseMatrix<double> WeightMatrix;
 typedef Eigen::MatrixXd EmbeddingMatrix;
 

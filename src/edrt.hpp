@@ -18,10 +18,10 @@
 #include <eigen3/Eigen/SparseCore>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/SuperLUSupport>
-#include "libedrt_defines.hpp"
-#include "libedrt_methods.hpp"
-#include "libedrt_neighbors.hpp"
-#include "libedrt_embedding.hpp"
+#include "defines.hpp"
+#include "methods/local_weights.hpp"
+#include "neighbors/neighbors.hpp"
+#include "methods/eigen_embedding.hpp"
 
 using std::cout;
 using std::endl;
@@ -47,7 +47,7 @@ struct edrt_options_t
 {
 	edrt_options_t()
 	{
-		method = KERNEL_LOCALLY_LINEAR_EMBEDDING;
+		method = KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
 		num_threads = 1;
 		use_arpack = true;
 		use_superlu = true;
@@ -98,9 +98,13 @@ Eigen::MatrixXd embed(
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			break;
 		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT:
+		{
+			shogun::CTime time(true);
 			neighbors = find_neighbors(begin,end,callback,k);
 			weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
 			embedding_matrix = eigen_embedding<arpack_dsxupd>()(weight_matrix,target_dimension);
+			cout << "Embedding took " << time.cur_time_diff() << endl;
+		}
 			break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
 			break;

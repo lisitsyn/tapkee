@@ -1,4 +1,11 @@
-#include "edrt/libedrt.hpp"
+/*
+ *
+ *
+ * Copyright (c) 2012, Sergey Lisitsyn
+ * All rights reserved.
+ */
+
+#include "edrt.hpp"
 
 #include <shogun/features/DenseFeatures.h>
 #include <shogun/kernel/LinearKernel.h>
@@ -17,7 +24,7 @@ using namespace std;
 struct kernel_callback
 {
 	kernel_callback(CKernel* kernel) : _kernel(kernel) {};
-	double operator()(int a, int b)
+	double operator()(int a, int b) const
 	{
 		return _kernel->kernel(a, b);
 	}
@@ -29,6 +36,7 @@ int main(int argc, const char** argv)
 {
 	if (argc!=2)
 	{
+		printf("No parameters specified.\n");
 		exit(EXIT_FAILURE);
 	}
 	ifstream ifs("input.dat");

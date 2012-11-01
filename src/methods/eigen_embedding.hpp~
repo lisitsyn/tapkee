@@ -1,11 +1,17 @@
 #ifndef libedrt_embedding_h_
 #define libedrt_embedding_h_
 
-#include "libedrt_defines.hpp"
+#include "defines.hpp"
 
+#include <eigen3/Eigen/SuperLUSupport>
 #include <shogun/lib/Time.h>
 #include <shogun/mathematics/arpack.h>
 #include <shogun/mathematics/lapack.h>
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 enum eigen_embedding_methods
 {
@@ -31,10 +37,10 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 	double* eigenvalues_vector = SG_MALLOC(double, N);
 	double* eigenvectors = SG_MALLOC(double, (target_dimension+1)*N);
 	int eigenproblem_status = 0;
-	Eigen::MatrixXd weight_matrix = Eigen::MatrixXd::Zero(N,N);
+	DenseMatrix weight_matrix = DenseMatrix::Zero(N,N);
 	weight_matrix += wm;
 	shogun::arpack_dsxupd(weight_matrix.data(), NULL, false, N, target_dimension+1,
-	                      "LA", true, 3, true, false, -1e-9, 0.0,
+	                      "LA", true, 3, true, false, 0.0, 0.0,
 	                      eigenvalues_vector, weight_matrix.data(), eigenproblem_status);
 	Eigen::MatrixXd embedding_feature_matrix = Eigen::MatrixXd::Zero(N,target_dimension);
 	for (int i=0; i<target_dimension; i++)
@@ -107,6 +113,7 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 		}
 	}
 	cout << "Solver creation" << endl;
+	//Eigen::ConjugateGradient<WeightMatrix,Eigen::Upper> solver;
 	Eigen::SuperLU<WeightMatrix> solver;
 	solver.compute(wm);
 	cout << "Factorized" << endl;
@@ -132,7 +139,17 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 	DenseMatrix B1 = solver.solve(Y);
 	DenseMatrix B = Y.householderQr().solve(B1);
 	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenOfB(B);
-	Eigen::MatrixXd embedding = Y*eigenOfB.eigenvectors();
+	DenseMatrix embedding = Y*eigenOfB.eigenvectors();
+
+	/* refinements idea (drop probably)
+	const int n_refinements = 20;
+	for (int r=0; r<n_refinements; r++)
+	{
+		embedding = solver.solve(embedding);
+		embedding /= embedding.norm();
+	}
+	*/
+
 	cout << "eigenproblem took " << time.cur_time_diff() << endl;
 	cout << "embedding # cols " << embedding.cols() << endl;
 	cout << "embedding # rows " << embedding.rows() << endl;
