@@ -6,7 +6,7 @@ OBJECTS=$(SOURCES:%.cpp=%.o)
 all: hd
 
 hd: 
-	$(CXX) -fPIC -o application src/main.cpp -I/usr/include/atlas -I/usr/include/superlu -lshogun -lsuperlu -O3 $(LDFLAGS)
+	$(CXX) -fPIC -fno-exceptions -fno-rtti -o application src/main.cpp -I/usr/include/atlas -I/usr/include/superlu -lshogun -lsuperlu -O3 $(LDFLAGS)
 
 clean:
 	rm $(OBJECTS)

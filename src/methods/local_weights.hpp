@@ -4,6 +4,8 @@
 #include "../defines.hpp"
 #include <iostream>
 #include <shogun/lib/SGMatrix.h>
+#include <ctime>
+#include "../utils/time.hpp"
 
 using std::cout;
 using std::endl;
@@ -16,7 +18,8 @@ WeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterato
 	typedef Eigen::MatrixXd DenseMatrix;
 	typedef Eigen::Triplet<double> SparseTriplet;
 	typedef std::vector<SparseTriplet> SparseTriplets;
-	
+
+	timed_context context("KLTSA weight matrix computation");
 	int k = neighbors[0].size();
 
 	SparseTriplets sparse_triplets;
@@ -89,6 +92,7 @@ WeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterato
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
 	cout << weight_matrix.cols() << endl;
 	cout << weight_matrix.rows() << endl;
+
 	return weight_matrix;
 }
 template <class RandomAccessIterator, class PairwiseCallback>
@@ -100,6 +104,7 @@ WeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIterator
 	typedef Eigen::Triplet<double> SparseTriplet;
 	typedef std::vector<SparseTriplet> SparseTriplets;
 	
+	timed_context context("KLLE weight computation");
 	int k = neighbors[0].size();
 
 	SparseTriplets sparse_triplets;

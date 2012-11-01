@@ -2,6 +2,7 @@
 #define libedrt_embedding_h_
 
 #include "../defines.hpp"
+#include "../utils/time.hpp"
 
 #include <eigen3/Eigen/SuperLUSupport>
 #include <shogun/lib/Time.h>
@@ -31,8 +32,7 @@ class eigen_embedding<arpack_dsxupd>
 public:
 EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 {
-	shogun::CTime time(true);
-	/// ARPACK based eigendecomposition
+	timed_context context("ARPACK DSXUPD eigendecomposition");
 	int N = wm.cols();
 	double* eigenvalues_vector = SG_MALLOC(double, N);
 	double* eigenvectors = SG_MALLOC(double, (target_dimension+1)*N);
@@ -51,7 +51,6 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 	}
 	SG_FREE(eigenvalues_vector);
 	SG_FREE(eigenvectors);
-	cout << "eigenproblem took " << time.cur_time_diff() << endl;
 	return embedding_feature_matrix;
 }
 };
@@ -62,7 +61,7 @@ class eigen_embedding<lapack_dsyevr>
 public:
 EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 {
-	/// LAPACK based eigendecomposition
+	timed_context context("LAPACK DSYEVR eigendecomposition");
 	int N = wm.cols();
 	double* eigenvalues_vector = SG_MALLOC(double, N);
 	double* eigenvectors = SG_MALLOC(double, (target_dimension+1)*N);
@@ -90,8 +89,7 @@ class eigen_embedding<randomized_shift_inverse>
 public:
 EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 {
-	cout << "Embedding" << endl;
-	shogun::CTime time(true);
+	timed_context context("Randomized eigendecomposition");
 	Eigen::MatrixXd O(wm.rows(), target_dimension+1);
 	for (int i=0; i<O.rows(); ++i)
 	{
@@ -150,7 +148,6 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 	}
 	*/
 
-	cout << "eigenproblem took " << time.cur_time_diff() << endl;
 	cout << "embedding # cols " << embedding.cols() << endl;
 	cout << "embedding # rows " << embedding.rows() << endl;
 	return embedding.block(0, 1, wm.cols(), target_dimension);

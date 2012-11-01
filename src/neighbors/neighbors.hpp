@@ -4,6 +4,9 @@
 #include "../defines.hpp"
 #include "covertree.hpp"
 #include <vector>
+#include <utility>
+
+using std::pair;
 
 template <class DistanceRecord>
 struct distances_comparator
@@ -19,9 +22,9 @@ struct kernel_distance
 {
 	kernel_distance(const KernelCallback& kc) : kc_(kc) {};
 	KernelCallback kc_;
-	double operator()(const RandomAccessIterator& l, const RandomAccessIterator& r) const
+	double operator()(const pair<double, RandomAccessIterator>& l, const pair<double, RandomAccessIterator>& r) const
 	{
-		return kc_(*l,*l) + kc_(*r,*r) - 2*kc_(*l,*r);
+		return l.first + r.first - 2*kc_(*(l.second),*(r.second));
 	}
 };
 
@@ -29,30 +32,31 @@ template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, 
                          PairwiseCallback callback, unsigned int k)
 {
-	cout << "Using covertree" << endl;
-	kernel_distance<RandomAccessIterator, PairwiseCallback> kd(callback);
-	CoverTree<double, RandomAccessIterator, kernel_distance<RandomAccessIterator, PairwiseCallback> > ct(kd);
+	timed_context context("Covertree-based neighbors search");
 
-	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+	kernel_distance<RandomAccessIterator, PairwiseCallback> kd(callback);
+	CoverTree<double, pair<double, RandomAccessIterator>, kernel_distance<RandomAccessIterator, PairwiseCallback> > ct(kd);
+
 	{
-		ct.insert(iter);
+		timed_context ct_context("Covertree construction");
+		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+			ct.insert(make_pair(callback(*iter,*iter),iter));
 	}
 	
 	Neighbors neighbors;
 	neighbors.reserve(end-begin);
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
-		typedef std::vector< RandomAccessIterator > QueryResult;
-		QueryResult query = ct.knn(iter,k);
+		typedef std::vector< pair<double, RandomAccessIterator> > QueryResult;
+		QueryResult query = ct.knn(make_pair(callback(*iter,*iter),iter),k);
 		
 		LocalNeighbors local_neighbors;
 		local_neighbors.reserve(k);
 		for (typename QueryResult::const_iterator neighbors_iter=query.begin(); 
 				neighbors_iter!=query.end(); ++neighbors_iter)
-			local_neighbors.push_back(*neighbors_iter-begin);
+			local_neighbors.push_back(neighbors_iter->second-begin);
 		neighbors.push_back(local_neighbors);
 	}
-	cout << "Done " << endl;
 	return neighbors;
 
 	/*
