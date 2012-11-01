@@ -91,16 +91,22 @@ Eigen::MatrixXd embed(
 	switch (options.method)
 	{
 		case KERNEL_LOCALLY_LINEAR_EMBEDDING:
-			neighbors = find_neighbors(begin,end,callback,k);
-			weight_matrix = klle_weight_matrix(begin,end,neighbors,callback);
-			embedding_matrix = eigen_embedding<randomized_shift_inverse>()(weight_matrix,target_dimension);
+			{
+				timed_context context("Embedding with KLLE");
+				neighbors = find_neighbors(begin,end,callback,k);
+				weight_matrix = klle_weight_matrix(begin,end,neighbors,callback);
+				embedding_matrix = eigen_embedding<randomized_shift_inverse>()(weight_matrix,target_dimension);
+			}
 			break;
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			break;
 		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT:
-			neighbors = find_neighbors(begin,end,callback,k);
-			weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
-			embedding_matrix = eigen_embedding<arpack_dsxupd>()(weight_matrix,target_dimension);
+			{
+				timed_context context("Embedding with KLTSA");
+				neighbors = find_neighbors(begin,end,callback,k);
+				weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
+				embedding_matrix = eigen_embedding<arpack_dsxupd>()(weight_matrix,target_dimension);
+			}
 			break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
 			break;

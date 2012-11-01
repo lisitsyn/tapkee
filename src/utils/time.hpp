@@ -2,12 +2,16 @@
 #define TIME_H_
 #include <ctime>
 #include <string>
-#include <stdio.h>
+#include <iostream>
+#include "logging.hpp"
+
+using std::string;
+using std::stringstream;
 
 struct timed_context
 {
 	clock_t start_clock;
-	std::string operation_name;
+	string operation_name;
 	timed_context(const std::string& name)
 	{
 		operation_name = name;
@@ -15,7 +19,9 @@ struct timed_context
 	}
 	~timed_context()
 	{
-		printf("%s took %f seconds\n",operation_name.c_str(),double(clock()-start_clock)/CLOCKS_PER_SEC);
+		stringstream msg_stream;
+		msg_stream << operation_name << " took " << double(clock()-start_clock)/CLOCKS_PER_SEC << " seconds"; 
+		LoggingSingleton::instance().benchmark(msg_stream.str());
 	}
 };
 #endif
