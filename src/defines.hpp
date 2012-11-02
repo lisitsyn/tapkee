@@ -1,5 +1,14 @@
-#ifndef libedrt_defines
-#define libedrt_defines
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Copyright (c) 2012, Sergey Lisitsyn
+ */
+
+#ifndef EDRT_DEFINES_H_
+#define EDRT_DEFINES_H_
 
 #include <vector>
 #include <string>
@@ -8,27 +17,17 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 
-template<bool> struct basic_static_assert
+enum EDRT_NEIGHBORS_METHOD
 {
-	basic_static_assert();
+	BRUTE_FORCE,
+	COVER_TREE
 };
 
-template<> struct basic_static_assert<true>
+enum EDRT_EIGEN_EMBEDDING_METHOD
 {
-	basic_static_assert()
-	{
-	}
-};
-
-#define STATIC_ASSERT(cond, msg) \
-{ \
-	class ERROR_##msg {}; \
-	(void)sizeof(basic_static_assert<(cond != 0)>(ERROR_##msg()));\
-}
-
-template<class PairwiseCallback>
-struct CallbackTraits
-{
+	ARPACK_XSXUPD,
+	LAPACK_XSYEVR,
+	RANDOMIZED_INVERSE
 };
 
 enum EDRT_METHOD
@@ -52,7 +51,9 @@ enum EDRT_PARAMETERS
 	REDUCTION_METHOD,
 	NUMBER_OF_NEIGHBORS,
 	TARGET_DIMENSIONALITY,
-	CURRENT_DIMENSIONALITY
+	CURRENT_DIMENSIONALITY,
+	EIGEN_EMBEDDING_METHOD,
+	NEIGHBORS_METHOD
 };
 
 typedef Eigen::Triplet<double> SparseTriplet;

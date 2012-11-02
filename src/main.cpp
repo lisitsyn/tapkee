@@ -1,8 +1,10 @@
 /*
- *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  *
  * Copyright (c) 2012, Sergey Lisitsyn
- * All rights reserved.
  */
 
 #include "edrt.hpp"
@@ -10,7 +12,6 @@
 
 #include <shogun/features/DenseFeatures.h>
 #include <shogun/kernel/LinearKernel.h>
-#include <shogun/converter/KernelLocallyLinearEmbedding.h>
 #include <algorithm>
 #include <string>
 #include <istream>
@@ -21,7 +22,6 @@
 using namespace Eigen;
 using namespace shogun;
 using namespace std;
-
 
 struct kernel_callback
 {
@@ -62,8 +62,10 @@ int main(int argc, const char** argv)
 
 	ParametersMap parameters;
 	parameters[REDUCTION_METHOD] = KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	parameters[NUMBER_OF_NEIGHBORS] = atoi(argv[1]);
-	parameters[TARGET_DIMENSIONALITY] = 2;
+	parameters[NEIGHBORS_METHOD] = COVER_TREE;
+	parameters[EIGEN_EMBEDDING_METHOD] = RANDOMIZED_INVERSE;
+	parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(atoi(argv[1]));
+	parameters[TARGET_DIMENSIONALITY] = static_cast<unsigned int>(2);
 
 	// Load data
 	vector< vector<double> > input_data = read_data("input.dat");

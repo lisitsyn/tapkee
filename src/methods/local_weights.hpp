@@ -1,14 +1,21 @@
-#ifndef libedrt_methods_h_
-#define libedrt_methods_h_
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Copyright (c) 2012, Sergey Lisitsyn
+ */
+
+#ifndef EDRT_LOCAL_METHODS_H_
+#define EDRT_LOCAL_METHODS_H_
 
 #include "../defines.hpp"
-#include <iostream>
-#include <shogun/lib/SGMatrix.h>
 #include "../utils/time.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>
-WeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
-                                Neighbors neighbors, PairwiseCallback callback, unsigned int target_dimension)
+WeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
+                                 const Neighbors& neighbors, const PairwiseCallback& callback, unsigned int target_dimension)
 {
 	timed_context context("KLTSA weight matrix computation");
 	int k = neighbors[0].size();
@@ -46,7 +53,7 @@ WeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterato
 		gram_matrix.rowwise() -= col_means.transpose();
 		gram_matrix.colwise() -= row_means;
 		
-		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> sae_solver;
+		Eigen::SelfAdjointEigenSolver<DenseMatrix> sae_solver;
 		sae_solver.compute(gram_matrix);
 
 		DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
@@ -70,8 +77,8 @@ WeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterato
 	return weight_matrix;
 }
 template <class RandomAccessIterator, class PairwiseCallback>
-WeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
-                                Neighbors neighbors, PairwiseCallback callback)
+WeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
+                                const Neighbors& neighbors, const PairwiseCallback& callback)
 {
 	timed_context context("KLLE weight computation");
 	int k = neighbors[0].size();
@@ -122,5 +129,4 @@ WeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIterator
 
 	return weight_matrix;
 }
-
 #endif

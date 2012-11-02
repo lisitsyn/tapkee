@@ -1,11 +1,22 @@
-#ifndef libedrt_neighbors_h_
-#define libedrt_neighbors_h_
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Copyright (c) 2012, Sergey Lisitsyn
+ */
+
+#ifndef EDRT_NEIGHBORS_H_
+#define EDRT_NEIGHBORS_H_
 
 #include "../defines.hpp"
 #include "covertree.hpp"
 #include <vector>
 #include <utility>
+#include <algorithm>
 
+using std::partial_sort;
 using std::pair;
 
 template <class DistanceRecord>
@@ -29,7 +40,7 @@ struct kernel_distance
 };
 
 template <class RandomAccessIterator, class PairwiseCallback>
-Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, 
+Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
                          PairwiseCallback callback, unsigned int k)
 {
 	timed_context context("Covertree-based neighbors search");
@@ -61,8 +72,8 @@ Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end,
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
-Neighbors find_neighbors_sort(RandomAccessIterator begin, RandomAccessIterator end, 
-                         PairwiseCallback callback, unsigned int k)
+Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
+                                         const PairwiseCallback& callback, unsigned int k)
 {
 	timed_context context("Distance sorting based neighbors search");
 	typedef std::pair<RandomAccessIterator, double> DistanceRecord;
@@ -76,8 +87,8 @@ Neighbors find_neighbors_sort(RandomAccessIterator begin, RandomAccessIterator e
 		for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
 			distances.push_back(make_pair(around_iter, callback(*around_iter,*around_iter) + callback(*iter,*iter) - 2*callback(*iter,*around_iter)));
 
-		std::sort(distances.begin(),distances.end(),
-		                  distances_comparator<DistanceRecord>());
+		partial_sort(distances.begin(),distances.begin()+k+1,distances.end(),
+		             distances_comparator<DistanceRecord>());
 
 		LocalNeighbors local_neighbors;
 		local_neighbors.reserve(k);
@@ -88,5 +99,18 @@ Neighbors find_neighbors_sort(RandomAccessIterator begin, RandomAccessIterator e
 	}
 	return neighbors;
 }
+
+template <class RandomAccessIterator, class PairwiseCallback>
+Neighbors find_neighbors(EDRT_NEIGHBORS_METHOD method, const RandomAccessIterator& begin, 
+                         const RandomAccessIterator& end, const PairwiseCallback& callback, 
+                         unsigned int k)
+{
+	switch (method)
+	{
+		case BRUTE_FORCE: return find_neighbors_bruteforce_impl(begin,end,callback,k);
+		case COVER_TREE: return find_neighbors_covertree_impl(begin,end,callback,k);
+	}
+	return Neighbors();
+};
 
 #endif

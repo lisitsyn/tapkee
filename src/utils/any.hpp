@@ -1,4 +1,3 @@
-#pragma once
 /*
  * (C) Copyright Christopher Diggins 2005-2011
  * (C) Copyright Pablo Aguilar 2005
@@ -8,6 +7,9 @@
  * accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt
  */
+
+#ifndef DIGGINS_ANY_H_
+#define DIGGINS_ANY_H_
 
 #include <stdexcept>
 
@@ -24,11 +26,11 @@ namespace anyimpl
 	struct base_any_policy 
 	{
 		virtual ~base_any_policy() {};
-		virtual void static_delete(void** x) = 0;
-		virtual void copy_from_value(void const* src, void** dest) = 0;
-		virtual void clone(void* const* src, void** dest) = 0;
-		virtual void move(void* const* src, void** dest) = 0;
-		virtual void* get_value(void** src) = 0;
+		virtual void static_delete(void**) = 0;
+		virtual void copy_from_value(void const*, void**) = 0;
+		virtual void clone(void* const*, void**) = 0;
+		virtual void move(void* const*, void**) = 0;
+		virtual void* get_value(void**) = 0;
 		virtual size_t get_size() = 0;
 	};
 
@@ -41,7 +43,7 @@ namespace anyimpl
 	template<typename T>
 	struct small_any_policy : typed_base_any_policy<T>
 	{
-		virtual void static_delete(void** x) { }
+		virtual void static_delete(void**) { }
 		virtual void copy_from_value(void const* src, void** dest)
 			{ new(dest) T(*reinterpret_cast<T const*>(src)); }
 		virtual void clone(void* const* src, void** dest) { *dest = *src; }
@@ -214,3 +216,4 @@ public:
         return policy == x.policy;
     }
 };
+#endif
