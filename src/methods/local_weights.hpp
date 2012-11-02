@@ -18,7 +18,7 @@ WeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const Random
                                  const Neighbors& neighbors, const PairwiseCallback& callback, unsigned int target_dimension)
 {
 	timed_context context("KLTSA weight matrix computation");
-	int k = neighbors[0].size();
+	const int k = neighbors[0].size();
 
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve(k*k*(end-begin));
@@ -81,7 +81,7 @@ WeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const RandomA
                                 const Neighbors& neighbors, const PairwiseCallback& callback)
 {
 	timed_context context("KLLE weight computation");
-	int k = neighbors[0].size();
+	const int k = neighbors[0].size();
 
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve(k*k*(end-begin));

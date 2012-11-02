@@ -40,9 +40,10 @@ struct kernel_distance
 };
 
 template <class RandomAccessIterator, class PairwiseCallback>
-Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
-                         PairwiseCallback callback, unsigned int k)
+Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
+                         const PairwiseCallback& callback, unsigned int k)
 {
+	typedef std::vector< pair<double, RandomAccessIterator> > QueryResult;
 	timed_context context("Covertree-based neighbors search");
 
 	kernel_distance<RandomAccessIterator, PairwiseCallback> kd(callback);
@@ -58,14 +59,13 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
 	neighbors.reserve(end-begin);
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
-		typedef std::vector< pair<double, RandomAccessIterator> > QueryResult;
 		QueryResult query = ct.knn(make_pair(callback(*iter,*iter),iter),k);
-		
 		LocalNeighbors local_neighbors;
 		local_neighbors.reserve(k);
 		for (typename QueryResult::const_iterator neighbors_iter=query.begin(); 
-				neighbors_iter!=query.end(); ++neighbors_iter)
+		     neighbors_iter!=query.end(); ++neighbors_iter)
 			local_neighbors.push_back(neighbors_iter->second-begin);
+	
 		neighbors.push_back(local_neighbors);
 	}
 	return neighbors;

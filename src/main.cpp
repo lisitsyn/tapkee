@@ -9,6 +9,7 @@
 
 #include "edrt.hpp"
 #include "utils/time.hpp"
+#include "defines.hpp"
 
 #include <shogun/features/DenseFeatures.h>
 #include <shogun/kernel/LinearKernel.h>
@@ -18,6 +19,7 @@
 #include <fstream>
 #include <vector>
 #include <iterator>
+
 
 using namespace Eigen;
 using namespace shogun;
@@ -32,6 +34,7 @@ struct kernel_callback
 	}
 	CKernel* _kernel;
 };
+
 vector< vector<double> > read_data(const string& filename)
 {
 	ifstream ifs(filename.c_str());
@@ -52,20 +55,61 @@ vector< vector<double> > read_data(const string& filename)
 	return input_data;
 }
 
+EDRT_METHOD parse_reduction_method(const char* str)
+{
+	if (!strcmp(str,"kltsa"))
+		return KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
+	if (!strcmp(str,"klle"))
+		return KERNEL_LOCALLY_LINEAR_EMBEDDING;
+
+	printf("Method %s is not supported (yet?)\n",str);
+	exit(EXIT_FAILURE);
+	return KERNEL_LOCALLY_LINEAR_EMBEDDING;
+}
+
+EDRT_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
+{
+	if (!strcmp(str,"brute"))
+		return BRUTE_FORCE;
+	if (!strcmp(str,"covertree"))
+		return COVER_TREE;
+
+	printf("Method %s is not supported (yet?)\n",str);
+	exit(EXIT_FAILURE);
+	return BRUTE_FORCE;
+}
+
+EDRT_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
+{
+	if (!strcmp(str,"arpack"))
+		return ARPACK_XSXUPD;
+	if (!strcmp(str,"lapack"))
+		return LAPACK_XSYEVR;
+	if (!strcmp(str,"randomized"))
+		return RANDOMIZED_INVERSE;
+
+	printf("Method %s is not supported (yet?)\n",str);
+	exit(EXIT_FAILURE);
+	return RANDOMIZED_INVERSE;
+}
+
 int main(int argc, const char** argv)
 {
-	if (argc!=2)
+	ParametersMap parameters;
+	if (argc!=6)
 	{
 		printf("No parameters specified.\n");
+		printf("Usage is [method] [neighbor_method] [eigen_method] [number of neighbors] [target dimension]\n");
 		exit(EXIT_FAILURE);
 	}
-
-	ParametersMap parameters;
-	parameters[REDUCTION_METHOD] = KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	parameters[NEIGHBORS_METHOD] = COVER_TREE;
-	parameters[EIGEN_EMBEDDING_METHOD] = RANDOMIZED_INVERSE;
-	parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(atoi(argv[1]));
-	parameters[TARGET_DIMENSIONALITY] = static_cast<unsigned int>(2);
+	else
+	{
+		parameters[REDUCTION_METHOD] = parse_reduction_method(argv[1]);
+		parameters[NEIGHBORS_METHOD] = parse_neighbors_method(argv[2]);
+		parameters[EIGEN_EMBEDDING_METHOD] = parse_eigen_method(argv[3]);
+		parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(atoi(argv[4]));
+		parameters[TARGET_DIMENSIONALITY] = static_cast<unsigned int>(atoi(argv[5]));
+	}
 
 	// Load data
 	vector< vector<double> > input_data = read_data("input.dat");
