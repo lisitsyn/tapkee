@@ -17,6 +17,9 @@ class CoverTree
 
   struct Node
   {
+    Node() : data(), children() 
+    {
+    }
     Point data;
     typedef boost::ptr_list<Node> ChildrenLevelContainer;
     typedef boost::unordered_map<int, ChildrenLevelContainer> ChildrenContainer;
@@ -164,7 +167,7 @@ class CoverTree
 
 public:
   CoverTree(const Distance& distance)
-    :max_level(default_max_level), min_level(default_max_level), distance(distance)
+    : max_level(default_max_level), min_level(default_max_level), distance(distance), root(NULL)
   {
   }
 

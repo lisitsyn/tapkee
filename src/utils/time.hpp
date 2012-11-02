@@ -12,10 +12,8 @@ struct timed_context
 {
 	clock_t start_clock;
 	string operation_name;
-	timed_context(const std::string& name)
+	timed_context(const std::string& name) : start_clock(clock()), operation_name(name)
 	{
-		operation_name = name;
-		start_clock = clock();
 	}
 	~timed_context()
 	{

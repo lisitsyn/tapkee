@@ -33,7 +33,7 @@ public:
 EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 {
 	timed_context context("ARPACK DSXUPD eigendecomposition");
-	int N = wm.cols();
+	unsigned int N = wm.cols();
 	double* eigenvalues_vector = SG_MALLOC(double, N);
 	double* eigenvectors = SG_MALLOC(double, (target_dimension+1)*N);
 	int eigenproblem_status = 0;
@@ -42,10 +42,10 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 	shogun::arpack_dsxupd(weight_matrix.data(), NULL, false, N, target_dimension+1,
 	                      "LA", true, 3, true, false, 0.0, 0.0,
 	                      eigenvalues_vector, weight_matrix.data(), eigenproblem_status);
-	Eigen::MatrixXd embedding_feature_matrix = Eigen::MatrixXd::Zero(N,target_dimension);
-	for (int i=0; i<target_dimension; i++)
+	DenseMatrix embedding_feature_matrix = DenseMatrix::Zero(N,target_dimension);
+	for (unsigned int i=0; i<target_dimension; i++)
 	{
-		for (int j=0; j<N; j++)
+		for (unsigned int j=0; j<N; j++)
 			embedding_feature_matrix(j,i) = 
 				weight_matrix.data()[j*(target_dimension+1)+i+1];
 	}
@@ -62,7 +62,7 @@ public:
 EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 {
 	timed_context context("LAPACK DSYEVR eigendecomposition");
-	int N = wm.cols();
+	unsigned int N = wm.cols();
 	double* eigenvalues_vector = SG_MALLOC(double, N);
 	double* eigenvectors = SG_MALLOC(double, (target_dimension+1)*N);
 	int eigenproblem_status = 0;
@@ -72,9 +72,9 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 	shogun::wrap_dsyevr('V','U',N,weight_matrix.data(),N,2,target_dimension+2,
 	                    eigenvalues_vector,eigenvectors,&eigenproblem_status);
 	EmbeddingMatrix embedding_feature_matrix(target_dimension,N);
-	for (int i=0; i<target_dimension; i++)
+	for (unsigned int i=0; i<target_dimension; i++)
 	{
-		for (int j=0; j<N; j++)
+		for (unsigned int j=0; j<N; j++)
 			embedding_feature_matrix(i,j) = eigenvectors[i*N+j];
 	}
 	SG_FREE(eigenvectors);
@@ -89,9 +89,11 @@ class eigen_embedding<randomized_shift_inverse>
 public:
 EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 {
+	const int eigenvalues_skip = 1;
+
 	timed_context context("Randomized eigendecomposition");
 	
-	Eigen::MatrixXd O(wm.rows(), target_dimension+1);
+	DenseMatrix O(wm.rows(), target_dimension+eigenvalues_skip);
 	for (int i=0; i<O.rows(); ++i)
 	{
 		int j=0;
@@ -111,14 +113,11 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 			O(i,j) = len*cos(2.f*M_PI*v2);
 		}
 	}
-	cout << "Solver creation" << endl;
-	//Eigen::ConjugateGradient<WeightMatrix,Eigen::Upper> solver;
+	// TODO parametrize or define
 	Eigen::SuperLU<WeightMatrix> solver;
 	solver.compute(wm);
-	cout << "Factorized" << endl;
 
-	Eigen::MatrixXd Y = solver.solve(O);
-	cout << "Solved" << endl;
+	DenseMatrix Y = solver.solve(O);
 	for (int i=0; i<Y.cols(); i++)
 	{
 		for (int j=0; j<i; j++)
@@ -148,10 +147,7 @@ EmbeddingMatrix operator()(WeightMatrix wm, unsigned int target_dimension)
 		embedding /= embedding.norm();
 	}
 	*/
-
-	cout << "embedding # cols " << embedding.cols() << endl;
-	cout << "embedding # rows " << embedding.rows() << endl;
-	return embedding.block(0, 1, wm.cols(), target_dimension);
+	return embedding.block(0, eigenvalues_skip, wm.cols(), target_dimension);
 }
 };
 #endif

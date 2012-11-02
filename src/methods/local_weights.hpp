@@ -6,9 +6,6 @@
 #include <shogun/lib/SGMatrix.h>
 #include "../utils/time.hpp"
 
-using std::cout;
-using std::endl;
-
 template <class RandomAccessIterator, class PairwiseCallback>
 WeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
                                 Neighbors neighbors, PairwiseCallback callback, unsigned int target_dimension)

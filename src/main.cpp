@@ -22,6 +22,7 @@ using namespace Eigen;
 using namespace shogun;
 using namespace std;
 
+
 struct kernel_callback
 {
 	kernel_callback(CKernel* kernel) : _kernel(kernel) {};
@@ -31,7 +32,6 @@ struct kernel_callback
 	}
 	CKernel* _kernel;
 };
-
 vector< vector<double> > read_data(const string& filename)
 {
 	ifstream ifs(filename.c_str());
@@ -60,6 +60,11 @@ int main(int argc, const char** argv)
 		exit(EXIT_FAILURE);
 	}
 
+	ParametersMap parameters;
+	parameters[REDUCTION_METHOD] = KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
+	parameters[NUMBER_OF_NEIGHBORS] = atoi(argv[1]);
+	parameters[TARGET_DIMENSIONALITY] = 2;
+
 	// Load data
 	vector< vector<double> > input_data = read_data("input.dat");
 
@@ -80,8 +85,7 @@ int main(int argc, const char** argv)
 	kernel_callback cb(kernel);
 
 	// Embed
-	edrt_options_t options;
-	DenseMatrix embedding = embed(data_indices.begin(),data_indices.end(),cb,options,2,0,atoi(argv[1]));
+	DenseMatrix embedding = embed(data_indices.begin(),data_indices.end(),cb,parameters);
 
 	// Save obtained data
 	ofstream ofs("output.dat");

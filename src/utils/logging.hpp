@@ -11,10 +11,7 @@ using std::string;
 class LoggingSingleton
 {
 	private:
-		LoggingSingleton()
-		{
-			os_ = &cout;
-		}
+		LoggingSingleton() : os_(&cout) {};
 		LoggingSingleton(const LoggingSingleton& ls);
 		void operator=(const LoggingSingleton& ls);
 
