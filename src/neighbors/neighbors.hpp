@@ -59,10 +59,10 @@ Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const
 		}
 		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 		{
-			QueryResult query = ct.knn(make_pair(callback(*iter,*iter),iter),k);
+			QueryResult query = ct.knn(make_pair(callback(*iter,*iter),iter),k+1);
 			LocalNeighbors local_neighbors;
 			local_neighbors.reserve(k);
-			for (typename QueryResult::const_iterator neighbors_iter=query.begin(); 
+			for (typename QueryResult::const_iterator neighbors_iter=query.begin()+1; 
 			     neighbors_iter!=query.end(); ++neighbors_iter)
 				local_neighbors.push_back(neighbors_iter->second-begin);
 			neighbors.push_back(local_neighbors);
@@ -79,10 +79,10 @@ Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const
 		}
 		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 		{
-			QueryResult query = ct.knn((iter-begin),k);
+			QueryResult query = ct.knn((iter-begin),k+1);
 			LocalNeighbors local_neighbors;
 			local_neighbors.reserve(k);
-			for (typename QueryResult::const_iterator neighbors_iter=query.begin(); 
+			for (typename QueryResult::const_iterator neighbors_iter=query.begin()+1; 
 			     neighbors_iter!=query.end(); ++neighbors_iter)
 				local_neighbors.push_back(*neighbors_iter);
 			neighbors.push_back(local_neighbors);
