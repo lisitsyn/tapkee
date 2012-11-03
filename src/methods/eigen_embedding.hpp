@@ -19,7 +19,6 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 
-#include <eigen3/Eigen/SuperLUSupport>
 #include <shogun/mathematics/arpack.h>
 #include <shogun/mathematics/lapack.h>
 

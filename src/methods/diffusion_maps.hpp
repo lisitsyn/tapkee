@@ -1,0 +1,6 @@
+#ifdef EDRT_DIFFUSION_MAPS_H_
+#define EDRT_DIFFUSION_MAPS_H_
+
+
+
+#endif

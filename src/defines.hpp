@@ -18,8 +18,13 @@
 #include <utility>
 #include <map>
 #include "utils/any.hpp"
+
+#define EIGEN_NO_DEBUG
+#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
+#include <eigen3/Eigen/SuperLUSupport>
+#undef EIGEN_MATRIXBASE_PLUGIN
 
 enum EDRT_NEIGHBORS_METHOD
 {
@@ -45,7 +50,9 @@ enum EDRT_METHOD
 	LOCALITY_PRESERVING_PROJECTIONS,
 	DIFFUSION_MAPS,
 	ISOMAP,
+	LANDMARK_ISOMAP,
 	MULTIDIMENSIONAL_SCALING,
+	LANDMARK_MULTIDIMENSIONAL_SCALING,
 	STOCHASTIC_PROXIMITY_EMBEDDING,
 	MAXIMUM_VARIANCE_UNFOLDING
 };

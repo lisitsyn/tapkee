@@ -11,8 +11,6 @@
 #include "defines.hpp"
 
 #include <shogun/features/DenseFeatures.h>
-#include <shogun/kernel/LinearKernel.h>
-#include <shogun/distance/EuclideanDistance.h>
 #include <algorithm>
 #include <string>
 #include <istream>
@@ -24,6 +22,11 @@ using namespace Eigen;
 using namespace shogun;
 using namespace std;
 
+struct addition_callback
+{
+
+};
+
 struct kernel_callback
 {
 	kernel_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
@@ -32,6 +35,7 @@ struct kernel_callback
 		return feature_matrix.col(a).dot(feature_matrix.col(b));
 	}
 	const DenseMatrix& feature_matrix;
+	static bool is_kernel() { return true; }
 };
 
 struct distance_callback
@@ -42,6 +46,7 @@ struct distance_callback
 		return (feature_matrix.col(a)-feature_matrix.col(b)).norm();
 	}
 	const DenseMatrix& feature_matrix;
+	static bool is_kernel() { return false; }
 };
 
 DenseMatrix read_data(const string& filename)
@@ -78,6 +83,8 @@ EDRT_METHOD parse_reduction_method(const char* str)
 		return KERNEL_LOCALLY_LINEAR_EMBEDDING;
 	if (!strcmp(str,"mds"))
 		return MULTIDIMENSIONAL_SCALING;
+	if (!strcmp(str,"isomap"))
+		return ISOMAP;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -137,16 +144,17 @@ int main(int argc, const char** argv)
 	// Embed
 	DenseMatrix embedding;
 	init_shogun_with_defaults();
-	if (parameters[REDUCTION_METHOD].cast<EDRT_METHOD>()==MULTIDIMENSIONAL_SCALING)
+	if (parameters[REDUCTION_METHOD].cast<EDRT_METHOD>()==MULTIDIMENSIONAL_SCALING ||
+	    parameters[REDUCTION_METHOD].cast<EDRT_METHOD>()==ISOMAP)
 	{
 		distance_callback dcb(input_data);
-		addition_callback add();
+		addition_callback add;
 		embedding = embed(data_indices.begin(),data_indices.end(),dcb,add,parameters);
 	}
 	else
 	{
 		kernel_callback kcb(input_data);
-		addition_callback add();
+		addition_callback add;
 		embedding = embed(data_indices.begin(),data_indices.end(),kcb,add,parameters);
 	}
 

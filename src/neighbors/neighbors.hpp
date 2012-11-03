@@ -43,30 +43,50 @@ template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
                          const PairwiseCallback& callback, unsigned int k)
 {
-	typedef std::vector< pair<double, RandomAccessIterator> > QueryResult;
 	timed_context context("Covertree-based neighbors search");
 
-	kernel_distance<RandomAccessIterator, PairwiseCallback> kd(callback);
-	CoverTree<double, pair<double, RandomAccessIterator>, kernel_distance<RandomAccessIterator, PairwiseCallback> > ct(kd);
-
-	{
-		timed_context ct_context("Covertree construction");
-		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-			ct.insert(make_pair(callback(*iter,*iter),iter));
-	}
-	
 	Neighbors neighbors;
 	neighbors.reserve(end-begin);
-	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+	if (PairwiseCallback::is_kernel())
 	{
-		QueryResult query = ct.knn(make_pair(callback(*iter,*iter),iter),k);
-		LocalNeighbors local_neighbors;
-		local_neighbors.reserve(k);
-		for (typename QueryResult::const_iterator neighbors_iter=query.begin(); 
-		     neighbors_iter!=query.end(); ++neighbors_iter)
-			local_neighbors.push_back(neighbors_iter->second-begin);
-	
-		neighbors.push_back(local_neighbors);
+		typedef std::vector< pair<double, RandomAccessIterator> > QueryResult;
+		kernel_distance<RandomAccessIterator, PairwiseCallback> kd(callback);
+		CoverTree<double, pair<double, RandomAccessIterator>, kernel_distance<RandomAccessIterator, PairwiseCallback> > ct(kd);
+		{
+			timed_context ct_context("Covertree construction");
+			for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+				ct.insert(make_pair(callback(*iter,*iter),iter));
+		}
+		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+		{
+			QueryResult query = ct.knn(make_pair(callback(*iter,*iter),iter),k);
+			LocalNeighbors local_neighbors;
+			local_neighbors.reserve(k);
+			for (typename QueryResult::const_iterator neighbors_iter=query.begin(); 
+			     neighbors_iter!=query.end(); ++neighbors_iter)
+				local_neighbors.push_back(neighbors_iter->second-begin);
+			neighbors.push_back(local_neighbors);
+		}
+	}
+	else
+	{
+		typedef std::vector< int > QueryResult;
+		CoverTree<double,int,PairwiseCallback> ct(callback);
+		{
+			timed_context ct_context("Covertree construction");
+			for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+				ct.insert(iter-begin);
+		}
+		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+		{
+			QueryResult query = ct.knn((iter-begin),k);
+			LocalNeighbors local_neighbors;
+			local_neighbors.reserve(k);
+			for (typename QueryResult::const_iterator neighbors_iter=query.begin(); 
+			     neighbors_iter!=query.end(); ++neighbors_iter)
+				local_neighbors.push_back(*neighbors_iter);
+			neighbors.push_back(local_neighbors);
+		}
 	}
 	return neighbors;
 }
@@ -84,8 +104,16 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		Distances distances;
-		for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
-			distances.push_back(make_pair(around_iter, callback(*around_iter,*around_iter) + callback(*iter,*iter) - 2*callback(*iter,*around_iter)));
+		if (PairwiseCallback::is_kernel())
+		{
+			for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
+				distances.push_back(make_pair(around_iter, callback(*around_iter,*around_iter) + callback(*iter,*iter) - 2*callback(*iter,*around_iter)));
+		}
+		else
+		{
+			for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
+				distances.push_back(make_pair(around_iter, callback(*iter,*around_iter)));
+		}
 
 		partial_sort(distances.begin(),distances.begin()+k+1,distances.end(),
 		             distances_comparator<DistanceRecord>());
