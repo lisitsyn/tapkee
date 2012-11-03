@@ -5,6 +5,9 @@
  * (at your option) any later version.
  *
  * Copyright (c) 2012, Sergey Lisitsyn
+ *
+ * This code uses Any type developed by C. Diggins under Boost license, version 1.0.
+ * http://www.boost.org/LICENSE_1_0.txt
  */
 
 #ifndef EDRT_DEFINES_H_

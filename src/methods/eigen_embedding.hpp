@@ -5,6 +5,12 @@
  * (at your option) any later version.
  *
  * Copyright (c) 2012, Sergey Lisitsyn
+ *
+ * Randomized eigendecomposition code is inspired by the redsvd library
+ * code which is distributed under BSD 3-clause license.
+ *
+ * Copyright (c) 2010, Daisuke Okanohara
+ *
  */
 
 #ifndef EDRT_EIGEN_EMBEDDING_H_
