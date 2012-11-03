@@ -12,6 +12,7 @@
 
 #include "../defines.hpp"
 #include "covertree.hpp"
+#include "JLCoverTree.hpp"
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -92,6 +93,36 @@ Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
+Neighbors find_neighbors_jl_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
+                         PairwiseCallback callback, unsigned int k)
+{
+	timed_context context("JL's Covertree-based neighbors search");
+
+	typedef JLCoverTreePoint<RandomAccessIterator, PairwiseCallback> TreePoint;
+	v_array<TreePoint> points;
+	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+		push(points, TreePoint(iter, callback));
+
+	node<TreePoint> ct = batch_create(points);
+
+	v_array< v_array<TreePoint> > res;
+	k_nearest_neighbor(ct,ct,res,k);
+
+	Neighbors neighbors;
+	neighbors.reserve(end-begin);
+	assert(end-begin==res.index);
+	for (int i=0; i<res.index; ++i)
+	{
+		LocalNeighbors local_neighbors;
+		local_neighbors.reserve(k);
+		for (unsigned int j=1; j<=k; ++j)
+			local_neighbors.push_back(res[i][j].iter_-begin);
+		neighbors.push_back(local_neighbors);
+	}
+	return neighbors;
+}
+
+template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
                                          const PairwiseCallback& callback, unsigned int k)
 {
@@ -137,6 +168,7 @@ Neighbors find_neighbors(EDRT_NEIGHBORS_METHOD method, const RandomAccessIterato
 	{
 		case BRUTE_FORCE: return find_neighbors_bruteforce_impl(begin,end,callback,k);
 		case COVER_TREE: return find_neighbors_covertree_impl(begin,end,callback,k);
+		case JL_COVER_TREE: return find_neighbors_jl_covertree_impl(begin,end,callback,k);
 	}
 	return Neighbors();
 };
