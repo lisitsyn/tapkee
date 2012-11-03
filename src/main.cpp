@@ -8,7 +8,6 @@
  */
 
 #include "edrt.hpp"
-#include "utils/time.hpp"
 #include "defines.hpp"
 
 #include <shogun/features/DenseFeatures.h>
@@ -27,25 +26,25 @@ using namespace std;
 
 struct kernel_callback
 {
-	kernel_callback(CKernel* kernel) : _kernel(kernel) {};
+	kernel_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
 	double operator()(int a, int b) const
 	{
-		return _kernel->kernel(a, b);
+		return feature_matrix.col(a).dot(feature_matrix.col(b));
 	}
-	CKernel* _kernel;
+	const DenseMatrix& feature_matrix;
 };
 
 struct distance_callback
 {
-	distance_callback(CDistance* distance) : _distance(distance) {};
+	distance_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
 	double operator()(int a, int b) const
 	{
-		return _distance->distance(a, b);
+		return (feature_matrix.col(a)-feature_matrix.col(b)).norm();
 	}
-	CDistance* _distance;
+	const DenseMatrix& feature_matrix;
 };
 
-vector< vector<double> > read_data(const string& filename)
+DenseMatrix read_data(const string& filename)
 {
 	ifstream ifs(filename.c_str());
 	string str;
@@ -62,7 +61,13 @@ vector< vector<double> > read_data(const string& filename)
 			input_data.push_back(row);
 		}
 	}
-	return input_data;
+	DenseMatrix fm(input_data[0].size(),input_data.size());
+	for (int i=0; i<fm.rows(); i++)
+	{
+		for (int j=0; j<fm.cols(); j++)
+			fm(i,j) = input_data[j][i];
+	}
+	return fm;
 }
 
 EDRT_METHOD parse_reduction_method(const char* str)
@@ -124,35 +129,25 @@ int main(int argc, const char** argv)
 	}
 
 	// Load data
-	vector< vector<double> > input_data = read_data("input.dat");
-
-	// Shogun part
-	init_shogun_with_defaults();
-	SGMatrix<double> fm(input_data[0].size(),input_data.size());
+	DenseMatrix input_data = read_data("input.dat");
 	vector<int> data_indices;
-	for (int i=0; i<fm.num_rows; i++)
-	{
-		for (int j=0; j<fm.num_cols; j++)
-			fm(i,j) = input_data[j][i];
-	}
-	for (int i=0; i<fm.num_cols; i++)
+	for (int i=0; i<input_data.cols(); i++)
 		data_indices.push_back(i);
-	CDenseFeatures<double>* features = new CDenseFeatures<double>(fm);
-	features = new CDenseFeatures<double>(fm);
-	CKernel* kernel = new CLinearKernel(features,features);
-	kernel_callback kcb(kernel);
-	CDistance* distance = new CEuclideanDistance(features,features);
-	distance_callback dcb(distance);
-
+	
 	// Embed
 	DenseMatrix embedding;
+	init_shogun_with_defaults();
 	if (parameters[REDUCTION_METHOD].cast<EDRT_METHOD>()==MULTIDIMENSIONAL_SCALING)
 	{
-		embedding = embed(data_indices.begin(),data_indices.end(),dcb,parameters);
+		distance_callback dcb(input_data);
+		addition_callback add();
+		embedding = embed(data_indices.begin(),data_indices.end(),dcb,add,parameters);
 	}
 	else
 	{
-		embedding = embed(data_indices.begin(),data_indices.end(),kcb,parameters);
+		kernel_callback kcb(input_data);
+		addition_callback add();
+		embedding = embed(data_indices.begin(),data_indices.end(),kcb,add,parameters);
 	}
 
 	// Save obtained data
