@@ -1,2 +1,2 @@
-edrt
+Efficient Dimensionality Reduction Toolbox
 ====
