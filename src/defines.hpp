@@ -20,7 +20,7 @@
 #include "utils/any.hpp"
 
 #define EIGEN_NO_DEBUG
-#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
+//#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SuperLUSupport>

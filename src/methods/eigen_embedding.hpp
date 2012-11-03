@@ -171,18 +171,26 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 			embedding /= embedding.norm();
 		}
 		*/
-		return EmbeddingResult(embedding.block(0, eigenvalues_skip, wm.cols(), target_dimension),eigenOfB.eigenvalues());
+		return EmbeddingResult(embedding.block(0, eigenvalues_skip, wm.cols(), target_dimension),
+		                       eigenOfB.eigenvalues());
 	}
 };
 
 template <class WeightMatrix, template<class> class WeightMatrixOperation>
-EmbeddingResult eigen_embedding(EDRT_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, unsigned int target_dimension)
+EmbeddingResult eigen_embedding(EDRT_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, 
+                                unsigned int target_dimension)
 {
 	switch (method)
 	{
-		case ARPACK_XSXUPD: return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>().embed(wm, target_dimension);
-		case LAPACK_XSYEVR: return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, LAPACK_XSYEVR>().embed(wm, target_dimension);
-		case RANDOMIZED_INVERSE: return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVERSE>().embed(wm, target_dimension);
+		case ARPACK_XSXUPD: 
+			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, 
+				ARPACK_XSXUPD>().embed(wm, target_dimension);
+		case LAPACK_XSYEVR: 
+			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation,
+				LAPACK_XSYEVR>().embed(wm, target_dimension);
+		case RANDOMIZED_INVERSE: 
+			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation,
+				RANDOMIZED_INVERSE>().embed(wm, target_dimension);
 	}
 	return EmbeddingResult();
 };

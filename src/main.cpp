@@ -123,7 +123,8 @@ int main(int argc, const char** argv)
 	if (argc!=6)
 	{
 		printf("No parameters specified.\n");
-		printf("Usage is [method] [neighbor_method] [eigen_method] [number of neighbors] [target dimension]\n");
+		printf("Usage is [method] [neighbor_method] [eigen_method]"
+				"[number of neighbors] [target dimension]\n");
 		exit(EXIT_FAILURE);
 	}
 	else
