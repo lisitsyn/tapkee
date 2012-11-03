@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include <map>
 #include "utils/any.hpp"
 #include <eigen3/Eigen/Dense>
@@ -63,7 +64,7 @@ typedef Eigen::VectorXd DenseVector;
 typedef std::vector<int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
 typedef Eigen::SparseMatrix<double> SparseWeightMatrix;
-typedef Eigen::MatrixXd EmbeddingMatrix;
+typedef std::pair<Eigen::MatrixXd,Eigen::VectorXd> EmbeddingResult;
 typedef std::map<EDRT_PARAMETERS, any> ParametersMap;
 
 /*

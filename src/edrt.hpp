@@ -38,7 +38,7 @@ template <class RandomAccessIterator, class PairwiseCallback>
 DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator& end,
                   const PairwiseCallback& callback, ParametersMap options)
 {
-	EmbeddingMatrix embedding_matrix;
+	EmbeddingResult embedding_result;
 
 	EDRT_METHOD method = options[REDUCTION_METHOD].cast<EDRT_METHOD>();
 	EDRT_EIGEN_EMBEDDING_METHOD eigen_method = options[EIGEN_EMBEDDING_METHOD].cast<EDRT_EIGEN_EMBEDDING_METHOD>();
@@ -53,7 +53,7 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 				timed_context context("Embedding with KLLE");
 				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
 				SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,callback);
-				embedding_matrix = 
+				embedding_result = 
 					eigen_embedding<SparseWeightMatrix, InverseSparseMatrixOperation>(
 							eigen_method,weight_matrix,target_dimension);
 			}
@@ -63,7 +63,7 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 				timed_context context("Embedding with KLTSA");
 				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
 				SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
-				embedding_matrix = 
+				embedding_result = 
 					eigen_embedding<SparseWeightMatrix, InverseSparseMatrixOperation>(
 							eigen_method,weight_matrix,target_dimension);
 			}
@@ -81,9 +81,11 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 			{
 				timed_context context("Embeding with MDS");
 				DenseMatrix distance_matrix = mds_distance_matrix(begin,end,callback);
-				embedding_matrix = 
+				embedding_result = 
 					eigen_embedding<DenseMatrix, DenseMatrixOperation>(
 							eigen_method,distance_matrix,target_dimension);
+				for (unsigned int i=0; i<target_dimension; ++i)
+					embedding_result.first.col(i).array() *= sqrt(embedding_result.second[i]);
 			}
 			break;
 		case ISOMAP:
@@ -109,7 +111,7 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 		default:
 			break;
 	}
-	return embedding_matrix;
+	return embedding_result.first;
 }
 
 #endif /* libedrt_h_ */
