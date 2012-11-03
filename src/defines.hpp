@@ -62,7 +62,7 @@ typedef Eigen::MatrixXd DenseMatrix;
 typedef Eigen::VectorXd DenseVector;
 typedef std::vector<int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
-typedef Eigen::SparseMatrix<double> WeightMatrix;
+typedef Eigen::SparseMatrix<double> SparseWeightMatrix;
 typedef Eigen::MatrixXd EmbeddingMatrix;
 typedef std::map<EDRT_PARAMETERS, any> ParametersMap;
 

@@ -28,18 +28,16 @@
 
 #include <eigen3/Eigen/SparseCore>
 #include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/SuperLUSupport>
 #include "defines.hpp"
 #include "methods/local_weights.hpp"
-#include "neighbors/neighbors.hpp"
 #include "methods/eigen_embedding.hpp"
+#include "methods/multidimensional_scaling.hpp"
+#include "neighbors/neighbors.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>
 DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator& end,
                   const PairwiseCallback& callback, ParametersMap options)
 {
-	Neighbors neighbors;
-	WeightMatrix weight_matrix;
 	EmbeddingMatrix embedding_matrix;
 
 	EDRT_METHOD method = options[REDUCTION_METHOD].cast<EDRT_METHOD>();
@@ -53,20 +51,52 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 		case KERNEL_LOCALLY_LINEAR_EMBEDDING:
 			{
 				timed_context context("Embedding with KLLE");
-				neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
-				weight_matrix = klle_weight_matrix(begin,end,neighbors,callback);
-				embedding_matrix = eigen_embedding(eigen_method,weight_matrix,target_dimension);
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
+				SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,callback);
+				embedding_matrix = 
+					eigen_embedding<SparseWeightMatrix, InverseSparseMatrixOperation>(
+							eigen_method,weight_matrix,target_dimension);
 			}
-			break;
-		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			break;
 		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT:
 			{
 				timed_context context("Embedding with KLTSA");
-				neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
-				weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
-				embedding_matrix = eigen_embedding(eigen_method,weight_matrix,target_dimension);
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
+				SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
+				embedding_matrix = 
+					eigen_embedding<SparseWeightMatrix, InverseSparseMatrixOperation>(
+							eigen_method,weight_matrix,target_dimension);
 			}
+			break;
+		case DIFFUSION_MAPS:
+			{
+				timed_context context("Embedding with diffusion maps");
+				//kernel_matrix = ...
+				//embedding_matrix = 
+				//	eigen_embedding<DenseWeightMatrix, DenseMatrixOperation>(
+				//			eigen_method,distance_matrix,target_dimension);
+			}
+			break;
+		case MULTIDIMENSIONAL_SCALING:
+			{
+				timed_context context("Embeding with MDS");
+				DenseMatrix distance_matrix = mds_distance_matrix(begin,end,callback);
+				embedding_matrix = 
+					eigen_embedding<DenseMatrix, DenseMatrixOperation>(
+							eigen_method,distance_matrix,target_dimension);
+			}
+			break;
+		case ISOMAP:
+			{
+				timed_context context("Embedding with Isomap");
+				//distance_matrix = ...
+				//dijkstra
+				//embedding_matrix = 
+				//	eigen_embedding<DenseWeightMatrix, DenseMatrixOperation>(
+				//			eigen_method,distance_matrix,target_dimension);
+			}
+			break;
+		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
 			break;
@@ -75,12 +105,6 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 		case LAPLACIAN_EIGENMAPS:
 			break;
 		case LOCALITY_PRESERVING_PROJECTIONS:
-			break;
-		case DIFFUSION_MAPS:
-			break;
-		case ISOMAP:
-			break;
-		case MULTIDIMENSIONAL_SCALING:
 			break;
 		default:
 			break;

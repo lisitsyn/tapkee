@@ -17,12 +17,41 @@
 #include <shogun/mathematics/arpack.h>
 #include <shogun/mathematics/lapack.h>
 
-template <int> struct eigen_embedding_impl
+template <class MatrixType>
+struct InverseSparseMatrixOperation
+{
+	InverseSparseMatrixOperation(const MatrixType& matrix) : solver()
+	{
+		solver.compute(matrix);
+	}
+	DenseMatrix operator()(DenseMatrix operatee)
+	{
+		return solver.solve(operatee);
+	}
+	Eigen::SuperLU<MatrixType> solver;
+};
+
+template <class MatrixType>
+struct DenseMatrixOperation
+{
+	DenseMatrixOperation(const MatrixType& matrix) : _matrix(matrix)
+	{
+	}
+	DenseMatrix operator()(DenseMatrix operatee)
+	{
+		return _matrix*operatee;
+	}
+	const MatrixType& _matrix;
+};
+
+template <class WeightMatrix, template<class> class WeightMatrixOperation, int> 
+struct eigen_embedding_impl
 {
 	virtual EmbeddingMatrix embed(const WeightMatrix& wm, unsigned int target_dimension);
 };
 
-template <> struct eigen_embedding_impl<ARPACK_XSXUPD>
+template <class WeightMatrix, template<class> class WeightMatrixOperation> 
+struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 {
 	EmbeddingMatrix embed(const WeightMatrix& wm, unsigned int target_dimension)
 	{
@@ -49,7 +78,8 @@ template <> struct eigen_embedding_impl<ARPACK_XSXUPD>
 	}
 };
 
-template <> struct eigen_embedding_impl<LAPACK_XSYEVR>
+template <class WeightMatrix, template<class> class WeightMatrixOperation> 
+struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, LAPACK_XSYEVR>
 {
 	EmbeddingMatrix embed(const WeightMatrix& wm, unsigned int target_dimension)
 	{
@@ -75,11 +105,12 @@ template <> struct eigen_embedding_impl<LAPACK_XSYEVR>
 	}
 };
 
-template <> struct eigen_embedding_impl<RANDOMIZED_INVERSE>
+template <class WeightMatrix, template<class> class WeightMatrixOperation> 
+struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVERSE>
 {
 	EmbeddingMatrix embed(const WeightMatrix& wm, unsigned int target_dimension)
 	{
-		const int eigenvalues_skip = 1;
+		const int eigenvalues_skip = 0;
 
 		timed_context context("Randomized eigendecomposition");
 		
@@ -103,14 +134,12 @@ template <> struct eigen_embedding_impl<RANDOMIZED_INVERSE>
 				O(i,j) = len*cos(2.f*M_PI*v2);
 			}
 		}
-		// TODO parametrize or define
-		Eigen::SuperLU<WeightMatrix> solver;
-		solver.compute(wm);
+		WeightMatrixOperation<WeightMatrix> operation(wm);
 
-		DenseMatrix Y = solver.solve(O);
-		for (int i=0; i<Y.cols(); i++)
+		DenseMatrix Y = operation(O);
+		for (unsigned int i=0; i<Y.cols(); i++)
 		{
-			for (int j=0; j<i; j++)
+			for (unsigned int j=0; j<i; j++)
 			{
 				double r = Y.col(i).dot(Y.col(j));
 				Y.col(i) -= r*Y.col(j);
@@ -118,16 +147,21 @@ template <> struct eigen_embedding_impl<RANDOMIZED_INVERSE>
 			double norm = Y.col(i).norm();
 			if (norm < 1e-4)
 			{
-				for (int k = i; k<Y.cols(); k++)
+				for (unsigned int k = i; k<Y.cols(); k++)
 					Y.col(k).setZero();
 			}
 			Y.col(i) *= (1.f / norm);
 		}
 
-		DenseMatrix B1 = solver.solve(Y);
+		DenseMatrix B1 = operation(Y);
 		DenseMatrix B = Y.householderQr().solve(B1);
-		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenOfB(B);
+		Eigen::SelfAdjointEigenSolver<DenseMatrix> eigenOfB(B);
 		DenseMatrix embedding = Y*eigenOfB.eigenvectors();
+
+		std::cout << eigenOfB.eigenvalues() << std::endl;
+
+		for (unsigned int t=0; t<target_dimension; t++)
+			embedding.col(t).array() *= sqrt(eigenOfB.eigenvalues()[t]);
 
 		/* refinements idea (drop probably)
 		const int n_refinements = 20;
@@ -141,13 +175,14 @@ template <> struct eigen_embedding_impl<RANDOMIZED_INVERSE>
 	}
 };
 
+template <class WeightMatrix, template<class> class WeightMatrixOperation>
 EmbeddingMatrix eigen_embedding(EDRT_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, unsigned int target_dimension)
 {
 	switch (method)
 	{
-		case ARPACK_XSXUPD: return eigen_embedding_impl<ARPACK_XSXUPD>().embed(wm, target_dimension);
-		case LAPACK_XSYEVR: return eigen_embedding_impl<LAPACK_XSYEVR>().embed(wm, target_dimension);
-		case RANDOMIZED_INVERSE: return eigen_embedding_impl<RANDOMIZED_INVERSE>().embed(wm, target_dimension);
+		case ARPACK_XSXUPD: return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>().embed(wm, target_dimension);
+		case LAPACK_XSYEVR: return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, LAPACK_XSYEVR>().embed(wm, target_dimension);
+		case RANDOMIZED_INVERSE: return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVERSE>().embed(wm, target_dimension);
 	}
 	return EmbeddingMatrix();
 };

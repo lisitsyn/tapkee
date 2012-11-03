@@ -13,13 +13,13 @@
 
 #include <shogun/features/DenseFeatures.h>
 #include <shogun/kernel/LinearKernel.h>
+#include <shogun/distance/EuclideanDistance.h>
 #include <algorithm>
 #include <string>
 #include <istream>
 #include <fstream>
 #include <vector>
 #include <iterator>
-
 
 using namespace Eigen;
 using namespace shogun;
@@ -33,6 +33,16 @@ struct kernel_callback
 		return _kernel->kernel(a, b);
 	}
 	CKernel* _kernel;
+};
+
+struct distance_callback
+{
+	distance_callback(CDistance* distance) : _distance(distance) {};
+	double operator()(int a, int b) const
+	{
+		return _distance->distance(a, b);
+	}
+	CDistance* _distance;
 };
 
 vector< vector<double> > read_data(const string& filename)
@@ -61,6 +71,8 @@ EDRT_METHOD parse_reduction_method(const char* str)
 		return KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
 	if (!strcmp(str,"klle"))
 		return KERNEL_LOCALLY_LINEAR_EMBEDDING;
+	if (!strcmp(str,"mds"))
+		return MULTIDIMENSIONAL_SCALING;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -128,10 +140,20 @@ int main(int argc, const char** argv)
 	CDenseFeatures<double>* features = new CDenseFeatures<double>(fm);
 	features = new CDenseFeatures<double>(fm);
 	CKernel* kernel = new CLinearKernel(features,features);
-	kernel_callback cb(kernel);
+	kernel_callback kcb(kernel);
+	CDistance* distance = new CEuclideanDistance(features,features);
+	distance_callback dcb(distance);
 
 	// Embed
-	DenseMatrix embedding = embed(data_indices.begin(),data_indices.end(),cb,parameters);
+	DenseMatrix embedding;
+	if (parameters[REDUCTION_METHOD].cast<EDRT_METHOD>()==MULTIDIMENSIONAL_SCALING)
+	{
+		embedding = embed(data_indices.begin(),data_indices.end(),dcb,parameters);
+	}
+	else
+	{
+		embedding = embed(data_indices.begin(),data_indices.end(),kcb,parameters);
+	}
 
 	// Save obtained data
 	ofstream ofs("output.dat");

@@ -14,8 +14,8 @@
 #include "../utils/time.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>
-WeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                 const Neighbors& neighbors, const PairwiseCallback& callback, unsigned int target_dimension)
+SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
+                                       const Neighbors& neighbors, const PairwiseCallback& callback, unsigned int target_dimension)
 {
 	timed_context context("KLTSA weight matrix computation");
 	const int k = neighbors[0].size();
@@ -28,7 +28,6 @@ WeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const Random
 	DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
 	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
-	WeightMatrix weight_matrix(end-begin,end-begin);
 	for (RandomAccessIterator iter=iter_begin; iter!=iter_end; ++iter)
 	{
 		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
@@ -72,13 +71,14 @@ WeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const Random
 		}
 	}
 
+	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
 
 	return weight_matrix;
 }
 template <class RandomAccessIterator, class PairwiseCallback>
-WeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                const Neighbors& neighbors, const PairwiseCallback& callback)
+SparseWeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
+                                      const Neighbors& neighbors, const PairwiseCallback& callback)
 {
 	timed_context context("KLLE weight computation");
 	const int k = neighbors[0].size();
@@ -124,7 +124,7 @@ WeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const RandomA
 		}
 	}
 
-	WeightMatrix weight_matrix(end-begin,end-begin);
+	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
 
 	return weight_matrix;
