@@ -339,8 +339,8 @@ ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
 	eigen_assert(A.cols() == A.rows());
 	eigen_assert(B.cols() == B.rows());
 	eigen_assert(B.rows() == 0 || A.cols() == B.rows());
-	eigen_assert((options &~ (EigVecMask | GenEigMask)) == 0
-	             && (options & EigVecMask) != EigVecMask
+	eigen_assert((options &~ (Eigen::EigVecMask | Eigen::GenEigMask)) == 0
+	             && (options & Eigen::EigVecMask) != Eigen::EigVecMask
 	             && "invalid option parameter");
 
 	bool isBempty = (B.rows() == 0) || (B.cols() == 0);

@@ -19,10 +19,11 @@
 #include <map>
 #include "utils/any.hpp"
 
-#define EIGEN_NO_DEBUG
+//#define EIGEN_NO_DEBUG
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
+#include <eigen3/Eigen/SparseCholesky>
 #include <eigen3/Eigen/SuperLUSupport>
 #undef EIGEN_MATRIXBASE_PLUGIN
 
@@ -81,8 +82,8 @@ typedef Eigen::MatrixXd DenseMatrix;
 typedef Eigen::VectorXd DenseVector;
 typedef std::vector<int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
-typedef Eigen::SparseMatrix<double> SparseWeightMatrix;
 typedef std::pair<Eigen::MatrixXd,Eigen::VectorXd> EmbeddingResult;
 typedef std::map<EDRT_PARAMETERS, any> ParametersMap;
+typedef Eigen::SparseMatrix<double> SparseWeightMatrix;
 
 #endif

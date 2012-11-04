@@ -31,7 +31,7 @@ struct InverseSparseMatrixOperation
 	{
 		return solver.solve(operatee);
 	}
-	Eigen::SuperLU<MatrixType> solver;
+	Eigen::SimplicialLDLT<MatrixType> solver;
 };
 
 template <class MatrixType>
@@ -127,13 +127,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 		embedding *= pca.eigenvectors();
 		*/
 		/* refinements idea (drop probably)
-		const int n_refinements = 20;
-		for (int r=0; r<n_refinements; r++)
-		{
-			embedding = solver.solve(embedding);
-			embedding /= embedding.norm();
-		}
-		*/
+		 */
 		return EmbeddingResult(embedding,eigenOfB.eigenvalues());
 	}
 };
