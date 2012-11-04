@@ -107,8 +107,6 @@ EDRT_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 {
 	if (!strcmp(str,"arpack"))
 		return ARPACK_XSXUPD;
-	if (!strcmp(str,"lapack"))
-		return LAPACK_XSYEVR;
 	if (!strcmp(str,"randomized"))
 		return RANDOMIZED_INVERSE;
 

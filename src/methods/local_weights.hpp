@@ -147,7 +147,7 @@ SparseWeightMatrix hlle_weight_matrix(const RandomAccessIterator& begin, const R
 	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
 
-	unsigned int dp = target_dimension*(target_dimension+1)/2;
+//	unsigned int dp = target_dimension*(target_dimension+1)/2;
 
 	for (RandomAccessIterator iter=iter_begin; iter!=iter_end; ++iter)
 	{

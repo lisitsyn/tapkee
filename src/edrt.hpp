@@ -10,13 +10,6 @@
 #ifndef EDRT_MAIN_H_
 #define EDRT_MAIN_H_
 
-#define HAVE_LAPACK
-#define HAVE_ARPACK
-#include <shogun/mathematics/lapack.h>
-#include <shogun/mathematics/arpack.h>
-#undef HAVE_LAPACK
-#undef HAVE_ARPACK
-#include <vector>
 #include <map>
 #include <stdlib.h>
 #include <string.h>
