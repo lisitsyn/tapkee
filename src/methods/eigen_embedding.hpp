@@ -142,9 +142,9 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 		WeightMatrixOperation<WeightMatrix> operation(wm);
 
 		DenseMatrix Y = operation(O);
-		for (unsigned int i=0; i<Y.cols(); i++)
+		for (int i=0; i<Y.cols(); i++)
 		{
-			for (unsigned int j=0; j<i; j++)
+			for (int j=0; j<i; j++)
 			{
 				double r = Y.col(i).dot(Y.col(j));
 				Y.col(i) -= r*Y.col(j);
@@ -152,7 +152,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 			double norm = Y.col(i).norm();
 			if (norm < 1e-4)
 			{
-				for (unsigned int k = i; k<Y.cols(); k++)
+				for (int k = i; k<Y.cols(); k++)
 					Y.col(k).setZero();
 			}
 			Y.col(i) *= (1.f / norm);
