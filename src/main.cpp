@@ -97,6 +97,8 @@ EDRT_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 		return BRUTE_FORCE;
 	if (!strcmp(str,"covertree"))
 		return COVER_TREE;
+	if (!strcmp(str,"jlcovertree"))
+		return JL_COVER_TREE;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);

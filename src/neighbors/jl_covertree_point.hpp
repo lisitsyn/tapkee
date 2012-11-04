@@ -12,6 +12,7 @@
 #define _JL_COVERTREE_POINT_H_
 
 #include <iostream>
+#include <cmath>
 
 /** @brief Class v_array taken directly from JL's implementation */
 template<class T> 
@@ -118,7 +119,7 @@ double distance(const JLCoverTreePoint<RandomAccessIterator, DistanceCallback>& 
 	        const JLCoverTreePoint<RandomAccessIterator, DistanceCallback>& r, double upper_bound)
 {
 	assert(upper_bound>=0);
-	return l.dc_(*l.iter_,*l.iter_) + l.dc_(*r.iter_,*r.iter_) - 2*l.dc_(*r.iter_,*l.iter_);
+	return std::sqrt(l.dc_(*l.iter_,*l.iter_) + l.dc_(*r.iter_,*r.iter_) - 2*l.dc_(*r.iter_,*l.iter_));
 }
 
 /** Print the information of the CoverTree point */

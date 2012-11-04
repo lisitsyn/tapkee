@@ -15,5 +15,8 @@ debug:
 clean:
 	rm $(OBJECTS)
 
+debug:
+	$(CXX) $(CFLAGS) -g -o application src/main.cpp -I/usr/include/atlas -I/usr/include/superlu -lshogun -lsuperlu $(LDFLAGS)
+
 .PHONY: all clean
 

@@ -5,6 +5,8 @@
  * (at your option) any later version.
  *
  * Copyright (c) 2012, Sergey Lisitsyn
+ * Written (w) 2012, Fernando J. Iglesias Garcia, John Langford's cover
+ * tree port
  */
 
 #ifndef EDRT_NEIGHBORS_H_
@@ -106,18 +108,24 @@ Neighbors find_neighbors_jl_covertree_impl(RandomAccessIterator begin, RandomAcc
 	node<TreePoint> ct = batch_create(points);
 
 	v_array< v_array<TreePoint> > res;
+	++k; // because one of the neighbors will be the actual query point
 	k_nearest_neighbor(ct,ct,res,k);
 
 	Neighbors neighbors;
-	neighbors.reserve(end-begin);
+	neighbors.resize(end-begin);
 	assert(end-begin==res.index);
 	for (int i=0; i<res.index; ++i)
 	{
 		LocalNeighbors local_neighbors;
 		local_neighbors.reserve(k);
-		for (unsigned int j=1; j<=k; ++j)
+		for (unsigned int j=1; j<=k; ++j) // j=0 is the query point
+		{
+			// The actual query point is found as a neighbor, just ignore it
+			if (res[i][j].iter_-begin==res[i][0].iter_-begin)
+				continue;
 			local_neighbors.push_back(res[i][j].iter_-begin);
-		neighbors.push_back(local_neighbors);
+		}
+		neighbors[res[i][0].iter_-begin] = local_neighbors;
 	}
 	return neighbors;
 }
