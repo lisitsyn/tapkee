@@ -144,7 +144,7 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		Distances distances;
-		if (PairwiseCallback::is_kernel())
+		if (CallbackTraits<PairwiseCallback>::is_kernel())
 		{
 			for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
 				distances.push_back(make_pair(around_iter, callback(*around_iter,*around_iter) + callback(*iter,*iter) - 2*callback(*iter,*around_iter)));

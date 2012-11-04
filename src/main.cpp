@@ -35,8 +35,8 @@ struct kernel_callback
 		return feature_matrix.col(a).dot(feature_matrix.col(b));
 	}
 	const DenseMatrix& feature_matrix;
-	static bool is_kernel() { return true; }
 };
+EDRT_CALLBACK_IS_KERNEL(kernel_callback);
 
 struct distance_callback
 {
@@ -46,8 +46,8 @@ struct distance_callback
 		return (feature_matrix.col(a)-feature_matrix.col(b)).norm();
 	}
 	const DenseMatrix& feature_matrix;
-	static bool is_kernel() { return false; }
 };
+EDRT_CALLBACK_IS_DISTANCE(distance_callback);
 
 DenseMatrix read_data(const string& filename)
 {

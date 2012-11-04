@@ -11,6 +11,7 @@
 #ifndef _JL_COVERTREE_POINT_H_
 #define _JL_COVERTREE_POINT_H_
 
+#include "../defines.hpp"
 #include <iostream>
 #include <cmath>
 
@@ -126,7 +127,7 @@ inline double distance(const DistanceCallback& dcb, const CoverTreePoint<RandomA
 	if (*l.iter_==*r.iter_)
 		return 0.0;
 
-	if (dcb.is_kernel())
+	if (CallbackTraits<DistanceCallback>::is_kernel())
 		return sqrt(l.norm_ + r.norm_ - 2*dcb(*r.iter_,*l.iter_));
 	else	// distance_kernel
 		return dcb(*l.iter_,*r.iter_);

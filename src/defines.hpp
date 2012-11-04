@@ -20,12 +20,20 @@
 #include "utils/any.hpp"
 
 #define EIGEN_NO_DEBUG
-#include "utils/matrix.hpp"
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SuperLUSupport>
 #undef EIGEN_MATRIXBASE_PLUGIN
+
+template <class Callback>
+struct CallbackTraits
+{
+	bool is_kernel();
+};
+
+#define EDRT_CALLBACK_IS_KERNEL(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return true; } };
+#define EDRT_CALLBACK_IS_DISTANCE(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return false; } };
 
 enum EDRT_NEIGHBORS_METHOD
 {
