@@ -121,7 +121,10 @@ double distance(const DistanceCallback& dcb, const JLCoverTreePoint<RandomAccess
 	if (*l.iter_==*r.iter_)
 		return 0.0;
 
-	return std::sqrt(dcb(*l.iter_,*l.iter_) + dcb(*r.iter_,*r.iter_) - 2*dcb(*r.iter_,*l.iter_));
+	if (dcb.is_kernel())
+		return std::sqrt(dcb(*l.iter_,*l.iter_) + dcb(*r.iter_,*r.iter_) - 2*dcb(*r.iter_,*l.iter_));
+	else	// distance_kernel
+		return dcb(*l.iter_,*r.iter_);
 }
 
 /** Print the information of the CoverTree point */
