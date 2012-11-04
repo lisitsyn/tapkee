@@ -14,7 +14,6 @@
 
 #include "../defines.hpp"
 #include "covertree.hpp"
-#include "JLCoverTree.hpp"
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -42,6 +41,7 @@ struct kernel_distance
 	}
 };
 
+/*
 template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
                          const PairwiseCallback& callback, unsigned int k)
@@ -93,14 +93,15 @@ Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const
 	}
 	return neighbors;
 }
+*/
 
 template <class RandomAccessIterator, class PairwiseCallback>
-Neighbors find_neighbors_jl_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
+Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
                          PairwiseCallback callback, unsigned int k)
 {
-	timed_context context("JL's Covertree-based neighbors search");
+	timed_context context("Covertree-based neighbors search");
 
-	typedef JLCoverTreePoint<RandomAccessIterator> TreePoint;
+	typedef CoverTreePoint<RandomAccessIterator> TreePoint;
 	v_array<TreePoint> points;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 		push(points, TreePoint(iter, callback(*iter,*iter)));
@@ -127,7 +128,6 @@ Neighbors find_neighbors_jl_covertree_impl(RandomAccessIterator begin, RandomAcc
 		}
 		neighbors[res[i][0].iter_-begin] = local_neighbors;
 	}
-
 	return neighbors;
 }
 
@@ -177,7 +177,6 @@ Neighbors find_neighbors(EDRT_NEIGHBORS_METHOD method, const RandomAccessIterato
 	{
 		case BRUTE_FORCE: return find_neighbors_bruteforce_impl(begin,end,callback,k);
 		case COVER_TREE: return find_neighbors_covertree_impl(begin,end,callback,k);
-		case JL_COVER_TREE: return find_neighbors_jl_covertree_impl(begin,end,callback,k);
 	}
 	return Neighbors();
 };

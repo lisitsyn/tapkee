@@ -32,9 +32,10 @@
 #include "methods/isomap.hpp"
 #include "neighbors/neighbors.hpp"
 
-template <class RandomAccessIterator, class PairwiseCallback, class AdditionCallback>
+template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class AdditionCallback>
 DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator& end,
-                  const PairwiseCallback& callback, const AdditionCallback& add_callback, 
+                  const KernelCallback& kernel_callback, const DistanceCallback& distance_callback,
+                  const AdditionCallback& add_callback, 
                   ParametersMap options)
 {
 	EmbeddingResult embedding_result;
@@ -57,13 +58,13 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 				EDRT_NEIGHBORS_METHOD neighbors_method = 
 					options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
 				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 				// construct sparse weight matrix
-				SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,callback);
+				SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback);
 				// construct embedding with eigendecomposition of the
 				// sparse weight matrix
 				embedding_result = 
-					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension);
+					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,1);
 			}
 			break;
 		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT:
@@ -72,13 +73,13 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
 				EDRT_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
 				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 				// construct sparse weight matrix
-				SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,callback,target_dimension);
+				SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
 				// construct embedding with eigendecomposition of the
 				// sparse weight matrix
 				embedding_result = 
-					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension);
+					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,1);
 			}
 			break;
 		case DIFFUSION_MAPS:
@@ -94,13 +95,13 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 			{
 				timed_context context("Embeding with MDS");
 				// compute distance matrix (matrix of pairwise distances) of data
-				DenseMatrix distance_matrix = compute_distance_matrix(begin,end,callback);
+				DenseMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
 				// process the distance matrix (center it and *(-0.5))
 				mds_process_matrix(distance_matrix);
 				// construct embedding with eigendecomposition of the
 				// dense weight matrix
 				embedding_result = 
-					eigen_embedding<DenseMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension);
+					eigen_embedding<DenseMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,0);
 				for (unsigned int i=0; i<target_dimension; ++i)
 					embedding_result.first.col(i).array() *= sqrt(embedding_result.second[i]);
 			}
@@ -117,15 +118,15 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 				EDRT_NEIGHBORS_METHOD neighbors_method = 
 					options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
 				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,callback,k);
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
 				// compute distance matrix (matrix of pairwise distances) of data
-				DenseMatrix distance_matrix = compute_distance_matrix(begin,end,callback);
+				DenseMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
 				// relax distances with Dijkstra shortest path algorithm
 				DenseMatrix relaxed_distance_matrix = isomap_relax_distances(distance_matrix,neighbors);
 				// construct embedding with eigendecomposition of the
 				// dense weight matrix
 				embedding_result = 
-					eigen_embedding<DenseMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension);
+					eigen_embedding<DenseMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension,0);
 			}
 			break;
 		case LANDMARK_ISOMAP:
@@ -146,6 +147,16 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 		case HESSIAN_LOCALLY_LINEAR_EMBEDDING:
 			{
 				timed_context context("Embedding with HLLE");
+				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
+				EDRT_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
+				// find neighbors of each vector
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+				// construct sparse weight matrix
+				SparseWeightMatrix weight_matrix = hlle_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
+				// construct embedding with eigendecomposition of the
+				// sparse weight matrix
+				embedding_result = 
+					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,1);
 			}
 			break;
 		case LAPLACIAN_EIGENMAPS:

@@ -52,13 +52,13 @@ struct DenseMatrixOperation
 template <class WeightMatrix, template<class> class WeightMatrixOperation, int> 
 struct eigen_embedding_impl
 {
-	virtual EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension);
+	virtual EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip);
 };
 
 template <class WeightMatrix, template<class> class WeightMatrixOperation> 
 struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 {
-	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension)
+	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip)
 	{
 		timed_context context("ARPACK DSXUPD eigendecomposition");
 		unsigned int N = wm.cols();
@@ -86,7 +86,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 template <class WeightMatrix, template<class> class WeightMatrixOperation> 
 struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, LAPACK_XSYEVR>
 {
-	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension)
+	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip)
 	{
 		timed_context context("LAPACK DSYEVR eigendecomposition");
 		unsigned int N = wm.cols();
@@ -113,13 +113,11 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, LAPACK_XSYEVR>
 template <class WeightMatrix, template<class> class WeightMatrixOperation> 
 struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVERSE>
 {
-	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension)
+	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip)
 	{
-		const int eigenvalues_skip = 0;
-
 		timed_context context("Randomized eigendecomposition");
 		
-		DenseMatrix O(wm.rows(), target_dimension+eigenvalues_skip);
+		DenseMatrix O(wm.rows(), target_dimension+skip);
 		for (int i=0; i<O.rows(); ++i)
 		{
 			int j=0;
@@ -161,8 +159,13 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 		DenseMatrix B1 = operation(Y);
 		DenseMatrix B = Y.householderQr().solve(B1);
 		Eigen::SelfAdjointEigenSolver<DenseMatrix> eigenOfB(B);
-		DenseMatrix embedding = Y*eigenOfB.eigenvectors();
+		DenseMatrix embedding = (Y*eigenOfB.eigenvectors()).block(0, skip, wm.cols(), target_dimension);
 
+		DenseMatrix covariance(target_dimension,target_dimension);
+		covariance = embedding.transpose()*embedding;
+		//covariance.centerMatrix();
+		Eigen::SelfAdjointEigenSolver<DenseMatrix> pca(covariance);
+		embedding *= pca.eigenvectors();
 		/* refinements idea (drop probably)
 		const int n_refinements = 20;
 		for (int r=0; r<n_refinements; r++)
@@ -171,26 +174,25 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 			embedding /= embedding.norm();
 		}
 		*/
-		return EmbeddingResult(embedding.block(0, eigenvalues_skip, wm.cols(), target_dimension),
-		                       eigenOfB.eigenvalues());
+		return EmbeddingResult(embedding,eigenOfB.eigenvalues());
 	}
 };
 
 template <class WeightMatrix, template<class> class WeightMatrixOperation>
 EmbeddingResult eigen_embedding(EDRT_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, 
-                                unsigned int target_dimension)
+                                unsigned int target_dimension, unsigned int skip)
 {
 	switch (method)
 	{
 		case ARPACK_XSXUPD: 
 			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, 
-				ARPACK_XSXUPD>().embed(wm, target_dimension);
+				ARPACK_XSXUPD>().embed(wm, target_dimension, skip);
 		case LAPACK_XSYEVR: 
 			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation,
-				LAPACK_XSYEVR>().embed(wm, target_dimension);
+				LAPACK_XSYEVR>().embed(wm, target_dimension, skip);
 		case RANDOMIZED_INVERSE: 
 			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation,
-				RANDOMIZED_INVERSE>().embed(wm, target_dimension);
+				RANDOMIZED_INVERSE>().embed(wm, target_dimension, skip);
 	}
 	return EmbeddingResult();
 };

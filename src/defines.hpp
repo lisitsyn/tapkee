@@ -20,6 +20,7 @@
 #include "utils/any.hpp"
 
 #define EIGEN_NO_DEBUG
+#include "utils/matrix.hpp"
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
@@ -30,7 +31,6 @@ enum EDRT_NEIGHBORS_METHOD
 {
 	BRUTE_FORCE,
 	COVER_TREE,
-	JL_COVER_TREE,
 };
 
 enum EDRT_EIGEN_EMBEDDING_METHOD

@@ -14,6 +14,8 @@
 #include <iostream>
 #include <cmath>
 
+using std::sqrt;
+
 /** @brief Class v_array taken directly from JL's implementation */
 template<class T> 
 class v_array{
@@ -43,7 +45,6 @@ class v_array{
 
 		/** Pointer to the beginning of the v_array elements */
 		T* elements;
-
 };
 
 /**
@@ -96,16 +97,16 @@ v_array<T> pop(v_array<v_array<T> > &stack)
 
 /** @brief Class Point to use with John Langford's CoverTree. This
  * class must have some associated functions defined (distance,
- * and print, see below) so it can be used with the JLCoverTree
+ * and print, see below) so it can be used with the CoverTree
  * implementation.
  */
 template <class RandomAccessIterator>
-struct JLCoverTreePoint
+struct CoverTreePoint
 {
-	JLCoverTreePoint() : iter_(NULL), norm_(0.0)
+	CoverTreePoint() : iter_(NULL), norm_(0.0)
 	{
 	};
-	JLCoverTreePoint(const RandomAccessIterator& iter, double norm) :
+	CoverTreePoint(const RandomAccessIterator& iter, double norm) :
 		iter_(iter), norm_(norm)
 	{
 	};
@@ -114,12 +115,11 @@ struct JLCoverTreePoint
 	double norm_;
 }; /* struct JLCoverTreePoint */
 
-/** Functions declared out of the class definition to respect JLCoverTree 
+/** Functions declared out of the class definition to respect CoverTree 
  *  structure */
-
 template <class RandomAccessIterator, class DistanceCallback>
-double distance(const DistanceCallback& dcb, const JLCoverTreePoint<RandomAccessIterator>& l,
-		const JLCoverTreePoint<RandomAccessIterator>& r, double upper_bound)
+inline double distance(const DistanceCallback& dcb, const CoverTreePoint<RandomAccessIterator>& l,
+		const CoverTreePoint<RandomAccessIterator>& r, double upper_bound)
 {
 	assert(upper_bound>=0);
 
@@ -127,16 +127,14 @@ double distance(const DistanceCallback& dcb, const JLCoverTreePoint<RandomAccess
 		return 0.0;
 
 	if (dcb.is_kernel())
-		return std::sqrt(l.norm_ + r.norm_ - 2*dcb(*r.iter_,*l.iter_));
+		return sqrt(l.norm_ + r.norm_ - 2*dcb(*r.iter_,*l.iter_));
 	else	// distance_kernel
 		return dcb(*l.iter_,*r.iter_);
 }
 
 /** Print the information of the CoverTree point */
 template <class RandomAccessIterator>
-void print(const JLCoverTreePoint<RandomAccessIterator> &p)
+void print(const CoverTreePoint<RandomAccessIterator> &p)
 {
-	std::cout << "Print JLCoverTreePoint not implemented\n";
 }
-
 #endif /* _JL_COVERTREE_POINT_H_*/

@@ -30,7 +30,7 @@ struct addition_callback
 struct kernel_callback
 {
 	kernel_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
-	double operator()(int a, int b) const
+	inline double operator()(int a, int b) const
 	{
 		return feature_matrix.col(a).dot(feature_matrix.col(b));
 	}
@@ -41,7 +41,7 @@ struct kernel_callback
 struct distance_callback
 {
 	distance_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
-	double operator()(int a, int b) const
+	inline double operator()(int a, int b) const
 	{
 		return (feature_matrix.col(a)-feature_matrix.col(b)).norm();
 	}
@@ -97,8 +97,6 @@ EDRT_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 		return BRUTE_FORCE;
 	if (!strcmp(str,"covertree"))
 		return COVER_TREE;
-	if (!strcmp(str,"jlcovertree"))
-		return JL_COVER_TREE;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -147,19 +145,10 @@ int main(int argc, const char** argv)
 	// Embed
 	DenseMatrix embedding;
 	init_shogun_with_defaults();
-	if (parameters[REDUCTION_METHOD].cast<EDRT_METHOD>()==MULTIDIMENSIONAL_SCALING ||
-	    parameters[REDUCTION_METHOD].cast<EDRT_METHOD>()==ISOMAP)
-	{
-		distance_callback dcb(input_data);
-		addition_callback add;
-		embedding = embed(data_indices.begin(),data_indices.end(),dcb,add,parameters);
-	}
-	else
-	{
-		kernel_callback kcb(input_data);
-		addition_callback add;
-		embedding = embed(data_indices.begin(),data_indices.end(),kcb,add,parameters);
-	}
+	distance_callback dcb(input_data);
+	kernel_callback kcb(input_data);
+	addition_callback add;
+	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,add,parameters);
 
 	// Save obtained data
 	ofstream ofs("output.dat");
