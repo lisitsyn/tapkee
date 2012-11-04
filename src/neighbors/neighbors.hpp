@@ -100,16 +100,16 @@ Neighbors find_neighbors_jl_covertree_impl(RandomAccessIterator begin, RandomAcc
 {
 	timed_context context("JL's Covertree-based neighbors search");
 
-	typedef JLCoverTreePoint<RandomAccessIterator, PairwiseCallback> TreePoint;
+	typedef JLCoverTreePoint<RandomAccessIterator> TreePoint;
 	v_array<TreePoint> points;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-		push(points, TreePoint(iter, callback));
+		push(points, TreePoint(iter));
 
-	node<TreePoint> ct = batch_create(points);
+	node<TreePoint> ct = batch_create(callback, points);
 
 	v_array< v_array<TreePoint> > res;
 	++k; // because one of the neighbors will be the actual query point
-	k_nearest_neighbor(ct,ct,res,k);
+	k_nearest_neighbor(callback,ct,ct,res,k);
 
 	Neighbors neighbors;
 	neighbors.resize(end-begin);
@@ -127,6 +127,7 @@ Neighbors find_neighbors_jl_covertree_impl(RandomAccessIterator begin, RandomAcc
 		}
 		neighbors[res[i][0].iter_-begin] = local_neighbors;
 	}
+
 	return neighbors;
 }
 

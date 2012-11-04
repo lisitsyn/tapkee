@@ -168,8 +168,8 @@ void split(v_array<ds_node<P> >& point_set, v_array<ds_node<P> >& far_set, int m
   point_set.index=new_index;  
 }
 
-template<class P>
-void dist_split(v_array<ds_node<P> >& point_set, 
+template<class P, class DistanceCallback>
+void dist_split(const DistanceCallback& dcb, v_array<ds_node<P> >& point_set,
 		v_array<ds_node<P> >& new_point_set, 
 		P new_point, 
 		int max_scale)
@@ -179,7 +179,7 @@ void dist_split(v_array<ds_node<P> >& point_set,
   for(int i = 0; i < point_set.index; i++) 
     {
       double new_d;
-      new_d = distance(new_point, point_set[i].p, fmax);
+      new_d = distance(dcb, new_point, point_set[i].p, fmax);
       if (new_d <= fmax ) 
       {
 	push(point_set[i].dist, new_d);
@@ -199,8 +199,8 @@ void dist_split(v_array<ds_node<P> >& point_set,
    point_set contains points which are 2*max_scale or less away.
 */
 
-template <class P>
-node<P> batch_insert(const P& p, 
+template <class P, class DistanceCallback>
+node<P> batch_insert(const DistanceCallback& dcb, const P& p,
 		  int max_scale, 
 		  int top_scale,
 		  v_array<ds_node<P> >& point_set, 
@@ -235,7 +235,7 @@ node<P> batch_insert(const P& p,
 	v_array<ds_node<P> > far = pop(stack);
 	split(point_set,far,max_scale); //O(|point_set|)
 	
-	node<P> child = batch_insert(p, next_scale, top_scale, point_set, consumed_set, stack);
+	node<P> child = batch_insert(dcb, p, next_scale, top_scale, point_set, consumed_set, stack);
 	
 	if (point_set.index == 0)
 	  {
@@ -255,11 +255,11 @@ node<P> batch_insert(const P& p,
 	    push(consumed_set, point_set.last());
 	    point_set.decr();
 	    
-	    dist_split(point_set, new_point_set, new_point, max_scale); //O(|point_saet|)
-	    dist_split(far,new_point_set,new_point,max_scale); //O(|far|)
+	    dist_split(dcb,point_set,new_point_set,new_point,max_scale); //O(|point_saet|)
+	    dist_split(dcb,far,new_point_set,new_point,max_scale); //O(|far|)
 	    
 	    node<P> new_child = 
-	      batch_insert(new_point, next_scale, top_scale, new_point_set, new_consumed_set, stack);
+	      batch_insert(dcb, new_point, next_scale, top_scale, new_point_set, new_consumed_set, stack);
 	    new_child.parent_dist = new_dist;
 
 	    push(children, new_child);
@@ -296,8 +296,8 @@ node<P> batch_insert(const P& p,
   }
 }
   
-template<class P>
-node<P> batch_create(v_array<P> points) 
+template<class P, class DistanceCallback>
+node<P> batch_create(const DistanceCallback& dcb, v_array<P> points)
 {
   assert(points.index > 0);
   v_array<ds_node<P> > point_set;
@@ -305,7 +305,7 @@ node<P> batch_create(v_array<P> points)
 
   for (int i = 1; i < points.index; i++) {
     ds_node<P> temp;
-    push(temp.dist, distance(points[0], points[i], FLT_MAX)); 
+    push(temp.dist, distance(dcb, points[0], points[i], FLT_MAX));
     temp.p = points[i];
     push(point_set,temp);
   }
@@ -314,7 +314,7 @@ node<P> batch_create(v_array<P> points)
   
   float max_dist = max_set(point_set);
   
-  node<P> top = batch_insert (points[0], 
+  node<P> top = batch_insert (dcb, points[0],
 			   get_scale(max_dist),
 			   get_scale(max_dist),
 			    point_set, 
@@ -535,9 +535,10 @@ void (*update)(float *foo, float bar) = update_k;
 void (*setter)(float *foo, float bar) = set_k;
 float* (*alloc_upper)() = alloc_k;
 
-template <class P>
-inline void copy_zero_set(node<P>* query_chi, float* new_upper_bound, 
-			    v_array<d_node<P> > &zero_set, v_array<d_node<P> > &new_zero_set)
+template <class P, class DistanceCallback>
+inline void copy_zero_set(const DistanceCallback& dcb, node<P>* query_chi,
+		          float* new_upper_bound, v_array<d_node<P> > &zero_set,
+			  v_array<d_node<P> > &new_zero_set)
 {
   new_zero_set.index = 0;
   d_node<P> *end = zero_set.elements + zero_set.index;
@@ -546,7 +547,7 @@ inline void copy_zero_set(node<P>* query_chi, float* new_upper_bound,
       float upper_dist = *new_upper_bound + query_chi->max_dist;
       if (shell(ele->dist, query_chi->parent_dist, upper_dist))
 	{
-	  float d = distance(query_chi->p, ele->n->p, upper_dist);
+	  float d = distance(dcb, query_chi->p, ele->n->p, upper_dist);
 	  
 	  if (d <= upper_dist)
 	    {
@@ -559,11 +560,12 @@ inline void copy_zero_set(node<P>* query_chi, float* new_upper_bound,
     }
 }
 
-template <class P>
-inline void copy_cover_sets(node<P>* query_chi, float* new_upper_bound,
-			      v_array<v_array<d_node<P> > > &cover_sets,
-			      v_array<v_array<d_node<P> > > &new_cover_sets,
-			      int current_scale, int max_scale)
+template <class P, class DistanceCallback>
+inline void copy_cover_sets(const DistanceCallback& dcb, node<P>* query_chi,
+			    float* new_upper_bound,
+			    v_array<v_array<d_node<P> > > &cover_sets,
+			    v_array<v_array<d_node<P> > > &new_cover_sets,
+			    int current_scale, int max_scale)
 {
   for (; current_scale <= max_scale; current_scale++)
     {
@@ -574,7 +576,7 @@ inline void copy_cover_sets(node<P>* query_chi, float* new_upper_bound,
 	  float upper_dist = *new_upper_bound + query_chi->max_dist + ele->n->max_dist;
 	  if (shell(ele->dist, query_chi->parent_dist, upper_dist))
 	    {
-	      float d = distance(query_chi->p, ele->n->p, upper_dist);
+	      float d = distance(dcb, query_chi->p, ele->n->p, upper_dist);
 	      
 	      if (d <= upper_dist)
 		{
@@ -639,12 +641,11 @@ void print_cover_sets(v_array<v_array<d_node<P> > > &cover_sets,
   Compute distances in the presence of the tighter upper bound.
  */
 
-template <class P>
+template <class P, class DistanceCallback>
 inline 
-void descend(const node<P>* query, float* upper_bound, 
-		      int current_scale,
-		      int &max_scale, v_array<v_array<d_node<P> > > &cover_sets, 
-		      v_array<d_node<P> > &zero_set)
+void descend(const DistanceCallback& dcb, const node<P>* query, float* upper_bound,
+	     int current_scale,int &max_scale, v_array<v_array<d_node<P> > > &cover_sets,
+	     v_array<d_node<P> > &zero_set)
 {
   d_node<P> *end = cover_sets[current_scale].elements + cover_sets[current_scale].index;
   for (d_node<P> *parent = cover_sets[current_scale].elements; parent != end; parent++)
@@ -675,7 +676,7 @@ void descend(const node<P>* query, float* upper_bound,
 	      float upper_chi = *upper_bound + chi->max_dist + query->max_dist + query->max_dist;
 	      if (shell(parent->dist, chi->parent_dist, upper_chi))
 		{
-		  float d = distance(query->p, chi->p, upper_chi);
+		  float d = distance(dcb, query->p, chi->p, upper_chi);
 		  if (d <= upper_chi) 
 		    {
 		      if (d < *upper_bound)
@@ -700,9 +701,9 @@ void descend(const node<P>* query, float* upper_bound,
     }
 }
 
-template <class P>
-void brute_nearest(const node<P>* query,v_array<d_node<P> > zero_set,
-		   float* upper_bound,
+template <class P, class DistanceCallback>
+void brute_nearest(const DistanceCallback& dcb, const node<P>* query,
+		   v_array<d_node<P> > zero_set, float* upper_bound,
 		   v_array<v_array<P> > &results,
 		   v_array<v_array<d_node<P> > > &spare_zero_sets)
 {
@@ -710,15 +711,15 @@ void brute_nearest(const node<P>* query,v_array<d_node<P> > zero_set,
     {
       v_array<d_node<P> > new_zero_set = pop(spare_zero_sets);
       node<P> * query_chi = query->children; 
-      brute_nearest(query_chi, zero_set, upper_bound, results, spare_zero_sets);
+      brute_nearest(dcb, query_chi, zero_set, upper_bound, results, spare_zero_sets);
       float* new_upper_bound = alloc_upper();
       
       node<P> *child_end = query->children + query->num_children;
       for (query_chi++;query_chi != child_end; query_chi++)
 	{
 	  setter(new_upper_bound,*upper_bound + query_chi->parent_dist);
-	  copy_zero_set(query_chi, new_upper_bound, zero_set, new_zero_set);
-	  brute_nearest(query_chi, new_zero_set, new_upper_bound, results, spare_zero_sets);
+	  copy_zero_set(dcb, query_chi, new_upper_bound, zero_set, new_zero_set);
+	  brute_nearest(dcb, query_chi, new_zero_set, new_upper_bound, results, spare_zero_sets);
 	}
       free (new_upper_bound);
       new_zero_set.index = 0;
@@ -736,8 +737,8 @@ void brute_nearest(const node<P>* query,v_array<d_node<P> > zero_set,
     }
 }
 
-template <class P>
-void internal_batch_nearest_neighbor(const node<P> *query, 
+template <class P, class DistanceCallback>
+void internal_batch_nearest_neighbor(const DistanceCallback& dcb, const node<P> *query,
 				     v_array<v_array<d_node<P> > > &cover_sets,
 				     v_array<d_node<P> > &zero_set,
 				     int current_scale,
@@ -748,7 +749,7 @@ void internal_batch_nearest_neighbor(const node<P> *query,
 				     v_array<v_array<d_node<P> > > &spare_zero_sets)
 {
   if (current_scale > max_scale) // All remaining points are in the zero set. 
-    brute_nearest(query, zero_set, upper_bound, results, spare_zero_sets);
+    brute_nearest(dcb, query, zero_set, upper_bound, results, spare_zero_sets);
   else
     if (query->scale <= current_scale && query->scale != 100) 
       // Our query has too much scale.  Reduce.
@@ -762,10 +763,10 @@ void internal_batch_nearest_neighbor(const node<P> *query,
 	for (query_chi++; query_chi != child_end; query_chi++)
 	  {
 	    setter(new_upper_bound,*upper_bound + query_chi->parent_dist);
-	    copy_zero_set(query_chi, new_upper_bound, zero_set, new_zero_set);
-	    copy_cover_sets(query_chi, new_upper_bound, cover_sets, new_cover_sets,
+	    copy_zero_set(dcb, query_chi, new_upper_bound, zero_set, new_zero_set);
+	    copy_cover_sets(dcb, query_chi, new_upper_bound, cover_sets, new_cover_sets,
 			      current_scale, max_scale);
-	    internal_batch_nearest_neighbor(query_chi, new_cover_sets, new_zero_set,
+	    internal_batch_nearest_neighbor(dcb, query_chi, new_cover_sets, new_zero_set,
 					    current_scale, max_scale, new_upper_bound, 
 					    results, spare_cover_sets, spare_zero_sets);
 	  }
@@ -773,24 +774,24 @@ void internal_batch_nearest_neighbor(const node<P> *query,
 	new_zero_set.index = 0;
 	push(spare_zero_sets, new_zero_set);
 	push(spare_cover_sets, new_cover_sets);
-	internal_batch_nearest_neighbor(query->children, cover_sets, zero_set, 
+	internal_batch_nearest_neighbor(dcb, query->children, cover_sets, zero_set,
 					current_scale, max_scale, upper_bound, results, 
 					spare_cover_sets, spare_zero_sets);
       }
     else // reduce cover set scale
       {
 	halfsort(cover_sets[current_scale]);
-	descend(query, upper_bound, current_scale, max_scale,cover_sets, zero_set);
+	descend(dcb, query, upper_bound, current_scale, max_scale,cover_sets, zero_set);
 	cover_sets[current_scale++].index = 0;
-	internal_batch_nearest_neighbor(query, cover_sets, zero_set, 
+	internal_batch_nearest_neighbor(dcb, query, cover_sets, zero_set,
 					current_scale, max_scale, upper_bound, results, 
 					spare_cover_sets, spare_zero_sets);
       }
 }
 
-template <class P>
-void batch_nearest_neighbor(const node<P> &top_node, const node<P> &query, 
-			    v_array<v_array<P> > &results)
+template <class P, class DistanceCallback>
+void batch_nearest_neighbor(const DistanceCallback &dcb, const node<P> &top_node,
+			    const node<P> &query, v_array<v_array<P> > &results)
 {
   v_array<v_array<v_array<d_node<P> > > > spare_cover_sets;
   v_array<v_array<d_node<P> > > spare_zero_sets;
@@ -801,13 +802,13 @@ void batch_nearest_neighbor(const node<P> &top_node, const node<P> &query,
   float* upper_bound = alloc_upper();
   setter(upper_bound,FLT_MAX);
   
-  float top_dist = distance(query.p, top_node.p, FLT_MAX);
+  float top_dist = distance(dcb, query.p, top_node.p, FLT_MAX);
   update(upper_bound, top_dist);
   
   d_node<P> temp = {top_dist, &top_node};
   push(cover_sets[0], temp);
   
-  internal_batch_nearest_neighbor(&query,cover_sets,zero_set,0,0,upper_bound,results, 
+  internal_batch_nearest_neighbor(dcb, &query,cover_sets,zero_set,0,0,upper_bound,results,
 				  spare_cover_sets,spare_zero_sets);
   
   free(upper_bound);
@@ -829,39 +830,40 @@ void batch_nearest_neighbor(const node<P> &top_node, const node<P> &query,
   free(spare_zero_sets.elements);
 }
 
-template <class P>
-void k_nearest_neighbor(const node<P> &top_node, const node<P> &query, 
-			v_array<v_array<P> > &results, int k)
+template <class P, class DistanceCallback>
+void k_nearest_neighbor(const DistanceCallback &dcb, const node<P> &top_node,
+		        const node<P> &query, v_array<v_array<P> > &results, int k)
 {
   internal_k = k;
   update = update_k;
   setter = set_k;
   alloc_upper = alloc_k;
   
-  batch_nearest_neighbor(top_node, query,results);
+  batch_nearest_neighbor(dcb, top_node, query, results);
 }
 
-template <class P>
-void epsilon_nearest_neighbor(const node<P> &top_node, const node<P> &query, 
-			      v_array<v_array<P> > &results, float epsilon)
+template <class P, class DistanceCallback>
+void epsilon_nearest_neighbor(const DistanceCallback &dcb, const node<P> &top_node,
+			      const node<P> &query, v_array<v_array<P> > &results,
+			      float epsilon)
 {
   internal_epsilon = epsilon;
 //  update = update_epsilon;
   setter = set_epsilon;
   alloc_upper = alloc_epsilon;
 
-  batch_nearest_neighbor(top_node, query,results);
+  batch_nearest_neighbor(dcb, top_node, query, results);
 }
 
-template <class P>
-void unequal_nearest_neighbor(const node<P> &top_node, const node<P> &query, 
-			      v_array<v_array<P> > &results)
+template <class P, class DistanceCallback>
+void unequal_nearest_neighbor(const DistanceCallback &dcb, const node<P> &top_node,
+			      const node<P> &query, v_array<v_array<P> > &results)
 {
   update = update_unequal;
   setter = set_unequal;
   alloc_upper = alloc_unequal;
   
-  batch_nearest_neighbor(top_node, query, results);
+  batch_nearest_neighbor(dcb, top_node, query, results);
 }
 
 #endif

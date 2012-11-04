@@ -99,32 +99,34 @@ v_array<T> pop(v_array<v_array<T> > &stack)
  * and print, see below) so it can be used with the JLCoverTree
  * implementation.
  */
-template <class RandomAccessIterator, class DistanceCallback>
+template <class RandomAccessIterator>
 struct JLCoverTreePoint
 {
-	JLCoverTreePoint() : iter_(NULL), dc_(NULL) {};
-	JLCoverTreePoint(const RandomAccessIterator& iter, const DistanceCallback& dc) :
-		iter_(iter), dc_(dc) {};
+	JLCoverTreePoint() : iter_(NULL)  {};
+	JLCoverTreePoint(const RandomAccessIterator& iter) :
+		iter_(iter) {};
 
 	RandomAccessIterator iter_;
-	// TODO not every point needs its own DistanceCallback...
-	DistanceCallback dc_;
 }; /* struct JLCoverTreePoint */
 
 /** Functions declared out of the class definition to respect JLCoverTree 
  *  structure */
 
 template <class RandomAccessIterator, class DistanceCallback>
-double distance(const JLCoverTreePoint<RandomAccessIterator, DistanceCallback>& l,
-	        const JLCoverTreePoint<RandomAccessIterator, DistanceCallback>& r, double upper_bound)
+double distance(const DistanceCallback& dcb, const JLCoverTreePoint<RandomAccessIterator>& l,
+		const JLCoverTreePoint<RandomAccessIterator>& r, double upper_bound)
 {
 	assert(upper_bound>=0);
-	return std::sqrt(l.dc_(*l.iter_,*l.iter_) + l.dc_(*r.iter_,*r.iter_) - 2*l.dc_(*r.iter_,*l.iter_));
+
+	if (*l.iter_==*r.iter_)
+		return 0.0;
+
+	return std::sqrt(dcb(*l.iter_,*l.iter_) + dcb(*r.iter_,*r.iter_) - 2*dcb(*r.iter_,*l.iter_));
 }
 
 /** Print the information of the CoverTree point */
-template <class RandomAccessIterator, class DistanceCallback>
-void print(const JLCoverTreePoint<RandomAccessIterator, DistanceCallback> &p)
+template <class RandomAccessIterator>
+void print(const JLCoverTreePoint<RandomAccessIterator> &p)
 {
 	std::cout << "Print JLCoverTreePoint not implemented\n";
 }
