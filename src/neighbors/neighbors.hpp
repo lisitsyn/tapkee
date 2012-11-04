@@ -103,7 +103,7 @@ Neighbors find_neighbors_jl_covertree_impl(RandomAccessIterator begin, RandomAcc
 	typedef JLCoverTreePoint<RandomAccessIterator> TreePoint;
 	v_array<TreePoint> points;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-		push(points, TreePoint(iter));
+		push(points, TreePoint(iter, callback(*iter,*iter)));
 
 	node<TreePoint> ct = batch_create(callback, points);
 

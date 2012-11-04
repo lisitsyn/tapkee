@@ -102,11 +102,16 @@ v_array<T> pop(v_array<v_array<T> > &stack)
 template <class RandomAccessIterator>
 struct JLCoverTreePoint
 {
-	JLCoverTreePoint() : iter_(NULL)  {};
-	JLCoverTreePoint(const RandomAccessIterator& iter) :
-		iter_(iter) {};
+	JLCoverTreePoint() : iter_(NULL), norm_(0.0)
+	{
+	};
+	JLCoverTreePoint(const RandomAccessIterator& iter, double norm) :
+		iter_(iter), norm_(norm)
+	{
+	};
 
 	RandomAccessIterator iter_;
+	double norm_;
 }; /* struct JLCoverTreePoint */
 
 /** Functions declared out of the class definition to respect JLCoverTree 
@@ -122,7 +127,7 @@ double distance(const DistanceCallback& dcb, const JLCoverTreePoint<RandomAccess
 		return 0.0;
 
 	if (dcb.is_kernel())
-		return std::sqrt(dcb(*l.iter_,*l.iter_) + dcb(*r.iter_,*r.iter_) - 2*dcb(*r.iter_,*l.iter_));
+		return std::sqrt(l.norm_ + r.norm_ - 2*dcb(*r.iter_,*l.iter_));
 	else	// distance_kernel
 		return dcb(*l.iter_,*r.iter_);
 }
