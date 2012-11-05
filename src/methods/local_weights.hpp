@@ -21,7 +21,7 @@ SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const 
 	const int k = neighbors[0].size();
 
 	SparseTriplets sparse_triplets;
-	sparse_triplets.reserve(k*k*(end-begin));
+	sparse_triplets.reserve((k*k+k+1)*(end-begin));
 
 	RandomAccessIterator iter;
 	RandomAccessIterator iter_begin = begin, iter_end = end;
@@ -29,7 +29,7 @@ SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const 
 	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
 	DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
-	for (RandomAccessIterator iter=iter_begin; iter!=iter_end; ++iter)
+	for (iter=iter_begin; iter<iter_end; ++iter)
 	{
 		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
 	
@@ -59,7 +59,7 @@ SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const 
 		G.col(0).setConstant(1/sqrt(k));
 
 		G.rightCols(target_dimension) = sae_solver.eigenvectors().rightCols(target_dimension);
-		gram_matrix = G * G.transpose();
+		gram_matrix.noalias() = G * G.transpose();
 		
 		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1e-8));
 		for (int i=0; i<k; ++i)
@@ -85,7 +85,7 @@ SparseWeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const R
 	const int k = neighbors[0].size();
 
 	SparseTriplets sparse_triplets;
-	sparse_triplets.reserve(k*k*(end-begin));
+	sparse_triplets.reserve((k*k+2*k+1)*(end-begin));
 
 	RandomAccessIterator iter;
 	RandomAccessIterator iter_begin = begin, iter_end = end;
@@ -141,15 +141,14 @@ SparseWeightMatrix hlle_weight_matrix(const RandomAccessIterator& begin, const R
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve(k*k*(end-begin));
 
-	RandomAccessIterator iter;
 	RandomAccessIterator iter_begin = begin, iter_end = end;
 	DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
 	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
+	DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
 
-//	unsigned int dp = target_dimension*(target_dimension+1)/2;
-
-	for (RandomAccessIterator iter=iter_begin; iter!=iter_end; ++iter)
+	RandomAccessIterator iter;
+	for (iter=iter_begin; iter!=iter_end; ++iter)
 	{
 		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
 	
@@ -176,9 +175,7 @@ SparseWeightMatrix hlle_weight_matrix(const RandomAccessIterator& begin, const R
 		Eigen::SelfAdjointEigenSolver<DenseMatrix> sae_solver;
 		sae_solver.compute(gram_matrix);
 
-		DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
 		G.col(0).setConstant(1/sqrt(k));
-
 		G.rightCols(target_dimension) = sae_solver.eigenvectors().rightCols(target_dimension);
 		gram_matrix = G * G.transpose();
 		

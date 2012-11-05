@@ -31,6 +31,7 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
                   const AdditionCallback& add_callback, 
                   ParametersMap options)
 {
+	Eigen::initParallel();
 	EmbeddingResult embedding_result;
 
 	// load common parameters from the parameters map

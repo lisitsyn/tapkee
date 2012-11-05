@@ -6,10 +6,10 @@ OBJECTS=$(SOURCES:%.cpp=%.o)
 all: default
 
 default: 
-	$(CXX) $(CFLAGS) -O3 -o application src/main.cpp $(SOURCES) -I/usr/include/atlas -I/usr/include/superlu -lshogun -lsuperlu -larpack $(LDFLAGS)
+	$(CXX) $(CFLAGS) -O3 -o application src/main.cpp $(SOURCES) -I/usr/include/atlas -I/usr/include/superlu -lshogun -lsuperlu -larpack -fopenmp $(LDFLAGS)
 
 debug:
-	$(CXX) $(CFLAGS) -g -o application src/main.cpp $(SOURCES) -I/usr/include/atlas -I/usr/include/superlu -lshogun -lsuperlu -larpack $(LDFLAGS)
+	$(CXX) $(CFLAGS) -g -o application src/main.cpp $(SOURCES) -I/usr/include/atlas -I/usr/include/superlu -lshogun -lsuperlu -larpack -fopenmp $(LDFLAGS)
 
 
 clean:

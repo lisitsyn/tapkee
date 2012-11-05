@@ -60,7 +60,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 	{
 		timed_context context("ARPACK DSXUPD eigendecomposition");
 
-		ArpackGeneralizedSelfAdjointEigenSolver<WeightMatrix, WeightMatrixOperation> arpack(wm,target_dimension+1,"SM");
+		ArpackGeneralizedSelfAdjointEigenSolver<WeightMatrix, WeightMatrixOperation> arpack(wm,target_dimension+skip,"SM");
 
 		DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
 
