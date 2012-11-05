@@ -20,6 +20,12 @@
 #include "../utils/time.hpp"
 #include "../utils/arpack_wrapper.hpp"
 
+/** Matrix-matrix operation used to 
+ * compute smallest eigenvalues and 
+ * associated eigenvectors. Essentially
+ * solves linear system with provided
+ * right-hand side part.
+ */
 template <class MatrixType>
 struct InverseSparseMatrixOperation
 {
@@ -27,6 +33,8 @@ struct InverseSparseMatrixOperation
 	{
 		solver.compute(matrix);
 	}
+	/** Solves linear system with provided right-hand size
+	 */
 	DenseMatrix operator()(DenseMatrix operatee)
 	{
 		return solver.solve(operatee);
@@ -34,25 +42,50 @@ struct InverseSparseMatrixOperation
 	Eigen::SimplicialLDLT<MatrixType> solver;
 };
 
+/** Matrix-matrix operation used to
+ * compute largest eigenvalues and
+ * associated eigenvectors. Essentially
+ * computes matrix product with 
+ * provided right-hand side part.
+ */
 template <class MatrixType>
 struct DenseMatrixOperation
 {
 	DenseMatrixOperation(const MatrixType& matrix) : _matrix(matrix)
 	{
 	}
+	/** Computes matrix product of the matrix and provided right-hand 
+	 * side matrix
+	 */
 	DenseMatrix operator()(DenseMatrix operatee)
 	{
 		return _matrix*operatee;
 	}
+	// TODO avoid copying somehow
 	MatrixType _matrix;
 };
 
+/** Templated implementation of eigendecomposition-based embedding. 
+ * Has three template parameters:
+ * WeightMatrix - class of weight matrix to perform eigendecomposition of
+ * WeightMatrixOperation - class of product operation over matrix.
+ *
+ * In order to find largest eigenvalues WeightMatrixOperation should provide
+ * implementation of operator()(DenseMatrix) which computes right product
+ * of the parameter with the WeightMatrix.
+ */
 template <class WeightMatrix, template<class> class WeightMatrixOperation, int> 
 struct eigen_embedding_impl
 {
+	/** Construct embedding
+	 * @param wm weight matrix to eigendecompose
+	 * @param target_dimension target dimension of embedding (number of eigenvectors to find)
+	 * @param skip number of eigenvectors to skip
+	 */
 	virtual EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip);
 };
 
+/** ARPACK implementation of eigendecomposition-based embedding */
 template <class WeightMatrix, template<class> class WeightMatrixOperation> 
 struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 {
@@ -68,6 +101,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 	}
 };
 
+/** Randomized redsvd-like implementation of eigendecomposition-based embedding */
 template <class WeightMatrix, template<class> class WeightMatrixOperation> 
 struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVERSE>
 {
@@ -132,6 +166,11 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 	}
 };
 
+/** Adapter method for various eigendecomposition methods. Currently
+ * supports two methods:
+ * * ARPACK_XSXUPD
+ * * RANDOMIZED_INVERSE
+ */
 template <class WeightMatrix, template<class> class WeightMatrixOperation>
 EmbeddingResult eigen_embedding(EDRT_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, 
                                 unsigned int target_dimension, unsigned int skip)

@@ -25,6 +25,34 @@
 #include "methods/isomap.hpp"
 #include "neighbors/neighbors.hpp"
 
+/** Main entry-point of the library. Constructs dense embedding with specified dimension
+ * using provided data and callbacks.
+ *
+ * Has four template parameters:
+ * 
+ * RandomAccessIterator basic random access iterator with no specific capabilities.
+ * 
+ * KernelCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation 
+ * between two iterators. The operation should return value of Mercer kernel function 
+ * between vectors/objects iterators pointing to. KernelCallback should be marked as a kernel function using
+ * EDRT_CALLBACK_IS_KERNEL macro (fails during compilation in other case).
+ * 
+ * DistanceCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation
+ * between two iterators. DistanceCallback should be marked as a distance function using 
+ * EDRT_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
+ * 
+ * AdditionCallback TODO
+ *
+ * Parameters required by the chosen algorithm are obtained from the parameter map. It fails during runtime if
+ * some of required parameters are not specified or have improper values.
+ *
+ * @param begin begin iterator of data
+ * @param end end iterator of data
+ * @param kernel_callback the kernel callback described before
+ * @param distance_callback the distance callback described before
+ * @param add_callback TODO
+ * @param options parameter map
+ */
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class AdditionCallback>
 DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator& end,
                   const KernelCallback& kernel_callback, const DistanceCallback& distance_callback,
