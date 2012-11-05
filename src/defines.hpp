@@ -76,14 +76,15 @@ enum EDRT_PARAMETERS
 	NEIGHBORS_METHOD
 };
 
-typedef Eigen::Triplet<double> SparseTriplet;
+typedef double DefaultScalarType;
+typedef Eigen::Triplet<DefaultScalarType> SparseTriplet;
 typedef std::vector<SparseTriplet> SparseTriplets;
-typedef Eigen::MatrixXd DenseMatrix;
-typedef Eigen::VectorXd DenseVector;
+typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,Eigen::Dynamic> DenseMatrix;
+typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
 typedef std::vector<int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
-typedef std::pair<Eigen::MatrixXd,Eigen::VectorXd> EmbeddingResult;
+typedef std::pair<DenseMatrix,DenseVector> EmbeddingResult;
 typedef std::map<EDRT_PARAMETERS, any> ParametersMap;
-typedef Eigen::SparseMatrix<double> SparseWeightMatrix;
+typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
 
 #endif

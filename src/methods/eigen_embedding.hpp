@@ -76,9 +76,9 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 		timed_context context("Randomized eigendecomposition");
 		
 		DenseMatrix O(wm.rows(), target_dimension+skip);
-		for (int i=0; i<O.rows(); ++i)
+		for (unsigned int i=0; i<O.rows(); ++i)
 		{
-			int j=0;
+			unsigned int j=0;
 			for ( ; j+1 < O.cols(); j+= 2)
 			{
 				double v1 = (double)(rand()+1.f)/((float)RAND_MAX+2.f);
@@ -98,14 +98,14 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 		WeightMatrixOperation<WeightMatrix> operation(wm);
 
 		DenseMatrix Y = operation(O);
-		for (int i=0; i<Y.cols(); i++)
+		for (unsigned int i=0; i<Y.cols(); i++)
 		{
-			for (int j=0; j<i; j++)
+			for (unsigned int j=0; j<i; j++)
 			{
-				double r = Y.col(i).dot(Y.col(j));
+				DefaultScalarType r = Y.col(i).dot(Y.col(j));
 				Y.col(i) -= r*Y.col(j);
 			}
-			double norm = Y.col(i).norm();
+			DefaultScalarType norm = Y.col(i).norm();
 			if (norm < 1e-4)
 			{
 				for (int k = i; k<Y.cols(); k++)

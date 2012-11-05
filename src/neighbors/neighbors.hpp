@@ -35,7 +35,7 @@ struct kernel_distance
 {
 	kernel_distance(const KernelCallback& kc) : kc_(kc) {};
 	KernelCallback kc_;
-	double operator()(const pair<double, RandomAccessIterator>& l, const pair<double, RandomAccessIterator>& r) const
+	DefaultScalarType operator()(const pair<DefaultScalarType, RandomAccessIterator>& l, const pair<DefaultScalarType, RandomAccessIterator>& r) const
 	{
 		return l.first + r.first - 2*kc_(*(l.second),*(r.second));
 	}
@@ -127,7 +127,11 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
 			local_neighbors.push_back(res[i][j].iter_-begin);
 		}
 		neighbors[res[i][0].iter_-begin] = local_neighbors;
-	}
+		free(res[i].elements);
+	};
+	free(res.elements);
+	free_children(ct);
+	free(points.elements);
 	return neighbors;
 }
 
@@ -136,7 +140,7 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
                                          const PairwiseCallback& callback, unsigned int k)
 {
 	timed_context context("Distance sorting based neighbors search");
-	typedef std::pair<RandomAccessIterator, double> DistanceRecord;
+	typedef std::pair<RandomAccessIterator, DefaultScalarType> DistanceRecord;
 	typedef std::vector<DistanceRecord> Distances;
 
 	Neighbors neighbors;

@@ -37,7 +37,7 @@ SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const 
 		{
 			for (int j=i; j<k; ++j)
 			{
-				double kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
+				DefaultScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
 				gram_matrix(i,j) = kij;
 				gram_matrix(j,i) = kij;
 			}
@@ -48,7 +48,7 @@ SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const 
 			col_means[i] = gram_matrix.col(i).mean();
 			row_means[i] = gram_matrix.row(i).mean();
 		}
-		double grand_mean = gram_matrix.mean();
+		DefaultScalarType grand_mean = gram_matrix.mean();
 		gram_matrix.array() += grand_mean;
 		gram_matrix.rowwise() -= col_means.transpose();
 		gram_matrix.colwise() -= row_means;
@@ -95,7 +95,7 @@ SparseWeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const R
 	DenseVector weights;
 	for (RandomAccessIterator iter=iter_begin; iter!=iter_end; ++iter)
 	{
-		double kernel_value = callback(*iter,*iter);
+		DefaultScalarType kernel_value = callback(*iter,*iter);
 		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
 		
 		for (int i=0; i<k; ++i)
@@ -107,7 +107,7 @@ SparseWeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const R
 				gram_matrix(i,j) = kernel_value - dots(i) - dots(j) + callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
 		}
 		
-		double trace = gram_matrix.trace();
+		DefaultScalarType trace = gram_matrix.trace();
 		gram_matrix.diagonal().array() += 1e-3*trace;
 		weights = gram_matrix.ldlt().solve(rhs);
 		weights /= weights.sum();
@@ -157,7 +157,7 @@ SparseWeightMatrix hlle_weight_matrix(const RandomAccessIterator& begin, const R
 		{
 			for (int j=i; j<k; ++j)
 			{
-				double kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
+				DefaultScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
 				gram_matrix(i,j) = kij;
 				gram_matrix(j,i) = kij;
 			}
@@ -168,7 +168,7 @@ SparseWeightMatrix hlle_weight_matrix(const RandomAccessIterator& begin, const R
 			col_means[i] = gram_matrix.col(i).mean();
 			row_means[i] = gram_matrix.row(i).mean();
 		}
-		double grand_mean = gram_matrix.mean();
+		DefaultScalarType grand_mean = gram_matrix.mean();
 		gram_matrix.array() += grand_mean;
 		gram_matrix.rowwise() -= col_means.transpose();
 		gram_matrix.colwise() -= row_means;

@@ -107,20 +107,20 @@ struct CoverTreePoint
 	CoverTreePoint() : iter_(NULL), norm_(0.0)
 	{
 	};
-	CoverTreePoint(const RandomAccessIterator& iter, double norm) :
+	CoverTreePoint(const RandomAccessIterator& iter, DefaultScalarType norm) :
 		iter_(iter), norm_(norm)
 	{
 	};
 
 	RandomAccessIterator iter_;
-	double norm_;
+	DefaultScalarType norm_;
 }; /* struct JLCoverTreePoint */
 
 /** Functions declared out of the class definition to respect CoverTree 
  *  structure */
 template <class RandomAccessIterator, class DistanceCallback>
-inline double distance(const DistanceCallback& dcb, const CoverTreePoint<RandomAccessIterator>& l,
-		const CoverTreePoint<RandomAccessIterator>& r, double upper_bound)
+inline DefaultScalarType distance(const DistanceCallback& dcb, const CoverTreePoint<RandomAccessIterator>& l,
+		const CoverTreePoint<RandomAccessIterator>& r, DefaultScalarType upper_bound)
 {
 	assert(upper_bound>=0);
 

@@ -10,7 +10,6 @@
 #include "edrt.hpp"
 #include "defines.hpp"
 
-#include <shogun/features/DenseFeatures.h>
 #include <algorithm>
 #include <string>
 #include <istream>
@@ -19,7 +18,6 @@
 #include <iterator>
 
 using namespace Eigen;
-using namespace shogun;
 using namespace std;
 
 struct addition_callback
@@ -30,7 +28,7 @@ struct addition_callback
 struct kernel_callback
 {
 	kernel_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline double operator()(int a, int b) const
+	inline DefaultScalarType operator()(int a, int b) const
 	{
 		return feature_matrix.col(a).dot(feature_matrix.col(b));
 	}
@@ -41,7 +39,7 @@ EDRT_CALLBACK_IS_KERNEL(kernel_callback);
 struct distance_callback
 {
 	distance_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline double operator()(int a, int b) const
+	inline DefaultScalarType operator()(int a, int b) const
 	{
 		return (feature_matrix.col(a)-feature_matrix.col(b)).norm();
 	}
@@ -53,16 +51,16 @@ DenseMatrix read_data(const string& filename)
 {
 	ifstream ifs(filename.c_str());
 	string str;
-	vector< vector<double> > input_data;
+	vector< vector<DefaultScalarType> > input_data;
 	while (!ifs.eof())
 	{
 		getline(ifs,str);
 		if (str.size())
 		{
 			stringstream strstr(str);
-			istream_iterator<double> it(strstr);
-			istream_iterator<double> end;
-			vector<double> row(it, end);
+			istream_iterator<DefaultScalarType> it(strstr);
+			istream_iterator<DefaultScalarType> end;
+			vector<DefaultScalarType> row(it, end);
 			input_data.push_back(row);
 		}
 	}
@@ -142,7 +140,6 @@ int main(int argc, const char** argv)
 	
 	// Embed
 	DenseMatrix embedding;
-	init_shogun_with_defaults();
 	distance_callback dcb(input_data);
 	kernel_callback kcb(input_data);
 	addition_callback add;
