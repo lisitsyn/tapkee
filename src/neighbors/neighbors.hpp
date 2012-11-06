@@ -18,7 +18,7 @@
 #include <utility>
 #include <algorithm>
 
-using std::partial_sort;
+using std::nth_element;
 using std::pair;
 
 template <class DistanceRecord>
@@ -159,8 +159,8 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 				distances.push_back(make_pair(around_iter, callback(*iter,*around_iter)));
 		}
 
-		partial_sort(distances.begin(),distances.begin()+k+1,distances.end(),
-		             distances_comparator<DistanceRecord>());
+		nth_element(distances.begin(),distances.begin()+k+1,distances.end(),
+		            distances_comparator<DistanceRecord>());
 
 		LocalNeighbors local_neighbors;
 		local_neighbors.reserve(k);
