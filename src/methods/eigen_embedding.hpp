@@ -35,7 +35,7 @@ struct InverseSparseMatrixOperation
 	}
 	/** Solves linear system with provided right-hand size
 	 */
-	DenseMatrix operator()(DenseMatrix operatee)
+	inline DenseMatrix operator()(DenseMatrix operatee)
 	{
 		return solver.solve(operatee);
 	}
@@ -57,9 +57,33 @@ struct DenseMatrixOperation
 	/** Computes matrix product of the matrix and provided right-hand 
 	 * side matrix
 	 */
-	DenseMatrix operator()(DenseMatrix operatee)
+	inline DenseMatrix operator()(DenseMatrix operatee)
 	{
 		return _matrix*operatee;
+	}
+	// TODO avoid copying somehow
+	MatrixType _matrix;
+};
+
+/** Matrix-matrix operation used to
+ * compute largest eigenvalues and
+ * associated eigenvectors of X*X^T like
+ * matrix implicitly. Essentially
+ * computes matrix product with provided
+ * right-hand side part *twice*.
+ */
+template <class MatrixType>
+struct DenseImplicitSquareMatrixOperation
+{
+	DenseImplicitSquareMatrixOperation(const MatrixType& matrix) : _matrix(matrix)
+	{
+	}
+	/** Computes matrix product of the matrix and provided right-hand 
+	 * side matrix *twice*
+	 */
+	inline DenseMatrix operator()(DenseMatrix operatee)
+	{
+		return _matrix*(_matrix*operatee);
 	}
 	// TODO avoid copying somehow
 	MatrixType _matrix;

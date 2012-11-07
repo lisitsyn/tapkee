@@ -83,6 +83,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"isomap"))
 		return ISOMAP;
+	if (!strcmp(str,"diffusion_map"))
+		return DIFFUSION_MAP;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -130,6 +132,9 @@ int main(int argc, const char** argv)
 		parameters[EIGEN_EMBEDDING_METHOD] = parse_eigen_method(argv[3]);
 		parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(atoi(argv[4]));
 		parameters[TARGET_DIMENSIONALITY] = static_cast<unsigned int>(atoi(argv[5]));
+		// keep it static yet
+		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
+		parameters[DIFFUSION_MAP_KERNEL_WIDTH] = static_cast<DefaultScalarType>(100.0);
 	}
 
 	// Load data

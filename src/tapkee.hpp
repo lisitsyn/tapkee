@@ -22,6 +22,7 @@
 #include "methods/local_weights.hpp"
 #include "methods/eigen_embedding.hpp"
 #include "methods/multidimensional_scaling.hpp"
+#include "methods/diffusion_maps.hpp"
 #include "methods/isomap.hpp"
 #include "neighbors/neighbors.hpp"
 
@@ -104,13 +105,17 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,1);
 			}
 			break;
-		case DIFFUSION_MAPS:
+		case DIFFUSION_MAP:
 			{
-				timed_context context("Embedding with diffusion maps");
-				//kernel_matrix = ...
-				//embedding_matrix = 
-				//	eigen_embedding<DenseWeightMatrix, DenseMatrixOperation>(
-				//			eigen_method,distance_matrix,target_dimension);
+				timed_context context("Embedding with diffusion map");
+				unsigned int timesteps = options[DIFFUSION_MAP_TIMESTEPS].cast<unsigned int>();
+				DefaultScalarType width = options[DIFFUSION_MAP_KERNEL_WIDTH].cast<DefaultScalarType>();
+				// compute diffusion matrix
+				DenseMatrix diffusion_matrix = compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
+				// compute embedding with eigendecomposition
+				embedding_result = 
+					eigen_embedding<DenseMatrix, DenseImplicitSquareMatrixOperation>(eigen_method,
+							diffusion_matrix,target_dimension,0);
 			}
 			break;
 		case MULTIDIMENSIONAL_SCALING:
