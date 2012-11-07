@@ -7,8 +7,8 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#ifndef EDRT_LOGGING_H_
-#define EDRT_LOGGING_H_
+#ifndef TAPKEE_LOGGING_H_
+#define TAPKEE_LOGGING_H_
 
 #include <iostream>
 #include <string>

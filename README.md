@@ -1,2 +1,2 @@
-Efficient Dimensionality Reduction Toolbox
+Tapkee: an efficient dimension reduction toolbox
 ====

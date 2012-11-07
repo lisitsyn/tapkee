@@ -10,8 +10,8 @@
  * http://www.boost.org/LICENSE_1_0.txt
  */
 
-#ifndef EDRT_DEFINES_H_
-#define EDRT_DEFINES_H_
+#ifndef TAPKEE_DEFINES_H_
+#define TAPKEE_DEFINES_H_
 
 #include <vector>
 #include <string>
@@ -39,12 +39,12 @@ struct CallbackTraits
 };
 
 /** Macro used to indicate that callback X is a kernel function */
-#define EDRT_CALLBACK_IS_KERNEL(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return true; } };
+#define TAPKEE_CALLBACK_IS_KERNEL(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return true; } };
 /** Macro used to indicate that callback X is a distance function */
-#define EDRT_CALLBACK_IS_DISTANCE(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return false; } };
+#define TAPKEE_CALLBACK_IS_DISTANCE(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return false; } };
 
 /** Neighbors computation method */
-enum EDRT_NEIGHBORS_METHOD
+enum TAPKEE_NEIGHBORS_METHOD
 {
 	/** Brute force method with approx. O(N*N*log k) time complexity.
 	 * Recommended to be used only in debug purposes.
@@ -57,7 +57,7 @@ enum EDRT_NEIGHBORS_METHOD
 };
 
 /** Eigendecomposition-based embedding method */
-enum EDRT_EIGEN_EMBEDDING_METHOD
+enum TAPKEE_EIGEN_EMBEDDING_METHOD
 {
 	/** ARPACK-based method (requires the ARPACK library
 	 * binaries to be available around). 
@@ -69,7 +69,7 @@ enum EDRT_EIGEN_EMBEDDING_METHOD
 };
 
 /** Parameters that are used by the library */
-enum EDRT_PARAMETERS
+enum TAPKEE_PARAMETERS
 {
 	REDUCTION_METHOD,
 	NUMBER_OF_NEIGHBORS,
@@ -79,15 +79,15 @@ enum EDRT_PARAMETERS
 	NEIGHBORS_METHOD
 };
 /** Parameters map type */
-typedef std::map<EDRT_PARAMETERS, any> ParametersMap;
+typedef std::map<TAPKEE_PARAMETERS, any> ParametersMap;
 
 /** Dimension reduction method */
-enum EDRT_METHOD
+enum TAPKEE_METHOD
 {
 	/** Locally Linear Embedding / Kernel Locally Linear Embedding
 	 * Requires Mercer kernel callback (linear kernel makes the algorithm a 
 	 * standard Locally Linear Embedding) and number of neighbors 
-	 * @enum EDRT_PARAMETERS::NUMBER_OF_NEIGHBORS. 
+	 * @enum TAPKEE_PARAMETERS::NUMBER_OF_NEIGHBORS. 
 	 *
 	 * References:
 	 *
@@ -110,7 +110,7 @@ enum EDRT_METHOD
 	/** Local Tangent Space Alignment / Kernel Local Tangent Space Alignment
 	 * Requires Mercer kernel callback (linear kernel makes the algorithm a 
 	 * standard Local Tangent Space Alignment) and number of neighbors 
-	 * @enum EDRT_PARAMETERS::NUMBER_OF_NEIGHBORS. 
+	 * @enum TAPKEE_PARAMETERS::NUMBER_OF_NEIGHBORS. 
 	 * 
 	 * References:
 	 *

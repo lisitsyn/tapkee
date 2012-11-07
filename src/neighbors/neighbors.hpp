@@ -9,8 +9,8 @@
  * tree port
  */
 
-#ifndef EDRT_NEIGHBORS_H_
-#define EDRT_NEIGHBORS_H_
+#ifndef TAPKEE_NEIGHBORS_H_
+#define TAPKEE_NEIGHBORS_H_
 
 #include "../defines.hpp"
 #include "covertree.hpp"
@@ -173,7 +173,7 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
-Neighbors find_neighbors(EDRT_NEIGHBORS_METHOD method, const RandomAccessIterator& begin, 
+Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessIterator& begin, 
                          const RandomAccessIterator& end, const PairwiseCallback& callback, 
                          unsigned int k)
 {

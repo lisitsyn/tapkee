@@ -7,8 +7,8 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#ifndef EDRT_MAIN_H_
-#define EDRT_MAIN_H_
+#ifndef TAPKEE_MAIN_H_
+#define TAPKEE_MAIN_H_
 
 #include <map>
 #include <stdlib.h>
@@ -35,11 +35,11 @@
  * KernelCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation 
  * between two iterators. The operation should return value of Mercer kernel function 
  * between vectors/objects iterators pointing to. KernelCallback should be marked as a kernel function using
- * EDRT_CALLBACK_IS_KERNEL macro (fails during compilation in other case).
+ * TAPKEE_CALLBACK_IS_KERNEL macro (fails during compilation in other case).
  * 
  * DistanceCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation
  * between two iterators. DistanceCallback should be marked as a distance function using 
- * EDRT_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
+ * TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
  * 
  * AdditionCallback TODO
  *
@@ -63,10 +63,10 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 	EmbeddingResult embedding_result;
 
 	// load common parameters from the parameters map
-	EDRT_METHOD method = 
-		options[REDUCTION_METHOD].cast<EDRT_METHOD>();
-	EDRT_EIGEN_EMBEDDING_METHOD eigen_method = 
-		options[EIGEN_EMBEDDING_METHOD].cast<EDRT_EIGEN_EMBEDDING_METHOD>();
+	TAPKEE_METHOD method = 
+		options[REDUCTION_METHOD].cast<TAPKEE_METHOD>();
+	TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
+		options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
 	unsigned int target_dimension = 
 		options[TARGET_DIMENSIONALITY].cast<unsigned int>();
 
@@ -77,8 +77,8 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 			{
 				timed_context context("Embedding with KLLE");
 				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				EDRT_NEIGHBORS_METHOD neighbors_method = 
-					options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
+				TAPKEE_NEIGHBORS_METHOD neighbors_method = 
+					options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
 				// find neighbors of each vector
 				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 				// construct sparse weight matrix
@@ -93,7 +93,7 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 			{
 				timed_context context("Embedding with KLTSA");
 				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				EDRT_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
+				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
 				// find neighbors of each vector
 				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 				// construct sparse weight matrix
@@ -137,8 +137,8 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 			{
 				timed_context context("Embedding with Isomap");
 				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				EDRT_NEIGHBORS_METHOD neighbors_method = 
-					options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
+				TAPKEE_NEIGHBORS_METHOD neighbors_method = 
+					options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
 				// find neighbors of each vector
 				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
 				// compute distance matrix (matrix of pairwise distances) of data
@@ -170,7 +170,7 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 			{
 				timed_context context("Embedding with HLLE");
 				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				EDRT_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<EDRT_NEIGHBORS_METHOD>();
+				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
 				// find neighbors of each vector
 				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 				// construct sparse weight matrix

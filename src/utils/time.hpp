@@ -7,8 +7,8 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#ifndef EDRT_TIME_H_
-#define EDRT_TIME_H_
+#ifndef TAPKEE_TIME_H_
+#define TAPKEE_TIME_H_
 #include <ctime>
 #include <string>
 #include <iostream>

@@ -1,5 +1,5 @@
-#ifndef EDRT_ISOMAP_H_
-#define EDRT_ISOMAP_H_
+#ifndef TAPKEE_ISOMAP_H_
+#define TAPKEE_ISOMAP_H_
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"
@@ -17,8 +17,8 @@ DenseMatrix isomap_relax_distances(const DenseMatrix& distances, const Neighbors
 	unsigned int N = distances.cols();
 	FibonacciHeap* heap = new FibonacciHeap(N);
 
-	vector<bool> s(N);
-	vector<bool> f(N);
+	bool* s = new bool[N];
+	bool* f = new bool[N];
 
 	DenseMatrix shortest_distances(N,N);
 	
@@ -27,7 +27,7 @@ DenseMatrix isomap_relax_distances(const DenseMatrix& distances, const Neighbors
 		// fill s and f with false, fill shortest_D with infinity
 		for (unsigned int j=0; j<N; j++)
 		{
-			shortest_distances(k,j) = numeric_limits<double>::max();
+			shortest_distances(k,j) = numeric_limits<DenseMatrix::Scalar>::max();
 			s[j] = false;
 			f[j] = false;
 		}
@@ -82,6 +82,8 @@ DenseMatrix isomap_relax_distances(const DenseMatrix& distances, const Neighbors
 		heap->clear();
 	}
 	delete heap;
+	delete[] s;
+	delete[] f;
 	return shortest_distances;
 }
 

@@ -7,8 +7,8 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#ifndef EDRT_LOCAL_METHODS_H_
-#define EDRT_LOCAL_METHODS_H_
+#ifndef TAPKEE_LOCAL_METHODS_H_
+#define TAPKEE_LOCAL_METHODS_H_
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"

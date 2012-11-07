@@ -13,8 +13,8 @@
  *
  */
 
-#ifndef EDRT_EIGEN_EMBEDDING_H_
-#define EDRT_EIGEN_EMBEDDING_H_
+#ifndef TAPKEE_EIGEN_EMBEDDING_H_
+#define TAPKEE_EIGEN_EMBEDDING_H_
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"
@@ -172,7 +172,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
  * * RANDOMIZED_INVERSE
  */
 template <class WeightMatrix, template<class> class WeightMatrixOperation>
-EmbeddingResult eigen_embedding(EDRT_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, 
+EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, 
                                 unsigned int target_dimension, unsigned int skip)
 {
 	switch (method)

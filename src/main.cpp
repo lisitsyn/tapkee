@@ -7,7 +7,7 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#include "edrt.hpp"
+#include "tapkee.hpp"
 #include "defines.hpp"
 
 #include <algorithm>
@@ -34,7 +34,7 @@ struct kernel_callback
 	}
 	const DenseMatrix& feature_matrix;
 };
-EDRT_CALLBACK_IS_KERNEL(kernel_callback);
+TAPKEE_CALLBACK_IS_KERNEL(kernel_callback);
 
 struct distance_callback
 {
@@ -45,7 +45,7 @@ struct distance_callback
 	}
 	const DenseMatrix& feature_matrix;
 };
-EDRT_CALLBACK_IS_DISTANCE(distance_callback);
+TAPKEE_CALLBACK_IS_DISTANCE(distance_callback);
 
 DenseMatrix read_data(const string& filename)
 {
@@ -73,7 +73,7 @@ DenseMatrix read_data(const string& filename)
 	return fm;
 }
 
-EDRT_METHOD parse_reduction_method(const char* str)
+TAPKEE_METHOD parse_reduction_method(const char* str)
 {
 	if (!strcmp(str,"kltsa"))
 		return KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
@@ -89,7 +89,7 @@ EDRT_METHOD parse_reduction_method(const char* str)
 	return KERNEL_LOCALLY_LINEAR_EMBEDDING;
 }
 
-EDRT_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
+TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 {
 	if (!strcmp(str,"brute"))
 		return BRUTE_FORCE;
@@ -101,7 +101,7 @@ EDRT_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 	return BRUTE_FORCE;
 }
 
-EDRT_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
+TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 {
 	if (!strcmp(str,"arpack"))
 		return ARPACK_XSXUPD;

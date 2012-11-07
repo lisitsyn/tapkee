@@ -1,5 +1,5 @@
-#ifndef EDRT_MATRIX_H_
-#define EDRT_MATRIX_H_
+#ifndef TAPKEE_MATRIX_H_
+#define TAPKEE_MATRIX_H_
 
 void centerMatrix()
 {
