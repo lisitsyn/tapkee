@@ -1,0 +1,3 @@
+[submodule "arpack"]
+	path = arpack
+	url = https://github.com/lisitsyn/arpack.git
