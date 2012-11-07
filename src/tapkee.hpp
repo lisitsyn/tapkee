@@ -55,10 +55,9 @@
  * @param options parameter map
  */
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class AdditionCallback>
-DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator& end,
-                  const KernelCallback& kernel_callback, const DistanceCallback& distance_callback,
-                  const AdditionCallback& add_callback, 
-                  ParametersMap options)
+DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
+                  KernelCallback kernel_callback, DistanceCallback distance_callback,
+                  AdditionCallback add_callback, ParametersMap options)
 {
 	Eigen::initParallel();
 	EmbeddingResult embedding_result;
@@ -70,7 +69,6 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 		options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
 	unsigned int target_dimension = 
 		options[TARGET_DIMENSIONALITY].cast<unsigned int>();
-
 
 	switch (method)
 	{
@@ -111,10 +109,10 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 				unsigned int timesteps = options[DIFFUSION_MAP_TIMESTEPS].cast<unsigned int>();
 				DefaultScalarType width = options[DIFFUSION_MAP_KERNEL_WIDTH].cast<DefaultScalarType>();
 				// compute diffusion matrix
-				DenseMatrix diffusion_matrix = compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
+				DenseSymmetricMatrix diffusion_matrix = compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
 				// compute embedding with eigendecomposition
 				embedding_result = 
-					eigen_embedding<DenseMatrix, DenseImplicitSquareMatrixOperation>(eigen_method,
+					eigen_embedding<DenseSymmetricMatrix, DenseImplicitSquareMatrixOperation>(eigen_method,
 							diffusion_matrix,target_dimension,0);
 			}
 			break;
@@ -122,13 +120,13 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 			{
 				timed_context context("Embeding with MDS");
 				// compute distance matrix (matrix of pairwise distances) of data
-				DenseMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
+				DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
 				// process the distance matrix (center it and *(-0.5))
 				mds_process_matrix(distance_matrix);
 				// construct embedding with eigendecomposition of the
 				// dense weight matrix
 				embedding_result = 
-					eigen_embedding<DenseMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,0);
+					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,0);
 				for (unsigned int i=0; i<target_dimension; ++i)
 					embedding_result.first.col(i).array() *= sqrt(embedding_result.second[i]);
 			}
@@ -147,13 +145,13 @@ DenseMatrix embed(const RandomAccessIterator& begin, const RandomAccessIterator&
 				// find neighbors of each vector
 				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
 				// compute distance matrix (matrix of pairwise distances) of data
-				DenseMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
+				DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
 				// relax distances with Dijkstra shortest path algorithm
-				DenseMatrix relaxed_distance_matrix = isomap_relax_distances(distance_matrix,neighbors);
+				DenseSymmetricMatrix relaxed_distance_matrix = isomap_relax_distances(distance_matrix,neighbors);
 				// construct embedding with eigendecomposition of the
 				// dense weight matrix
 				embedding_result = 
-					eigen_embedding<DenseMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension,0);
+					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension,0);
 			}
 			break;
 		case LANDMARK_ISOMAP:

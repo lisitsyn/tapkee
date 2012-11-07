@@ -4,13 +4,9 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 template <class RandomAccessIterator, class PairwiseCallback>
-DenseMatrix compute_distance_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
-                                    PairwiseCallback callback)
+DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
+                                             PairwiseCallback callback)
 {
 	timed_context context("Multidimensional scaling distance matrix computation");
 
@@ -29,7 +25,7 @@ DenseMatrix compute_distance_matrix(RandomAccessIterator begin, RandomAccessIter
 	return distance_matrix;
 };
 
-void mds_process_matrix(DenseMatrix& distance_matrix)
+void mds_process_matrix(DenseSymmetricMatrix& distance_matrix)
 {
 	timed_context context("Multidimensional distance matrix processing");
 

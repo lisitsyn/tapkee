@@ -195,6 +195,7 @@ typedef double DefaultScalarType;
 typedef Eigen::Triplet<DefaultScalarType> SparseTriplet;
 typedef std::vector<SparseTriplet> SparseTriplets;
 typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,Eigen::Dynamic> DenseMatrix;
+typedef DenseMatrix DenseSymmetricMatrix;
 typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
 typedef std::vector<int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;

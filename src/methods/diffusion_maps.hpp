@@ -5,12 +5,12 @@
 #include "../utils/time.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>
-DenseMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback, 
-                                     unsigned int timesteps, DefaultScalarType width)
+DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback, 
+                                              unsigned int timesteps, DefaultScalarType width)
 {
 	timed_context context("Diffusion map matrix computation");
 
-	DenseMatrix diffusion_matrix(end-begin,end-begin);
+	DenseSymmetricMatrix diffusion_matrix(end-begin,end-begin);
 
 	for (RandomAccessIterator i_iter=begin; i_iter!=end; ++i_iter)
 	{
