@@ -9,8 +9,8 @@ using std::cout;
 using std::endl;
 
 template <class RandomAccessIterator, class PairwiseCallback>
-DenseMatrix compute_distance_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                    const PairwiseCallback& callback)
+DenseMatrix compute_distance_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
+                                    PairwiseCallback callback)
 {
 	timed_context context("Multidimensional scaling distance matrix computation");
 

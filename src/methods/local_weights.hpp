@@ -14,8 +14,8 @@
 #include "../utils/time.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>
-SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                       const Neighbors& neighbors, const PairwiseCallback& callback, unsigned int target_dimension)
+SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
+                                       const Neighbors& neighbors, PairwiseCallback callback, unsigned int target_dimension)
 {
 	timed_context context("KLTSA weight matrix computation");
 	const int k = neighbors[0].size();
@@ -78,8 +78,8 @@ SparseWeightMatrix kltsa_weight_matrix(const RandomAccessIterator& begin, const 
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
-SparseWeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                      const Neighbors& neighbors, const PairwiseCallback& callback)
+SparseWeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
+                                      const Neighbors& neighbors, PairwiseCallback callback)
 {
 	timed_context context("KLLE weight computation");
 	const int k = neighbors[0].size();
@@ -132,8 +132,8 @@ SparseWeightMatrix klle_weight_matrix(const RandomAccessIterator& begin, const R
 }
 
 	template <class RandomAccessIterator, class PairwiseCallback>
-SparseWeightMatrix hlle_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                      const Neighbors& neighbors, const PairwiseCallback& callback, unsigned int target_dimension)
+SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
+                                      const Neighbors& neighbors, PairwiseCallback callback, unsigned int target_dimension)
 {
 	timed_context context("KLTSA weight matrix computation");
 	const int k = neighbors[0].size();
