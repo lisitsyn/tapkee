@@ -85,6 +85,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return ISOMAP;
 	if (!strcmp(str,"diffusion_map"))
 		return DIFFUSION_MAP;
+	if (!strcmp(str,"kpca"))
+		return KERNEL_PCA;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);

@@ -187,7 +187,13 @@ enum TAPKEE_METHOD
 	 *
 	 *
 	 */
-	MAXIMUM_VARIANCE_UNFOLDING
+	MAXIMUM_VARIANCE_UNFOLDING,
+	/**
+	 *
+	 *
+	 *
+	 */
+	KERNEL_PCA
 };
 
 /** Internal types */

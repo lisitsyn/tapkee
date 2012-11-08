@@ -24,6 +24,7 @@
 #include "methods/multidimensional_scaling.hpp"
 #include "methods/diffusion_maps.hpp"
 #include "methods/isomap.hpp"
+#include "methods/kernel_pca.hpp"
 #include "neighbors/neighbors.hpp"
 
 /** Main entry-point of the library. Constructs dense embedding with specified dimension
@@ -192,6 +193,17 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 		case LOCALITY_PRESERVING_PROJECTIONS:
 			{
 				timed_context context("Embedding with LPP");
+			}
+			break;
+		case KERNEL_PCA:
+			{
+				timed_context context("Embedding with kPCA");
+
+				// compute centered kernel matrix 
+				DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(begin,end,kernel_callback);
+				// construct embedding
+				embedding_result = 
+					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_kernel_matrix,target_dimension,0);
 			}
 			break;
 		default:
