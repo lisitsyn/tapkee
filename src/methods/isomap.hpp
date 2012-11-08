@@ -20,7 +20,7 @@ DenseMatrix isomap_relax_distances(const DenseMatrix& distances, const Neighbors
 	bool* s = new bool[N];
 	bool* f = new bool[N];
 
-	DenseMatrix shortest_distances(N,N);
+	DenseSymmetricMatrix shortest_distances(N,N);
 	
 	for (unsigned int k=0; k<N; k++)
 	{
@@ -84,7 +84,7 @@ DenseMatrix isomap_relax_distances(const DenseMatrix& distances, const Neighbors
 	delete heap;
 	delete[] s;
 	delete[] f;
-	return shortest_distances;
+	return shortest_distances.selfadjointView<Eigen::Upper>();
 }
 
 #endif

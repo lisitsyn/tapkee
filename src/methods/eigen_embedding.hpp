@@ -83,7 +83,7 @@ struct DenseImplicitSquareMatrixOperation
 	 */
 	inline DenseMatrix operator()(DenseMatrix operatee)
 	{
-		return _matrix*(_matrix*operatee);
+		return (_matrix)*(_matrix*operatee);
 	}
 	// TODO avoid copying somehow
 	MatrixType _matrix;

@@ -22,7 +22,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 			diffusion_matrix(j_iter-begin,i_iter-begin) = gk;
 		}
 	}
-
+	
 	DenseVector p = diffusion_matrix.colwise().sum();
 
 	for (unsigned int i=0; i<(end-begin); i++)
@@ -39,7 +39,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 			diffusion_matrix(i,j) /= p(i)*p(j);
 	}
 
-	return diffusion_matrix;
+	return diffusion_matrix.selfadjointView<Eigen::Upper>();
 };
 
 #endif

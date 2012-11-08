@@ -29,18 +29,19 @@ void mds_process_matrix(DenseSymmetricMatrix& distance_matrix)
 {
 	timed_context context("Multidimensional distance matrix processing");
 
-	unsigned int N = distance_matrix.cols();
-	DenseVector col_means(N);
-	DenseVector row_means(N);
-	for (unsigned int i=0; i<N; ++i)
+	double grand_mean = 0.0;
+	DenseVector col_means;
 	{
-		col_means[i] = distance_matrix.col(i).mean();
-		row_means[i] = distance_matrix.row(i).mean();
+		timed_context c("Computing means");
+		col_means = distance_matrix.colwise().mean();
+		grand_mean = distance_matrix.mean();
 	}
-	double grand_mean = distance_matrix.mean();
-	distance_matrix.array() += grand_mean;
-	distance_matrix.rowwise() -= col_means.transpose();
-	distance_matrix.colwise() -= row_means;
-	distance_matrix.array() *= -0.5;
+	{
+		timed_context c("Mutating matrix");
+		distance_matrix.array() += grand_mean;
+		distance_matrix.colwise() -= col_means;
+		distance_matrix.rowwise() -= col_means.transpose();
+		distance_matrix.array() *= -0.5;
+	}
 };
 #endif
