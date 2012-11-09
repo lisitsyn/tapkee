@@ -153,6 +153,8 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				// dense weight matrix
 				embedding_result = 
 					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension,0);
+				for (unsigned int i=0; i<target_dimension; ++i)
+					embedding_result.first.col(i).array() *= sqrt(embedding_result.second[i]);
 			}
 			break;
 		case LANDMARK_ISOMAP:
@@ -204,6 +206,8 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				// construct embedding
 				embedding_result = 
 					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_kernel_matrix,target_dimension,0);
+				for (unsigned int i=0; i<target_dimension; ++i)
+					embedding_result.first.col(i).array() /= sqrt(embedding_result.second[i]);
 			}
 			break;
 		default:
