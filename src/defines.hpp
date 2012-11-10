@@ -19,12 +19,12 @@
 #include <map>
 #include "utils/any.hpp"
 
-#define EIGEN_NO_DEBUG
+//#define EIGEN_NO_DEBUG
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SparseCholesky>
-#include <eigen3/Eigen/SuperLUSupport>
+//#include <eigen3/Eigen/SuperLUSupport>
 #undef EIGEN_MATRIXBASE_PLUGIN
 
 /** Callback traits used to indicate
@@ -73,8 +73,8 @@ enum TAPKEE_PARAMETERS
 {
 	REDUCTION_METHOD,
 	NUMBER_OF_NEIGHBORS,
-	TARGET_DIMENSIONALITY,
-	CURRENT_DIMENSIONALITY,
+	TARGET_DIMENSION,
+	CURRENT_DIMENSION,
 	EIGEN_EMBEDDING_METHOD,
 	NEIGHBORS_METHOD,
 	DIFFUSION_MAP_TIMESTEPS,
@@ -193,7 +193,13 @@ enum TAPKEE_METHOD
 	 *
 	 *
 	 */
-	KERNEL_PCA
+	KERNEL_PCA,
+	/**
+	 *
+	 *
+	 *
+	 */
+	PCA
 };
 
 /** Internal types */
@@ -206,6 +212,7 @@ typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
 typedef std::vector<int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
 typedef std::pair<DenseMatrix,DenseVector> EmbeddingResult;
+typedef std::pair<DenseMatrix,DenseVector> ProjectionResult;
 typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
 
 #endif

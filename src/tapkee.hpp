@@ -24,7 +24,7 @@
 #include "methods/multidimensional_scaling.hpp"
 #include "methods/diffusion_maps.hpp"
 #include "methods/isomap.hpp"
-#include "methods/kernel_pca.hpp"
+#include "methods/pca.hpp"
 #include "neighbors/neighbors.hpp"
 
 /** Main entry-point of the library. Constructs dense embedding with specified dimension
@@ -43,7 +43,7 @@
  * between two iterators. DistanceCallback should be marked as a distance function using 
  * TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
  * 
- * AdditionCallback TODO
+ * FeatureVectorCallback TODO
  *
  * Parameters required by the chosen algorithm are obtained from the parameter map. It fails during runtime if
  * some of required parameters are not specified or have improper values.
@@ -52,13 +52,13 @@
  * @param end end iterator of data
  * @param kernel_callback the kernel callback described before
  * @param distance_callback the distance callback described before
- * @param add_callback TODO
+ * @param feature_vector_callback TODO
  * @param options parameter map
  */
-template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class AdditionCallback>
+template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
 DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
                   KernelCallback kernel_callback, DistanceCallback distance_callback,
-                  AdditionCallback add_callback, ParametersMap options)
+                  FeatureVectorCallback feature_vector_callback, ParametersMap options)
 {
 	Eigen::initParallel();
 	EmbeddingResult embedding_result;
@@ -69,7 +69,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 	TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
 		options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
 	unsigned int target_dimension = 
-		options[TARGET_DIMENSIONALITY].cast<unsigned int>();
+		options[TARGET_DIMENSION].cast<unsigned int>();
 
 	switch (method)
 	{
@@ -128,8 +128,6 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				// dense weight matrix
 				embedding_result = 
 					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,0);
-				for (unsigned int i=0; i<target_dimension; ++i)
-					embedding_result.first.col(i).array() *= sqrt(embedding_result.second[i]);
 			}
 			break;
 		case LANDMARK_MULTIDIMENSIONAL_SCALING:
@@ -153,8 +151,6 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				// dense weight matrix
 				embedding_result = 
 					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension,0);
-				for (unsigned int i=0; i<target_dimension; ++i)
-					embedding_result.first.col(i).array() *= sqrt(embedding_result.second[i]);
 			}
 			break;
 		case LANDMARK_ISOMAP:
@@ -197,6 +193,20 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				timed_context context("Embedding with LPP");
 			}
 			break;
+		case PCA:
+			{
+				timed_context context("Embedding with PCA");
+
+				unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
+				// compute centered covariance matrix
+				DenseSymmetricMatrix centered_covariance_matrix = compute_centered_covariance_matrix(begin,end,feature_vector_callback,dimension);
+				
+				ProjectionResult projection_result = 
+					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,0);
+				// TODO to be improved with out-of-box projection
+				embedding_result = project(projection_result,begin,end,feature_vector_callback,dimension);
+			}
+			break;
 		case KERNEL_PCA:
 			{
 				timed_context context("Embedding with kPCA");
@@ -206,8 +216,6 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				// construct embedding
 				embedding_result = 
 					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_kernel_matrix,target_dimension,0);
-				for (unsigned int i=0; i<target_dimension; ++i)
-					embedding_result.first.col(i).array() /= sqrt(embedding_result.second[i]);
 			}
 			break;
 		default:

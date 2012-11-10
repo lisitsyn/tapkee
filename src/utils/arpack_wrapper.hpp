@@ -42,7 +42,7 @@ namespace internal
 	template<typename Scalar, typename RealScalar> struct arpack_wrapper;
 }
 
-template<class MatrixType, template<class> class MatrixOperation, bool BisSPD=false>
+template<class MatrixType, class MatrixOperation, bool BisSPD=false>
 class ArpackGeneralizedSelfAdjointEigenSolver
 {
 public:
@@ -320,7 +320,7 @@ protected:
 	size_t m_nbrIterations;
 };
 
-template<typename MatrixType, template<class> class MatrixOperation, bool BisSPD>
+template<typename MatrixType, class MatrixOperation, bool BisSPD>
 ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
     ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>
 ::compute(const MatrixType& A, Index nbrEigenvalues,
@@ -330,7 +330,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
 	return compute(A, B, nbrEigenvalues, eigs_sigma, options, tol);
 }
 
-template<typename MatrixType, template<class> class MatrixOperation, bool BisSPD>
+template<typename MatrixType, class MatrixOperation, bool BisSPD>
 ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
     ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>
 ::compute(const MatrixType& A, const MatrixType& B, Index nbrEigenvalues,
@@ -435,8 +435,8 @@ ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
 	//        it.valueRef() /= scale;
 	//}
 
-	MatrixOperation<MatrixType> op((mode==1 || mode==2) ? B :
-	                               (mode==3) ? A : MatrixType());
+	MatrixOperation op((mode==1 || mode==2) ? B :
+	                   (mode==3) ? A : MatrixType());
 
 	do
 	{

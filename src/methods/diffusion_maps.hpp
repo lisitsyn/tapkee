@@ -11,7 +11,8 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 	timed_context context("Diffusion map matrix computation");
 
 	DenseSymmetricMatrix diffusion_matrix(end-begin,end-begin);
-
+	
+	DenseVector p = DenseVector::Zero(end-begin);
 	for (RandomAccessIterator i_iter=begin; i_iter!=end; ++i_iter)
 	{
 		for (RandomAccessIterator j_iter=i_iter; j_iter!=end; ++j_iter)
@@ -22,8 +23,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 			diffusion_matrix(j_iter-begin,i_iter-begin) = gk;
 		}
 	}
-	
-	DenseVector p = diffusion_matrix.colwise().sum();
+	p = diffusion_matrix.colwise().sum();
 
 	for (unsigned int i=0; i<(end-begin); i++)
 	{
@@ -39,7 +39,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 			diffusion_matrix(i,j) /= p(i)*p(j);
 	}
 
-	return diffusion_matrix.selfadjointView<Eigen::Upper>();
+	return diffusion_matrix;
 };
 
 #endif

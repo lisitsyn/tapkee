@@ -20,9 +20,14 @@
 using namespace Eigen;
 using namespace std;
 
-struct addition_callback
+struct feature_vector_callback
 {
-
+	feature_vector_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
+	inline void operator()(int i, DenseVector& vector) const
+	{
+		vector = feature_matrix.col(i);
+	}
+	const DenseMatrix& feature_matrix;
 };
 
 struct kernel_callback
@@ -87,6 +92,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return DIFFUSION_MAP;
 	if (!strcmp(str,"kpca"))
 		return KERNEL_PCA;
+	if (!strcmp(str,"pca"))
+		return PCA;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -133,7 +140,8 @@ int main(int argc, const char** argv)
 		parameters[NEIGHBORS_METHOD] = parse_neighbors_method(argv[2]);
 		parameters[EIGEN_EMBEDDING_METHOD] = parse_eigen_method(argv[3]);
 		parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(atoi(argv[4]));
-		parameters[TARGET_DIMENSIONALITY] = static_cast<unsigned int>(atoi(argv[5]));
+		parameters[TARGET_DIMENSION] = static_cast<unsigned int>(atoi(argv[5]));
+		parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(3);
 		// keep it static yet
 		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
 		parameters[DIFFUSION_MAP_KERNEL_WIDTH] = static_cast<DefaultScalarType>(100.0);
@@ -149,8 +157,8 @@ int main(int argc, const char** argv)
 	DenseMatrix embedding;
 	distance_callback dcb(input_data);
 	kernel_callback kcb(input_data);
-	addition_callback add;
-	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,add,parameters);
+	feature_vector_callback fvcb(input_data);
+	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 
 	// Save obtained data
 	ofstream ofs("output.dat");

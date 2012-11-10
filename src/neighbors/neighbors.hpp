@@ -41,60 +41,6 @@ struct kernel_distance
 	}
 };
 
-/*
-template <class RandomAccessIterator, class PairwiseCallback>
-Neighbors find_neighbors_covertree_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                         const PairwiseCallback& callback, unsigned int k)
-{
-	timed_context context("Covertree-based neighbors search");
-
-	Neighbors neighbors;
-	neighbors.reserve(end-begin);
-	if (PairwiseCallback::is_kernel())
-	{
-		typedef std::vector< pair<double, RandomAccessIterator> > QueryResult;
-		kernel_distance<RandomAccessIterator, PairwiseCallback> kd(callback);
-		CoverTree<double, pair<double, RandomAccessIterator>, kernel_distance<RandomAccessIterator, PairwiseCallback> > ct(kd);
-		{
-			timed_context ct_context("Covertree construction");
-			for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-				ct.insert(make_pair(callback(*iter,*iter),iter));
-		}
-		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-		{
-			QueryResult query = ct.knn(make_pair(callback(*iter,*iter),iter),k+1);
-			LocalNeighbors local_neighbors;
-			local_neighbors.reserve(k);
-			for (typename QueryResult::const_iterator neighbors_iter=query.begin()+1; 
-			     neighbors_iter!=query.end(); ++neighbors_iter)
-				local_neighbors.push_back(neighbors_iter->second-begin);
-			neighbors.push_back(local_neighbors);
-		}
-	}
-	else
-	{
-		typedef std::vector< int > QueryResult;
-		CoverTree<double,int,PairwiseCallback> ct(callback);
-		{
-			timed_context ct_context("Covertree construction");
-			for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-				ct.insert(iter-begin);
-		}
-		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-		{
-			QueryResult query = ct.knn((iter-begin),k+1);
-			LocalNeighbors local_neighbors;
-			local_neighbors.reserve(k);
-			for (typename QueryResult::const_iterator neighbors_iter=query.begin()+1; 
-			     neighbors_iter!=query.end(); ++neighbors_iter)
-				local_neighbors.push_back(*neighbors_iter);
-			neighbors.push_back(local_neighbors);
-		}
-	}
-	return neighbors;
-}
-*/
-
 template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
                          PairwiseCallback callback, unsigned int k)
@@ -119,6 +65,7 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
 	{
 		LocalNeighbors local_neighbors;
 		local_neighbors.reserve(k);
+		
 		for (unsigned int j=1; j<=k; ++j) // j=0 is the query point
 		{
 			// The actual query point is found as a neighbor, just ignore it

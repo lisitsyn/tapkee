@@ -58,7 +58,7 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 
 		G.col(0).setConstant(1/sqrt(k));
 
-		G.rightCols(target_dimension) = sae_solver.eigenvectors().rightCols(target_dimension);
+		G.rightCols(target_dimension).noalias() = sae_solver.eigenvectors().rightCols(target_dimension);
 		gram_matrix.noalias() = G * G.transpose();
 		
 		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1e-8));
@@ -176,7 +176,7 @@ SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 		sae_solver.compute(gram_matrix);
 
 		G.col(0).setConstant(1/sqrt(k));
-		G.rightCols(target_dimension) = sae_solver.eigenvectors().rightCols(target_dimension);
+		G.rightCols(target_dimension).noalias() = sae_solver.eigenvectors().rightCols(target_dimension);
 		gram_matrix = G * G.transpose();
 		
 		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1e-8));

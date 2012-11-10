@@ -10,7 +10,7 @@
 using std::vector;
 using std::numeric_limits;
 
-DenseMatrix isomap_relax_distances(const DenseMatrix& distances, const Neighbors& neighbors)
+DenseSymmetricMatrix isomap_relax_distances(const DenseSymmetricMatrix& distances, const Neighbors& neighbors)
 {
 	timed_context context("Distances shortest path relaxing");
 	unsigned int n_neighbors = neighbors[0].size();
@@ -84,7 +84,7 @@ DenseMatrix isomap_relax_distances(const DenseMatrix& distances, const Neighbors
 	delete heap;
 	delete[] s;
 	delete[] f;
-	return shortest_distances.selfadjointView<Eigen::Upper>();
+	return shortest_distances;
 }
 
 #endif

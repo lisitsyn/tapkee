@@ -26,10 +26,9 @@
  * solves linear system with provided
  * right-hand side part.
  */
-template <class MatrixType>
 struct InverseSparseMatrixOperation
 {
-	InverseSparseMatrixOperation(const MatrixType& matrix) : solver()
+	InverseSparseMatrixOperation(const SparseWeightMatrix& matrix) : solver()
 	{
 		solver.compute(matrix);
 	}
@@ -39,7 +38,7 @@ struct InverseSparseMatrixOperation
 	{
 		return solver.solve(operatee);
 	}
-	Eigen::SimplicialLDLT<MatrixType> solver;
+	Eigen::SimplicialLDLT<SparseWeightMatrix> solver;
 };
 
 /** Matrix-matrix operation used to
@@ -48,10 +47,9 @@ struct InverseSparseMatrixOperation
  * computes matrix product with 
  * provided right-hand side part.
  */
-template <class MatrixType>
 struct DenseMatrixOperation
 {
-	DenseMatrixOperation(const MatrixType& matrix) : _matrix(matrix)
+	DenseMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
 	/** Computes matrix product of the matrix and provided right-hand 
@@ -59,10 +57,10 @@ struct DenseMatrixOperation
 	 */
 	inline DenseMatrix operator()(DenseMatrix operatee)
 	{
-		return _matrix*operatee;
+		return _matrix.selfadjointView<Eigen::Upper>()*operatee;
 	}
 	// TODO avoid copying somehow
-	MatrixType _matrix;
+	DenseMatrix _matrix;
 };
 
 /** Matrix-matrix operation used to
@@ -72,10 +70,9 @@ struct DenseMatrixOperation
  * computes matrix product with provided
  * right-hand side part *twice*.
  */
-template <class MatrixType>
 struct DenseImplicitSquareMatrixOperation
 {
-	DenseImplicitSquareMatrixOperation(const MatrixType& matrix) : _matrix(matrix)
+	DenseImplicitSquareMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
 	/** Computes matrix product of the matrix and provided right-hand 
@@ -83,10 +80,10 @@ struct DenseImplicitSquareMatrixOperation
 	 */
 	inline DenseMatrix operator()(DenseMatrix operatee)
 	{
-		return (_matrix)*(_matrix*operatee);
+		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*operatee);
 	}
 	// TODO avoid copying somehow
-	MatrixType _matrix;
+	DenseMatrix _matrix;
 };
 
 /** Templated implementation of eigendecomposition-based embedding. 
@@ -98,7 +95,7 @@ struct DenseImplicitSquareMatrixOperation
  * implementation of operator()(DenseMatrix) which computes right product
  * of the parameter with the WeightMatrix.
  */
-template <class WeightMatrix, template<class> class WeightMatrixOperation, int> 
+template <class WeightMatrix, class WeightMatrixOperation, int> 
 struct eigen_embedding_impl
 {
 	/** Construct embedding
@@ -110,7 +107,7 @@ struct eigen_embedding_impl
 };
 
 /** ARPACK implementation of eigendecomposition-based embedding */
-template <class WeightMatrix, template<class> class WeightMatrixOperation> 
+template <class WeightMatrix, class WeightMatrixOperation> 
 struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 {
 	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip)
@@ -126,7 +123,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 };
 
 /** Randomized redsvd-like implementation of eigendecomposition-based embedding */
-template <class WeightMatrix, template<class> class WeightMatrixOperation> 
+template <class WeightMatrix, class WeightMatrixOperation> 
 struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVERSE>
 {
 	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip)
@@ -153,7 +150,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 				O(i,j) = len*cos(2.f*M_PI*v2);
 			}
 		}
-		WeightMatrixOperation<WeightMatrix> operation(wm);
+		WeightMatrixOperation operation(wm);
 
 		DenseMatrix Y = operation(O);
 		for (unsigned int i=0; i<Y.cols(); i++)
@@ -195,7 +192,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
  * * ARPACK_XSXUPD
  * * RANDOMIZED_INVERSE
  */
-template <class WeightMatrix, template<class> class WeightMatrixOperation>
+template <class WeightMatrix, class WeightMatrixOperation>
 EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, 
                                 unsigned int target_dimension, unsigned int skip)
 {

@@ -135,7 +135,7 @@ inline DefaultScalarType distance(const DistanceCallback& dcb, const CoverTreePo
 
 /** Print the information of the CoverTree point */
 template <class RandomAccessIterator>
-void print(const CoverTreePoint<RandomAccessIterator> &p)
+void print(const CoverTreePoint<RandomAccessIterator>&)
 {
 }
 #endif /* _JL_COVERTREE_POINT_H_*/

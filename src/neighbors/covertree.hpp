@@ -839,7 +839,7 @@ void k_nearest_neighbor(const DistanceCallback &dcb, const node<P> &top_node,
 
 	batch_nearest_neighbor(dcb, top_node, query, results);
 }
-
+/*
 template <class P, class DistanceCallback>
 void epsilon_nearest_neighbor(const DistanceCallback &dcb, const node<P> &top_node,
 		const node<P> &query, v_array<v_array<P> > &results,
@@ -863,4 +863,5 @@ void unequal_nearest_neighbor(const DistanceCallback &dcb, const node<P> &top_no
 
 	batch_nearest_neighbor(dcb, top_node, query, results);
 }
+*/
 #endif
