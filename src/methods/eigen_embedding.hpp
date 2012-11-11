@@ -58,6 +58,23 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK_XSXUPD>
 	}
 };
 
+/** Eigen library dense implementation of eigendecomposition-based embedding */
+template <class MatrixType, class MatrixTypeOperation> 
+struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJOINT_SOLVER>
+{
+	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip)
+	{
+		timed_context context("Eigen library dense eigendecomposition");
+
+		DenseMatrix dense_wm = wm;
+		Eigen::SelfAdjointEigenSolver<DenseMatrix> solver(dense_wm);
+
+		DenseMatrix embedding_feature_matrix = (solver.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
+
+		return EmbeddingResult(embedding_feature_matrix,solver.eigenvalues().tail(target_dimension));
+	}
+};
+
 /** Randomized redsvd-like implementation of eigendecomposition-based embedding */
 template <class MatrixType, class MatrixTypeOperation> 
 struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED_INVERSE>
@@ -127,6 +144,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED_INVERSE>
  * supports two methods:
  * * ARPACK_XSXUPD
  * * RANDOMIZED_INVERSE
+ * * EIGEN_DENSE_SELFADJOINT_SOLVER
  */
 template <class MatrixType, class MatrixTypeOperation>
 EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const MatrixType& wm, 
@@ -141,8 +159,8 @@ EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const Matr
 			return eigen_embedding_impl<MatrixType, MatrixTypeOperation,
 				RANDOMIZED_INVERSE>().embed(wm, target_dimension, skip);
 		case EIGEN_DENSE_SELFADJOINT_SOLVER:
-			// Not yet implemented
-			return EmbeddingResult();
+			return eigen_embedding_impl<MatrixType, MatrixTypeOperation,
+				EIGEN_DENSE_SELFADJOINT_SOLVER>().embed(wm, target_dimension, skip);
 	}
 	return EmbeddingResult();
 };
