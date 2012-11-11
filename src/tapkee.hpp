@@ -21,8 +21,10 @@
 #include "defines.hpp"
 #include "methods/local_weights.hpp"
 #include "methods/eigen_embedding.hpp"
+#include "methods/generalized_eigen_embedding.hpp"
 #include "methods/multidimensional_scaling.hpp"
 #include "methods/diffusion_maps.hpp"
+#include "methods/laplacian_eigenmaps.hpp"
 #include "methods/isomap.hpp"
 #include "methods/pca.hpp"
 #include "neighbors/neighbors.hpp"
@@ -108,7 +110,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 			{
 				timed_context context("Embedding with diffusion map");
 				unsigned int timesteps = options[DIFFUSION_MAP_TIMESTEPS].cast<unsigned int>();
-				DefaultScalarType width = options[DIFFUSION_MAP_KERNEL_WIDTH].cast<DefaultScalarType>();
+				DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
 				// compute diffusion matrix
 				DenseSymmetricMatrix diffusion_matrix = compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
 				// compute embedding with eigendecomposition
@@ -186,6 +188,18 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 		case LAPLACIAN_EIGENMAPS:
 			{
 				timed_context context("Embedding with Laplacian Eigenmaps");
+				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
+				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
+				DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
+				// find neighbors of each vector
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+				// construct sparse weight matrix
+				pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
+					compute_laplacian(begin,end,neighbors,distance_callback,width);
+				// construct embedding
+				embedding_result = 
+					generalized_eigen_embedding<SparseWeightMatrix,DenseDiagonalMatrix,InverseSparseMatrixOperation>(
+							eigen_method,laplacian.first,laplacian.second,target_dimension,1);
 			}
 			break;
 		case LOCALITY_PRESERVING_PROJECTIONS:
@@ -203,7 +217,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				
 				ProjectionResult projection_result = 
 					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,0);
-				// TODO to be improved with out-of-box projection
+				// TODO to be improved with out-of-sample projection
 				embedding_result = project(projection_result,begin,end,feature_vector_callback,dimension);
 			}
 			break;

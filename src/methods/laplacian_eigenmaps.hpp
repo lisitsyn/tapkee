@@ -1,0 +1,51 @@
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Copyright (c) 2012, Sergey Lisitsyn
+ */
+
+#ifndef TAPKEE_LAPLACIAN_EIGENMAPS_H_
+#define TAPKEE_LAPLACIAN_EIGENMAPS_H_
+	
+#include "../defines.hpp"
+
+#include <utility>
+using std::pair;
+using std::make_pair;
+
+template<class RandomAccessIterator, class DistanceCallback>
+pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessIterator begin, 
+		RandomAccessIterator end,const Neighbors& neighbors, 
+		DistanceCallback callback, DefaultScalarType width)
+{
+	SparseTriplets sparse_triplets;
+
+	const unsigned int k = neighbors[0].size();
+	sparse_triplets.reserve(k*(end-begin));
+
+	DenseVector D = DenseVector::Zero(end-begin);
+	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+	{
+		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
+
+		for (unsigned int i=0; i<k; ++i)
+		{
+			DefaultScalarType distance = callback(*iter,begin[current_neighbors[i]]);
+			DefaultScalarType heat = exp(-distance*distance/width);
+			D(iter-begin) += heat;
+			sparse_triplets.push_back(SparseTriplet(begin[current_neighbors[i]],(iter-begin),-heat));
+			sparse_triplets.push_back(SparseTriplet((iter-begin),begin[current_neighbors[i]],-heat));
+		}
+	}
+	for (unsigned int i=0; i<(end-begin); ++i)
+		sparse_triplets.push_back(SparseTriplet(i,i,D(i)));
+
+	SparseWeightMatrix weight_matrix(end-begin,end-begin);
+	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
+
+	return make_pair(weight_matrix,DenseDiagonalMatrix(D));
+}
+#endif

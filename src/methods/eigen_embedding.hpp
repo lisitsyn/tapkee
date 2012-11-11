@@ -19,83 +19,18 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 #include "../utils/arpack_wrapper.hpp"
-
-/** Matrix-matrix operation used to 
- * compute smallest eigenvalues and 
- * associated eigenvectors. Essentially
- * solves linear system with provided
- * right-hand side part.
- */
-struct InverseSparseMatrixOperation
-{
-	InverseSparseMatrixOperation(const SparseWeightMatrix& matrix) : solver()
-	{
-		solver.compute(matrix);
-	}
-	/** Solves linear system with provided right-hand size
-	 */
-	inline DenseMatrix operator()(DenseMatrix operatee)
-	{
-		return solver.solve(operatee);
-	}
-	Eigen::SimplicialLDLT<SparseWeightMatrix> solver;
-};
-
-/** Matrix-matrix operation used to
- * compute largest eigenvalues and
- * associated eigenvectors. Essentially
- * computes matrix product with 
- * provided right-hand side part.
- */
-struct DenseMatrixOperation
-{
-	DenseMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
-	{
-	}
-	/** Computes matrix product of the matrix and provided right-hand 
-	 * side matrix
-	 */
-	inline DenseMatrix operator()(DenseMatrix operatee)
-	{
-		return _matrix.selfadjointView<Eigen::Upper>()*operatee;
-	}
-	// TODO avoid copying somehow
-	DenseMatrix _matrix;
-};
-
-/** Matrix-matrix operation used to
- * compute largest eigenvalues and
- * associated eigenvectors of X*X^T like
- * matrix implicitly. Essentially
- * computes matrix product with provided
- * right-hand side part *twice*.
- */
-struct DenseImplicitSquareMatrixOperation
-{
-	DenseImplicitSquareMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
-	{
-	}
-	/** Computes matrix product of the matrix and provided right-hand 
-	 * side matrix *twice*
-	 */
-	inline DenseMatrix operator()(DenseMatrix operatee)
-	{
-		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*operatee);
-	}
-	// TODO avoid copying somehow
-	DenseMatrix _matrix;
-};
+#include "matrix_operations.hpp"
 
 /** Templated implementation of eigendecomposition-based embedding. 
  * Has three template parameters:
- * WeightMatrix - class of weight matrix to perform eigendecomposition of
- * WeightMatrixOperation - class of product operation over matrix.
+ * MatrixType - class of weight matrix to perform eigendecomposition of
+ * MatrixTypeOperation - class of product operation over matrix.
  *
- * In order to find largest eigenvalues WeightMatrixOperation should provide
+ * In order to find largest eigenvalues MatrixTypeOperation should provide
  * implementation of operator()(DenseMatrix) which computes right product
- * of the parameter with the WeightMatrix.
+ * of the parameter with the MatrixType.
  */
-template <class WeightMatrix, class WeightMatrixOperation, int> 
+template <class MatrixType, class MatrixTypeOperation, int> 
 struct eigen_embedding_impl
 {
 	/** Construct embedding
@@ -103,18 +38,19 @@ struct eigen_embedding_impl
 	 * @param target_dimension target dimension of embedding (number of eigenvectors to find)
 	 * @param skip number of eigenvectors to skip
 	 */
-	virtual EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip);
+	virtual EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip);
 };
 
 /** ARPACK implementation of eigendecomposition-based embedding */
-template <class WeightMatrix, class WeightMatrixOperation> 
-struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
+template <class MatrixType, class MatrixTypeOperation> 
+struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK_XSXUPD>
 {
-	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip)
+	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip)
 	{
 		timed_context context("ARPACK DSXUPD eigendecomposition");
 
-		ArpackGeneralizedSelfAdjointEigenSolver<WeightMatrix, WeightMatrixOperation> arpack(wm,target_dimension+skip,"SM");
+		// TODO SM / LM
+		ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixTypeOperation> arpack(wm,target_dimension+skip,"SM");
 
 		DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
 
@@ -123,10 +59,10 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, ARPACK_XSXUPD>
 };
 
 /** Randomized redsvd-like implementation of eigendecomposition-based embedding */
-template <class WeightMatrix, class WeightMatrixOperation> 
-struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVERSE>
+template <class MatrixType, class MatrixTypeOperation> 
+struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED_INVERSE>
 {
-	EmbeddingResult embed(const WeightMatrix& wm, unsigned int target_dimension, unsigned int skip)
+	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip)
 	{
 		timed_context context("Randomized eigendecomposition");
 		
@@ -150,7 +86,7 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
 				O(i,j) = len*cos(2.f*M_PI*v2);
 			}
 		}
-		WeightMatrixOperation operation(wm);
+		MatrixTypeOperation operation(wm);
 
 		DenseMatrix Y = operation(O);
 		for (unsigned int i=0; i<Y.cols(); i++)
@@ -192,18 +128,21 @@ struct eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, RANDOMIZED_INVE
  * * ARPACK_XSXUPD
  * * RANDOMIZED_INVERSE
  */
-template <class WeightMatrix, class WeightMatrixOperation>
-EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const WeightMatrix& wm, 
+template <class MatrixType, class MatrixTypeOperation>
+EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const MatrixType& wm, 
                                 unsigned int target_dimension, unsigned int skip)
 {
 	switch (method)
 	{
 		case ARPACK_XSXUPD: 
-			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation, 
+			return eigen_embedding_impl<MatrixType, MatrixTypeOperation, 
 				ARPACK_XSXUPD>().embed(wm, target_dimension, skip);
 		case RANDOMIZED_INVERSE: 
-			return eigen_embedding_impl<WeightMatrix, WeightMatrixOperation,
+			return eigen_embedding_impl<MatrixType, MatrixTypeOperation,
 				RANDOMIZED_INVERSE>().embed(wm, target_dimension, skip);
+		case EIGEN_DENSE_SELFADJOINT_SOLVER:
+			// Not yet implemented
+			return EmbeddingResult();
 	}
 	return EmbeddingResult();
 };

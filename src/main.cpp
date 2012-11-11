@@ -94,6 +94,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return KERNEL_PCA;
 	if (!strcmp(str,"pca"))
 		return PCA;
+	if (!strcmp(str,"laplacian_eigenmaps"))
+		return LAPLACIAN_EIGENMAPS;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -118,6 +120,8 @@ TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 		return ARPACK_XSXUPD;
 	if (!strcmp(str,"randomized"))
 		return RANDOMIZED_INVERSE;
+	if (!strcmp(str,"dense"))
+		return EIGEN_DENSE_SELFADJOINT_SOLVER;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -144,7 +148,7 @@ int main(int argc, const char** argv)
 		parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(3);
 		// keep it static yet
 		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
-		parameters[DIFFUSION_MAP_KERNEL_WIDTH] = static_cast<DefaultScalarType>(100.0);
+		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(100.0);
 	}
 
 	// Load data

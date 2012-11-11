@@ -25,10 +25,11 @@ DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomA
 	return distance_matrix;
 };
 
-void mds_process_matrix(DenseSymmetricMatrix& distance_matrix)
+void mds_process_matrix(const DenseSymmetricMatrix& const_distance_matrix)
 {
 	timed_context context("Multidimensional distance matrix processing");
 
+	DenseSymmetricMatrix& distance_matrix = const_cast<DenseSymmetricMatrix&>(const_distance_matrix); 
 	double grand_mean = 0.0;
 	DenseVector col_means;
 	{

@@ -10,6 +10,7 @@
 using std::vector;
 using std::numeric_limits;
 
+// TODO inplace whether possible
 DenseSymmetricMatrix isomap_relax_distances(const DenseSymmetricMatrix& distances, const Neighbors& neighbors)
 {
 	timed_context context("Distances shortest path relaxing");

@@ -42,15 +42,15 @@ namespace internal
 	template<typename Scalar, typename RealScalar> struct arpack_wrapper;
 }
 
-template<class MatrixType, class MatrixOperation, bool BisSPD=false>
+template<class LMatrixType, class RMatrixType, class MatrixOperation, bool BisSPD=false>
 class ArpackGeneralizedSelfAdjointEigenSolver
 {
 public:
   //typedef typename MatrixSolver::MatrixType MatrixType;
 
 	/** \brief Scalar type for matrices of type \p MatrixType. */
-	typedef typename MatrixType::Scalar Scalar;
-	typedef typename MatrixType::Index Index;
+	typedef typename LMatrixType::Scalar Scalar;
+	typedef typename LMatrixType::Index Index;
 
 	/** \brief Real scalar type for \p MatrixType.
 	*
@@ -65,7 +65,7 @@ public:
 	* This is a column vector with entries of type #RealScalar.
 	* The length of the vector is the size of \p nbrEigenvalues.
 	*/
-	typedef typename Eigen::internal::plain_col_type<MatrixType, RealScalar>::type RealVectorType;
+	typedef typename Eigen::internal::plain_col_type<LMatrixType, RealScalar>::type RealVectorType;
 
 	/** \brief Default constructor.
 	*
@@ -100,7 +100,7 @@ public:
 	* \p options equals #ComputeEigenvectors.
 	*
 	*/
-	ArpackGeneralizedSelfAdjointEigenSolver(const MatrixType& A, const MatrixType& B,
+	ArpackGeneralizedSelfAdjointEigenSolver(const LMatrixType& A, const RMatrixType& B,
 	                                        Index nbrEigenvalues, std::string eigs_sigma="LM",
 	                                        int options=ComputeEigenvectors, RealScalar tol=0.0) : 
 		m_eivec(), m_eivalues(), m_info(), m_isInitialized(false), m_eigenvectorsOk(false),
@@ -130,7 +130,7 @@ public:
 	* \p options equals #ComputeEigenvectors.
 	*
 	*/
-	ArpackGeneralizedSelfAdjointEigenSolver(const MatrixType& A, Index nbrEigenvalues, std::string eigs_sigma="LM",
+	ArpackGeneralizedSelfAdjointEigenSolver(const LMatrixType& A, Index nbrEigenvalues, std::string eigs_sigma="LM",
 	                                        int options=ComputeEigenvectors, RealScalar tol=0.0) : 
 		m_eivec(), m_eivalues(), m_info(), m_isInitialized(false), m_eigenvectorsOk(false),
 		m_nbrConverged(0), m_nbrIterations(0)
@@ -161,7 +161,7 @@ public:
 	* calling eigenvectors().
 	*
 	*/
-	ArpackGeneralizedSelfAdjointEigenSolver& compute(const MatrixType& A, const MatrixType& B,
+	ArpackGeneralizedSelfAdjointEigenSolver& compute(const LMatrixType& A, const RMatrixType& B,
 	                                                 Index nbrEigenvalues, std::string eigs_sigma="LM",
 	                                                 int options=ComputeEigenvectors, RealScalar tol=0.0);
 
@@ -187,7 +187,7 @@ public:
 	* calling eigenvectors().
 	*
 	*/
-	ArpackGeneralizedSelfAdjointEigenSolver& compute(const MatrixType& A, Index nbrEigenvalues, 
+	ArpackGeneralizedSelfAdjointEigenSolver& compute(const LMatrixType& A, Index nbrEigenvalues, 
 	                                                 std::string eigs_sigma="LM",
 	                                                 int options=ComputeEigenvectors, RealScalar tol=0.0);
 
@@ -320,20 +320,20 @@ protected:
 	size_t m_nbrIterations;
 };
 
-template<typename MatrixType, class MatrixOperation, bool BisSPD>
-ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
-    ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>
-::compute(const MatrixType& A, Index nbrEigenvalues,
+template<typename LMatrixType, typename RMatrixType, class MatrixOperation, bool BisSPD>
+ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperation, BisSPD>&
+    ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperation, BisSPD>
+::compute(const LMatrixType& A, Index nbrEigenvalues,
           std::string eigs_sigma, int options, RealScalar tol)
 {
-	MatrixType B(0,0);
+	RMatrixType B(0,0);
 	return compute(A, B, nbrEigenvalues, eigs_sigma, options, tol);
 }
 
-template<typename MatrixType, class MatrixOperation, bool BisSPD>
-ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
-    ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>
-::compute(const MatrixType& A, const MatrixType& B, Index nbrEigenvalues,
+template<typename LMatrixType, typename RMatrixType, class MatrixOperation, bool BisSPD>
+ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperation, BisSPD>&
+    ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperation, BisSPD>
+::compute(const LMatrixType& A, const RMatrixType& B, Index nbrEigenvalues,
           std::string eigs_sigma, int options, RealScalar tol)
 {
 	eigen_assert(A.cols() == A.rows());
@@ -391,6 +391,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
 		// We're going to use shift-and-invert mode, and basically find
 		// the largest eigenvalues of the inverse operator
 		mode = 3;
+		//std::cout << "Mode = 3\n";
 	}
 
 	// The user-specified number of eigenvalues/vectors to compute
@@ -435,11 +436,13 @@ ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
 	//        it.valueRef() /= scale;
 	//}
 
-	MatrixOperation op((mode==1 || mode==2) ? B :
-	                   (mode==3) ? A : MatrixType());
+	MatrixOperation op(A);
+	//		(mode==1 || mode==2) ? B :
+	//                   (mode==3) ? A : LMatrixType());
 
 	do
 	{
+		//std::cout << "Entering main loop\n";
 		internal::arpack_wrapper<Scalar, RealScalar>::saupd(&ido, bmat, &n, whch, &nev, &tol, resid, 
 		                                                    &ncv, v, &ldv, iparam, ipntr, workd, workl,
 		                                                    &lworkl, &info);
@@ -498,14 +501,27 @@ ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixOperation, BisSPD>&
 			else
 				Matrix<Scalar, Dynamic, 1>::Map(out, n) = B * Matrix<Scalar, Dynamic, 1>::Map(in, n);
 		}
+		//Scalar *out = workd + ipntr[1] - 1;
+		//std::cout << Matrix<Scalar, Dynamic, 1>::Map(out, n).transpose() << std::endl;
 	} while (ido != 99);
+		
+	//std::cout << "Finsihed\n";
 
 	if (info == 1)
+	{
+		//std::cout << "FAILED WITH NO CONV\n";
 		m_info = NoConvergence;
+	}
 	else if (info == 3)
+	{
+		//std::cout << "FAILED WITH NUMERICAL ISSUE\n";
 		m_info = NumericalIssue;
+	}
 	else if (info < 0)
+	{
+		//std::cout << "FAILED WITH INVALID INPUT " << info << "\n";
 		m_info = InvalidInput;
+	}
 	else if (info != 0)
 		eigen_assert(false && "Unknown ARPACK return value!");
 	else

@@ -19,7 +19,7 @@
 #include <map>
 #include "utils/any.hpp"
 
-//#define EIGEN_NO_DEBUG
+#define EIGEN_NO_DEBUG
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
@@ -61,11 +61,15 @@ enum TAPKEE_EIGEN_EMBEDDING_METHOD
 {
 	/** ARPACK-based method (requires the ARPACK library
 	 * binaries to be available around). 
-	 * Recommended to be used as a default method. */
+	 * Recommended to be used as a default method.
+	 * Supports both generalized and standard eigenproblems. */
 	ARPACK_XSXUPD,
-	/** Randomized method (like in redsvd). 
-	 * Fallback method. */
-	RANDOMIZED_INVERSE
+	/** Randomized method (implementation taken from the redsvd lib). 
+	 * Supports only standard eigenproblems. */
+	RANDOMIZED_INVERSE,
+	/** Eigen library dense method (useful for debugging)
+	 */
+	EIGEN_DENSE_SELFADJOINT_SOLVER
 };
 
 /** Parameters that are used by the library */
@@ -78,7 +82,7 @@ enum TAPKEE_PARAMETERS
 	EIGEN_EMBEDDING_METHOD,
 	NEIGHBORS_METHOD,
 	DIFFUSION_MAP_TIMESTEPS,
-	DIFFUSION_MAP_KERNEL_WIDTH
+	GAUSSIAN_KERNEL_WIDTH
 };
 /** Parameters map type */
 typedef std::map<TAPKEE_PARAMETERS, any> ParametersMap;
@@ -214,5 +218,6 @@ typedef std::vector<LocalNeighbors> Neighbors;
 typedef std::pair<DenseMatrix,DenseVector> EmbeddingResult;
 typedef std::pair<DenseMatrix,DenseVector> ProjectionResult;
 typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
+typedef Eigen::DiagonalMatrix<DefaultScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
 
 #endif
