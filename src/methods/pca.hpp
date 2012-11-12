@@ -1,10 +1,17 @@
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Copyright (c) 2012, Sergey Lisitsyn
+ */
+
 #ifndef TAPKEE_KERNEL_PCA_H_
 #define TAPKEE_KERNEL_PCA_H_
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"
-
-using std::cout;
 
 template <class RandomAccessIterator, class FeatureVectorCallback>
 EmbeddingResult project(const ProjectionResult& projection_result, RandomAccessIterator begin,
@@ -60,14 +67,14 @@ DenseSymmetricMatrix compute_centered_kernel_matrix(RandomAccessIterator begin, 
 	{
 		for (RandomAccessIterator j_iter=i_iter; j_iter!=end; ++j_iter)
 		{
-			double k = callback(*i_iter,*j_iter);
+			DefaultScalarType k = callback(*i_iter,*j_iter);
 			kernel_matrix(i_iter-begin,j_iter-begin) = k;
 			kernel_matrix(j_iter-begin,i_iter-begin) = k;
 		}
 	}
 
 	DenseVector col_means = kernel_matrix.colwise().mean();
-	double grand_mean = kernel_matrix.mean();
+	DefaultScalarType grand_mean = kernel_matrix.mean();
 	kernel_matrix.array() += grand_mean;
 	kernel_matrix.colwise() -= col_means;
 	kernel_matrix.rowwise() -= col_means.transpose();

@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <utility>
+#include <cmath>
 
 using std::pair;
 using std::make_pair;
@@ -64,9 +65,57 @@ class FibonacciHeap
 public:
 
 	/** Constructor for heap with specified capacity */
-	FibonacciHeap(int capacity);
+	FibonacciHeap(int capacity) : 
+		min_root(NULL), nodes(NULL), num_nodes(0),
+		num_trees(0), max_num_nodes(capacity), A(NULL), Dn(0)
+	{
+		nodes = (FibonacciHeapNode**)malloc(sizeof(FibonacciHeapNode*)*max_num_nodes);
+		for (int i = 0; i < max_num_nodes; i++)
+			nodes[i] = new FibonacciHeapNode;
 
-	virtual ~FibonacciHeap();
+		Dn = 1 + (int)(log2(double(max_num_nodes)));
+		A = (FibonacciHeapNode**)malloc(sizeof(FibonacciHeapNode*)*Dn);
+		for (int i = 0; i < Dn; i++)
+			A[i] = NULL;
+
+		num_nodes = 0;
+		num_trees = 0;
+	}
+
+	~FibonacciHeap()
+	{
+		for(int i = 0; i < max_num_nodes; i++)
+		{
+			if(nodes[i] != NULL)
+				delete nodes[i];
+		}
+		free(nodes);
+		free(A);
+	}
+
+	/** Inserts nodes with certain key in array of nodes with index
+	 * Have time of O(1)
+	 */
+	void insert(int index, double key)
+	{
+		if(index >= static_cast<int>(max_num_nodes) || index < 0)
+			return;
+
+		if(nodes[index]->index != -1)
+			return; // node is not empty
+
+		// init "new" node in array
+		nodes[index]->child = NULL;
+		nodes[index]->parent = NULL;
+
+		nodes[index]->rank = 0;
+		nodes[index]->index = index;
+		nodes[index]->key = key;
+		nodes[index]->marked = false;
+
+		add_to_roots(nodes[index]);
+		num_nodes++;
+	}
 
 	int get_num_nodes() const
 	{
@@ -83,29 +132,123 @@ public:
 		return max_num_nodes;
 	}
 
-	/** Inserts nodes with certain key in array of nodes with index
-	 * Have time of O(1)
-	 */
-	void insert(int index, double key);
-
 	/** Deletes and returns item with minimal key
 	 * Have amortized time of O(log n)
 	 * @return item with minimal key
 	 */
-	int extract_min(double& ret_val);
+	int extract_min(double& ret_key)
+	{
+		FibonacciHeapNode *min_node;
+		FibonacciHeapNode *child, *next_child;
+
+		int result;
+
+		if(num_nodes == 0)
+			return -1;
+
+		min_node = min_root;
+		if(min_node == NULL)
+			return -1; // heap is empty now
+
+		child = min_node->child;
+		while(child != NULL && child->parent != NULL)
+		{
+			next_child = child->right;
+
+			// delete current child from childs list
+			child->left->right = child->right;
+			child->right->left = child->left;
+
+			add_to_roots(child);
+
+			// next iteration
+			child = next_child;
+		}
+
+		// delete minimun from root list
+		min_node->left->right = min_node->right;
+		min_node->right->left = min_node->left;
+
+		num_trees--;
+
+		if(min_node == min_node->right)
+		{
+			min_root = NULL; // remove last element
+		}
+		else
+		{
+			min_root = min_node->right;
+			consolidate();
+		}
+
+		result = min_node->index;
+		ret_key = min_node->key;
+		clear_node(result);
+
+		num_nodes--;
+
+		return result;
+	}
 
 	/** Clears all nodes in heap */
-	void clear();
+	void clear()
+	{
+		min_root = NULL;
+
+		// clear all nodes
+		for(int i = 0; i < max_num_nodes; i++)
+		{
+			clear_node(i);
+		}
+
+		num_nodes = 0;
+		num_trees = 0;
+	}
 
 	/** Returns key by index
 	 * @return -1 if not valid
 	 */
-	int get_key(int index, double& ret_key);
+	int get_key(int index, double& ret_key)
+	{
+		if(index >= max_num_nodes || index < 0)
+			return -1;
+		if(nodes[index]->index == -1)
+			return -1;
+
+		int result = nodes[index]->index;
+		ret_key = nodes[index]->key;
+
+		return result;
+	}
 
 	/** Decreases key by index
 	 * Have amortized time of O(1)
 	 */
-	void decrease_key(int index, double& key);
+	void decrease_key(int index, double& key)
+	{
+		FibonacciHeapNode* parent;
+
+		if(index >= max_num_nodes || index < 0)
+			return;
+		if(nodes[index]->index == -1)
+			return; // node is empty
+		if(key > nodes[index]->key)
+			return;
+
+
+		nodes[index]->key = key;
+
+		parent = nodes[index]->parent;
+
+		if(parent != NULL && nodes[index]->key < parent->key)
+		{
+			cut(nodes[index], parent);
+			cascading_cut(parent);
+		}
+
+		if(nodes[index]->key < min_root->key)
+			min_root = nodes[index];
+	}
 
 private:
 
@@ -115,21 +258,176 @@ private:
 
 private:
 	/** Adds node to roots list */
-	void add_to_roots(FibonacciHeapNode *up_node);
+	void add_to_roots(FibonacciHeapNode *up_node)
+	{
+		if(min_root == NULL)
+		{
+			// if heap is empty, node becomes circular root list
+			min_root = up_node;
+
+			up_node->left = up_node;
+			up_node->right = up_node;
+		}
+		else
+		{
+			// insert node to root list
+			up_node->right = min_root->right;
+			up_node->left = min_root;
+
+			up_node->left->right = up_node;
+			up_node->right->left = up_node;
+
+			// nomination of new minimum node
+			if(up_node->key < min_root->key)
+			{
+				min_root = up_node;
+			}
+		}
+
+		up_node->parent = NULL;
+		num_trees++;
+	}
 
 	/** Consolidates heap */
-	void consolidate();
+	void consolidate()
+	{
+		FibonacciHeapNode *x, *y, *w;
+		int d;
+
+		for(int i = 0; i < Dn; i++)
+		{
+			A[i] = NULL;
+		}
+
+		min_root->left->right = NULL;
+		min_root->left = NULL;
+		w = min_root;
+
+		do
+		{
+			x = w;
+			d = x->rank;
+			w = w->right;
+
+			while(A[d] != NULL)
+			{
+				y = A[d];
+
+				if(y->key < x->key)
+				{
+					FibonacciHeapNode *temp;
+
+					temp = y;
+					y = x;
+					x = temp;
+				}
+
+				link_nodes(y, x);
+
+				A[d] = NULL;
+				d++;
+			}
+			A[d] = x;
+		}
+		while(w != NULL);
+
+		min_root = NULL;
+		num_trees = 0;
+
+		for(int i = 0; i < Dn; i++)
+		{
+			if(A[i] != NULL)
+			{
+				A[i]->marked = false;
+				add_to_roots(A[i]);
+			}
+		}
+	}
 
 	/** Links right node to childs of left node */
-	void link_nodes(FibonacciHeapNode *right, FibonacciHeapNode *left);
+	void link_nodes(FibonacciHeapNode *x, FibonacciHeapNode *y)
+	{
+		if(y->right != NULL)
+			y->right->left = y->left;
+		if(y->left != NULL)
+			y->left->right = y->right;
+
+		num_trees--;
+
+		y->left = y;
+		y->right = y;
+
+		y->parent = x;
+
+		if(x->child == NULL)
+		{
+			x->child = y;
+		}
+		else
+		{
+			y->left = x->child;
+			y->right = x->child->right;
+
+			x->child->right = y;
+			y->right->left = y;
+		}
+
+		x->rank++;
+
+		y->marked = false;
+	}
 
 	/** Clears node by index */
-	void clear_node(int index);
+	void clear_node(int index)
+	{
+		nodes[index]->parent = NULL;
+		nodes[index]->child = NULL;
+		nodes[index]->left = NULL;
+		nodes[index]->right = NULL;
+
+		nodes[index]->rank = 0;
+		nodes[index]->index = -1;
+		nodes[index]->key = 0;
+
+		nodes[index]->marked = false;
+	}
 
 	/** Cuts child node from childs list of parent */
-	void cut(FibonacciHeapNode *child, FibonacciHeapNode *parent);
+	void cut(FibonacciHeapNode *child, FibonacciHeapNode *parent)
+	{
+		if(parent->child == child)
+			parent->child = child->right;
 
-	void cascading_cut(FibonacciHeapNode* tree);
+		if(parent->child == child)
+			parent->child = NULL;
+
+		parent->rank--;
+
+		child->left->right = child->right;
+		child->right->left = child->left;
+		child->marked = false;
+
+		add_to_roots(child);
+	}
+
+	void cascading_cut(FibonacciHeapNode* tree)
+	{
+		FibonacciHeapNode *temp;
+
+		temp = tree->parent;
+		if(temp != NULL)
+		{
+			if(!tree->marked)
+			{
+				tree->marked = true;
+			}
+			else
+			{
+				cut(tree, temp);
+				cascading_cut(temp);
+			}
+		}
+	}
 
 protected:
 	/** minimal root in heap */

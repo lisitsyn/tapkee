@@ -50,7 +50,7 @@ pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessItera
 }
 
 template<class RandomAccessIterator, class FeatureVectorCallback>
-pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_neighborhood_preserving_eigenproblem(SparseWeightMatrix L,
+pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_locality_preserving_eigenproblem(SparseWeightMatrix L,
 		DenseDiagonalMatrix D, RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
 		unsigned int dimension)
 {

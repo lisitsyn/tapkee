@@ -6,11 +6,6 @@
  *
  * Copyright (c) 2012, Sergey Lisitsyn
  *
- * Randomized eigendecomposition code is inspired by the redsvd library
- * code which is distributed under BSD 3-clause license.
- *
- * Copyright (c) 2010, Daisuke Okanohara
- *
  */
 
 #ifndef TAPKEE_MATRIX_OPS_H_

@@ -5,7 +5,6 @@
  * (at your option) any later version.
  *
  * Copyright (c) 2012, Sergey Lisitsyn
- *
  */
 
 #ifndef TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_

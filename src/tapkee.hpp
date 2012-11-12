@@ -215,7 +215,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 				pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
 					compute_laplacian(begin,end,neighbors,distance_callback,width);
 				pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
-					construct_neighborhood_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
+					construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
 							feature_vector_callback,dimension);
 				// construct embedding
 				ProjectionResult projection_result = 

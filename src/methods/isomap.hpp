@@ -14,8 +14,8 @@ using std::numeric_limits;
 DenseSymmetricMatrix isomap_relax_distances(const DenseSymmetricMatrix& distances, const Neighbors& neighbors)
 {
 	timed_context context("Distances shortest path relaxing");
-	unsigned int n_neighbors = neighbors[0].size();
-	unsigned int N = distances.cols();
+	const unsigned int n_neighbors = neighbors[0].size();
+	const unsigned int N = distances.cols();
 	FibonacciHeap* heap = new FibonacciHeap(N);
 
 	bool* s = new bool[N];
