@@ -96,6 +96,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return PCA;
 	if (!strcmp(str,"laplacian_eigenmaps"))
 		return LAPLACIAN_EIGENMAPS;
+	if (!strcmp(str,"lpp"))
+		return LOCALITY_PRESERVING_PROJECTIONS;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);

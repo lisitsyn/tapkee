@@ -167,7 +167,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 			break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
 			{
-				timed_context context("Embedding with NPE");
+				timed_context context("Embedding with LLTSA");
 			}
 			break;
 		case HESSIAN_LOCALLY_LINEAR_EMBEDDING:
@@ -205,6 +205,24 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 		case LOCALITY_PRESERVING_PROJECTIONS:
 			{
 				timed_context context("Embedding with LPP");
+				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
+				unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
+				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
+				DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
+				// find neighbors of each vector
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+				// construct sparse weight matrix
+				pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
+					compute_laplacian(begin,end,neighbors,distance_callback,width);
+				pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
+					construct_neighborhood_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
+							feature_vector_callback,dimension);
+				// construct embedding
+				ProjectionResult projection_result = 
+					generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
+							eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,1);
+				// TODO to be improved with out-of-sample projection
+				embedding_result = project(projection_result,begin,end,feature_vector_callback,dimension);
 			}
 			break;
 		case PCA:

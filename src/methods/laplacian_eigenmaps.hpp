@@ -48,4 +48,34 @@ pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessItera
 
 	return make_pair(weight_matrix,DenseDiagonalMatrix(D));
 }
+
+template<class RandomAccessIterator, class FeatureVectorCallback>
+pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_neighborhood_preserving_eigenproblem(SparseWeightMatrix L,
+		DenseDiagonalMatrix D, RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
+		unsigned int dimension)
+{
+	DenseSymmetricMatrix lhs = DenseSymmetricMatrix::Zero(dimension,dimension);
+	DenseSymmetricMatrix rhs = DenseSymmetricMatrix::Zero(dimension,dimension);
+
+	DenseVector rank_update_vector_i(dimension);
+	DenseVector rank_update_vector_j(dimension);
+	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+	{
+		feature_vector_callback(*iter,rank_update_vector_i);
+		rhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i,D.diagonal()(iter-begin));
+	}
+
+	for (int i=0; i<L.outerSize(); ++i)
+	{
+		for (SparseWeightMatrix::InnerIterator it(L,i); it; ++it)
+		{
+			feature_vector_callback(begin[it.row()],rank_update_vector_i);
+			feature_vector_callback(begin[it.col()],rank_update_vector_j);
+			lhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i, rank_update_vector_j, it.value());
+		}
+	}
+
+	return make_pair(lhs,rhs);
+}
+
 #endif
