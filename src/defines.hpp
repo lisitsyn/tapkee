@@ -219,5 +219,6 @@ typedef std::pair<DenseMatrix,DenseVector> EmbeddingResult;
 typedef std::pair<DenseMatrix,DenseVector> ProjectionResult;
 typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
 typedef Eigen::DiagonalMatrix<DefaultScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
+typedef Eigen::SimplicialLDLT<SparseWeightMatrix> DefaultSparseSolver;
 
 #endif

@@ -31,7 +31,7 @@ struct InverseSparseMatrixOperation
 	{
 		return solver.solve(operatee);
 	}
-	Eigen::SimplicialLDLT<SparseWeightMatrix> solver;
+	DefaultSparseSolver solver;
 };
 
 /** Matrix-matrix operation used to
@@ -52,8 +52,7 @@ struct DenseMatrixOperation
 	{
 		return _matrix.selfadjointView<Eigen::Upper>()*operatee;
 	}
-	// TODO avoid copying somehow
-	DenseMatrix _matrix;
+	const DenseMatrix& _matrix;
 };
 
 /** Matrix-matrix operation used to
@@ -75,8 +74,7 @@ struct DenseImplicitSquareMatrixOperation
 	{
 		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*operatee);
 	}
-	// TODO avoid copying somehow
-	DenseMatrix _matrix;
+	const DenseMatrix& _matrix;
 };
 
 #endif
