@@ -1,0 +1,6 @@
+Adding new dimensionality reduction method
+
+1) Add enum value for the method to TAPKEE_METHOD definition in defines.hpp
+2) If you need additional parameters then add their names to TAPKEE_PARAMETERS enum in defines.hpp
+3) Add handling of new method name to switch in tapkee.hpp
+4) Add implementation of method to tapkee_highlevel_methods.hpp using CONCRETE_IMPLEMENTATION macro
