@@ -163,6 +163,23 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			{
 				timed_context context("Embedding with NPE");
+				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
+				unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
+				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
+				// find neighbors of each vector
+				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+				// construct sparse weight matrix
+				SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback);
+				// 
+				pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
+					construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
+							feature_vector_callback,dimension);
+				// construct embedding
+				ProjectionResult projection_result = 
+					generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
+							eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,1);
+				// TODO to be improved with out-of-sample projection
+				embedding_result = project(projection_result,begin,end,feature_vector_callback,dimension);
 			}
 			break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
@@ -198,7 +215,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 					compute_laplacian(begin,end,neighbors,distance_callback,width);
 				// construct embedding
 				embedding_result = 
-					generalized_eigen_embedding<SparseWeightMatrix,DenseDiagonalMatrix,InverseSparseMatrixOperation>(
+					generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,InverseSparseMatrixOperation>(
 							eigen_method,laplacian.first,laplacian.second,target_dimension,1);
 			}
 			break;

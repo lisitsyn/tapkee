@@ -24,7 +24,7 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SparseCholesky>
-//#include <eigen3/Eigen/SuperLUSupport>
+#include <eigen3/Eigen/SuperLUSupport>
 #undef EIGEN_MATRIXBASE_PLUGIN
 
 /** Callback traits used to indicate

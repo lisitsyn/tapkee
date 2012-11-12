@@ -98,6 +98,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return LAPLACIAN_EIGENMAPS;
 	if (!strcmp(str,"lpp"))
 		return LOCALITY_PRESERVING_PROJECTIONS;
+	if (!strcmp(str,"npe"))
+		return NEIGHBORHOOD_PRESERVING_EMBEDDING;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -150,7 +152,7 @@ int main(int argc, const char** argv)
 		parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(3);
 		// keep it static yet
 		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
-		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(100.0);
+		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(1000.0);
 	}
 
 	// Load data

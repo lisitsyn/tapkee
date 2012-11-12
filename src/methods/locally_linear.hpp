@@ -13,6 +13,9 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 
+using std::pair;
+using std::make_pair;
+
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
                                        const Neighbors& neighbors, PairwiseCallback callback, unsigned int target_dimension)
@@ -194,5 +197,34 @@ SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 
 	return weight_matrix;
 };
+
+template<class RandomAccessIterator, class FeatureVectorCallback>
+pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_neighborhood_preserving_eigenproblem(SparseWeightMatrix W,
+		RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
+		unsigned int dimension)
+{
+	DenseSymmetricMatrix lhs = DenseSymmetricMatrix::Zero(dimension,dimension);
+	DenseSymmetricMatrix rhs = DenseSymmetricMatrix::Zero(dimension,dimension);
+
+	DenseVector rank_update_vector_i(dimension);
+	DenseVector rank_update_vector_j(dimension);
+	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+	{
+		feature_vector_callback(*iter,rank_update_vector_i);
+		rhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i);
+	}
+
+	for (int i=0; i<W.outerSize(); ++i)
+	{
+		for (SparseWeightMatrix::InnerIterator it(W,i); it; ++it)
+		{
+			feature_vector_callback(begin[it.row()],rank_update_vector_i);
+			feature_vector_callback(begin[it.col()],rank_update_vector_j);
+			lhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i, rank_update_vector_j, it.value());
+		}
+	}
+
+	return make_pair(lhs,rhs);
+}
 
 #endif
