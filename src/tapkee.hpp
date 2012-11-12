@@ -19,7 +19,7 @@
 #include <iostream>
 
 #include "defines.hpp"
-#include "methods/local_weights.hpp"
+#include "methods/locally_linear.hpp"
 #include "methods/eigen_embedding.hpp"
 #include "methods/generalized_eigen_embedding.hpp"
 #include "methods/multidimensional_scaling.hpp"

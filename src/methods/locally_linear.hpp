@@ -7,8 +7,8 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#ifndef TAPKEE_LOCAL_METHODS_H_
-#define TAPKEE_LOCAL_METHODS_H_
+#ifndef TAPKEE_LOCALLY_LINEAR_H_
+#define TAPKEE_LOCALLY_LINEAR_H_
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"
@@ -193,6 +193,6 @@ SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
 
 	return weight_matrix;
-}
+};
 
 #endif
