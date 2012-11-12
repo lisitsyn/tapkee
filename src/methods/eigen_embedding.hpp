@@ -38,7 +38,7 @@ struct eigen_embedding_impl
 	 * @param target_dimension target dimension of embedding (number of eigenvectors to find)
 	 * @param skip number of eigenvectors to skip
 	 */
-	virtual EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip);
+	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip);
 };
 
 /** ARPACK implementation of eigendecomposition-based embedding */

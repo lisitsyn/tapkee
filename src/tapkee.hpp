@@ -19,15 +19,7 @@
 #include <iostream>
 
 #include "defines.hpp"
-#include "methods/locally_linear.hpp"
-#include "methods/eigen_embedding.hpp"
-#include "methods/generalized_eigen_embedding.hpp"
-#include "methods/multidimensional_scaling.hpp"
-#include "methods/diffusion_maps.hpp"
-#include "methods/laplacian_eigenmaps.hpp"
-#include "methods/isomap.hpp"
-#include "methods/pca.hpp"
-#include "neighbors/neighbors.hpp"
+#include "tapkee_highlevel_methods.hpp"
 
 /** Main entry-point of the library. Constructs dense embedding with specified dimension
  * using provided data and callbacks.
@@ -45,7 +37,9 @@
  * between two iterators. DistanceCallback should be marked as a distance function using 
  * TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
  * 
- * FeatureVectorCallback TODO
+ * FeatureVectorCallback that defines void operator()(RandomAccessIterator, DenseVector) operation
+ * used to access feature vector pointed by iterator. The callback should put the feature vector pointed by iterator
+ * to the vector of second argument.
  *
  * Parameters required by the chosen algorithm are obtained from the parameter map. It fails during runtime if
  * some of required parameters are not specified or have improper values.
@@ -54,7 +48,7 @@
  * @param end end iterator of data
  * @param kernel_callback the kernel callback described before
  * @param distance_callback the distance callback described before
- * @param feature_vector_callback TODO
+ * @param feature_vector_callback the feature vector access callback descrbied before
  * @param options parameter map
  */
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
@@ -68,208 +62,48 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 	// load common parameters from the parameters map
 	TAPKEE_METHOD method = 
 		options[REDUCTION_METHOD].cast<TAPKEE_METHOD>();
-	TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-		options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-	unsigned int target_dimension = 
-		options[TARGET_DIMENSION].cast<unsigned int>();
+
+#define CALL_IMPLEMENTATION(X) embedding_impl<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>().embed(\
+		begin,end,kernel_callback,distance_callback,feature_vector_callback,options)
+#define NO_IMPLEMENTATION_YET printf("Not implemented\n"); exit(EXIT_FAILURE)
 
 	switch (method)
 	{
 		case KERNEL_LOCALLY_LINEAR_EMBEDDING:
-			{
-				timed_context context("Embedding with KLLE");
-				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				TAPKEE_NEIGHBORS_METHOD neighbors_method = 
-					options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-				// construct sparse weight matrix
-				SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback);
-				// construct embedding with eigendecomposition of the
-				// sparse weight matrix
-				embedding_result = 
-					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,1);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING); break;
 		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT:
-			{
-				timed_context context("Embedding with KLTSA");
-				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-				// construct sparse weight matrix
-				SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
-				// construct embedding with eigendecomposition of the
-				// sparse weight matrix
-				embedding_result = 
-					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,1);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT); break;
 		case DIFFUSION_MAP:
-			{
-				timed_context context("Embedding with diffusion map");
-				unsigned int timesteps = options[DIFFUSION_MAP_TIMESTEPS].cast<unsigned int>();
-				DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
-				// compute diffusion matrix
-				DenseSymmetricMatrix diffusion_matrix = compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
-				// compute embedding with eigendecomposition
-				embedding_result = 
-					eigen_embedding<DenseSymmetricMatrix, DenseImplicitSquareMatrixOperation>(eigen_method,
-							diffusion_matrix,target_dimension,0);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(DIFFUSION_MAP); break;
 		case MULTIDIMENSIONAL_SCALING:
-			{
-				timed_context context("Embeding with MDS");
-				// compute distance matrix (matrix of pairwise distances) of data
-				DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
-				// process the distance matrix (center it and *(-0.5))
-				mds_process_matrix(distance_matrix);
-				// construct embedding with eigendecomposition of the
-				// dense weight matrix
-				embedding_result = 
-					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,0);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING); break;
 		case LANDMARK_MULTIDIMENSIONAL_SCALING:
-			{
-				timed_context context("Embedding with landmark MDS");
-			}
-			break;
+			NO_IMPLEMENTATION_YET; break;
 		case ISOMAP:
-			{
-				timed_context context("Embedding with Isomap");
-				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				TAPKEE_NEIGHBORS_METHOD neighbors_method = 
-					options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
-				// compute distance matrix (matrix of pairwise distances) of data
-				DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
-				// relax distances with Dijkstra shortest path algorithm
-				DenseSymmetricMatrix relaxed_distance_matrix = isomap_relax_distances(distance_matrix,neighbors);
-				// construct embedding with eigendecomposition of the
-				// dense weight matrix
-				embedding_result = 
-					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension,0);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(ISOMAP); break;
 		case LANDMARK_ISOMAP:
-			{
-				timed_context context("Embedding with landmark Isomap");
-			}
-			break;
+			NO_IMPLEMENTATION_YET; break;
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
-			{
-				timed_context context("Embedding with NPE");
-				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
-				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-				// construct sparse weight matrix
-				SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback);
-				// 
-				pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
-					construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
-							feature_vector_callback,dimension);
-				// construct embedding
-				ProjectionResult projection_result = 
-					generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
-							eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,1);
-				// TODO to be improved with out-of-sample projection
-				embedding_result = project(projection_result,begin,end,feature_vector_callback,dimension);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING); break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
-			{
-				timed_context context("Embedding with LLTSA");
-			}
-			break;
+			NO_IMPLEMENTATION_YET; break;
 		case HESSIAN_LOCALLY_LINEAR_EMBEDDING:
-			{
-				timed_context context("Embedding with HLLE");
-				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-				// construct sparse weight matrix
-				SparseWeightMatrix weight_matrix = hlle_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
-				// construct embedding with eigendecomposition of the
-				// sparse weight matrix
-				embedding_result = 
-					eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,1);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING); break;
 		case LAPLACIAN_EIGENMAPS:
-			{
-				timed_context context("Embedding with Laplacian Eigenmaps");
-				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-				DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
-				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-				// construct sparse weight matrix
-				pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
-					compute_laplacian(begin,end,neighbors,distance_callback,width);
-				// construct embedding
-				embedding_result = 
-					generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,InverseSparseMatrixOperation>(
-							eigen_method,laplacian.first,laplacian.second,target_dimension,1);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(LAPLACIAN_EIGENMAPS); break;
 		case LOCALITY_PRESERVING_PROJECTIONS:
-			{
-				timed_context context("Embedding with LPP");
-				unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-				unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
-				TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-				DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
-				// find neighbors of each vector
-				Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-				// construct sparse weight matrix
-				pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
-					compute_laplacian(begin,end,neighbors,distance_callback,width);
-				pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
-					construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
-							feature_vector_callback,dimension);
-				// construct embedding
-				ProjectionResult projection_result = 
-					generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
-							eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,1);
-				// TODO to be improved with out-of-sample projection
-				embedding_result = project(projection_result,begin,end,feature_vector_callback,dimension);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS); break;
 		case PCA:
-			{
-				timed_context context("Embedding with PCA");
-
-				unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
-				// compute centered covariance matrix
-				DenseSymmetricMatrix centered_covariance_matrix = compute_centered_covariance_matrix(begin,end,feature_vector_callback,dimension);
-				
-				ProjectionResult projection_result = 
-					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,0);
-				// TODO to be improved with out-of-sample projection
-				embedding_result = project(projection_result,begin,end,feature_vector_callback,dimension);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(PCA); break;
 		case KERNEL_PCA:
-			{
-				timed_context context("Embedding with kPCA");
-
-				// compute centered kernel matrix 
-				DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(begin,end,kernel_callback);
-				// construct embedding
-				embedding_result = 
-					eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_kernel_matrix,target_dimension,0);
-			}
-			break;
+			embedding_result = CALL_IMPLEMENTATION(KERNEL_PCA); break;
 		default:
 			break;
 	}
+
+#undef CALL_IMPLEMENTATION 
+#undef NO_IMPLEMENTATION_YET
+
 	return embedding_result.first;
 }
 
