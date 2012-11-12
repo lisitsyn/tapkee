@@ -1,3 +1,6 @@
 [submodule "arpack"]
 	path = arpack
 	url = https://github.com/lisitsyn/arpack.git
+[submodule "feast"]
+	path = feast
+	url = git://github.com/certik/feast.git
