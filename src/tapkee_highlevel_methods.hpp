@@ -283,7 +283,7 @@ CONCRETE_IMPLEMENTATION(PCA)
 		
 		timed_context context("Embedding with PCA");
 		// compute centered covariance matrix
-		DenseSymmetricMatrix centered_covariance_matrix = compute_centered_covariance_matrix(begin,end,feature_vector_callback,dimension);
+		DenseSymmetricMatrix centered_covariance_matrix = compute_covariance_matrix(begin,end,feature_vector_callback,dimension);
 		
 		ProjectionResult projection_result = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,0);

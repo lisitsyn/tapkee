@@ -7,8 +7,8 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#ifndef TAPKEE_KERNEL_PCA_H_
-#define TAPKEE_KERNEL_PCA_H_
+#ifndef TAPKEE_PCA_H_
+#define TAPKEE_PCA_H_
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"
@@ -35,10 +35,10 @@ EmbeddingResult project(const ProjectionResult& projection_result, RandomAccessI
 }
 
 template <class RandomAccessIterator, class FeatureVectorCallback>
-DenseSymmetricMatrix compute_centered_covariance_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
-                                                        FeatureVectorCallback callback, unsigned int dimension)
+DenseSymmetricMatrix compute_covariance_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
+                                               FeatureVectorCallback callback, unsigned int dimension)
 {
-	timed_context context("Constructing PCA centered kernel matrix");
+	timed_context context("Constructing PCA covariance matrix");
 
 	DenseSymmetricMatrix covariance_matrix = DenseSymmetricMatrix::Zero(dimension,dimension);
 	
