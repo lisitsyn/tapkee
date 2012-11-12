@@ -106,13 +106,13 @@ SparseWeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 
 		for (int i=0; i<k; ++i)
 		{
-			for (int j=0; j<k; ++j)
+			for (int j=i; j<k; ++j)
 				gram_matrix(i,j) = kernel_value - dots(i) - dots(j) + callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
 		}
 		
 		DefaultScalarType trace = gram_matrix.trace();
 		gram_matrix.diagonal().array() += 1e-3*trace;
-		weights = gram_matrix.ldlt().solve(rhs);
+		weights = gram_matrix.selfadjointView<Eigen::Upper>().ldlt().solve(rhs);
 		weights /= weights.sum();
 
 		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1.0));
