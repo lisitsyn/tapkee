@@ -73,7 +73,7 @@ public:
 		for (int i = 0; i < max_num_nodes; i++)
 			nodes[i] = new FibonacciHeapNode;
 
-		Dn = 1 + (int)(log2(double(max_num_nodes)));
+		Dn = 1 + (int)(log(double(max_num_nodes))/log(2.));
 		A = (FibonacciHeapNode**)malloc(sizeof(FibonacciHeapNode*)*Dn);
 		for (int i = 0; i < Dn; i++)
 			A[i] = NULL;

@@ -37,7 +37,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 	for (unsigned int i=0; i<(end-begin); i++)
 	{
 		for (unsigned int j=0; j<(end-begin); j++)
-			diffusion_matrix(i,j) /= pow(p(i)*p(j),timesteps);
+			diffusion_matrix(i,j) /= pow(p(i)*p(j),DefaultScalarType(timesteps));
 	}
 
 	p = diffusion_matrix.colwise().sum().cwiseSqrt();
