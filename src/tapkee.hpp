@@ -97,8 +97,10 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 			embedding_result = CALL_IMPLEMENTATION(PCA); break;
 		case KERNEL_PCA:
 			embedding_result = CALL_IMPLEMENTATION(KERNEL_PCA); break;
-		default:
-			break;
+		case STOCHASTIC_PROXIMITY_EMBEDDING:
+			NO_IMPLEMENTATION_YET; break;
+		case MAXIMUM_VARIANCE_UNFOLDING:
+			NO_IMPLEMENTATION_YET; break;
 	}
 
 #undef CALL_IMPLEMENTATION 
