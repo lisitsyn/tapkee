@@ -36,12 +36,31 @@ template <class Callback>
 struct CallbackTraits
 {
 	bool is_kernel();
+	bool is_linear_kernel();
+	bool is_distance();
 };
 
 /** Macro used to indicate that callback X is a kernel function */
-#define TAPKEE_CALLBACK_IS_KERNEL(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return true; } };
+#define TAPKEE_CALLBACK_IS_KERNEL(X) template<> struct CallbackTraits<X> \
+{ \
+	static bool is_kernel() { return true; }; \
+	static bool is_linear_kernel() { return false; }; \
+	static bool is_distance() { return false; }; \
+}; 
+/** Macro used to indicate that callback X is a kernel function */
+#define TAPKEE_CALLBACK_IS_LINEAR_KERNEL(X) template<> struct CallbackTraits<X> \
+{ \
+	static bool is_kernel() { return true; }; \
+	static bool is_linear_kernel() { return true; }; \
+	static bool is_distance() { return true; }; \
+};
 /** Macro used to indicate that callback X is a distance function */
-#define TAPKEE_CALLBACK_IS_DISTANCE(X) template<> struct CallbackTraits<X> { static bool is_kernel() { return false; } };
+#define TAPKEE_CALLBACK_IS_DISTANCE(X) template<> struct CallbackTraits<X> \
+{ \
+	static bool is_kernel() { return false; }; \
+	static bool is_linear_kernel() { return false; }; \
+	static bool is_distance() { return true; }; \
+};
 
 /** Neighbors computation method */
 enum TAPKEE_NEIGHBORS_METHOD
@@ -214,7 +233,7 @@ typedef std::vector<SparseTriplet> SparseTriplets;
 typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,Eigen::Dynamic> DenseMatrix;
 typedef DenseMatrix DenseSymmetricMatrix;
 typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
-typedef std::vector<int> LocalNeighbors;
+typedef std::vector<unsigned int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
 typedef std::pair<DenseMatrix,DenseVector> EmbeddingResult;
 typedef std::pair<DenseMatrix,DenseVector> ProjectionResult;
