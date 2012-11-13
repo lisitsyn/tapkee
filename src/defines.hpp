@@ -4,7 +4,7 @@
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * Copyright (c) 2012, Sergey Lisitsyn
+ * Copyright (c) 2012, Sergey Lisitsyn, Fernando J. Iglesias García
  *
  * This code uses Any type developed by C. Diggins under Boost license, version 1.0.
  * http://www.boost.org/LICENSE_1_0.txt
