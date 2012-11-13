@@ -180,7 +180,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		// construct embedding
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
-					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,1);
+					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,0);
 		// TODO to be improved with out-of-sample projection
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
@@ -263,7 +263,7 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 		// construct embedding
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
-					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,1);
+					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,0);
 		// TODO to be improved with out-of-sample projection
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
@@ -308,6 +308,39 @@ CONCRETE_IMPLEMENTATION(KERNEL_PCA)
 		DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(begin,end,kernel_callback);
 		// construct embedding
 		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_kernel_matrix,target_dimension,0);
+	}
+};
+
+CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
+{
+	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
+                          KernelCallback kernel_callback, DistanceCallback,
+                          FeatureVectorCallback feature_vector_callback, ParametersMap options)
+	{
+		unsigned int target_dimension = 
+			options[TARGET_DIMENSION].cast<unsigned int>();
+		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
+			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
+		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
+		TAPKEE_NEIGHBORS_METHOD neighbors_method = 
+			options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
+		unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
+		
+		timed_context context("Embedding with LLTSA");
+		// find neighbors of each vector
+		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		// construct sparse weight matrix
+		SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
+		
+		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
+			construct_lltsa_eigenproblem(weight_matrix,begin,end,
+					feature_vector_callback,dimension);
+		// construct embedding
+		ProjectionResult projection_result = 
+			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
+					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,0);
+		// TODO to be improved with out-of-sample projection
+		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
 };
 

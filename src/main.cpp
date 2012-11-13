@@ -100,6 +100,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return LOCALITY_PRESERVING_PROJECTIONS;
 	if (!strcmp(str,"npe"))
 		return NEIGHBORHOOD_PRESERVING_EMBEDDING;
+	if (!strcmp(str,"lltsa"))
+		return LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
