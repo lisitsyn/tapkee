@@ -426,15 +426,17 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 	int info = 0;
 
 	Scalar scale = 1.0;
-	//if (!isBempty)
-	//{
-	//Scalar scale = B.norm() / std::sqrt(n);
-	//scale = std::pow(2, std::floor(std::log(scale+1)));
+	/*
+	if (!isBempty)
+	{
+	Scalar scale = B.norm() / std::sqrt(n);
+	scale = std::pow(2, std::floor(std::log(scale+1)));
 	////M /= scale;
-	//for (size_t i=0; i<(size_t)B.outerSize(); i++)
-	//    for (typename MatrixType::InnerIterator it(B, i); it; ++it)
-	//        it.valueRef() /= scale;
-	//}
+	for (size_t i=0; i<(size_t)B.outerSize(); i++)
+	    for (typename RMatrixType::InnerIterator it(B, i); it; ++it)
+	        it.valueRef() /= scale;
+	}
+	*/
 
 	MatrixOperation op(A);
 	//		(mode==1 || mode==2) ? B :
@@ -565,15 +567,15 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 			m_nbrConverged  = iparam[4];
 			m_info = Success;
 		}
-		delete select;
+		delete[] select;
 	}
 
-	delete v;
-	delete iparam;
-	delete ipntr;
-	delete workd;
-	delete workl;
-	delete resid;
+	delete[] v;
+	delete[] iparam;
+	delete[] ipntr;
+	delete[] workd;
+	delete[] workl;
+	delete[] resid;
 	m_isInitialized = true;
 	return *this;
 }
