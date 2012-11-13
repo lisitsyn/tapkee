@@ -102,6 +102,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return NEIGHBORHOOD_PRESERVING_EMBEDDING;
 	if (!strcmp(str,"lltsa"))
 		return LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
+	if (!strcmp(str,"spe"))
+		return STOCHASTIC_PROXIMITY_EMBEDDING;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
@@ -140,7 +142,7 @@ int main(int argc, const char** argv)
 	if (argc!=6)
 	{
 		printf("No parameters specified.\n");
-		printf("Usage is [method] [neighbor_method] [eigen_method]"
+		printf("Usage is [method] [neighbor_method] [eigen_method] "
 				"[number of neighbors] [target dimension]\n");
 		exit(EXIT_FAILURE);
 	}
@@ -155,6 +157,9 @@ int main(int argc, const char** argv)
 		// keep it static yet
 		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
 		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(1000.0);
+		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
+		parameters[SPE_TOLERANCE] = static_cast<DefaultScalarType>(1e-5);
+		parameters[SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
 	}
 
 	// Load data

@@ -19,6 +19,7 @@
 #include "methods/laplacian_eigenmaps.hpp"
 #include "methods/isomap.hpp"
 #include "methods/pca.hpp"
+#include "methods/spe.hpp"
 #include "neighbors/neighbors.hpp"
 
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback, int>
@@ -341,6 +342,33 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,0);
 		// TODO to be improved with out-of-sample projection
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
+	}
+};
+
+CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
+{
+	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
+                          KernelCallback, DistanceCallback distance_callback,
+                          FeatureVectorCallback, ParametersMap options)
+	{
+		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
+		TAPKEE_NEIGHBORS_METHOD neighbors_method =
+			options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
+		unsigned int target_dimension =
+			options[TARGET_DIMENSION].cast<unsigned int>();
+		bool global_strategy = options[SPE_GLOBAL_STRATEGY].cast<bool>();
+		DefaultScalarType tolerance = options[SPE_TOLERANCE].cast<DefaultScalarType>();
+		unsigned int nupdates = options[SPE_NUM_UPDATES].cast<unsigned int>();
+
+		//TODO add local strategy using KNN
+		if (!global_strategy)
+		{
+			printf("Local strategy in SPE not implemented yet\n");
+			return EmbeddingResult(DenseMatrix(),DenseVector());
+		}
+
+		timed_context context("Embedding with SPE");
+		return spe_embedding(begin,end,distance_callback,k,target_dimension,global_strategy,tolerance,nupdates);
 	}
 };
 

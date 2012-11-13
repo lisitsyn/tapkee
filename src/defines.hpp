@@ -19,12 +19,12 @@
 #include <map>
 #include "utils/any.hpp"
 
-#define EIGEN_NO_DEBUG
+//#define EIGEN_NO_DEBUG
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SparseCholesky>
-#include <eigen3/Eigen/SuperLUSupport>
+//#include <eigen3/Eigen/SuperLUSupport>
 #undef EIGEN_MATRIXBASE_PLUGIN
 
 /** Callback traits used to indicate
@@ -102,7 +102,10 @@ enum TAPKEE_PARAMETERS
 	NEIGHBORS_METHOD,
 	DIFFUSION_MAP_TIMESTEPS,
 	GAUSSIAN_KERNEL_WIDTH,
-	MAX_ITERATION
+	MAX_ITERATION,
+	SPE_GLOBAL_STRATEGY,
+	SPE_TOLERANCE,
+	SPE_NUM_UPDATES
 };
 /** Parameters map type */
 typedef std::map<TAPKEE_PARAMETERS, any> ParametersMap;

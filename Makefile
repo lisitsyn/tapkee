@@ -13,7 +13,7 @@ debug:
 
 
 clean:
-	rm $(OBJECTS)
+	rm -f application
 
 .PHONY: all clean
 
