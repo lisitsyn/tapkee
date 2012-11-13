@@ -89,17 +89,17 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED_INVERSE>
 			unsigned int j=0;
 			for ( ; j+1 < O.cols(); j+= 2)
 			{
-				double v1 = (double)(rand()+1.f)/((float)RAND_MAX+2.f);
-				double v2 = (double)(rand()+1.f)/((float)RAND_MAX+2.f);
-				double len = sqrt(-2.f*log(v1));
+				DefaultScalarType v1 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				DefaultScalarType v2 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				DefaultScalarType len = sqrt(-2.f*log(v1));
 				O(i,j) = len*cos(2.f*M_PI*v2);
 				O(i,j+1) = len*sin(2.f*M_PI*v2);
 			}
 			for ( ; j < O.cols(); j++)
 			{
-				double v1 = (double)(rand()+1.f)/((float)RAND_MAX+2.f);
-				double v2 = (double)(rand()+1.f)/((float)RAND_MAX+2.f);
-				double len = sqrt(-2.f*log(v1));
+				DefaultScalarType v1 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				DefaultScalarType v2 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				DefaultScalarType len = sqrt(-2.f*log(v1));
 				O(i,j) = len*cos(2.f*M_PI*v2);
 			}
 		}

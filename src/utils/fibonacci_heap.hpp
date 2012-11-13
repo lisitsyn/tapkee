@@ -11,6 +11,7 @@
 #ifndef FIBONACCI_H_
 #define FIBONACCI_H_
 
+#include "../defines.hpp"
 #include <stdlib.h>
 #include <utility>
 #include <cmath>
@@ -47,7 +48,7 @@ struct FibonacciHeapNode
 	int index;
 
 	/** key of node */
-	double key;
+	DefaultScalarType key;
 
 private:
 	FibonacciHeapNode(const FibonacciHeapNode& fh);
@@ -73,7 +74,7 @@ public:
 		for (int i = 0; i < max_num_nodes; i++)
 			nodes[i] = new FibonacciHeapNode;
 
-		Dn = 1 + (int)(log(double(max_num_nodes))/log(2.));
+		Dn = 1 + (int)(log(DefaultScalarType(max_num_nodes))/log(2.));
 		A = (FibonacciHeapNode**)malloc(sizeof(FibonacciHeapNode*)*Dn);
 		for (int i = 0; i < Dn; i++)
 			A[i] = NULL;
@@ -96,7 +97,7 @@ public:
 	/** Inserts nodes with certain key in array of nodes with index
 	 * Have time of O(1)
 	 */
-	void insert(int index, double key)
+	void insert(int index, DefaultScalarType key)
 	{
 		if(index >= static_cast<int>(max_num_nodes) || index < 0)
 			return;
@@ -136,7 +137,7 @@ public:
 	 * Have amortized time of O(log n)
 	 * @return item with minimal key
 	 */
-	int extract_min(double& ret_key)
+	int extract_min(DefaultScalarType& ret_key)
 	{
 		FibonacciHeapNode *min_node;
 		FibonacciHeapNode *child, *next_child;
@@ -208,7 +209,7 @@ public:
 	/** Returns key by index
 	 * @return -1 if not valid
 	 */
-	int get_key(int index, double& ret_key)
+	int get_key(int index, DefaultScalarType& ret_key)
 	{
 		if(index >= max_num_nodes || index < 0)
 			return -1;
@@ -224,7 +225,7 @@ public:
 	/** Decreases key by index
 	 * Have amortized time of O(1)
 	 */
-	void decrease_key(int index, double& key)
+	void decrease_key(int index, DefaultScalarType& key)
 	{
 		FibonacciHeapNode* parent;
 

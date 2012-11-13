@@ -43,7 +43,7 @@ DenseSymmetricMatrix isomap_relax_distances(const DenseSymmetricMatrix& distance
 		while (heap->get_num_nodes()>0)
 		{
 			// extract min and set (s)olution state as true and (f)rontier as false
-			double tmp;
+			DefaultScalarType tmp;
 			int min_item = heap->extract_min(tmp);
 			s[min_item] = true;
 			f[min_item] = false;
@@ -57,7 +57,7 @@ DenseSymmetricMatrix isomap_relax_distances(const DenseSymmetricMatrix& distance
 				if (s[w] == false)
 				{
 					// get distance from k to i through min_item
-					double dist = shortest_distances(k,min_item) + distances(min_item,i);
+					DefaultScalarType dist = shortest_distances(k,min_item) + distances(min_item,i);
 					// if distance can be relaxed
 					if (dist < shortest_distances(k,w))
 					{

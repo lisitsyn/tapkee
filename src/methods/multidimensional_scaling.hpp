@@ -16,7 +16,7 @@ DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomA
 	{
 		for (RandomAccessIterator j_iter=i_iter; j_iter!=end; ++j_iter)
 		{
-			double d = callback(*i_iter,*j_iter);
+			DefaultScalarType d = callback(*i_iter,*j_iter);
 			d *= d;
 			distance_matrix(i_iter-begin,j_iter-begin) = d;
 			distance_matrix(j_iter-begin,i_iter-begin) = d;
@@ -30,7 +30,7 @@ void mds_process_matrix(const DenseSymmetricMatrix& const_distance_matrix)
 	timed_context context("Multidimensional distance matrix processing");
 
 	DenseSymmetricMatrix& distance_matrix = const_cast<DenseSymmetricMatrix&>(const_distance_matrix); 
-	double grand_mean = 0.0;
+	DefaultScalarType grand_mean = 0.0;
 	DenseVector col_means;
 	{
 		timed_context c("Computing means");
