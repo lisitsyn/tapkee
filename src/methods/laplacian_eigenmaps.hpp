@@ -11,7 +11,7 @@
 #define TAPKEE_LAPLACIAN_EIGENMAPS_H_
 	
 #include "../defines.hpp"
-
+#include "../utils/time.hpp"
 #include <utility>
 using std::pair;
 using std::make_pair;
@@ -23,8 +23,9 @@ pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessItera
 {
 	SparseTriplets sparse_triplets;
 
+	timed_context context("Laplacian computation");
 	const unsigned int k = neighbors[0].size();
-	sparse_triplets.reserve(k*(end-begin));
+	sparse_triplets.reserve(4*k*(end-begin));
 
 	DenseVector D = DenseVector::Zero(end-begin);
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
@@ -36,7 +37,7 @@ pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessItera
 			DefaultScalarType distance = callback(*iter,begin[current_neighbors[i]]);
 			DefaultScalarType heat = exp(-distance*distance/width);
 			D(iter-begin) += heat;
-			sparse_triplets.push_back(SparseTriplet(begin[current_neighbors[i]],(iter-begin),-heat));
+			//sparse_triplets.push_back(SparseTriplet(begin[current_neighbors[i]],(iter-begin),-heat));
 			sparse_triplets.push_back(SparseTriplet((iter-begin),begin[current_neighbors[i]],-heat));
 		}
 	}
@@ -45,6 +46,8 @@ pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessItera
 
 	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
+
+	weight_matrix.cwiseMax(SparseWeightMatrix(weight_matrix.transpose()));
 
 	return make_pair(weight_matrix,DenseDiagonalMatrix(D));
 }
