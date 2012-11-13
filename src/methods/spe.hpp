@@ -4,8 +4,8 @@
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * Written (w) 2012, Fernando J. Iglesias García
- * Copyright (c) 2012, Sergey Lisitsyn
+ * Written (w) 2012, Fernando J. Iglesias Garcia
+ * Copyright (c) 2012, Fernando J. Iglesias Garcia
  */
 
 #ifndef TAPKEE_SPE_H_
@@ -46,13 +46,16 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 
 	// Random embedding initialization, Y is the short for embedding_feature_matrix
 	std::srand(std::time(0));
-	DenseMatrix Y = (DenseMatrix::Random(N,target_dimension) 
-		       + DenseMatrix::Ones(N,target_dimension)) / 2;
+	DenseMatrix Y = (DenseMatrix::Random(target_dimension,N)
+		       + DenseMatrix::Ones(target_dimension,N)) / 2;
 	// Auxiliary diffference embedding feature matrix
-	DenseMatrix Yd(nupdates,target_dimension);
+	DenseMatrix Yd(target_dimension,nupdates);
 
 	// SPE's main loop
 	
+	typedef std::vector<int> Indices;
+	typedef std::vector<int>::iterator IndexIterator;
+
 	// Maximum number of iterations
 	int max_iter = 2000 + round(0.04 * N*N);
 	if (!global_strategy)
@@ -60,7 +63,7 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 	// Learning parameter
 	DefaultScalarType lambda = 1.0;
 	// Vector of indices used for shuffling
-	std::vector<int> indices(N);
+	Indices indices(N);
 	for (int i=0; i<N; ++i)
 		indices[i] = i;
 	// Vector with distances in the original space of the points to update
@@ -68,8 +71,8 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 	DenseVector scale(nupdates);
 	DenseVector D(nupdates);
 	// Pointers to the indices of the elements to update
-	std::vector<int>::iterator ind1;
-	std::vector<int>::iterator ind2;
+	IndexIterator ind1;
+	IndexIterator ind2;
 
 	for (int i=0; i<max_iter; ++i)
 	{
@@ -82,23 +85,16 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 		// Compute distances between the selected points in the embedded space
 		for(int j=0; j<nupdates; ++j)
 		{
-			DefaultScalarType sum = 0.0;
-
-			for (int l=0; l<target_dimension; ++l)
-			{
-				//FIXME it seems that here Euclidean distance is forced
-				sum += std::pow(Y(*ind1,l)-Y(*ind2,l), 2);
-			}
-
-			D[j] = std::sqrt(sum);
+			//FIXME it seems that here Euclidean distance is forced
+			D[j] = (Y.col(*ind1) - Y.col(*ind2)).norm();
 			++ind1, ++ind2;
 		}
 
 		// Get the corresponding distances in the original space
 		if (global_strategy)
-			Rt = alpha*DenseVector::Ones(nupdates);
+			Rt.fill(alpha);
 		else // local_strategy
-			Rt = DenseVector::Ones(nupdates);
+			Rt.fill(1);
 
 		ind1 = indices.begin();
 		ind2 = indices.begin()+nupdates;
@@ -107,19 +103,16 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 
 		// Compute some terms for update
 
-		// Scale factor: (Rt - D) ./ (D + tolerance)
-		for (int j=0; j<nupdates; ++j)
-			scale[j] = (Rt[j]-D[j]) / (D[j]+tolerance);
+		// Scale factor
+		D.array() += tolerance;
+		scale = (Rt-D).cwiseQuotient(D);
 
 		ind1 = indices.begin();
 		ind2 = indices.begin()+nupdates;
-		// Difference matrix: Y(ind1) - Y(ind2)
+		// Difference matrix
 		for (int j=0; j<nupdates; ++j)
 		{
-			for (int l=0 ; l<target_dimension; ++l)
-			{
-				Yd(j,l) = Y(*ind1,l) - Y(*ind2,l);
-			}
+			Yd.col(j) = Y.col(*ind1) - Y.col(*ind2);
 
 			++ind1, ++ind2;
 		}
@@ -129,11 +122,8 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 		// Update the location of the vectors in the embedded space
 		for (int j=0; j<nupdates; ++j)
 		{
-			for (int l=0 ; l<target_dimension; ++l)
-			{
-				Y(*ind1,l) += lambda / 2 * scale[j] * Yd(j,l);
-				Y(*ind2,l) -= lambda / 2 * scale[j] * Yd(j,l);
-			}
+			Y.col(*ind1) += lambda / 2 * scale[j] * Yd.col(j);
+			Y.col(*ind2) -= lambda / 2 * scale[j] * Yd.col(j);
 
 			++ind1, ++ind2;
 		}
