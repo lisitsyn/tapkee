@@ -48,12 +48,13 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 
 		timed_context context("Embedding with KLLE");
 		// find neighbors of each vector
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback);
+		SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
 		// construct embedding with eigendecomposition of the
 		// sparse weight matrix
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
@@ -70,12 +71,13 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 		
 		timed_context context("Embedding with KLTSA");
 		// find neighbors of each vector
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
+		SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
 		// construct embedding with eigendecomposition of the
 		// sparse weight matrix
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
@@ -181,12 +183,13 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
+		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 		
 		timed_context context("Embedding with NPE");
 		// find neighbors of each vector
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback);
+		SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
 		// 
 		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
@@ -327,12 +330,13 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
+		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 		
 		timed_context context("Embedding with LLTSA");
 		// find neighbors of each vector
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
+		SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
 		
 		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,

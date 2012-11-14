@@ -18,7 +18,8 @@ using std::make_pair;
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
-                                       const Neighbors& neighbors, PairwiseCallback callback, unsigned int target_dimension)
+                                       const Neighbors& neighbors, PairwiseCallback callback, 
+                                       unsigned int target_dimension, DefaultScalarType shift)
 {
 	timed_context context("KLTSA weight matrix computation");
 	const unsigned int k = neighbors[0].size();
@@ -64,7 +65,7 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 		G.rightCols(target_dimension).noalias() = sae_solver.eigenvectors().rightCols(target_dimension);
 		gram_matrix.noalias() = G * G.transpose();
 		
-		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1e-8));
+		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,shift));
 		for (unsigned int i=0; i<k; ++i)
 		{
 			sparse_triplets.push_back(SparseTriplet(current_neighbors[i],current_neighbors[i],1.0));
@@ -82,7 +83,7 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
-                                      const Neighbors& neighbors, PairwiseCallback callback)
+                                      const Neighbors& neighbors, PairwiseCallback callback, DefaultScalarType shift)
 {
 	timed_context context("KLLE weight computation");
 	const unsigned int k = neighbors[0].size();
@@ -115,7 +116,7 @@ SparseWeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 		weights = gram_matrix.selfadjointView<Eigen::Upper>().ldlt().solve(rhs);
 		weights /= weights.sum();
 
-		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1.0));
+		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,1.0+shift));
 		for (unsigned int i=0; i<k; ++i)
 		{
 			sparse_triplets.push_back(SparseTriplet(current_neighbors[i],iter-begin,
