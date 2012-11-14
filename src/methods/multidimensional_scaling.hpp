@@ -10,33 +10,33 @@ using std::random_shuffle;
 using std::fill;
 
 template <class RandomAccessIterator>
-std::vector<RandomAccessIterator> select_landmarks_random(RandomAccessIterator begin, RandomAccessIterator end, DefaultScalarType ratio)
+Landmarks select_landmarks_random(RandomAccessIterator begin, RandomAccessIterator end, DefaultScalarType ratio)
 {
-	std::vector<RandomAccessIterator> landmarks;
+	Landmarks landmarks;
 	landmarks.reserve(end-begin);
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-		landmarks.push_back(iter);
+		landmarks.push_back(iter-begin);
 	random_shuffle(landmarks.begin(),landmarks.end());
 	landmarks.erase(landmarks.begin() + static_cast<unsigned int>(landmarks.size()*ratio),landmarks.end());
 	return landmarks;
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
-DenseSymmetricMatrix compute_distance_matrix(std::vector<RandomAccessIterator> indices, 
+DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, Landmarks landmarks, 
                                              PairwiseCallback callback)
 {
 	timed_context context("Multidimensional scaling distance matrix computation");
 
-	DenseMatrix distance_matrix(indices.size(),indices.size());
+	DenseMatrix distance_matrix(landmarks.size(),landmarks.size());
 
-	for (typename std::vector<RandomAccessIterator>::const_iterator i_iter=indices.begin(); i_iter!=indices.end(); ++i_iter)
+	for (Landmarks::const_iterator i_iter=landmarks.begin(); i_iter!=landmarks.end(); ++i_iter)
 	{
-		for (typename std::vector<RandomAccessIterator>::const_iterator j_iter=i_iter; j_iter!=indices.end(); ++j_iter)
+		for (Landmarks::const_iterator j_iter=i_iter; j_iter!=landmarks.end(); ++j_iter)
 		{
-			DefaultScalarType d = callback(**i_iter,**j_iter);
+			DefaultScalarType d = callback(*(begin+*i_iter),*(begin+*j_iter));
 			d *= d;
-			distance_matrix(i_iter-indices.begin(),j_iter-indices.begin()) = d;
-			distance_matrix(j_iter-indices.begin(),i_iter-indices.begin()) = d;
+			distance_matrix(i_iter-landmarks.begin(),j_iter-landmarks.begin()) = d;
+			distance_matrix(j_iter-landmarks.begin(),i_iter-landmarks.begin()) = d;
 		}
 	}
 	return distance_matrix;
@@ -44,7 +44,7 @@ DenseSymmetricMatrix compute_distance_matrix(std::vector<RandomAccessIterator> i
 
 template <class RandomAccessIterator, class PairwiseCallback>
 EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback distance_callback,
-                            const std::vector<RandomAccessIterator>& landmarks, const DenseSymmetricMatrix& landmarks_distance_matrix, 
+                            const Landmarks& landmarks, const DenseSymmetricMatrix& landmarks_distance_matrix, 
                             const EmbeddingResult& landmarks_embedding, unsigned int target_dimension)
 {
 	timed_context context("Landmark triangulation");
@@ -54,11 +54,11 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 	
 	DenseMatrix embedding((end-begin),target_dimension);
 
-	for (typename std::vector<RandomAccessIterator>::const_iterator iter=landmarks.begin(); 
+	for (Landmarks::const_iterator iter=landmarks.begin(); 
 			iter!=landmarks.end(); ++iter)
 	{
-		to_process[*iter-begin] = false;
-		embedding.row(*iter-begin) = landmarks_embedding.first.row(iter-landmarks.begin());
+		to_process[*iter] = false;
+		embedding.row(*iter) = landmarks_embedding.first.row(iter-landmarks.begin());
 	}
 
 //	for (unsigned int i=0; i<target_dimension; ++i)
@@ -74,7 +74,7 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 
 		for (unsigned int i=0; i<distances_to_landmarks.size(); ++i)
 		{
-			DefaultScalarType d = distance_callback(*iter,*landmarks[i]);
+			DefaultScalarType d = distance_callback(*iter,begin[landmarks[i]]);
 			distances_to_landmarks[i] = d*d;
 		}
 

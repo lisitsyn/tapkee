@@ -136,9 +136,9 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 
 		timed_context context("Embedding with Landmark MDS");
 		// todo replace with some type
-		std::vector<RandomAccessIterator> landmarks = select_landmarks_random(begin,end,ratio);
+		Landmarks landmarks = select_landmarks_random(begin,end,ratio);
 
-		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(landmarks,distance_callback);
+		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,landmarks,distance_callback);
 		mds_process_matrix(distance_matrix);
 
 		EmbeddingResult landmarks_embedding = 

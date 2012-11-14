@@ -57,7 +57,7 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 		gram_matrix.rowwise() -= col_means.transpose();
 		gram_matrix.colwise() -= row_means;
 		
-		Eigen::SelfAdjointEigenSolver<DenseMatrix> sae_solver;
+		DefaultDenseSelfAdjointEigenSolver sae_solver;
 		sae_solver.compute(gram_matrix);
 
 		G.col(0).setConstant(1/sqrt(DefaultScalarType(k)));
@@ -176,7 +176,7 @@ SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 		gram_matrix.rowwise() -= col_means.transpose();
 		gram_matrix.colwise() -= row_means;
 		
-		Eigen::SelfAdjointEigenSolver<DenseMatrix> sae_solver;
+		DefaultDenseSelfAdjointEigenSolver sae_solver;
 		sae_solver.compute(gram_matrix);
 
 		G.col(0).setConstant(1/sqrt(DefaultScalarType(k)));
