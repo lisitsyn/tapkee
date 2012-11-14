@@ -105,7 +105,8 @@ enum TAPKEE_PARAMETERS
 	MAX_ITERATION,
 	SPE_GLOBAL_STRATEGY,
 	SPE_TOLERANCE,
-	SPE_NUM_UPDATES
+	SPE_NUM_UPDATES,
+	LANDMARK_RATIO
 };
 /** Parameters map type */
 typedef std::map<TAPKEE_PARAMETERS, any> ParametersMap;
@@ -243,5 +244,7 @@ typedef std::pair<DenseMatrix,DenseVector> ProjectionResult;
 typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
 typedef Eigen::DiagonalMatrix<DefaultScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
 typedef Eigen::SimplicialLDLT<SparseWeightMatrix> DefaultSparseSolver;
+typedef Eigen::SelfAdjointEigenSolver<DenseMatrix> DefaultDenseSelfAdjointEigenSolver;
+typedef std::vector<unsigned int> Landmarks;
 
 #endif

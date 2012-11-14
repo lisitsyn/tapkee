@@ -33,6 +33,8 @@ struct embedding_impl
 #define CONCRETE_IMPLEMENTATION(METHOD) \
 	template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback> \
 	struct embedding_impl<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,METHOD>
+#define OBTAIN_PARAMETER(TYPE,NAME,CODE) \
+	TYPE NAME = options[CODE].cast<TYPE>()
 
 CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 {
@@ -40,14 +42,11 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
                           KernelCallback kernel_callback, DistanceCallback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = 
-			options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+
 		timed_context context("Embedding with KLLE");
 		// find neighbors of each vector
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
@@ -65,13 +64,10 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
                           KernelCallback kernel_callback, DistanceCallback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = 
-			options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
 		
 		timed_context context("Embedding with KLTSA");
 		// find neighbors of each vector
@@ -90,12 +86,10 @@ CONCRETE_IMPLEMENTATION(DIFFUSION_MAP)
                           KernelCallback, DistanceCallback distance_callback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int timesteps = options[DIFFUSION_MAP_TIMESTEPS].cast<unsigned int>();
-		DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(unsigned int,timesteps,DIFFUSION_MAP_TIMESTEPS);
+		OBTAIN_PARAMETER(DefaultScalarType,width,GAUSSIAN_KERNEL_WIDTH);
 		
 		timed_context context("Embedding with diffusion map");
 		// compute diffusion matrix
@@ -112,10 +106,8 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
                           KernelCallback, DistanceCallback distance_callback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 
 		timed_context context("Embeding with MDS");
 		// compute distance matrix (matrix of pairwise distances) of data
@@ -128,20 +120,41 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 	}
 };
 
+CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
+{
+	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
+                          KernelCallback, DistanceCallback distance_callback,
+                          FeatureVectorCallback, ParametersMap options)
+	{
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(DefaultScalarType,ratio,LANDMARK_RATIO);
+
+		timed_context context("Embedding with Landmark MDS");
+		// todo replace with some type
+		std::vector<RandomAccessIterator> landmarks = select_landmarks_random(begin,end,ratio);
+
+		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(landmarks,distance_callback);
+		mds_process_matrix(distance_matrix);
+
+		EmbeddingResult landmarks_embedding = 
+			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,0);
+
+		return triangulate(begin,end,distance_callback,landmarks,distance_matrix,landmarks_embedding,target_dimension);
+	}
+};
+
 CONCRETE_IMPLEMENTATION(ISOMAP)
 {
 	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
                           KernelCallback, DistanceCallback distance_callback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = 
-			options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-		
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+
 		timed_context context("Embedding with Isomap");
 		// find neighbors of each vector
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
@@ -161,13 +174,11 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
                           KernelCallback kernel_callback, DistanceCallback,
                           FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		
 		timed_context context("Embedding with NPE");
 		// find neighbors of each vector
@@ -193,12 +204,10 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
                           KernelCallback kernel_callback, DistanceCallback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		
 		timed_context context("Embedding with HLLE");
 		// find neighbors of each vector
@@ -217,13 +226,11 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
                           KernelCallback, DistanceCallback distance_callback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-		DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(DefaultScalarType,width,GAUSSIAN_KERNEL_WIDTH);
 		
 		timed_context context("Embedding with Laplacian Eigenmaps");
 		// find neighbors of each vector
@@ -243,14 +250,12 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
                           KernelCallback, DistanceCallback distance_callback,
                           FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-		DefaultScalarType width = options[GAUSSIAN_KERNEL_WIDTH].cast<DefaultScalarType>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(DefaultScalarType,width,GAUSSIAN_KERNEL_WIDTH);
+		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		
 		timed_context context("Embedding with LPP");
 		// find neighbors of each vector
@@ -276,11 +281,9 @@ CONCRETE_IMPLEMENTATION(PCA)
                           KernelCallback, DistanceCallback,
                           FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		
 		timed_context context("Embedding with PCA");
 		// compute centered covariance matrix
@@ -299,10 +302,8 @@ CONCRETE_IMPLEMENTATION(KERNEL_PCA)
                           KernelCallback kernel_callback, DistanceCallback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 
 		timed_context context("Embedding with kPCA");
 		// compute centered kernel matrix 
@@ -318,14 +319,11 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
                           KernelCallback kernel_callback, DistanceCallback,
                           FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		unsigned int target_dimension = 
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		TAPKEE_EIGEN_EMBEDDING_METHOD eigen_method = 
-			options[EIGEN_EMBEDDING_METHOD].cast<TAPKEE_EIGEN_EMBEDDING_METHOD>();
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method = 
-			options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-		unsigned int dimension = options[CURRENT_DIMENSION].cast<unsigned int>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		
 		timed_context context("Embedding with LLTSA");
 		// find neighbors of each vector
@@ -351,14 +349,13 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
                           KernelCallback, DistanceCallback distance_callback,
                           FeatureVectorCallback, ParametersMap options)
 	{
-		unsigned int k = options[NUMBER_OF_NEIGHBORS].cast<unsigned int>();
-		TAPKEE_NEIGHBORS_METHOD neighbors_method =
-			options[NEIGHBORS_METHOD].cast<TAPKEE_NEIGHBORS_METHOD>();
-		unsigned int target_dimension =
-			options[TARGET_DIMENSION].cast<unsigned int>();
-		bool global_strategy = options[SPE_GLOBAL_STRATEGY].cast<bool>();
-		DefaultScalarType tolerance = options[SPE_TOLERANCE].cast<DefaultScalarType>();
-		unsigned int nupdates = options[SPE_NUM_UPDATES].cast<unsigned int>();
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
+		OBTAIN_PARAMETER(bool,global_strategy,SPE_GLOBAL_STRATEGY);
+		OBTAIN_PARAMETER(DefaultScalarType,tolerance,SPE_TOLERANCE);
+		OBTAIN_PARAMETER(unsigned int,nupdates,SPE_NUM_UPDATES);
 
 		//TODO add local strategy using KNN
 		if (!global_strategy)
@@ -373,4 +370,5 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 };
 
 #undef CONCRETE_IMPLEMENTATION
+#undef OBTAIN_PARAMETER
 #endif

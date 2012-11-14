@@ -45,7 +45,6 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOper
 
 		ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixTypeOperation> arpack(lhs,rhs,target_dimension+skip,"SM");
 
-		std::cout << arpack.info();
 		DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,lhs.cols(),target_dimension);
 
 		return EmbeddingResult(embedding_feature_matrix,arpack.eigenvalues().tail(target_dimension));

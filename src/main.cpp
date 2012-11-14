@@ -86,6 +86,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return KERNEL_LOCALLY_LINEAR_EMBEDDING;
 	if (!strcmp(str,"mds"))
 		return MULTIDIMENSIONAL_SCALING;
+	if (!strcmp(str,"lmds"))
+		return LANDMARK_MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"isomap"))
 		return ISOMAP;
 	if (!strcmp(str,"diffusion_map"))
@@ -160,6 +162,7 @@ int main(int argc, const char** argv)
 		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
 		parameters[SPE_TOLERANCE] = static_cast<DefaultScalarType>(1e-5);
 		parameters[SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
+		parameters[LANDMARK_RATIO] = static_cast<double>(0.2);
 	}
 
 	// Load data

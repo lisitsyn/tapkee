@@ -30,7 +30,7 @@
  * implementation of operator()(DenseMatrix) which computes right product
  * of the parameter with the MatrixType.
  */
-template <class MatrixType, class MatrixTypeOperation, int> 
+template <class MatrixType, class MatrixTypeOperation, int IMPLEMENTATION> 
 struct eigen_embedding_impl
 {
 	/** Construct embedding
@@ -67,7 +67,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJ
 		timed_context context("Eigen library dense eigendecomposition");
 
 		DenseMatrix dense_wm = wm;
-		Eigen::SelfAdjointEigenSolver<DenseMatrix> solver(dense_wm);
+		DefaultDenseSelfAdjointEigenSolver solver(dense_wm);
 
 		DenseMatrix embedding_feature_matrix = (solver.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
 
@@ -124,24 +124,15 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED_INVERSE>
 
 		DenseMatrix B1 = operation(Y);
 		DenseMatrix B = Y.householderQr().solve(B1);
-		Eigen::SelfAdjointEigenSolver<DenseMatrix> eigenOfB(B);
+		DefaultDenseSelfAdjointEigenSolver eigenOfB(B);
 		DenseMatrix embedding = (Y*eigenOfB.eigenvectors()).block(0, skip, wm.cols(), target_dimension);
 
-		/*
-		DenseMatrix covariance(target_dimension,target_dimension);
-		covariance = embedding.transpose()*embedding;
-		//covariance.centerMatrix();
-		Eigen::SelfAdjointEigenSolver<DenseMatrix> pca(covariance);
-		embedding *= pca.eigenvectors();
-		*/
-		/* refinements idea (drop probably)
-		 */
 		return EmbeddingResult(embedding,eigenOfB.eigenvalues());
 	}
 };
 
-/** Adapter method for various eigendecomposition methods. Currently
- * supports two methods:
+/** Handler method for various eigendecomposition methods. Currently
+ * supports three methods:
  * * ARPACK_XSXUPD
  * * RANDOMIZED_INVERSE
  * * EIGEN_DENSE_SELFADJOINT_SOLVER

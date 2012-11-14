@@ -78,7 +78,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 		case MULTIDIMENSIONAL_SCALING:
 			embedding_result = CALL_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING); break;
 		case LANDMARK_MULTIDIMENSIONAL_SCALING:
-			NO_IMPLEMENTATION_YET; break;
+			embedding_result = CALL_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING); break;
 		case ISOMAP:
 			embedding_result = CALL_IMPLEMENTATION(ISOMAP); break;
 		case LANDMARK_ISOMAP:
