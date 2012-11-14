@@ -9,6 +9,7 @@
 
 #include "tapkee.hpp"
 #include "defines.hpp"
+#include "callbacks/eigen_matrix_callbacks.hpp"
 
 #include <algorithm>
 #include <string>
@@ -19,38 +20,6 @@
 
 using namespace Eigen;
 using namespace std;
-
-struct feature_vector_callback
-{
-	feature_vector_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline void operator()(int i, DenseVector& vector) const
-	{
-		vector = feature_matrix.col(i);
-	}
-	const DenseMatrix& feature_matrix;
-};
-
-struct kernel_callback
-{
-	kernel_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline DefaultScalarType operator()(int a, int b) const
-	{
-		return feature_matrix.col(a).dot(feature_matrix.col(b));
-	}
-	const DenseMatrix& feature_matrix;
-};
-TAPKEE_CALLBACK_IS_KERNEL(kernel_callback);
-
-struct distance_callback
-{
-	distance_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline DefaultScalarType operator()(int a, int b) const
-	{
-		return (feature_matrix.col(a)-feature_matrix.col(b)).norm();
-	}
-	const DenseMatrix& feature_matrix;
-};
-TAPKEE_CALLBACK_IS_DISTANCE(distance_callback);
 
 DenseMatrix read_data(const string& filename)
 {
