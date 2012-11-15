@@ -18,7 +18,9 @@
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"
-#include "../utils/arpack_wrapper.hpp"
+#ifndef TAPKEE_NO_ARPACK
+	#include "../utils/arpack_wrapper.hpp"
+#endif
 #include "matrix_operations.hpp"
 
 /** Templated implementation of eigendecomposition-based embedding. 
@@ -50,11 +52,15 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK_XSXUPD>
 		timed_context context("ARPACK DSXUPD eigendecomposition");
 
 		// TODO SM / LM
+#ifdef TAPKEE_NO_ARPACK
+		return EmbeddingResult();
+#else
 		ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixTypeOperation> arpack(wm,target_dimension+skip,"SM");
 
 		DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
 
 		return EmbeddingResult(embedding_feature_matrix,arpack.eigenvalues().tail(target_dimension));
+#endif
 	}
 };
 

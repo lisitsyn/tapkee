@@ -95,8 +95,7 @@ struct ds_node {
 	P p;
 };
 
-static DefaultScalarType base = 1.3;
-
+static DefaultScalarType base = COVERTREE_BASE;
 static DefaultScalarType il2 = 1. / log(base);
 
 inline DefaultScalarType dist_of_scale (int s)

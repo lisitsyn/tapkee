@@ -13,83 +13,39 @@
 #ifndef TAPKEE_DEFINES_H_
 #define TAPKEE_DEFINES_H_
 
-#include <vector>
-#include <string>
-#include <utility>
-#include <map>
 #include "utils/any.hpp"
+#include <map>
+#include <vector>
+#include <utility>
 
-//#define EIGEN_NO_DEBUG
+#ifndef TAPKEE_DEBUG
+	#define EIGEN_NO_DEBUG
+#endif
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
+//#undef EIGEN_MATRIXBASE_PLUGIN
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SparseCholesky>
 //#include <eigen3/Eigen/SuperLUSupport>
-#undef EIGEN_MATRIXBASE_PLUGIN
 
-/** Callback traits used to indicate
- * whether provided pairwise callback is
- * a kernel (similarity function) or a
- * distance function
- */
-template <class Callback>
-struct CallbackTraits
-{
-	bool is_kernel();
-	bool is_linear_kernel();
-	bool is_distance();
-};
+// Customizable types
+#ifdef TAPKEE_CUSTOM_TYPES
+	#include TAPKEE_CUSTOM_TYPES
+#else
+	typedef double DefaultScalarType;
+	typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
+	typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,Eigen::Dynamic> DenseMatrix;
+	typedef DenseMatrix DenseSymmetricMatrix;
+	typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
+	typedef Eigen::SelfAdjointEigenSolver<DenseMatrix> DefaultDenseSelfAdjointEigenSolver;
+	typedef Eigen::SimplicialLDLT<SparseWeightMatrix> DefaultSparseSolver;
+#endif
 
-/** Macro used to indicate that callback X is a kernel function */
-#define TAPKEE_CALLBACK_IS_KERNEL(X) template<> struct CallbackTraits<X> \
-{ \
-	static bool is_kernel() { return true; }; \
-	static bool is_linear_kernel() { return false; }; \
-	static bool is_distance() { return false; }; \
-}; 
-/** Macro used to indicate that callback X is a kernel function */
-#define TAPKEE_CALLBACK_IS_LINEAR_KERNEL(X) template<> struct CallbackTraits<X> \
-{ \
-	static bool is_kernel() { return true; }; \
-	static bool is_linear_kernel() { return true; }; \
-	static bool is_distance() { return true; }; \
-};
-/** Macro used to indicate that callback X is a distance function */
-#define TAPKEE_CALLBACK_IS_DISTANCE(X) template<> struct CallbackTraits<X> \
-{ \
-	static bool is_kernel() { return false; }; \
-	static bool is_linear_kernel() { return false; }; \
-	static bool is_distance() { return true; }; \
-};
-
-/** Neighbors computation method */
-enum TAPKEE_NEIGHBORS_METHOD
-{
-	/** Brute force method with approx. O(N*N*log k) time complexity.
-	 * Recommended to be used only in debug purposes.
-	 */
-	BRUTE_FORCE,
-	/** Covertree-based method with approx. O(log N) time complexity.
-	 * Recommended to be used as a default method.
-	 */
-	COVER_TREE,
-};
-
-/** Eigendecomposition-based embedding method */
-enum TAPKEE_EIGEN_EMBEDDING_METHOD
-{
-	/** ARPACK-based method (requires the ARPACK library
-	 * binaries to be available around). 
-	 * Recommended to be used as a default method.
-	 * Supports both generalized and standard eigenproblems. */
-	ARPACK_XSXUPD,
-	/** Randomized method (implementation taken from the redsvd lib). 
-	 * Supports only standard eigenproblems. */
-	RANDOMIZED_INVERSE,
-	/** Eigen library dense method (useful for debugging)
-	 */
-	EIGEN_DENSE_SELFADJOINT_SOLVER
-};
+#ifdef TAPKEE_CUSTOM_PROPERTIES
+	#include TAPKEE_CUSTOM_PROPERTIES
+#else
+	#define COVERTREE_BASE 1.3
+#endif
 
 /** Parameters that are used by the library */
 enum TAPKEE_PARAMETERS
@@ -231,21 +187,45 @@ enum TAPKEE_METHOD
 	PCA
 };
 
+/** Neighbors computation method */
+enum TAPKEE_NEIGHBORS_METHOD
+{
+	/** Brute force method with approx. O(N*N*log k) time complexity.
+	 * Recommended to be used only in debug purposes.
+	 */
+	BRUTE_FORCE,
+	/** Covertree-based method with approx. O(log N) time complexity.
+	 * Recommended to be used as a default method.
+	 */
+	COVER_TREE,
+};
+
+/** Eigendecomposition-based embedding method */
+enum TAPKEE_EIGEN_EMBEDDING_METHOD
+{
+	/** ARPACK-based method (requires the ARPACK library
+	 * binaries to be available around). 
+	 * Recommended to be used as a default method.
+	 * Supports both generalized and standard eigenproblems. */
+	ARPACK_XSXUPD,
+	/** Randomized method (implementation taken from the redsvd lib). 
+	 * Supports only standard eigenproblems. */
+	RANDOMIZED_INVERSE,
+	/** Eigen library dense method (useful for debugging)
+	 */
+	EIGEN_DENSE_SELFADJOINT_SOLVER
+};
+
 /** Internal types */
-typedef double DefaultScalarType;
 typedef Eigen::Triplet<DefaultScalarType> SparseTriplet;
 typedef std::vector<SparseTriplet> SparseTriplets;
-typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,Eigen::Dynamic> DenseMatrix;
-typedef DenseMatrix DenseSymmetricMatrix;
-typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
 typedef std::vector<unsigned int> LocalNeighbors;
 typedef std::vector<LocalNeighbors> Neighbors;
 typedef std::pair<DenseMatrix,DenseVector> EmbeddingResult;
 typedef std::pair<DenseMatrix,DenseVector> ProjectionResult;
-typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
 typedef Eigen::DiagonalMatrix<DefaultScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
-typedef Eigen::SimplicialLDLT<SparseWeightMatrix> DefaultSparseSolver;
-typedef Eigen::SelfAdjointEigenSolver<DenseMatrix> DefaultDenseSelfAdjointEigenSolver;
 typedef std::vector<unsigned int> Landmarks;
+
+#include "callbacks/traits.hpp"
 
 #endif

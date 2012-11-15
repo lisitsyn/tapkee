@@ -10,14 +10,6 @@
 #ifndef TAPKEE_MAIN_H_
 #define TAPKEE_MAIN_H_
 
-#include <map>
-#include <stdlib.h>
-#include <string.h>
-
-#include <vector>
-#include <algorithm>
-#include <iostream>
-
 #include "defines.hpp"
 #include "tapkee_highlevel_methods.hpp"
 
@@ -59,7 +51,6 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 	Eigen::initParallel();
 	EmbeddingResult embedding_result;
 
-	// load common parameters from the parameters map
 	TAPKEE_METHOD method = 
 		options[REDUCTION_METHOD].cast<TAPKEE_METHOD>();
 

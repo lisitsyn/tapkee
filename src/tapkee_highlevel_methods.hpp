@@ -51,13 +51,12 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 
 		timed_context context("Embedding with KLLE");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
-		// construct embedding with eigendecomposition of the
-		// sparse weight matrix
-		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
+		Neighbors neighbors =
+			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		SparseWeightMatrix weight_matrix =
+			klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
+		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
+			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
 	}
 };
 
@@ -74,13 +73,12 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 		
 		timed_context context("Embedding with KLTSA");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
-		// construct embedding with eigendecomposition of the
-		// sparse weight matrix
-		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
+		Neighbors neighbors = 
+			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		SparseWeightMatrix weight_matrix = 
+			kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
+		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
+			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
 	}
 };
 
@@ -96,9 +94,8 @@ CONCRETE_IMPLEMENTATION(DIFFUSION_MAP)
 		OBTAIN_PARAMETER(DefaultScalarType,width,GAUSSIAN_KERNEL_WIDTH);
 		
 		timed_context context("Embedding with diffusion map");
-		// compute diffusion matrix
-		DenseSymmetricMatrix diffusion_matrix = compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
-		// compute embedding with eigendecomposition
+		DenseSymmetricMatrix diffusion_matrix =
+			compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
 		return eigen_embedding<DenseSymmetricMatrix, DenseImplicitSquareMatrixOperation>(eigen_method,
 			diffusion_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 	}
@@ -114,13 +111,10 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 
 		timed_context context("Embeding with MDS");
-		// compute distance matrix (matrix of pairwise distances) of data
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
-		// process the distance matrix (center it and *(-0.5))
 		mds_process_matrix(distance_matrix);
-		// construct embedding with eigendecomposition of the
-		// dense weight matrix
-		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
+		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
+			distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 	}
 };
 
@@ -135,16 +129,16 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 		OBTAIN_PARAMETER(DefaultScalarType,ratio,LANDMARK_RATIO);
 
 		timed_context context("Embedding with Landmark MDS");
-		// todo replace with some type
-		Landmarks landmarks = select_landmarks_random(begin,end,ratio);
-
-		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,landmarks,distance_callback);
+		Landmarks landmarks = 
+			select_landmarks_random(begin,end,ratio);
+		DenseSymmetricMatrix distance_matrix = 
+			compute_distance_matrix(begin,landmarks,distance_callback);
 		mds_process_matrix(distance_matrix);
-
 		EmbeddingResult landmarks_embedding = 
-			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
-
-		return triangulate(begin,end,distance_callback,landmarks,distance_matrix,landmarks_embedding,target_dimension);
+			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
+					distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
+		return triangulate(begin,end,distance_callback,landmarks,
+			distance_matrix,landmarks_embedding,target_dimension);
 	}
 };
 
@@ -160,15 +154,14 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 
 		timed_context context("Embedding with Isomap");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
-		// compute distance matrix (matrix of pairwise distances) of data
-		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
-		// relax distances with Dijkstra shortest path algorithm
-		DenseSymmetricMatrix relaxed_distance_matrix = isomap_relax_distances(distance_matrix,neighbors);
-		// construct embedding with eigendecomposition of the
-		// dense weight matrix
-		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,relaxed_distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
+		Neighbors neighbors = 
+			find_neighbors(neighbors_method,begin,end,distance_callback,k);
+		DenseSymmetricMatrix distance_matrix = 
+			compute_distance_matrix(begin,end,distance_callback);
+		DenseSymmetricMatrix relaxed_distance_matrix = 
+			isomap_relax_distances(distance_matrix,neighbors);
+		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
+			relaxed_distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 	}
 };
 
@@ -186,18 +179,16 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 		
 		timed_context context("Embedding with NPE");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
-		// 
-		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
+		Neighbors neighbors = 
+			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		SparseWeightMatrix weight_matrix = 
+			klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
+		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eig_matrices =
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
-					feature_vector_callback,dimension);
-		// construct embedding
+				feature_vector_callback,dimension);
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
-					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
+				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		// TODO to be improved with out-of-sample projection
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
@@ -215,13 +206,12 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		
 		timed_context context("Embedding with HLLE");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = hlle_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
-		// construct embedding with eigendecomposition of the
-		// sparse weight matrix
-		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
+		Neighbors neighbors =
+			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		SparseWeightMatrix weight_matrix =
+			hlle_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
+		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
+			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
 	}
 };
 
@@ -238,14 +228,12 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
 		OBTAIN_PARAMETER(DefaultScalarType,width,GAUSSIAN_KERNEL_WIDTH);
 		
 		timed_context context("Embedding with Laplacian Eigenmaps");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
-		// construct sparse weight matrix
+		Neighbors neighbors = 
+			find_neighbors(neighbors_method,begin,end,distance_callback,k);
 		pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
-		// construct embedding
 		return generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,InverseSparseMatrixOperation>(
-				eigen_method,laplacian.first,laplacian.second,target_dimension,SKIP_ONE_EIGENVALUE);
+			eigen_method,laplacian.first,laplacian.second,target_dimension,SKIP_ONE_EIGENVALUE);
 	}
 };
 
@@ -263,19 +251,16 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		
 		timed_context context("Embedding with LPP");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
-		// construct sparse weight matrix
+		Neighbors neighbors = 
+			find_neighbors(neighbors_method,begin,end,distance_callback,k);
 		pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
 		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
 			construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
 					feature_vector_callback,dimension);
-		// construct embedding
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
-					
-					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
+				eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		// TODO to be improved with out-of-sample projection
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
@@ -292,9 +277,8 @@ CONCRETE_IMPLEMENTATION(PCA)
 		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		
 		timed_context context("Embedding with PCA");
-		// compute centered covariance matrix
-		DenseSymmetricMatrix centered_covariance_matrix = compute_covariance_matrix(begin,end,feature_vector_callback,dimension);
-		
+		DenseSymmetricMatrix centered_covariance_matrix = 
+			compute_covariance_matrix(begin,end,feature_vector_callback,dimension);
 		ProjectionResult projection_result = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 		// TODO to be improved with out-of-sample projection
@@ -312,10 +296,10 @@ CONCRETE_IMPLEMENTATION(KERNEL_PCA)
 		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 
 		timed_context context("Embedding with kPCA");
-		// compute centered kernel matrix 
-		DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(begin,end,kernel_callback);
-		// construct embedding
-		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_kernel_matrix,target_dimension,SKIP_NO_EIGENVALUES);
+		DenseSymmetricMatrix centered_kernel_matrix = 
+			compute_centered_kernel_matrix(begin,end,kernel_callback);
+		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
+			centered_kernel_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 	}
 };
 
@@ -333,18 +317,16 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
 		
 		timed_context context("Embedding with LLTSA");
-		// find neighbors of each vector
-		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_callback,k);
-		// construct sparse weight matrix
-		SparseWeightMatrix weight_matrix = kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
-		
-		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
+		Neighbors neighbors = 
+			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		SparseWeightMatrix weight_matrix = 
+			kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
+		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eig_matrices =
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,
-					feature_vector_callback,dimension);
-		// construct embedding
+				feature_vector_callback,dimension);
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
-					eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
+				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		// TODO to be improved with out-of-sample projection
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
