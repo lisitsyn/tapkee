@@ -57,6 +57,8 @@ pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_locality_preserving_ei
 		DenseDiagonalMatrix D, RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
 		unsigned int dimension)
 {
+	timed_context context("Constructing LPP eigenproblem");
+
 	DenseSymmetricMatrix lhs = DenseSymmetricMatrix::Zero(dimension,dimension);
 	DenseSymmetricMatrix rhs = DenseSymmetricMatrix::Zero(dimension,dimension);
 

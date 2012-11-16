@@ -6,8 +6,6 @@
  *
  * Copyright (c) 2012, Sergey Lisitsyn, Fernando J. Iglesias García
  *
- * This code uses Any type developed by C. Diggins under Boost license, version 1.0.
- * http://www.boost.org/LICENSE_1_0.txt
  */
 
 #ifndef TAPKEE_EIGEN_CALLBACKS_H_
@@ -15,6 +13,12 @@
 
 #include "../defines.hpp"
 
+// Here we provide basic but still full set of callbacks
+// based on the Eigen3 template matrix library
+
+// Feature vector access callback that provides operation that 
+// puts contents of the specified feature 
+// vector to given DenseVector instance.
 struct feature_vector_callback
 {
 	feature_vector_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
@@ -25,6 +29,10 @@ struct feature_vector_callback
 	const DenseMatrix& feature_matrix;
 };
 
+// Kernel function callback that computes
+// similarity function values on vectors 
+// given by their indices. This impl. computes 
+// linear kernel i.e. dot product between two vectors.
 struct kernel_callback
 {
 	kernel_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
@@ -34,8 +42,14 @@ struct kernel_callback
 	}
 	const DenseMatrix& feature_matrix;
 };
-TAPKEE_CALLBACK_IS_KERNEL(kernel_callback);
+// That's mandatory to specify that kernel_callback
+// is a kernel (and it is good to know that it is linear).
+TAPKEE_CALLBACK_IS_LINEAR_KERNEL(kernel_callback);
 
+// Distance function callback that provides
+// dissimilarity function values on vectors
+// given by their indices. This impl. computes
+// euclidean distance between two vectors.
 struct distance_callback
 {
 	distance_callback(const DenseMatrix& matrix) : feature_matrix(matrix) {};
@@ -45,6 +59,8 @@ struct distance_callback
 	}
 	const DenseMatrix& feature_matrix;
 };
+// That's mandatory to specify that distance_callback
+// is a distance
 TAPKEE_CALLBACK_IS_DISTANCE(distance_callback);
 
 #endif

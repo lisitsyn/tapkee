@@ -32,12 +32,19 @@
 #ifdef TAPKEE_CUSTOM_TYPES
 	#include TAPKEE_CUSTOM_TYPES
 #else
+	//! default scalar value (currently only double is supported and tested, float is unstable)
 	typedef double DefaultScalarType;
+	//! dense vector type 
 	typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
+	//! dense matrix type
 	typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,Eigen::Dynamic> DenseMatrix;
+	//! dense symmetric matrix (currently just dense matrix, can be improved later)
 	typedef DenseMatrix DenseSymmetricMatrix;
+	//! sparse weight matrix type
 	typedef Eigen::SparseMatrix<DefaultScalarType> SparseWeightMatrix;
+	//! default selfadjoint solver
 	typedef Eigen::SelfAdjointEigenSolver<DenseMatrix> DefaultDenseSelfAdjointEigenSolver;
+	//! default sparse solver
 	typedef Eigen::SimplicialLDLT<SparseWeightMatrix> DefaultSparseSolver;
 #endif
 
@@ -47,7 +54,7 @@
 	#define COVERTREE_BASE 1.3
 #endif
 
-/** Parameters that are used by the library */
+//! Parameters that are used by the library
 enum TAPKEE_PARAMETERS
 {
 	/* TAPKEE_METHOD */	REDUCTION_METHOD,
@@ -65,166 +72,94 @@ enum TAPKEE_PARAMETERS
 	/* DefaultScalarType */ LANDMARK_RATIO,
 	/* DefaultScalarType */ EIGENSHIFT
 };
-/** Parameters map type */
+//! Parameters map type
 typedef std::map<TAPKEE_PARAMETERS, any> ParametersMap;
 
-/** Dimension reduction method */
+//! Dimension reduction method
 enum TAPKEE_METHOD
 {
-	/** Locally Linear Embedding / Kernel Locally Linear Embedding
-	 * Requires Mercer kernel callback (linear kernel makes the algorithm a 
-	 * standard Locally Linear Embedding) and number of neighbors 
-	 * @enum TAPKEE_PARAMETERS::NUMBER_OF_NEIGHBORS. 
-	 *
-	 * References:
-	 *
-	 * @cite Saul, L. K., Ave, P., Park, F., & Roweis, S. T. (2001).
-	 *      An Introduction to Locally Linear Embedding. 290(5500), 2323-2326.
-	 * @cite Decoste, D. (2001). Visualizing Mercer Kernel Feature Spaces 
-	 *      Via Kernelized Locally-Linear Embeddings.
-	 *      The 8th International Conference on Neural Information Processing ICONIP2001
-	 * @cite Zhao, D. (2006). Formulating LLE using alignment technique.
-	 *      Pattern Recognition, 39(11), 2233-2235.
-	 *
-	 */
+	//! Locally Linear Embedding / Kernel Locally Linear Embedding
+	//! Requires Mercer kernel callback (linear kernel makes the algorithm a 
+	//! standard Locally Linear Embedding) and number of neighbors 
+	//! @enum TAPKEE_PARAMETERS::NUMBER_OF_NEIGHBORS. 
+	//!
+	//! References:
+	//!
+	//! @cite Saul, L. K., Ave, P., Park, F., & Roweis, S. T. (2001).
+	//!      An Introduction to Locally Linear Embedding. 290(5500), 2323-2326.
+	//! @cite Decoste, D. (2001). Visualizing Mercer Kernel Feature Spaces 
+	//!      Via Kernelized Locally-Linear Embeddings.
+	//!      The 8th International Conference on Neural Information Processing ICONIP2001
+	//! @cite Zhao, D. (2006). Formulating LLE using alignment technique.
+	//!      Pattern Recognition, 39(11), 2233-2235.
 	KERNEL_LOCALLY_LINEAR_EMBEDDING,
-	/**
-	 *
-	 *
-	 *
-	 */
 	NEIGHBORHOOD_PRESERVING_EMBEDDING,
-	/** Local Tangent Space Alignment / Kernel Local Tangent Space Alignment
-	 * Requires Mercer kernel callback (linear kernel makes the algorithm a 
-	 * standard Local Tangent Space Alignment) and number of neighbors 
-	 * @enum TAPKEE_PARAMETERS::NUMBER_OF_NEIGHBORS. 
-	 * 
-	 * References:
-	 *
-	 * Zhang, Z., & Zha, H. (2002). Principal Manifolds
-	 * and Nonlinear Dimension Reduction via Local Tangent Space Alignment.
-	 * Journal of Shanghai University English Edition, 8(4), 406-424. SIAM.
-	 *
-	 */
+	//! Local Tangent Space Alignment / Kernel Local Tangent Space Alignment
+	//! Requires Mercer kernel callback (linear kernel makes the algorithm a 
+	//! standard Local Tangent Space Alignment) and number of neighbors 
+	//! @enum TAPKEE_PARAMETERS::NUMBER_OF_NEIGHBORS. 
+	//! 
+	//! References:
+	//!
+	//! @cite Zhang, Z., & Zha, H. (2002). Principal Manifolds
+	//!       and Nonlinear Dimension Reduction via Local Tangent Space Alignment.
+	//!       Journal of Shanghai University English Edition, 8(4), 406-424. SIAM.
 	KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT,
-	/**
-	 *
-	 *
-	 *
-	 */
 	LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT,
-	/**
-	 *
-	 *
-	 *
-	 */
 	HESSIAN_LOCALLY_LINEAR_EMBEDDING,
-	/**
-	 *
-	 *
-	 *
-	 */
 	LAPLACIAN_EIGENMAPS,
-	/**
-	 *
-	 *
-	 *
-	 */
 	LOCALITY_PRESERVING_PROJECTIONS,
-	/**
-	 *
-	 *
-	 *
-	 */
 	DIFFUSION_MAP,
-	/**
-	 *
-	 *
-	 *
-	 */
 	ISOMAP,
-	/**
-	 *
-	 *
-	 *
-	 */
 	LANDMARK_ISOMAP,
-	/**
-	 *
-	 *
-	 *
-	 */
 	MULTIDIMENSIONAL_SCALING,
-	/**
-	 *
-	 *
-	 *
-	 */
 	LANDMARK_MULTIDIMENSIONAL_SCALING,
-	/**
-	 *
-	 *
-	 *
-	 */
 	STOCHASTIC_PROXIMITY_EMBEDDING,
-	/**
-	 *
-	 *
-	 *
-	 */
 	MAXIMUM_VARIANCE_UNFOLDING,
-	/**
-	 *
-	 *
-	 *
-	 */
 	KERNEL_PCA,
-	/**
-	 *
-	 *
-	 *
-	 */
 	PCA
 };
 
-/** Neighbors computation method */
+//! Neighbors computation method
 enum TAPKEE_NEIGHBORS_METHOD
 {
-	/** Brute force method with approx. O(N*N*log k) time complexity.
-	 * Recommended to be used only in debug purposes.
-	 */
+	//! Brute force method with not least than 
+	//! O(N*N*log k) time complexity.
+	//! Recommended to be used only in debug purposes.
 	BRUTE_FORCE,
-	/** Covertree-based method with approx. O(log N) time complexity.
-	 * Recommended to be used as a default method.
-	 */
+	//! Covertree-based method with O(log N) time complexity.
+	//! Recommended to be used as a default method.
 	COVER_TREE,
 };
 
-/** Eigendecomposition-based embedding method */
+//! Eigendecomposition-based embedding methods enumeration
 enum TAPKEE_EIGEN_EMBEDDING_METHOD
 {
-	/** ARPACK-based method (requires the ARPACK library
-	 * binaries to be available around). 
-	 * Recommended to be used as a default method.
-	 * Supports both generalized and standard eigenproblems. */
-	ARPACK_XSXUPD,
-	/** Randomized method (implementation taken from the redsvd lib). 
-	 * Supports only standard eigenproblems. */
-	RANDOMIZED_INVERSE,
-	/** Eigen library dense method (useful for debugging)
-	 */
+	//! ARPACK-based method (requires the ARPACK library
+	//! binaries to be available around). Recommended to be used as a 
+	//! default method. Supports both generalized and standard eigenproblems.
+	ARPACK,
+	//! Randomized method (implementation taken from the redsvd lib). 
+	//! Supports only standard but not generalized eigenproblems.
+	RANDOMIZED,
+	//! Eigen library dense method (useful for debugging). Computes
+	//! all eigenvectors thus can be very slow doing large-scale.
 	EIGEN_DENSE_SELFADJOINT_SOLVER
 };
 
-/** Internal types */
+// Internal types
+#define INTERNAL_VECTOR std::vector
+#define INTERNAL_PAIR std::pair
 typedef Eigen::Triplet<DefaultScalarType> SparseTriplet;
-typedef std::vector<SparseTriplet> SparseTriplets;
-typedef std::vector<unsigned int> LocalNeighbors;
-typedef std::vector<LocalNeighbors> Neighbors;
-typedef std::pair<DenseMatrix,DenseVector> EmbeddingResult;
-typedef std::pair<DenseMatrix,DenseVector> ProjectionResult;
+typedef INTERNAL_VECTOR<SparseTriplet> SparseTriplets;
+typedef INTERNAL_VECTOR<unsigned int> LocalNeighbors;
+typedef INTERNAL_VECTOR<LocalNeighbors> Neighbors;
+typedef INTERNAL_PAIR<DenseMatrix,DenseVector> EmbeddingResult;
+typedef INTERNAL_PAIR<DenseMatrix,DenseVector> ProjectionResult;
 typedef Eigen::DiagonalMatrix<DefaultScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
-typedef std::vector<unsigned int> Landmarks;
+typedef INTERNAL_VECTOR<unsigned int> Landmarks;
+#undef INTERNAL_VECTOR
+#undef INTERNAL_PAIR
 
 #include "callbacks/traits.hpp"
 

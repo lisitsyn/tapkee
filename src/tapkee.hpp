@@ -13,36 +13,35 @@
 #include "defines.hpp"
 #include "tapkee_highlevel_methods.hpp"
 
-/** Main entry-point of the library. Constructs dense embedding with specified dimension
- * using provided data and callbacks.
- *
- * Has four template parameters:
- * 
- * RandomAccessIterator basic random access iterator with no specific capabilities.
- * 
- * KernelCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation 
- * between two iterators. The operation should return value of Mercer kernel function 
- * between vectors/objects iterators pointing to. KernelCallback should be marked as a kernel function using
- * TAPKEE_CALLBACK_IS_KERNEL macro (fails during compilation in other case).
- * 
- * DistanceCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation
- * between two iterators. DistanceCallback should be marked as a distance function using 
- * TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
- * 
- * FeatureVectorCallback that defines void operator()(RandomAccessIterator, DenseVector) operation
- * used to access feature vector pointed by iterator. The callback should put the feature vector pointed by iterator
- * to the vector of second argument.
- *
- * Parameters required by the chosen algorithm are obtained from the parameter map. It fails during runtime if
- * some of required parameters are not specified or have improper values.
- *
- * @param begin begin iterator of data
- * @param end end iterator of data
- * @param kernel_callback the kernel callback described before
- * @param distance_callback the distance callback described before
- * @param feature_vector_callback the feature vector access callback descrbied before
- * @param options parameter map
- */
+//! Main entry-point of the library. Constructs dense embedding with specified dimension
+//! using provided data and callbacks.
+//!
+//! Has four template parameters:
+//! 
+//! RandomAccessIterator basic random access iterator with no specific capabilities.
+//!
+//! KernelCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation 
+//! between two iterators. The operation should return value of Mercer kernel function 
+//! between vectors/objects iterators pointing to. KernelCallback should be marked as a kernel function using
+//! TAPKEE_CALLBACK_IS_KERNEL macro (fails on compilation in other case).
+//!
+//! DistanceCallback that defines DefaultScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation
+//! between two iterators. DistanceCallback should be marked as a distance function using 
+//! TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
+//!
+//! FeatureVectorCallback that defines void operator()(RandomAccessIterator, DenseVector) operation
+//! used to access feature vector pointed by iterator. The callback should put the feature vector pointed by iterator
+//! to the vector of second argument.
+//!
+//! Parameters required by the chosen algorithm are obtained from the parameter map. It fails during runtime if
+//! some of required parameters are not specified or have improper values.
+//!
+//! @param begin begin iterator of data
+//! @param end end iterator of data
+//! @param kernel_callback the kernel callback described before
+//! @param distance_callback the distance callback described before
+//! @param feature_vector_callback the feature vector access callback descrbied before 
+//! @param options parameter map
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
 DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
                   KernelCallback kernel_callback, DistanceCallback distance_callback,

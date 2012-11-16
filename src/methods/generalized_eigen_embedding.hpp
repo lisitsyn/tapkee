@@ -24,7 +24,7 @@
  * implementation of operator()(DenseMatrix) which computes right product
  * of the parameter with the MatrixType.
  */
-template <class LMatrixType, class RMatrixType, class MatrixTypeOperation, int> 
+template <class LMatrixType, class RMatrixType, class MatrixTypeOperation, int IMPLEMENTATION> 
 struct generalized_eigen_embedding_impl
 {
 	/** Construct embedding
@@ -37,7 +37,7 @@ struct generalized_eigen_embedding_impl
 
 /** ARPACK implementation of eigendecomposition-based embedding */
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation> 
-struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation, ARPACK_XSXUPD>
+struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation, ARPACK>
 {
 	EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, unsigned int target_dimension, unsigned int skip)
 	{
@@ -80,13 +80,13 @@ EmbeddingResult generalized_eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method
 {
 	switch (method)
 	{
-		case ARPACK_XSXUPD: 
+		case ARPACK: 
 			return generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation, 
-				ARPACK_XSXUPD>().embed(lhs, rhs, target_dimension, skip);
+				ARPACK>().embed(lhs, rhs, target_dimension, skip);
 		case EIGEN_DENSE_SELFADJOINT_SOLVER:
 			return generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation,
 				EIGEN_DENSE_SELFADJOINT_SOLVER>().embed(lhs, rhs, target_dimension, skip);
-		case RANDOMIZED_INVERSE:
+		case RANDOMIZED:
 			// TODO fail here
 			return EmbeddingResult();
 	}

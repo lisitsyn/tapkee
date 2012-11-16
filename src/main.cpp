@@ -96,15 +96,15 @@ TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 {
 	if (!strcmp(str,"arpack"))
-		return ARPACK_XSXUPD;
+		return ARPACK;
 	if (!strcmp(str,"randomized"))
-		return RANDOMIZED_INVERSE;
+		return RANDOMIZED;
 	if (!strcmp(str,"dense"))
 		return EIGEN_DENSE_SELFADJOINT_SOLVER;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);
-	return RANDOMIZED_INVERSE;
+	return RANDOMIZED;
 }
 
 int main(int argc, const char** argv)
@@ -114,7 +114,7 @@ int main(int argc, const char** argv)
 	{
 		printf("No parameters specified.\n");
 		printf("Usage is [method] [neighbor_method] [eigen_method] "
-				"[number of neighbors] [target dimension]\n");
+				" [number of neighbors] [target dimension]\n");
 		exit(EXIT_FAILURE);
 	}
 	else

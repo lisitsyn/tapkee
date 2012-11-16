@@ -12,12 +12,7 @@
 #define FIBONACCI_H_
 
 #include "../defines.hpp"
-#include <stdlib.h>
-#include <utility>
 #include <cmath>
-
-using std::pair;
-using std::make_pair;
 
 struct FibonacciHeapNode
 {
