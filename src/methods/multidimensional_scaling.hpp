@@ -45,7 +45,7 @@ DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, Landmar
 template <class RandomAccessIterator, class PairwiseCallback>
 EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback distance_callback,
                             const Landmarks& landmarks, const DenseSymmetricMatrix& landmarks_distance_matrix, 
-                            const EmbeddingResult& landmarks_embedding, unsigned int target_dimension)
+                            EmbeddingResult& landmarks_embedding, unsigned int target_dimension)
 {
 	timed_context context("Landmark triangulation");
 	
@@ -61,10 +61,10 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 		embedding.row(*iter).noalias() = landmarks_embedding.first.row(iter-landmarks.begin());
 	}
 
-//	for (unsigned int i=0; i<target_dimension; ++i)
-//		landmarks_embedding.first.col(i) /= 1.0;//sqrt(landmarks_embedding.second(i));
+	for (unsigned int i=0; i<target_dimension; ++i)
+		landmarks_embedding.first.col(i).array() /= landmarks_embedding.second(i);
 
-	DenseVector landmark_distances_squared = landmarks_distance_matrix.colwise().mean().array().square();
+	DenseVector landmark_distances_squared = landmarks_distance_matrix.colwise().sum().array().square()/landmarks.size();
 	DenseVector distances_to_landmarks(landmarks.size());
 
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
