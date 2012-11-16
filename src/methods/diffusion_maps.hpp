@@ -38,6 +38,8 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 	DenseSymmetricMatrix diffusion_matrix(end-begin,end-begin);	
 	DenseVector p = DenseVector::Zero(end-begin);
 
+	RESTRICT_ALLOC;
+
 	// compute gaussian kernel matrix
 	for (RandomAccessIterator i_iter=begin; i_iter!=end; ++i_iter)
 	{
@@ -53,21 +55,14 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 	p = diffusion_matrix.colwise().sum();
 
 	// compute full matrix as we need to compute sum later
-	for (unsigned int i=0; i<(end-begin); i++)
-	{
-		for (unsigned int j=0; j<(end-begin); j++)
-			diffusion_matrix(i,j) /= pow(p(i)*p(j),DefaultScalarType(timesteps));
-	}
+	diffusion_matrix.array().cwiseQuotient((p*p.transpose()).array().pow(timesteps));
 
 	// compute sqrt of column sum vector
 	p = diffusion_matrix.colwise().sum().cwiseSqrt();
 	
-	// compute only upper triangle part
-	for (unsigned int i=0; i<(end-begin); i++)
-	{
-		for (unsigned int j=i; j<(end-begin); j++)
-			diffusion_matrix(i,j) /= p(i)*p(j);
-	}
+	diffusion_matrix.array().cwiseQuotient(((p*p.transpose()).array()));
+
+	UNRESTRICT_ALLOC;
 
 	return diffusion_matrix;
 };

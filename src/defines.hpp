@@ -23,10 +23,19 @@
 #endif
 //#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 //#undef EIGEN_MATRIXBASE_PLUGIN
+#define EIGEN_RUNTIME_NO_MALLOC
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SparseCholesky>
 //#include <eigen3/Eigen/SuperLUSupport>
+
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+	#define RESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(false);
+	#define UNRESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(true);
+#else
+	#define RESTRICT_ALLOC
+	#define UNRESTRICT_ALLOC
+#endif
 
 // Customizable types
 #ifdef TAPKEE_CUSTOM_TYPES
