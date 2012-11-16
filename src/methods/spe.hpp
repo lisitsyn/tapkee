@@ -132,7 +132,7 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 		lambda = lambda - ( lambda / max_iter );
 	}
 
-	return EmbeddingResult(Y,DenseVector());
+	return EmbeddingResult(Y.transpose(),DenseVector());
 };
 
 #endif /* TAPKEE_SPE_H_ */
