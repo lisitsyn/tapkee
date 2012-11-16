@@ -137,6 +137,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 			select_landmarks_random(begin,end,ratio);
 		DenseSymmetricMatrix distance_matrix = 
 			compute_distance_matrix(begin,landmarks,distance_callback);
+		DenseVector landmark_distances_squared = distance_matrix.colwise().mean();
 		mds_process_matrix(distance_matrix);
 		EmbeddingResult landmarks_embedding = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
@@ -144,7 +145,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 		for (unsigned int i=0; i<target_dimension; i++)
 			landmarks_embedding.first.col(i).array() *= sqrt(landmarks_embedding.second(i));
 		return triangulate(begin,end,distance_callback,landmarks,
-			distance_matrix,landmarks_embedding,target_dimension);
+			landmark_distances_squared,landmarks_embedding,target_dimension);
 	}
 };
 

@@ -4,6 +4,7 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 
+#include <omp.h>
 #include <algorithm>
 
 using std::random_shuffle;
@@ -44,7 +45,7 @@ DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, Landmar
 
 template <class RandomAccessIterator, class PairwiseCallback>
 EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback distance_callback,
-                            const Landmarks& landmarks, const DenseSymmetricMatrix& landmarks_distance_matrix, 
+                            const Landmarks& landmarks, const DenseVector& landmark_distances_squared, 
                             EmbeddingResult& landmarks_embedding, unsigned int target_dimension)
 {
 	timed_context context("Landmark triangulation");
@@ -64,10 +65,16 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 	for (unsigned int i=0; i<target_dimension; ++i)
 		landmarks_embedding.first.col(i).array() /= landmarks_embedding.second(i);
 
-	DenseVector landmark_distances_squared = landmarks_distance_matrix.colwise().sum().array().square()/landmarks.size();
-	DenseVector distances_to_landmarks(landmarks.size());
+//	landmarks_embedding.first.transposeInPlace();
+	
+	RandomAccessIterator iter;
+	DenseVector distances_to_landmarks;
 
-	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+//#pragma omp parallel private(distances_to_landmarks)
+	{
+	distances_to_landmarks = DenseVector(landmarks.size());
+//#pragma omp for private(iter) schedule(static)
+	for (iter=begin; iter<end; ++iter)
 	{
 		if (!to_process[iter-begin])
 			continue;
@@ -75,12 +82,13 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 		for (unsigned int i=0; i<distances_to_landmarks.size(); ++i)
 		{
 			DefaultScalarType d = distance_callback(*iter,begin[landmarks[i]]);
-			distances_to_landmarks[i] = d*d;
+			distances_to_landmarks(i) = d*d;
 		}
+		//distances_to_landmarks.array().square();
 
 		distances_to_landmarks -= landmark_distances_squared;
-
 		embedding.row(iter-begin).noalias() = -0.5*landmarks_embedding.first.transpose()*distances_to_landmarks;
+	}
 	}
 
 	delete[] to_process;
