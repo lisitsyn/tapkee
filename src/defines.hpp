@@ -150,6 +150,7 @@ enum TAPKEE_EIGEN_EMBEDDING_METHOD
 // Internal types
 #define INTERNAL_VECTOR std::vector
 #define INTERNAL_PAIR std::pair
+
 typedef Eigen::Triplet<DefaultScalarType> SparseTriplet;
 typedef INTERNAL_VECTOR<SparseTriplet> SparseTriplets;
 typedef INTERNAL_VECTOR<unsigned int> LocalNeighbors;
@@ -158,6 +159,9 @@ typedef INTERNAL_PAIR<DenseMatrix,DenseVector> EmbeddingResult;
 typedef INTERNAL_PAIR<DenseMatrix,DenseVector> ProjectionResult;
 typedef Eigen::DiagonalMatrix<DefaultScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
 typedef INTERNAL_VECTOR<unsigned int> Landmarks;
+typedef INTERNAL_PAIR<SparseWeightMatrix,DenseDiagonalMatrix> Laplacian;
+typedef INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricMatrixPair;
+
 #undef INTERNAL_VECTOR
 #undef INTERNAL_PAIR
 

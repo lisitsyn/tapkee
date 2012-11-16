@@ -183,7 +183,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		SparseWeightMatrix weight_matrix = 
 			klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
-		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eig_matrices =
+		DenseSymmetricMatrixPair eig_matrices =
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
 		ProjectionResult projection_result = 
@@ -230,7 +230,7 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
 		timed_context context("Embedding with Laplacian Eigenmaps");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k);
-		pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
+		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
 		return generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,InverseSparseMatrixOperation>(
 			eigen_method,laplacian.first,laplacian.second,target_dimension,SKIP_ONE_EIGENVALUE);
@@ -253,9 +253,9 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 		timed_context context("Embedding with LPP");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k);
-		pair<SparseWeightMatrix,DenseDiagonalMatrix> laplacian = 
+		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
-		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eigenproblem_matrices =
+		DenseSymmetricMatrixPair eigenproblem_matrices =
 			construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
 					feature_vector_callback,dimension);
 		ProjectionResult projection_result = 
@@ -321,7 +321,7 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		SparseWeightMatrix weight_matrix = 
 			kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
-		pair<DenseSymmetricMatrix,DenseSymmetricMatrix> eig_matrices =
+		DenseSymmetricMatrixPair eig_matrices =
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
 		ProjectionResult projection_result = 

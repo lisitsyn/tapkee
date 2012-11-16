@@ -13,12 +13,12 @@
 
 #include "../defines.hpp"
 
-/** Matrix-matrix operation used to 
- * compute smallest eigenvalues and 
- * associated eigenvectors. Essentially
- * solves linear system with provided
- * right-hand side part.
- */
+//! Matrix-matrix operation used to 
+//! compute smallest eigenvalues and 
+//! associated eigenvectors. Essentially
+//! solves linear system with provided
+//! right-hand side part.
+//!
 struct InverseSparseMatrixOperation
 {
 	InverseSparseMatrixOperation(const SparseWeightMatrix& matrix) : solver()
@@ -34,45 +34,49 @@ struct InverseSparseMatrixOperation
 	DefaultSparseSolver solver;
 };
 
-/** Matrix-matrix operation used to
- * compute largest eigenvalues and
- * associated eigenvectors. Essentially
- * computes matrix product with 
- * provided right-hand side part.
- */
+//! Matrix-matrix operation used to
+//! compute largest eigenvalues and
+//! associated eigenvectors. Essentially
+//! computes matrix product with 
+//! provided right-hand side part.
+//!
 struct DenseMatrixOperation
 {
 	DenseMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
-	/** Computes matrix product of the matrix and provided right-hand 
-	 * side matrix
-	 */
-	inline DenseMatrix operator()(DenseMatrix operatee)
+	//! Computes matrix product of the matrix and provided right-hand 
+	//! side matrix
+	//! 
+	//! @param rhs right-hand size matrix
+	//!
+	inline DenseMatrix operator()(DenseMatrix rhs)
 	{
-		return _matrix.selfadjointView<Eigen::Upper>()*operatee;
+		return _matrix.selfadjointView<Eigen::Upper>()*rhs;
 	}
 	const DenseMatrix& _matrix;
 };
 
-/** Matrix-matrix operation used to
- * compute largest eigenvalues and
- * associated eigenvectors of X*X^T like
- * matrix implicitly. Essentially
- * computes matrix product with provided
- * right-hand side part *twice*.
- */
+//! Matrix-matrix operation used to
+//! compute largest eigenvalues and
+//! associated eigenvectors of X*X^T like
+//! matrix implicitly. Essentially
+//! computes matrix product with provided
+//! right-hand side part *twice*.
+//!
 struct DenseImplicitSquareMatrixOperation
 {
 	DenseImplicitSquareMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
-	/** Computes matrix product of the matrix and provided right-hand 
-	 * side matrix *twice*
-	 */
-	inline DenseMatrix operator()(DenseMatrix operatee)
+	//! Computes matrix product of the matrix and provided right-hand 
+	//! side matrix twice
+	//! 
+	//! @param rhs right-hand side matrix
+	//!
+	inline DenseMatrix operator()(DenseMatrix rhs)
 	{
-		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*operatee);
+		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*rhs);
 	}
 	const DenseMatrix& _matrix;
 };

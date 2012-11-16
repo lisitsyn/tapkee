@@ -12,14 +12,11 @@
 	
 #include "../defines.hpp"
 #include "../utils/time.hpp"
-#include <utility>
-using std::pair;
-using std::make_pair;
 
 template<class RandomAccessIterator, class DistanceCallback>
-pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessIterator begin, 
-		RandomAccessIterator end,const Neighbors& neighbors, 
-		DistanceCallback callback, DefaultScalarType width)
+Laplacian compute_laplacian(RandomAccessIterator begin, 
+			RandomAccessIterator end,const Neighbors& neighbors, 
+			DistanceCallback callback, DefaultScalarType width)
 {
 	SparseTriplets sparse_triplets;
 
@@ -49,11 +46,11 @@ pair<SparseWeightMatrix,DenseDiagonalMatrix> compute_laplacian(RandomAccessItera
 
 	weight_matrix.cwiseMax(SparseWeightMatrix(weight_matrix.transpose()));
 
-	return make_pair(weight_matrix,DenseDiagonalMatrix(D));
+	return Laplacian(weight_matrix,DenseDiagonalMatrix(D));
 }
 
 template<class RandomAccessIterator, class FeatureVectorCallback>
-pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_locality_preserving_eigenproblem(SparseWeightMatrix L,
+DenseSymmetricMatrixPair construct_locality_preserving_eigenproblem(SparseWeightMatrix L,
 		DenseDiagonalMatrix D, RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
 		unsigned int dimension)
 {
@@ -80,7 +77,7 @@ pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_locality_preserving_ei
 		}
 	}
 
-	return make_pair(lhs,rhs);
+	return DenseSymmetricMatrixPair(lhs,rhs);
 }
 
 #endif

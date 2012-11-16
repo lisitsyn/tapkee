@@ -5,9 +5,7 @@
 #include "../utils/time.hpp"
 #include "../utils/fibonacci_heap.hpp"
 
-#include <vector>
 #include <limits>
-using std::vector;
 using std::numeric_limits;
 
 // TODO inplace whether possible

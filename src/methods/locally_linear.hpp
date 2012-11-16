@@ -13,9 +13,6 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 
-using std::pair;
-using std::make_pair;
-
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
                                        const Neighbors& neighbors, PairwiseCallback callback, 
@@ -200,7 +197,7 @@ SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 };
 
 template<class RandomAccessIterator, class FeatureVectorCallback>
-pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_neighborhood_preserving_eigenproblem(SparseWeightMatrix W,
+DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWeightMatrix W,
 		RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
 		unsigned int dimension)
 {
@@ -225,11 +222,11 @@ pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_neighborhood_preservin
 		}
 	}
 
-	return make_pair(lhs,rhs);
+	return DenseSymmetricMatrixPair(lhs,rhs);
 }
 
 template<class RandomAccessIterator, class FeatureVectorCallback>
-pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_lltsa_eigenproblem(SparseWeightMatrix W,
+DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 		RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
 		unsigned int dimension)
 {
@@ -258,7 +255,7 @@ pair<DenseSymmetricMatrix,DenseSymmetricMatrix> construct_lltsa_eigenproblem(Spa
 	}
 	lhs.selfadjointView<Eigen::Upper>().rankUpdate(sum,-1./(end-begin));
 
-	return make_pair(lhs,rhs);
+	return DenseSymmetricMatrixPair(lhs,rhs);
 }
 
 
