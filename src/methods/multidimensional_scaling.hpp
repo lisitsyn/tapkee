@@ -58,7 +58,7 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 			iter!=landmarks.end(); ++iter)
 	{
 		to_process[*iter] = false;
-		embedding.row(*iter) = landmarks_embedding.first.row(iter-landmarks.begin());
+		embedding.row(*iter).noalias() = landmarks_embedding.first.row(iter-landmarks.begin());
 	}
 
 //	for (unsigned int i=0; i<target_dimension; ++i)
@@ -80,7 +80,7 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 
 		distances_to_landmarks -= landmark_distances_squared;
 
-		embedding.row(iter-begin) = -0.5*landmarks_embedding.first.transpose()*distances_to_landmarks;
+		embedding.row(iter-begin).noalias() = -0.5*landmarks_embedding.first.transpose()*distances_to_landmarks;
 	}
 
 	delete[] to_process;

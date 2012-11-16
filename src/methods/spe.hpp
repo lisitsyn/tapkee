@@ -112,7 +112,7 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 		// Difference matrix
 		for (int j=0; j<nupdates; ++j)
 		{
-			Yd.col(j) = Y.col(*ind1) - Y.col(*ind2);
+			Yd.col(j).noalias() = Y.col(*ind1) - Y.col(*ind2);
 
 			++ind1, ++ind2;
 		}
