@@ -341,7 +341,7 @@ private:
 	}
 
 	/** Links right node to childs of left node */
-	void link_nodes(FibonacciHeapNode *x, FibonacciHeapNode *y)
+	void link_nodes(FibonacciHeapNode *y, FibonacciHeapNode *x)
 	{
 		if(y->right != NULL)
 			y->right->left = y->left;
