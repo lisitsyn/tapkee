@@ -13,8 +13,24 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 
-template <class RandomAccessIterator, class PairwiseCallback>
-DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback, 
+//! Computes diffusion process matrix. Uses the following algorithm:
+//!
+//! <ol>
+//! <li> Compute matrix \f$ K \f$ such as \f$ K_{i,j} = \exp\left(-\frac{d(x_i,x_j)^2}{w}\right) \f$.
+//! <li> Compute sum vector \f$ p = \sum_i K_{i,j}\f$.
+//! <li> Modify \f$ K \f$ with \f$ K_{i,j} = K_{i,j} / (p_i  p_j)^t \f$.
+//! <li> Compute sum vector \f$ p = \sum_i K_{i,j}\f$ again.
+//! <li> Normalize \f$ K \f$ with \f$ K_{i,j} = K_{i,j} / (p_i p_j) \f$.
+//! </ol>
+//!
+//! @param begin begin data iterator
+//! @param end end data iterator
+//! @param callback distance callback
+//! @param timesteps number of timesteps \f$ t \f$ of diffusion process
+//! @param width width \f$ w \f$ of the gaussian kernel
+//!
+template <class RandomAccessIterator, class DistanceCallback>
+DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, DistanceCallback callback, 
                                               unsigned int timesteps, DefaultScalarType width)
 {
 	timed_context context("Diffusion map matrix computation");

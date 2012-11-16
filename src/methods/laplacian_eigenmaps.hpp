@@ -13,6 +13,25 @@
 #include "../defines.hpp"
 #include "../utils/time.hpp"
 
+//! Computes laplacian of neighborhood graph.
+//!
+//! Follows the algorithm described below:
+//! <ul>
+//! <li> For each vector compute gaussian exp of distances to its neighbor vectors and 
+//!      put it to sparse matrix \f$ L_{i,N_i(j)} = \exp\left( - \frac{d(x_i,x_{N_i(j)})^2}{w} \right) \f$.
+//! <li> Symmetrize matrix \f$ L \f$ with \f$ L_{i,j} = \max (L_{i,j}, L_{j,i}) \f$ to
+//!      make neighborhood relationship symmetric.
+//! <li> Compute sum vector \f$ D = \sum_{i} L_{i,j} \f$.
+//! <li> Modify \f$ L = D - L \f$.
+//! <li> Output matrix sparse matrix \f$ L \f$ and diagonal matrix built of vector \f$ D \f$.
+//! </ul>
+//!
+//! @param begin begin data iterator
+//! @param end end data iterator
+//! @param neighbors neighbors of each vector
+//! @param callback distance callback
+//! @param width width \f$ w \f$ of the gaussian kernel
+//!
 template<class RandomAccessIterator, class DistanceCallback>
 Laplacian compute_laplacian(RandomAccessIterator begin, 
 			RandomAccessIterator end,const Neighbors& neighbors, 
@@ -22,7 +41,7 @@ Laplacian compute_laplacian(RandomAccessIterator begin,
 
 	timed_context context("Laplacian computation");
 	const unsigned int k = neighbors[0].size();
-	sparse_triplets.reserve(4*k*(end-begin));
+	sparse_triplets.reserve(k*(end-begin));
 
 	DenseVector D = DenseVector::Zero(end-begin);
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
@@ -43,7 +62,6 @@ Laplacian compute_laplacian(RandomAccessIterator begin,
 
 	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
-
 	weight_matrix.cwiseMax(SparseWeightMatrix(weight_matrix.transpose()));
 
 	return Laplacian(weight_matrix,DenseDiagonalMatrix(D));

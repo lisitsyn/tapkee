@@ -8,12 +8,21 @@
 #include <limits>
 using std::numeric_limits;
 
-// TODO inplace whether possible
-DenseSymmetricMatrix isomap_relax_distances(const DenseSymmetricMatrix& distances, const Neighbors& neighbors)
+//! Computes shortest distances (so-called geodesic distances)
+//! using Dijkstra algorithm.
+//!
+//! @param begin begin data iterator
+//! @param end end data iterator
+//! @param neighbors neighbors of each vector
+//! @param callback distance callback
+//!
+template <class RandomAccessIterator, class DistanceCallback>
+DenseSymmetricMatrix compute_shortest_distances_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
+		const Neighbors& neighbors, DistanceCallback callback)
 {
 	timed_context context("Distances shortest path relaxing");
 	const unsigned int n_neighbors = neighbors[0].size();
-	const unsigned int N = distances.cols();
+	const unsigned int N = (end-begin);
 	FibonacciHeap* heap = new FibonacciHeap(N);
 
 	bool* s = new bool[N];
@@ -55,7 +64,7 @@ DenseSymmetricMatrix isomap_relax_distances(const DenseSymmetricMatrix& distance
 				if (s[w] == false)
 				{
 					// get distance from k to i through min_item
-					DefaultScalarType dist = shortest_distances(k,min_item) + distances(min_item,i);
+					DefaultScalarType dist = shortest_distances(k,min_item) + callback(begin[min_item],begin[i]);
 					// if distance can be relaxed
 					if (dist < shortest_distances(k,w))
 					{

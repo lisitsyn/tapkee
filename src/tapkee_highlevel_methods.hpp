@@ -156,12 +156,10 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 		timed_context context("Embedding with Isomap");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k);
-		DenseSymmetricMatrix distance_matrix = 
-			compute_distance_matrix(begin,end,distance_callback);
-		DenseSymmetricMatrix relaxed_distance_matrix = 
-			isomap_relax_distances(distance_matrix,neighbors);
+		DenseSymmetricMatrix shortest_distances_matrix = 
+			compute_shortest_distances_matrix(begin,end,neighbors,distance_callback);
 		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
-			relaxed_distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
+			shortest_distances_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 	}
 };
 
