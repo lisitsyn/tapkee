@@ -43,11 +43,10 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 	{
 		timed_context context("ARPACK DSXUPD eigendecomposition");
 
-		// TODO SM / LM
 #ifdef TAPKEE_NO_ARPACK
 		return EmbeddingResult();
 #else
-		ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixTypeOperation> arpack(wm,target_dimension+skip,"SM");
+		ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixTypeOperation> arpack(wm,target_dimension+skip,MatrixTypeOperation::ARPACK_CODE);
 
 		DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
 

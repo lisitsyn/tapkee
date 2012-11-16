@@ -32,7 +32,9 @@ struct InverseSparseMatrixOperation
 		return solver.solve(operatee);
 	}
 	DefaultSparseSolver solver;
+	static const char* ARPACK_CODE;
 };
+const char* InverseSparseMatrixOperation::ARPACK_CODE = "SM";
 
 //! Matrix-matrix operation used to
 //! compute largest eigenvalues and
@@ -55,7 +57,9 @@ struct DenseMatrixOperation
 		return _matrix.selfadjointView<Eigen::Upper>()*rhs;
 	}
 	const DenseMatrix& _matrix;
+	static const char* ARPACK_CODE;
 };
+const char* DenseMatrixOperation::ARPACK_CODE = "LM";
 
 //! Matrix-matrix operation used to
 //! compute largest eigenvalues and
@@ -79,6 +83,8 @@ struct DenseImplicitSquareMatrixOperation
 		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*rhs);
 	}
 	const DenseMatrix& _matrix;
+	static const char* ARPACK_CODE;
 };
+const char* DenseImplicitSquareMatrixOperation::ARPACK_CODE = "LM";
 
 #endif
