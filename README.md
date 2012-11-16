@@ -1,7 +1,10 @@
 Tapkee: an efficient dimension reduction toolbox
 ================================================
 
+Supported platforms
+-------------------
 
+Tapkee is tested to be fully functional on Linux and Mac OS X platforms using GCC and Clang compilers.
 
 Methods
 -------
