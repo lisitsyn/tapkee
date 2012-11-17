@@ -75,6 +75,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
 	if (!strcmp(str,"spe"))
 		return STOCHASTIC_PROXIMITY_EMBEDDING;
+	if (!strcmp(str,"lisomap"))
+		return LANDMARK_ISOMAP;
 
 	printf("Method %s is not supported (yet?)\n",str);
 	exit(EXIT_FAILURE);

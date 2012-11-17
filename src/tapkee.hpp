@@ -72,7 +72,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 		case ISOMAP:
 			embedding_result = CALL_IMPLEMENTATION(ISOMAP); break;
 		case LANDMARK_ISOMAP:
-			NO_IMPLEMENTATION_YET; break;
+			embedding_result = CALL_IMPLEMENTATION(LANDMARK_ISOMAP); break;
 		case NEIGHBORHOOD_PRESERVING_EMBEDDING:
 			embedding_result = CALL_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING); break;
 		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT:
