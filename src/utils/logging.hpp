@@ -33,6 +33,11 @@ class LoggingSingleton
 			return s;
 		}
 
+		void info(const string& msg) const
+		{
+			if (os_ && os_->good())
+				(*os_) << "[INFO] " << msg << "\n"; 
+		}
 		void benchmark(const string& msg) const
 		{
 			if (os_ && os_->good())

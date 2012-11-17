@@ -10,6 +10,7 @@
 #include "tapkee.hpp"
 #include "defines.hpp"
 #include "callbacks/eigen_matrix_callbacks.hpp"
+#include "utils/logging.hpp"
 
 #include <algorithm>
 #include <string>
@@ -126,7 +127,6 @@ int main(int argc, const char** argv)
 		parameters[EIGEN_EMBEDDING_METHOD] = parse_eigen_method(argv[3]);
 		parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(atoi(argv[4]));
 		parameters[TARGET_DIMENSION] = static_cast<unsigned int>(atoi(argv[5]));
-		parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(3);
 		// keep it static yet
 		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
 		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(1000.0);
@@ -137,8 +137,15 @@ int main(int argc, const char** argv)
 		parameters[EIGENSHIFT] = static_cast<DefaultScalarType>(1e-9);
 	}
 
+
 	// Load data
 	DenseMatrix input_data = read_data("input.dat");
+	parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
+	
+	std::stringstream ss;
+	ss << "Data contains " << input_data.cols() << " feature vector with dimension of " << input_data.rows();
+	LoggingSingleton::instance().info(ss.str());
+	
 	vector<int> data_indices;
 	for (int i=0; i<input_data.cols(); i++)
 		data_indices.push_back(i);
