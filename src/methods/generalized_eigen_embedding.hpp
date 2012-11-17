@@ -15,15 +15,7 @@
 #include "../utils/arpack_wrapper.hpp"
 #include "matrix_operations.hpp"
 
-/** Templated implementation of eigendecomposition-based embedding. 
- * Has three template parameters:
- * MatrixType - class of weight matrix to perform eigendecomposition of
- * MatrixTypeOperation - class of product operation over matrix.
- *
- * In order to find largest eigenvalues MatrixTypeOperation should provide
- * implementation of operator()(DenseMatrix) which computes right product
- * of the parameter with the MatrixType.
- */
+//! Templated implementation of eigendecomposition-based embedding. 
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation, int IMPLEMENTATION> 
 struct generalized_eigen_embedding_impl
 {
@@ -35,7 +27,7 @@ struct generalized_eigen_embedding_impl
 	virtual EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, unsigned int target_dimension, unsigned int skip);
 };
 
-/** ARPACK implementation of eigendecomposition-based embedding */
+//! ARPACK implementation of eigendecomposition-based embedding
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation> 
 struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation, ARPACK>
 {
@@ -51,6 +43,7 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOper
 	}
 };
 
+//! Eigen library dense implementation of eigendecomposition
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation> 
 struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJOINT_SOLVER>
 {
@@ -68,11 +61,12 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOper
 	}
 };
 
-/** Adapter method for various generalized eigendecomposition methods. Currently
- * supports two methods:
- * * ARPACK_XSXUPD
- * * EIGEN_DENSE_SELFADJOINT_SOLVER
- */
+//! Adapter method for various generalized eigendecomposition methods. Currently
+//! supports two methods:
+//! <ul>
+//! <li> ARPACK_XSXUPD
+//! <li> EIGEN_DENSE_SELFADJOINT_SOLVER
+//! </ul>
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation>
 EmbeddingResult generalized_eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const LMatrixType& lhs,
                                             const RMatrixType& rhs,
