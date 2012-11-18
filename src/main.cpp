@@ -9,7 +9,8 @@
 
 #include "tapkee.hpp"
 #include "defines.hpp"
-#include "callbacks/eigen_matrix_callbacks.hpp"
+#include "callbacks/eigen_callbacks.hpp"
+#include "callbacks/precomputed_callbacks.hpp"
 #include "utils/logging.hpp"
 
 #include <algorithm>
@@ -110,6 +111,20 @@ TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 	return RANDOMIZED;
 }
 
+template <class RandomAccessIterator, class PairwiseCallback>
+DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback)
+{
+	DenseMatrix result((end-begin),(end-begin));
+	for (RandomAccessIterator i_iter=begin; i_iter!=end; ++i_iter)
+	{
+		for (RandomAccessIterator j_iter=begin; j_iter!=end; ++j_iter)
+		{
+			result((i_iter-begin),(j_iter-begin)) = callback(*i_iter,*j_iter);
+		}
+	}
+	return result;
+}
+
 int main(int argc, const char** argv)
 {
 	ParametersMap parameters;
@@ -143,20 +158,32 @@ int main(int argc, const char** argv)
 	parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
 	
 	std::stringstream ss;
-	ss << "Data contains " << input_data.cols() << " feature vector with dimension of " << input_data.rows();
+	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
 	LoggingSingleton::instance().info(ss.str());
 	
 	vector<int> data_indices;
 	for (int i=0; i<input_data.cols(); i++)
 		data_indices.push_back(i);
-	
 	// Embed
 	DenseMatrix embedding;
+	
+#ifdef USE_PRECOMPUTED
+	DenseMatrix distance_matrix = 
+		matrix_from_callback(data_indices.begin(),data_indices.end(),distance_callback(input_data));
+	precomputed_distance_callback dcb(distance_matrix);
+	DenseMatrix kernel_matrix = 
+		matrix_from_callback(data_indices.begin(),data_indices.end(),kernel_callback(input_data));
+	precomputed_kernel_callback kcb(kernel_matrix);
+	feature_vector_callback fvcb(input_data);
+
+	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
+#else
 	distance_callback dcb(input_data);
 	kernel_callback kcb(input_data);
 	feature_vector_callback fvcb(input_data);
-	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 
+	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
+#endif
 	// Save obtained data
 	ofstream ofs("output.dat");
 	ofs << embedding;
