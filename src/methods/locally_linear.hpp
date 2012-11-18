@@ -12,11 +12,13 @@
 
 #include "../defines.hpp"
 #include "../utils/time.hpp"
+#include "eigen_embedding.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
                                        const Neighbors& neighbors, PairwiseCallback callback, 
-                                       unsigned int target_dimension, DefaultScalarType shift)
+                                       unsigned int target_dimension, DefaultScalarType shift,
+                                       bool partial_eigendecomposer=false)
 {
 	timed_context context("KLTSA weight matrix computation");
 	const unsigned int k = neighbors[0].size();
@@ -30,6 +32,9 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
 	DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
+	DefaultDenseSelfAdjointEigenSolver solver;
+
+	RESTRICT_ALLOC;
 	for (iter=iter_begin; iter<iter_end; ++iter)
 	{
 		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
@@ -53,13 +58,20 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 		gram_matrix.array() += grand_mean;
 		gram_matrix.rowwise() -= col_means.transpose();
 		gram_matrix.colwise() -= row_means;
-		
-		DefaultDenseSelfAdjointEigenSolver sae_solver;
-		sae_solver.compute(gram_matrix);
 
 		G.col(0).setConstant(1/sqrt(DefaultScalarType(k)));
 
-		G.rightCols(target_dimension).noalias() = sae_solver.eigenvectors().rightCols(target_dimension);
+		UNRESTRICT_ALLOC;
+		if (partial_eigendecomposer)
+		{
+			G.rightCols(target_dimension).noalias() = eigen_embedding<DenseMatrix,DenseMatrixOperation>(ARPACK,gram_matrix,target_dimension,0).first;
+		}
+		else
+		{
+			solver.compute(gram_matrix);
+			G.rightCols(target_dimension).noalias() = solver.eigenvectors().rightCols(target_dimension);
+		}
+		RESTRICT_ALLOC;
 		gram_matrix.noalias() = G * G.transpose();
 		
 		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,shift));
@@ -71,6 +83,7 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 				                                        -gram_matrix(i,j)));
 		}
 	}
+	UNRESTRICT_ALLOC;
 
 	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
