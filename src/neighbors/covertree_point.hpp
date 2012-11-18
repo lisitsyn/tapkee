@@ -124,7 +124,7 @@ inline DefaultScalarType distance(const DistanceCallback& dcb, const CoverTreePo
 {
 	assert(upper_bound>=0);
 
-	if (*l.iter_==*r.iter_)
+	if (l.iter_==r.iter_)
 		return 0.0;
 
 	if (BasicCallbackTraits<DistanceCallback>::is_kernel())
