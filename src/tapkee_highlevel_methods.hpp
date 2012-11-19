@@ -172,15 +172,15 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 
 CONCRETE_IMPLEMENTATION(LANDMARK_ISOMAP)
 {
-	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
-                          KernelCallback, DistanceCallback distance_callback,
-                          FeatureVectorCallback, ParametersMap options)
+	EmbeddingResult embed(RandomAccessIterator /*begin*/, RandomAccessIterator /*end*/,
+                          KernelCallback, DistanceCallback /*distance_callback*/,
+                          FeatureVectorCallback, ParametersMap /*options*/)
 	{
-		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
-		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
-		OBTAIN_PARAMETER(DefaultScalarType,ratio,LANDMARK_RATIO);
-		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
-		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		//OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		//OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		//OBTAIN_PARAMETER(DefaultScalarType,ratio,LANDMARK_RATIO);
+		//OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		//OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 
 		timed_context context("Embedding with Landmark Isomap");
 		/*
@@ -380,8 +380,7 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 	{
 		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
-		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
-		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
+		//OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(bool,global_strategy,SPE_GLOBAL_STRATEGY);
 		OBTAIN_PARAMETER(DefaultScalarType,tolerance,SPE_TOLERANCE);
 		OBTAIN_PARAMETER(unsigned int,nupdates,SPE_NUM_UPDATES);

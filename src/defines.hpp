@@ -21,8 +21,6 @@
 #ifndef TAPKEE_DEBUG
 	#define EIGEN_NO_DEBUG
 #endif
-//#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
-//#undef EIGEN_MATRIXBASE_PLUGIN
 #define EIGEN_RUNTIME_NO_MALLOC
 #define EIGEN_DONT_PARALLELIZE
 #include <eigen3/Eigen/Dense>

@@ -19,7 +19,7 @@
 
 template <class RandomAccessIterator, class PairwiseCallback>
 EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator end,
-		PairwiseCallback callback, unsigned int k, unsigned int target_dimension,
+		PairwiseCallback callback, unsigned int /*k*/, unsigned int target_dimension,
 		bool global_strategy, DefaultScalarType tolerance, int nupdates)
 {
 	timed_context context("SPE embedding computation");
