@@ -11,7 +11,6 @@
 #ifndef FIBONACCI_H_
 #define FIBONACCI_H_
 
-#include "../defines.hpp"
 #include <cmath>
 
 struct FibonacciHeapNode

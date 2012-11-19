@@ -10,7 +10,6 @@
 #ifndef TAPKEE_PCA_H_
 #define TAPKEE_PCA_H_
 
-#include "../defines.hpp"
 #include "../utils/time.hpp"
 
 template <class RandomAccessIterator, class FeatureVectorCallback>

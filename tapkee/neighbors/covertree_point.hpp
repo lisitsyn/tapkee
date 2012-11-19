@@ -11,7 +11,6 @@
 #ifndef _JL_COVERTREE_POINT_H_
 #define _JL_COVERTREE_POINT_H_
 
-#include "../defines.hpp"
 #include <iostream>
 #include <cmath>
 

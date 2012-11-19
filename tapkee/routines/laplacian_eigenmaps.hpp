@@ -10,9 +10,6 @@
 #ifndef TAPKEE_LAPLACIAN_EIGENMAPS_H_
 #define TAPKEE_LAPLACIAN_EIGENMAPS_H_
 	
-#include "../defines.hpp"
-#include "../utils/time.hpp"
-
 //! Computes laplacian of neighborhood graph.
 //!
 //! Follows the algorithm described below:

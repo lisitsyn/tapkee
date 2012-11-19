@@ -14,7 +14,6 @@
 #include <algorithm>
 #include <ctime>
 
-#include "../defines.hpp"
 #include "../utils/time.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>

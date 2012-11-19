@@ -10,8 +10,6 @@
 #ifndef TAPKEE_LOCALLY_LINEAR_H_
 #define TAPKEE_LOCALLY_LINEAR_H_
 
-#include "../defines.hpp"
-#include "../utils/time.hpp"
 #include "eigen_embedding.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>

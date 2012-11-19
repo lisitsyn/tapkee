@@ -14,6 +14,7 @@
 #define TAPKEE_DEFINES_H_
 
 #include "utils/any.hpp"
+#include "utils/time.hpp"
 #include <map>
 #include <vector>
 #include <utility>

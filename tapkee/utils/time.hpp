@@ -11,7 +11,7 @@
 #define TAPKEE_TIME_H_
 #include <ctime>
 #include <string>
-#include <iostream>
+#include <sstream>
 #include "logging.hpp"
 
 using std::string;

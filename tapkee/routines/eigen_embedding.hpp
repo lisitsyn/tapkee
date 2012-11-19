@@ -16,8 +16,6 @@
 #ifndef TAPKEE_EIGEN_EMBEDDING_H_
 #define TAPKEE_EIGEN_EMBEDDING_H_
 
-#include "../defines.hpp"
-#include "../utils/time.hpp"
 #ifndef TAPKEE_NO_ARPACK
 	#include "../utils/arpack_wrapper.hpp"
 #endif

@@ -11,8 +11,6 @@
 #ifndef TAPKEE_PRECOMPUTED_CALLBACKS_H_
 #define TAPKEE_PRECOMPUTED_CALLBACKS_H_
 
-#include "../defines.hpp"
-
 // Here we provide basic but still full set of callbacks
 // based on the Eigen3 template matrix library
 

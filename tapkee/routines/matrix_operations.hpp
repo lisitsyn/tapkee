@@ -11,8 +11,6 @@
 #ifndef TAPKEE_MATRIX_OPS_H_
 #define TAPKEE_MATRIX_OPS_H_
 
-#include "../defines.hpp"
-
 //! Matrix-matrix operation used to 
 //! compute smallest eigenvalues and 
 //! associated eigenvectors. Essentially

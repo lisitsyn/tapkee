@@ -12,7 +12,6 @@
 #ifndef TAPKEE_NEIGHBORS_H_
 #define TAPKEE_NEIGHBORS_H_
 
-#include "../defines.hpp"
 #include "covertree.hpp"
 #include <vector>
 #include <utility>

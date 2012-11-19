@@ -10,9 +10,6 @@
 #ifndef TAPKEE_DIFFUSION_MAPS_H_
 #define TAPKEE_DIFFUSION_MAPS_H_
 
-#include "../defines.hpp"
-#include "../utils/time.hpp"
-
 //! Computes diffusion process matrix. Uses the following algorithm:
 //!
 //! <ol>

@@ -10,8 +10,8 @@
 #ifndef TAPKEE_MAIN_H_
 #define TAPKEE_MAIN_H_
 
-#include "defines.hpp"
-#include "tapkee_highlevel_methods.hpp"
+#include "tapkee_defines.hpp"
+#include "tapkee_methods.hpp"
 
 //! Main entry-point of the library. Constructs dense embedding with specified dimension
 //! using provided data and callbacks.

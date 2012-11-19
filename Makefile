@@ -1,12 +1,12 @@
 CXX=g++
-CFLAGS=-fPIC -Wall -Weffc++ -Wextra
+CFLAGS=-fPIC -Wall -Wextra
 SOURCES=$(wildcard src/**/*.cpp)
 OBJECTS=$(SOURCES:%.cpp=%.o)
 
 all: default
 
 default: 
-	$(CXX) $(CFLAGS) -O3 -o application src/main.cpp $(SOURCES) -larpack -fopenmp $(LDFLAGS)
+	$(CXX) $(CFLAGS) -fopenmp -O3 -o application src/main.cpp $(SOURCES) -I./tapkee -larpack $(LDFLAGS)
 
 noarpack:
 	$(CXX) $(CFLAGS) -O3 -o application src/main.cpp $(SOURCES) -DTAPKEE_NO_ARPACK -fopenmp $(LDFLAGS)

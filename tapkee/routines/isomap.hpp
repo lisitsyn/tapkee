@@ -1,8 +1,6 @@
 #ifndef TAPKEE_ISOMAP_H_
 #define TAPKEE_ISOMAP_H_
 
-#include "../defines.hpp"
-#include "../utils/time.hpp"
 #include "../utils/fibonacci_heap.hpp"
 
 #include <limits>

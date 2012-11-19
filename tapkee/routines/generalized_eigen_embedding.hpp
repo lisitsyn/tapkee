@@ -10,8 +10,6 @@
 #ifndef TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
 #define TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
 
-#include "../defines.hpp"
-#include "../utils/time.hpp"
 #include "../utils/arpack_wrapper.hpp"
 #include "matrix_operations.hpp"
 

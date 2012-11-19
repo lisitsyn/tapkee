@@ -7,11 +7,11 @@
  * Copyright (c) 2012, Sergey Lisitsyn
  */
 
-#include "tapkee.hpp"
-#include "defines.hpp"
-#include "callbacks/eigen_callbacks.hpp"
-#include "callbacks/precomputed_callbacks.hpp"
-#include "utils/logging.hpp"
+#include <tapkee.hpp>
+#include <tapkee_defines.hpp>
+#include <callbacks/eigen_callbacks.hpp>
+#include <callbacks/precomputed_callbacks.hpp>
+#include <utils/logging.hpp>
 
 #include <algorithm>
 #include <string>

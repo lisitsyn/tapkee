@@ -1,9 +1,6 @@
 #ifndef tapkee_mds_h_
 #define tapkee_mds_h_
 
-#include "../defines.hpp"
-#include "../utils/time.hpp"
-
 #include <omp.h>
 #include <algorithm>
 

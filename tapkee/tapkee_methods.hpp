@@ -10,19 +10,19 @@
 #ifndef TAPKEE_METHODS_H_
 #define TAPKEE_METHODS_H_
 
-#include "defines.hpp"
-#include "methods/locally_linear.hpp"
-#include "methods/eigen_embedding.hpp"
-#include "methods/generalized_eigen_embedding.hpp"
-#include "methods/multidimensional_scaling.hpp"
-#include "methods/diffusion_maps.hpp"
-#include "methods/laplacian_eigenmaps.hpp"
-#include "methods/isomap.hpp"
-#include "methods/pca.hpp"
-#include "methods/spe.hpp"
+#include "tapkee_defines.hpp"
+#include "routines/locally_linear.hpp"
+#include "routines/eigen_embedding.hpp"
+#include "routines/generalized_eigen_embedding.hpp"
+#include "routines/multidimensional_scaling.hpp"
+#include "routines/diffusion_maps.hpp"
+#include "routines/laplacian_eigenmaps.hpp"
+#include "routines/isomap.hpp"
+#include "routines/pca.hpp"
+#include "routines/spe.hpp"
 #include "neighbors/neighbors.hpp"
 
-template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback, int>
+template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback, int IMPLEMENTATION>
 struct embedding_impl
 {
 	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
@@ -399,4 +399,6 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 
 #undef CONCRETE_IMPLEMENTATION
 #undef OBTAIN_PARAMETER
+#undef SKIP_ONE_EIGENVALUE
+#undef SKIP_NO_EIGENVALUES
 #endif
