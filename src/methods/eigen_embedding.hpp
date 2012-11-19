@@ -23,6 +23,9 @@
 #endif
 #include "matrix_operations.hpp"
 
+namespace eigen_embedding_internal
+{
+
 //! Templated implementation of eigendecomposition-based embedding. 
 template <class MatrixType, class MatrixTypeOperation, int IMPLEMENTATION> 
 struct eigen_embedding_impl
@@ -128,6 +131,8 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 	}
 };
 
+};
+
 //! Multiple implementation handler method for various eigendecomposition methods. 
 //!
 //! Has three template parameters:
@@ -163,13 +168,16 @@ EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const Matr
 	switch (method)
 	{
 		case ARPACK: 
-			return eigen_embedding_impl<MatrixType, MatrixTypeOperation, 
+			return eigen_embedding_internal::
+				eigen_embedding_impl<MatrixType, MatrixTypeOperation, 
 				ARPACK>().embed(m, target_dimension, skip);
 		case RANDOMIZED: 
-			return eigen_embedding_impl<MatrixType, MatrixTypeOperation,
+			return eigen_embedding_internal::
+				eigen_embedding_impl<MatrixType, MatrixTypeOperation,
 				RANDOMIZED>().embed(m, target_dimension, skip);
 		case EIGEN_DENSE_SELFADJOINT_SOLVER:
-			return eigen_embedding_impl<MatrixType, MatrixTypeOperation,
+			return eigen_embedding_internal::
+				eigen_embedding_impl<MatrixType, MatrixTypeOperation, 
 				EIGEN_DENSE_SELFADJOINT_SOLVER>().embed(m, target_dimension, skip);
 	}
 	return EmbeddingResult();
