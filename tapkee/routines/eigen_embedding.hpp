@@ -20,6 +20,7 @@
 	#include "../utils/arpack_wrapper.hpp"
 #endif
 #include "matrix_operations.hpp"
+#include "../tapkee_defines.hpp"
 
 namespace eigen_embedding_internal
 {
@@ -49,9 +50,12 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 #else
 		ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixTypeOperation> arpack(wm,target_dimension+skip,MatrixTypeOperation::ARPACK_CODE);
 
-		DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
-
-		return EmbeddingResult(embedding_feature_matrix,arpack.eigenvalues().tail(target_dimension));
+		if (arpack.info() == Eigen::Success)
+		{
+			DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
+			return EmbeddingResult(embedding_feature_matrix,arpack.eigenvalues().tail(target_dimension));
+		}
+		return EmbeddingResult();
 #endif
 	}
 };
@@ -67,9 +71,12 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJ
 		DenseMatrix dense_wm = wm;
 		DefaultDenseSelfAdjointEigenSolver solver(dense_wm);
 
-		DenseMatrix embedding_feature_matrix = (solver.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
-
-		return EmbeddingResult(embedding_feature_matrix,solver.eigenvalues().tail(target_dimension));
+		if (solver.info() == Eigen::Success)
+		{
+			DenseMatrix embedding_feature_matrix = (solver.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
+			return EmbeddingResult(embedding_feature_matrix,solver.eigenvalues().tail(target_dimension));
+		}
+		return EmbeddingResult();
 	}
 };
 
