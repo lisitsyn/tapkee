@@ -55,6 +55,11 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 			DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
 			return EmbeddingResult(embedding_feature_matrix,arpack.eigenvalues().tail(target_dimension));
 		}
+		else
+		{
+			LoggingSingleton::instance().error("Eigendecomposition failed");
+			throw std::runtime_error("Eigendecomposition failed");
+		}
 		return EmbeddingResult();
 #endif
 	}
@@ -75,6 +80,11 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJ
 		{
 			DenseMatrix embedding_feature_matrix = (solver.eigenvectors()).block(0,skip,wm.cols(),target_dimension);
 			return EmbeddingResult(embedding_feature_matrix,solver.eigenvalues().tail(target_dimension));
+		}
+		else
+		{
+			LoggingSingleton::instance().error("Eigendecomposition failed");
+			throw std::runtime_error("Eigendecomposition failed");
 		}
 		return EmbeddingResult();
 	}
@@ -130,9 +140,18 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 		DenseMatrix B1 = operation(Y);
 		DenseMatrix B = Y.householderQr().solve(B1);
 		DefaultDenseSelfAdjointEigenSolver eigenOfB(B);
-		DenseMatrix embedding = (Y*eigenOfB.eigenvectors()).block(0, skip, wm.cols(), target_dimension);
 
-		return EmbeddingResult(embedding,eigenOfB.eigenvalues());
+		if (eigenOfB.info() == Eigen::Success)
+		{
+			DenseMatrix embedding = (Y*eigenOfB.eigenvectors()).block(0, skip, wm.cols(), target_dimension);
+			return EmbeddingResult(embedding,eigenOfB.eigenvalues());
+		}
+		else
+		{
+			LoggingSingleton::instance().error("Eigendecomposition failed");
+			throw std::runtime_error("Eigendecomposition failed");
+		}
+		return EmbeddingResult();
 	}
 };
 

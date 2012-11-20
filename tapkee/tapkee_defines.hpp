@@ -15,6 +15,7 @@
 
 #include "utils/any.hpp"
 #include "utils/time.hpp"
+#include "utils/logging.hpp"
 #include <map>
 #include <vector>
 #include <utility>
@@ -195,5 +196,21 @@ typedef INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricM
 #undef INTERNAL_PAIR
 
 #include "callbacks/traits.hpp"
+
+struct ProjectingImplementation
+{
+	virtual ~ProjectingImplementation();
+	virtual DenseVector project(const DenseVector& vec) = 0;
+};
+
+struct ProjectingFunction
+{
+	ProjectingFunction(ProjectingImplementation* impl) : implementation(impl) {};
+	inline DenseVector operator()(const DenseVector& vec)
+	{
+		return implementation->project(vec);
+	}
+	ProjectingImplementation* implementation;
+};
 
 #endif

@@ -43,6 +43,16 @@ class LoggingSingleton
 			if (os_ && os_->good())
 				(*os_) << "[BENCHMARK] " << msg << "\n"; 
 		}
+		void error(const string& msg) const
+		{
+			if (os_ && os_->good())
+				(*os_) << "[ERROR] " << msg << "\n"; 
+		}
+		void warning(const string& msg) const
+		{
+			if (os_ && os_->good())
+				(*os_) << "[WARNING] " << msg << "\n"; 
+		}
 };
 
 #endif
