@@ -25,7 +25,7 @@ struct InverseSparseMatrixOperation
 	}
 	/** Solves linear system with provided right-hand size
 	 */
-	inline DenseMatrix operator()(DenseMatrix operatee)
+	inline DenseMatrix operator()(const DenseMatrix& operatee)
 	{
 		return solver.solve(operatee);
 	}
@@ -50,7 +50,7 @@ struct DenseMatrixOperation
 	//! 
 	//! @param rhs right-hand size matrix
 	//!
-	inline DenseMatrix operator()(DenseMatrix rhs)
+	inline DenseMatrix operator()(const DenseMatrix& rhs)
 	{
 		return _matrix.selfadjointView<Eigen::Upper>()*rhs;
 	}
@@ -76,7 +76,7 @@ struct DenseImplicitSquareMatrixOperation
 	//! 
 	//! @param rhs right-hand side matrix
 	//!
-	inline DenseMatrix operator()(DenseMatrix rhs)
+	inline DenseMatrix operator()(const DenseMatrix& rhs)
 	{
 		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*rhs);
 	}
