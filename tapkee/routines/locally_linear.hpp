@@ -11,6 +11,7 @@
 #define TAPKEE_LOCALLY_LINEAR_H_
 
 #include "eigen_embedding.hpp"
+#include "../tapkee_defines.hpp"
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
@@ -30,9 +31,11 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
 	DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
+	G.col(0).setConstant(1/sqrt(DefaultScalarType(k)));
 	DefaultDenseSelfAdjointEigenSolver solver;
 
 	RESTRICT_ALLOC;
+//#pragma omp parallel for private(iter,gram_matrix,G)
 	for (iter=iter_begin; iter<iter_end; ++iter)
 	{
 		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
@@ -47,17 +50,11 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 			}
 		}
 		
-		for (unsigned int i=0; i<k; ++i)
-		{
-			col_means[i] = gram_matrix.col(i).mean();
-			row_means[i] = gram_matrix.row(i).mean();
-		}
+		col_means = gram_matrix.colwise().mean();
 		DefaultScalarType grand_mean = gram_matrix.mean();
 		gram_matrix.array() += grand_mean;
 		gram_matrix.rowwise() -= col_means.transpose();
-		gram_matrix.colwise() -= row_means;
-
-		G.col(0).setConstant(1/sqrt(DefaultScalarType(k)));
+		gram_matrix.colwise() -= col_means;
 
 		UNRESTRICT_ALLOC;
 		if (partial_eigendecomposer)
