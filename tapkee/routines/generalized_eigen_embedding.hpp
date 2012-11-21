@@ -88,6 +88,7 @@ EmbeddingResult generalized_eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method
 		case RANDOMIZED:
 			// TODO fail here
 			return EmbeddingResult();
+		default: break;
 	}
 	return EmbeddingResult();
 };

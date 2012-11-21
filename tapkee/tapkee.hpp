@@ -78,15 +78,16 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 			HANDLE_IMPLEMENTATION(PCA);
 			HANDLE_IMPLEMENTATION(KERNEL_PCA);
 			HANDLE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING);
+			default: break;
 		}
 	}
 	catch (const std::bad_alloc& ba)
 	{
-		LoggingSingleton::instance().error("Not enough memory available");
+		LoggingSingleton::instance().message_error("Not enough memory available");
 	}
 	catch (const std::exception& ex)
 	{
-		LoggingSingleton::instance().error(string("Some error occured : ") + string(ex.what()));
+		LoggingSingleton::instance().message_error(string("Some error occured : ") + string(ex.what()));
 	}
 
 #undef CALL_IMPLEMENTATION 

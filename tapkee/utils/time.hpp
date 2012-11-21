@@ -28,7 +28,7 @@ struct timed_context
 	{
 		stringstream msg_stream;
 		msg_stream << operation_name << " took " << double(clock()-start_clock)/CLOCKS_PER_SEC << " seconds"; 
-		LoggingSingleton::instance().benchmark(msg_stream.str());
+		LoggingSingleton::instance().message_benchmark(msg_stream.str());
 	}
 };
 #endif

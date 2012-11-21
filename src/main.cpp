@@ -13,6 +13,8 @@
 #include <callbacks/precomputed_callbacks.hpp>
 #include <utils/logging.hpp>
 
+#include "ezoptionparser.hpp"
+
 #include <algorithm>
 #include <string>
 #include <istream>
@@ -20,6 +22,7 @@
 #include <vector>
 #include <iterator>
 
+using namespace ez;
 using namespace Eigen;
 using namespace std;
 
@@ -80,9 +83,7 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 	if (!strcmp(str,"lisomap"))
 		return LANDMARK_ISOMAP;
 
-	printf("Method %s is not supported (yet?)\n",str);
-	exit(EXIT_FAILURE);
-	return KERNEL_LOCALLY_LINEAR_EMBEDDING;
+	return UNKNOWN_METHOD;
 }
 
 TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
@@ -92,9 +93,7 @@ TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 	if (!strcmp(str,"covertree"))
 		return COVER_TREE;
 
-	printf("Method %s is not supported (yet?)\n",str);
-	exit(EXIT_FAILURE);
-	return BRUTE_FORCE;
+	return UNKNOWN_NEIGHBORS_METHOD;
 }
 
 TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
@@ -127,21 +126,99 @@ DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterato
 
 int main(int argc, const char** argv)
 {
-	ParametersMap parameters;
-	if (argc!=6)
+	ezOptionParser opt;
+	opt.footer = "\n";
+	opt.overview = "Tapkee library sample application for dense matrix embedding.";
+	opt.example = "tapkee --method klle --";
+	opt.syntax = "tapkee [options]";
+
+	opt.add("",0,0,0,"Display help","-h","--help");
+	opt.add("",0,0,0,"Output benchmark information","--benchmark");
+	opt.add("",0,0,0,"Output more information","--verbose");
+	opt.add("klle",0,1,0,
+			"Dimension reduction method (default klle). One of the following: "
+			"klle, npe, kltsa, lltsa, hlle, laplacian_eigenmaps, lpp, "
+			"diffusion_map, isomap, lisomap, mds, lmds, spe, kpca, pca.",
+			"-m","--method");
+	opt.add("covertree",0,1,0,
+			"Neighbors search method (default covertree). One of the following "
+			"covertree, brute.",
+			"-nm","--neighbors_method");
+	opt.add("arpack",0,1,0,
+			"Eigendecomposition method (default arpack). One of the following "
+			"arpack, randomized, dense.",
+			"-em","--eigen_method");
+	opt.add("2",0,1,0,"Target dimension (default 2)","-td","--target_dimension");
+	opt.add("10",0,1,0,"Number of neighbors (default 10)","-nn","-k","--n_neighbors");
+	opt.parse(argc, argv);
+
+	if (opt.isSet("-h"))
 	{
-		printf("No parameters specified.\n");
-		printf("Usage is [method] [neighbor_method] [eigen_method] "
-				" [number of neighbors] [target dimension]\n");
-		exit(EXIT_FAILURE);
+		string usage;
+		opt.getUsage(usage);
+		std::cout << usage << std::endl;
+		return 0;
 	}
-	else
+
+	if (opt.isSet("--verbose"))
 	{
-		parameters[REDUCTION_METHOD] = parse_reduction_method(argv[1]);
-		parameters[NEIGHBORS_METHOD] = parse_neighbors_method(argv[2]);
-		parameters[EIGEN_EMBEDDING_METHOD] = parse_eigen_method(argv[3]);
-		parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(atoi(argv[4]));
-		parameters[TARGET_DIMENSION] = static_cast<unsigned int>(atoi(argv[5]));
+		LoggingSingleton::instance().enable_info();
+	}
+
+	if (opt.isSet("--benchmark"))
+	{
+		LoggingSingleton::instance().enable_benchmark();
+		LoggingSingleton::instance().message_info("Benchmarking enabled");
+	}
+	
+	ParametersMap parameters;
+
+	{
+		string method;
+		opt.get("--method")->getString(method);
+		TAPKEE_METHOD tapkee_method = parse_reduction_method(method.c_str());
+		if (tapkee_method==UNKNOWN_METHOD)
+			LoggingSingleton::instance().message_error(string("Unknown method ") + method);
+		else
+			parameters[REDUCTION_METHOD] = tapkee_method;
+	}
+	{
+		string method;
+		opt.get("--neighbors_method")->getString(method);
+		TAPKEE_NEIGHBORS_METHOD tapkee_neighbors_method = parse_neighbors_method(method.c_str());
+		if (tapkee_neighbors_method==UNKNOWN_NEIGHBORS_METHOD)
+			LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
+		else
+			parameters[NEIGHBORS_METHOD] = tapkee_neighbors_method;
+	}
+	{
+		string method;
+		opt.get("--eigen_method")->getString(method);
+		TAPKEE_EIGEN_EMBEDDING_METHOD tapkee_eigen_method = parse_eigen_method(method.c_str());
+		if (tapkee_eigen_method==UNKNOWN_EIGEN_METHOD)
+			LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
+		else
+			parameters[EIGEN_EMBEDDING_METHOD] = tapkee_eigen_method;
+	}
+	{
+		int target_dimension = 1;
+		opt.get("--target_dimension")->getInt(target_dimension);
+		if (target_dimension < 0)
+			LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
+			                                           "Please visit other universe");
+		else
+			parameters[TARGET_DIMENSION] = static_cast<unsigned int>(target_dimension);
+	}
+	{
+		int k = 1;
+		opt.get("--n_neighbors")->getInt(k);
+		if (k < 3)
+			LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
+		else
+			parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(k);
+	}
+
+	{
 		// keep it static yet
 		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
 		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(1000.0);
@@ -152,14 +229,13 @@ int main(int argc, const char** argv)
 		parameters[EIGENSHIFT] = static_cast<DefaultScalarType>(1e-9);
 	}
 
-
 	// Load data
 	DenseMatrix input_data = read_data("input.dat");
 	parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
 	
 	std::stringstream ss;
 	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
-	LoggingSingleton::instance().info(ss.str());
+	LoggingSingleton::instance().message_info(ss.str());
 	
 	vector<int> data_indices;
 	for (int i=0; i<input_data.cols(); i++)

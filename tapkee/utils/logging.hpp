@@ -17,14 +17,36 @@ using std::cout;
 using std::ostream;
 using std::string;
 
+#define LEVEL_ENABLED_FIELD(X) bool X##_enabled
+#define LEVEL_ENABLED_FIELD_INITIALIZER(X,value) X##_enabled(value)
+#define LEVEL_HANDLERS(LEVEL) \
+		void enable_##LEVEL() { LEVEL##_enabled = true; };		\
+		void disable_##LEVEL() { LEVEL##_enabled = false; };	\
+		void message_##LEVEL(const string& msg)					\
+		{														\
+			if (LEVEL##_enabled && os_ && os_->good())			\
+				(*os_) << "["#LEVEL"] " << msg << "\n";			\
+		}
+
 class LoggingSingleton
 {
 	private:
-		LoggingSingleton() : os_(&cout) {};
+		LoggingSingleton() : os_(&cout),
+			LEVEL_ENABLED_FIELD_INITIALIZER(info,false),
+			LEVEL_ENABLED_FIELD_INITIALIZER(warning,true),
+			LEVEL_ENABLED_FIELD_INITIALIZER(error,true),
+			LEVEL_ENABLED_FIELD_INITIALIZER(benchmark,false)
+		{
+		};
 		LoggingSingleton(const LoggingSingleton& ls);
 		void operator=(const LoggingSingleton& ls);
 
 		ostream* os_;
+
+		LEVEL_ENABLED_FIELD(info);
+		LEVEL_ENABLED_FIELD(warning);
+		LEVEL_ENABLED_FIELD(error);
+		LEVEL_ENABLED_FIELD(benchmark);
 
 	public:
 		static LoggingSingleton& instance()
@@ -33,26 +55,14 @@ class LoggingSingleton
 			return s;
 		}
 
-		void info(const string& msg) const
-		{
-			if (os_ && os_->good())
-				(*os_) << "[INFO] " << msg << "\n"; 
-		}
-		void benchmark(const string& msg) const
-		{
-			if (os_ && os_->good())
-				(*os_) << "[BENCHMARK] " << msg << "\n"; 
-		}
-		void error(const string& msg) const
-		{
-			if (os_ && os_->good())
-				(*os_) << "[ERROR] " << msg << "\n"; 
-		}
-		void warning(const string& msg) const
-		{
-			if (os_ && os_->good())
-				(*os_) << "[WARNING] " << msg << "\n"; 
-		}
+		LEVEL_HANDLERS(info);
+		LEVEL_HANDLERS(warning);
+		LEVEL_HANDLERS(error);
+		LEVEL_HANDLERS(benchmark);
+
 };
+
+#undef LEVEL_HANDLERS
+#undef LEVEL_ENABLED_FIELD
 
 #endif

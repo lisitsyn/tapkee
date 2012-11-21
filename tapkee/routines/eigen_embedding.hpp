@@ -57,7 +57,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 		}
 		else
 		{
-			LoggingSingleton::instance().error("Eigendecomposition failed");
+			LoggingSingleton::instance().message_error("Eigendecomposition failed");
 			throw std::runtime_error("Eigendecomposition failed");
 		}
 		return EmbeddingResult();
@@ -83,7 +83,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJ
 		}
 		else
 		{
-			LoggingSingleton::instance().error("Eigendecomposition failed");
+			LoggingSingleton::instance().message_error("Eigendecomposition failed");
 			throw std::runtime_error("Eigendecomposition failed");
 		}
 		return EmbeddingResult();
@@ -148,7 +148,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 		}
 		else
 		{
-			LoggingSingleton::instance().error("Eigendecomposition failed");
+			LoggingSingleton::instance().message_error("Eigendecomposition failed");
 			throw std::runtime_error("Eigendecomposition failed");
 		}
 		return EmbeddingResult();
@@ -203,6 +203,7 @@ EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const Matr
 			return eigen_embedding_internal::
 				eigen_embedding_impl<MatrixType, MatrixTypeOperation, 
 				EIGEN_DENSE_SELFADJOINT_SOLVER>().embed(m, target_dimension, skip);
+		default: break;
 	}
 	return EmbeddingResult();
 };

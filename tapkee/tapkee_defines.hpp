@@ -147,7 +147,8 @@ enum TAPKEE_METHOD
 	LANDMARK_MULTIDIMENSIONAL_SCALING,
 	STOCHASTIC_PROXIMITY_EMBEDDING,
 	KERNEL_PCA,
-	PCA
+	PCA,
+	UNKNOWN_METHOD
 };
 
 //! Neighbors computation method
@@ -160,6 +161,7 @@ enum TAPKEE_NEIGHBORS_METHOD
 	//! Covertree-based method with \f$ O(\log N) \f$ time complexity.
 	//! Recommended to be used as a default method.
 	COVER_TREE,
+	UNKNOWN_NEIGHBORS_METHOD
 };
 
 //! Eigendecomposition-based embedding methods enumeration
@@ -174,7 +176,8 @@ enum TAPKEE_EIGEN_EMBEDDING_METHOD
 	RANDOMIZED,
 	//! Eigen library dense method (useful for debugging). Computes
 	//! all eigenvectors thus can be very slow doing large-scale.
-	EIGEN_DENSE_SELFADJOINT_SOLVER
+	EIGEN_DENSE_SELFADJOINT_SOLVER,
+	UNKNOWN_EIGEN_METHOD
 };
 
 // Internal types

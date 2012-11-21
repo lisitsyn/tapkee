@@ -127,6 +127,7 @@ Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessItera
 	{
 		case BRUTE_FORCE: return find_neighbors_bruteforce_impl(begin,end,callback,k);
 		case COVER_TREE: return find_neighbors_covertree_impl(begin,end,callback,k);
+		default: break;
 	}
 	return Neighbors();
 };
