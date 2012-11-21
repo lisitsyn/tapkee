@@ -209,6 +209,8 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 		RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
 		unsigned int dimension)
 {
+	timed_context context("NPE eigenproblem construction");
+	
 	DenseSymmetricMatrix lhs = DenseSymmetricMatrix::Zero(dimension,dimension);
 	DenseSymmetricMatrix rhs = DenseSymmetricMatrix::Zero(dimension,dimension);
 
@@ -229,6 +231,9 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 			lhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i, rank_update_vector_j, it.value());
 		}
 	}
+	
+	rhs += rhs.transpose();
+	rhs /= 2;
 
 	return DenseSymmetricMatrixPair(lhs,rhs);
 }
@@ -238,6 +243,8 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 		RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
 		unsigned int dimension)
 {
+	timed_context context("LLTSA eigenproblem construction");
+
 	DenseSymmetricMatrix lhs = DenseSymmetricMatrix::Zero(dimension,dimension);
 	DenseSymmetricMatrix rhs = DenseSymmetricMatrix::Zero(dimension,dimension);
 
@@ -262,6 +269,9 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 		}
 	}
 	lhs.selfadjointView<Eigen::Upper>().rankUpdate(sum,-1./(end-begin));
+
+	rhs += rhs.transpose();
+	rhs /= 2;
 
 	return DenseSymmetricMatrixPair(lhs,rhs);
 }
