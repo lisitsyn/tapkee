@@ -6,7 +6,7 @@ OBJECTS=$(SOURCES:%.cpp=%.o)
 all: default
 
 default: 
-	$(CXX) $(CFLAGS) -fopenmp -O3 -o tapkee src/main.cpp $(SOURCES) -I./tapkee -larpack $(LDFLAGS)
+	$(CXX) $(CFLAGS) -fopenmp -O3 -o tapkee_app src/main.cpp $(SOURCES) -I./tapkee -larpack $(LDFLAGS)
 
 noarpack:
 	$(CXX) $(CFLAGS) -O3 -o application src/main.cpp $(SOURCES) -DTAPKEE_NO_ARPACK -fopenmp $(LDFLAGS)

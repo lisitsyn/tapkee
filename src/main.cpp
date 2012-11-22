@@ -129,8 +129,10 @@ int main(int argc, const char** argv)
 	ezOptionParser opt;
 	opt.footer = "\n";
 	opt.overview = "Tapkee library sample application for dense matrix embedding.";
-	opt.example = "tapkee --method klle --";
-	opt.syntax = "tapkee [options]";
+	opt.example = "Run kernel locally linear embedding with k=10 with arpack "
+                  "eigensolver on some dataset \n\n"
+	              "tapkee --method klle -em arpack -k 10";
+	opt.syntax = "tapkee_app [options]";
 
 	opt.add("",0,0,0,"Display help","-h","--help");
 	opt.add("",0,0,0,"Output benchmark information","--benchmark");
