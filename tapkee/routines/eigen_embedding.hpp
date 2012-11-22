@@ -43,7 +43,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 {
 	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip)
 	{
-		timed_context context("ARPACK DSXUPD eigendecomposition");
+		timed_context context("ARPACK eigendecomposition");
 
 #ifdef TAPKEE_NO_ARPACK
 		return EmbeddingResult();
@@ -58,7 +58,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 		else
 		{
 			LoggingSingleton::instance().message_error("Eigendecomposition failed");
-			throw std::runtime_error("Eigendecomposition failed");
+			throw std::runtime_error("eigendecomposition failed");
 		}
 		return EmbeddingResult();
 #endif
@@ -84,7 +84,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJ
 		else
 		{
 			LoggingSingleton::instance().message_error("Eigendecomposition failed");
-			throw std::runtime_error("Eigendecomposition failed");
+			throw std::runtime_error("eigendecomposition failed");
 		}
 		return EmbeddingResult();
 	}
@@ -149,7 +149,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 		else
 		{
 			LoggingSingleton::instance().message_error("Eigendecomposition failed");
-			throw std::runtime_error("Eigendecomposition failed");
+			throw std::runtime_error("eigendecomposition failed");
 		}
 		return EmbeddingResult();
 	}

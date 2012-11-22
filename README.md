@@ -22,6 +22,13 @@ Callback interface enables user to reach great flexibility: ability to set up so
 lazy initialization of resources and various more. As an example we provide simple dense feature 
 matrices callback set.
 
+Application
+-----------
+
+Tapkee comes with a sample application used to embed dense representations, for more information run
+
+./tapkee -h
+
 Supported platforms
 -------------------
 
