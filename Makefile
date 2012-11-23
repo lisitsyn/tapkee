@@ -9,16 +9,16 @@ default:
 	$(CXX) $(CFLAGS) -fopenmp -O3 -o tapkee_app src/main.cpp $(SOURCES) -I./tapkee -larpack $(LDFLAGS)
 
 noarpack:
-	$(CXX) $(CFLAGS) -O3 -o application src/main.cpp $(SOURCES) -DTAPKEE_NO_ARPACK -fopenmp $(LDFLAGS)
+	$(CXX) $(CFLAGS) -O3 -o tapkee_app src/main.cpp $(SOURCES) -DTAPKEE_NO_ARPACK -fopenmp $(LDFLAGS)
 
 debug:
-	$(CXX) $(CFLAGS) -g -o application src/main.cpp $(SOURCES) -DTAPKEE_DEBUG -larpack -fopenmp $(LDFLAGS)
+	$(CXX) $(CFLAGS) -g -o tapkee_app src/main.cpp $(SOURCES) -I./tapkee -DTAPKEE_DEBUG -larpack -fopenmp $(LDFLAGS)
 
 doc:
 	doxygen doc/Doxyfile
 
 clean:
-	rm -f application
+	rm -f tapkee_app
 
 .PHONY: all clean
 
