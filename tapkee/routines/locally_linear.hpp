@@ -102,6 +102,8 @@ SparseWeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 	DenseVector dots(k);
 	DenseVector rhs = DenseVector::Ones(k);
 	DenseVector weights;
+	
+	RESTRICT_ALLOC;
 	for (RandomAccessIterator iter=iter_begin; iter!=iter_end; ++iter)
 	{
 		DefaultScalarType kernel_value = callback(*iter,*iter);
@@ -133,6 +135,7 @@ SparseWeightMatrix klle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 				                                        +weights(i)*weights(j)));
 		}
 	}
+	UNRESTRICT_ALLOC;
 
 	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
@@ -216,6 +219,8 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 
 	DenseVector rank_update_vector_i(dimension);
 	DenseVector rank_update_vector_j(dimension);
+
+	RESTRICT_ALLOC;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		feature_vector_callback(*iter,rank_update_vector_i);
@@ -235,6 +240,8 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 	rhs += rhs.transpose();
 	rhs /= 2;
 
+	UNRESTRICT_ALLOC;
+
 	return DenseSymmetricMatrixPair(lhs,rhs);
 }
 
@@ -251,6 +258,8 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 	DenseVector rank_update_vector_i(dimension);
 	DenseVector rank_update_vector_j(dimension);
 	DenseVector sum = DenseVector::Zero(dimension);
+	
+	RESTRICT_ALLOC;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		feature_vector_callback(*iter,rank_update_vector_i);
@@ -273,8 +282,9 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 	rhs += rhs.transpose();
 	rhs /= 2;
 
+	UNRESTRICT_ALLOC;
+
 	return DenseSymmetricMatrixPair(lhs,rhs);
 }
-
 
 #endif
