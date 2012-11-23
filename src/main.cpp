@@ -180,7 +180,10 @@ int main(int argc, const char** argv)
 		opt.get("--method")->getString(method);
 		TAPKEE_METHOD tapkee_method = parse_reduction_method(method.c_str());
 		if (tapkee_method==UNKNOWN_METHOD)
+		{
 			LoggingSingleton::instance().message_error(string("Unknown method ") + method);
+			return 0;
+		}
 		else
 			parameters[REDUCTION_METHOD] = tapkee_method;
 	}
@@ -189,7 +192,10 @@ int main(int argc, const char** argv)
 		opt.get("--neighbors_method")->getString(method);
 		TAPKEE_NEIGHBORS_METHOD tapkee_neighbors_method = parse_neighbors_method(method.c_str());
 		if (tapkee_neighbors_method==UNKNOWN_NEIGHBORS_METHOD)
+		{
 			LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
+			return 0;
+		}
 		else
 			parameters[NEIGHBORS_METHOD] = tapkee_neighbors_method;
 	}
@@ -198,7 +204,10 @@ int main(int argc, const char** argv)
 		opt.get("--eigen_method")->getString(method);
 		TAPKEE_EIGEN_EMBEDDING_METHOD tapkee_eigen_method = parse_eigen_method(method.c_str());
 		if (tapkee_eigen_method==UNKNOWN_EIGEN_METHOD)
+		{
 			LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
+			return 0;
+		}
 		else
 			parameters[EIGEN_EMBEDDING_METHOD] = tapkee_eigen_method;
 	}
@@ -206,8 +215,11 @@ int main(int argc, const char** argv)
 		int target_dimension = 1;
 		opt.get("--target_dimension")->getInt(target_dimension);
 		if (target_dimension < 0)
+		{
 			LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
 			                                           "Please visit other universe");
+			return 0;
+		}
 		else
 			parameters[TARGET_DIMENSION] = static_cast<unsigned int>(target_dimension);
 	}
