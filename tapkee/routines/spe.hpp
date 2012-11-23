@@ -18,10 +18,14 @@
 
 template <class RandomAccessIterator, class PairwiseCallback>
 EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator end,
-		PairwiseCallback callback, unsigned int /*k*/, unsigned int target_dimension,
-		bool global_strategy, DefaultScalarType tolerance, int nupdates)
+		PairwiseCallback callback, const Neighbors& neighbors,
+		unsigned int target_dimension, bool global_strategy,
+		DefaultScalarType tolerance, int nupdates)
 {
 	timed_context context("SPE embedding computation");
+	unsigned int k = 0;
+	if (!global_strategy)
+		k = neighbors[0].size();
 
 	// The number of data points
 	int N = end-begin;
@@ -72,6 +76,10 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 	// Pointers to the indices of the elements to update
 	IndexIterator ind1;
 	IndexIterator ind2;
+	// Helper used in local strategy
+	Indices ind1Neighbors;
+	if (!global_strategy)
+		ind1Neighbors.resize(k*nupdates);
 
 	for (int i=0; i<max_iter; ++i)
 	{
@@ -80,6 +88,31 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 
 		ind1 = indices.begin();
 		ind2 = indices.begin()+nupdates;
+
+		// With local strategy, the seecond set of indices is selected among
+		// neighbors of the first set
+		if (!global_strategy)
+		{
+			// Neighbors of interest
+			for(int j=0; j<nupdates; ++j)
+			{
+				const LocalNeighbors& current_neighbors =
+					neighbors[*ind1++];
+
+				for(unsigned int kk=0; kk<k; ++kk)
+					ind1Neighbors[kk + j*k] = current_neighbors[kk];
+			}
+			// Restore ind1
+			ind1 = indices.begin();
+
+			// Generate pseudo-random indices and select final indices
+			for(int j=0; j<nupdates; ++j)
+			{
+				unsigned int r = round( std::rand()*1.0/RAND_MAX*(k-1) ) + k*j;
+				indices[nupdates+j] = ind1Neighbors[r];
+			}
+		}
+
 
 		// Compute distances between the selected points in the embedded space
 		for(int j=0; j<nupdates; ++j)

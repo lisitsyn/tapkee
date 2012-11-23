@@ -380,20 +380,18 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 	{
 		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
-		//OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(bool,global_strategy,SPE_GLOBAL_STRATEGY);
 		OBTAIN_PARAMETER(DefaultScalarType,tolerance,SPE_TOLERANCE);
 		OBTAIN_PARAMETER(unsigned int,nupdates,SPE_NUM_UPDATES);
 
-		//TODO add local strategy using KNN
+		Neighbors neighbors;
 		if (!global_strategy)
-		{
-			printf("Local strategy in SPE not implemented yet\n");
-			return EmbeddingResult();
-		}
+			neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
 
 		timed_context context("Embedding with SPE");
-		return spe_embedding(begin,end,distance_callback,k,target_dimension,global_strategy,tolerance,nupdates);
+		return spe_embedding(begin,end,distance_callback,neighbors,
+				target_dimension,global_strategy,tolerance,nupdates);
 	}
 };
 

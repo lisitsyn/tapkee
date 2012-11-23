@@ -154,6 +154,7 @@ int main(int argc, const char** argv)
 	opt.add("10",0,1,0,"Number of neighbors (default 10)","-nn","-k","--n_neighbors");
 	opt.add("1.0",0,1,0,"Width of gaussian kernel (default 1.0)","-w","--width");
 	opt.add("1",0,1,0,"Number of timesteps for diffusion map (default 1)","--timesteps");
+	opt.add("0",0,0,0,"Local strategy in SPE (default global)", "--spe_local");
 	opt.parse(argc, argv);
 
 	if (opt.isSet("-h"))
@@ -248,9 +249,15 @@ int main(int argc, const char** argv)
 			parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
 	}
 
+	if (opt.isSet("--spe_local"))
+		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(false);
+	else
+		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
+
 	{
 		// keep it static yet
-		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
+		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
+		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(1000.0);
 		parameters[SPE_TOLERANCE] = static_cast<DefaultScalarType>(1e-5);
 		parameters[SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
 		parameters[LANDMARK_RATIO] = static_cast<DefaultScalarType>(0.2);
