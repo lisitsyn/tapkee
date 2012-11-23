@@ -152,6 +152,8 @@ int main(int argc, const char** argv)
 			"-em","--eigen_method");
 	opt.add("2",0,1,0,"Target dimension (default 2)","-td","--target_dimension");
 	opt.add("10",0,1,0,"Number of neighbors (default 10)","-nn","-k","--n_neighbors");
+	opt.add("1.0",0,1,0,"Width of gaussian kernel (default 1.0)","-w","--width");
+	opt.add("1",0,1,0,"Number of timesteps for diffusion map (default 1)","--timesteps");
 	opt.parse(argc, argv);
 
 	if (opt.isSet("-h"))
@@ -231,11 +233,23 @@ int main(int argc, const char** argv)
 		else
 			parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(k);
 	}
+	{
+		double width = 1.0;
+		opt.get("--width")->getDouble(width);
+		if (width < 0.0)
+			LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
+		else
+			parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(width);
+		int timesteps = 1;
+		opt.get("--timesteps")->getInt(timesteps);
+		if (timesteps < 0)
+			LoggingSingleton::instance().message_error("Number of timesteps is negative.");
+		else
+			parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
+	}
 
 	{
 		// keep it static yet
-		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
-		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(1000.0);
 		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
 		parameters[SPE_TOLERANCE] = static_cast<DefaultScalarType>(1e-5);
 		parameters[SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
