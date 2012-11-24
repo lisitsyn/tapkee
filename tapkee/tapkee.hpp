@@ -50,8 +50,15 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 	Eigen::initParallel();
 	EmbeddingResult embedding_result;
 
-	TAPKEE_METHOD method = 
-		options[REDUCTION_METHOD].cast<TAPKEE_METHOD>();
+	TAPKEE_METHOD method;
+	try 
+	{
+		method = options[REDUCTION_METHOD].cast<TAPKEE_METHOD>();
+	}
+	catch (const anyimpl::bad_any_cast&)
+	{
+		throw std::runtime_error("Wrong method specified");
+	}
 
 #define CALL_IMPLEMENTATION(X) embedding_impl<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>().embed(\
 		begin,end,kernel_callback,distance_callback,feature_vector_callback,options)
