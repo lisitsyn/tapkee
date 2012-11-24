@@ -29,17 +29,6 @@ struct distances_comparator
 	}
 };
 
-template <class RandomAccessIterator, class KernelCallback>
-struct kernel_distance
-{
-	kernel_distance(const KernelCallback& kc) : kc_(kc) {};
-	KernelCallback kc_;
-	DefaultScalarType operator()(const pair<DefaultScalarType, RandomAccessIterator>& l, const pair<DefaultScalarType, RandomAccessIterator>& r) const
-	{
-		return l.first + r.first - 2*kc_(*(l.second),*(r.second));
-	}
-};
-
 template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
                          PairwiseCallback callback, unsigned int k)
@@ -123,6 +112,12 @@ Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessItera
                          const RandomAccessIterator& end, const PairwiseCallback& callback, 
                          unsigned int k)
 {
+	if (k > (end-begin-1))
+	{
+		LoggingSingleton::instance().message_warning("Number of neighbors is greater than number of objects to embed. "
+		                                             "Using greatest possible number of neighbors");
+		k = (end-begin-1);
+	}
 	switch (method)
 	{
 		case BRUTE_FORCE: return find_neighbors_bruteforce_impl(begin,end,callback,k);
