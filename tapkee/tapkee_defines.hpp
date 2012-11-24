@@ -89,53 +89,9 @@ typedef std::map<TAPKEE_PARAMETERS, any> ParametersMap;
 //! All methods require 
 enum TAPKEE_METHOD
 {
-	//! Locally Linear Embedding / Kernel Locally Linear Embedding.
-	//! Requires Mercer kernel callback (linear kernel makes the algorithm a 
-	//! standard Locally Linear Embedding) and number of neighbors 
-	//! ::NUMBER_OF_NEIGHBORS. 
-	//!
-	//! References:
-	//!
-	//! @cite Saul, L. K., Ave, P., Park, F., & Roweis, S. T. (2001).
-	//!      An Introduction to Locally Linear Embedding. 290(5500), 2323-2326.
-	//!
-	//! @cite Decoste, D. (2001). Visualizing Mercer Kernel Feature Spaces 
-	//!      Via Kernelized Locally-Linear Embeddings.
-	//!      The 8th International Conference on Neural Information Processing ICONIP2001
-	//!
-	//! @cite Zhao, D. (2006). Formulating LLE using alignment technique.
-	//!      Pattern Recognition, 39(11), 2233-2235.
 	KERNEL_LOCALLY_LINEAR_EMBEDDING,
-	//! Neighborhood preserving embedding.
-	//! Requires two callbacks: linear kernel callback and feature vector access callback.
-	//! As any other local method requires ::NUMBER_OF_NEIGHBORS parameter to be set.
-	//!
-	//! References:
-	//!
-	//! @cite He, X., Cai, D., Yan, S., & Zhang, H.-J. (2005).
-	//!       Neighborhood preserving embedding.
-	//!       Tenth IEEE International Conference on Computer Vision ICCV05 Volume 1, 2, 1208-1213. Ieee.
 	NEIGHBORHOOD_PRESERVING_EMBEDDING,
-	//! Local Tangent Space Alignment / Kernel Local Tangent Space Alignment.
-	//! Requires Mercer kernel callback (linear kernel makes the algorithm a 
-	//! standard Local Tangent Space Alignment) and number of neighbors 
-	//! ::NUMBER_OF_NEIGHBORS. 
-	//!
-	//! References:
-	//!
-	//! @cite Zhang, Z., & Zha, H. (2002). Principal Manifolds
-	//!       and Nonlinear Dimension Reduction via Local Tangent Space Alignment.
-	//!       Journal of Shanghai University English Edition, 8(4), 406-424. SIAM.
 	KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT,
-	//! Linear Local Tangent Space Alignment. 
-	//! Requires two callbacks: linear kernel callback and feature vector access callback.
-	//! As any other local method requires ::NUMBER_OF_NEIGHBORS parameter to be set.
-	//!
-	//! References:
-	//!
-	//! @cite Zhang, T., Yang, J., Zhao, D., & Ge, X. (2007).
-	//!       Linear local tangent space alignment and application to face recognition.
-	//!       Neurocomputing, 70(7-9), 1547-1553.
 	LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT,
 	HESSIAN_LOCALLY_LINEAR_EMBEDDING,
 	LAPLACIAN_EIGENMAPS,
