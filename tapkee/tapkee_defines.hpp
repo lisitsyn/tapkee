@@ -24,6 +24,7 @@
 	#define EIGEN_NO_DEBUG
 #endif
 #define EIGEN_RUNTIME_NO_MALLOC
+#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #define EIGEN_DONT_PARALLELIZE
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Sparse>
@@ -39,11 +40,12 @@
 #endif
 
 // Customizable types
-#ifdef TAPKEE_CUSTOM_TYPES
-	#include TAPKEE_CUSTOM_TYPES
+#ifdef TAPKEE_CUSTOM_INTERNAL_NUMTYPE
+	typedef TAPKEE_CUSTOM_INTERNAL_NUMTYPE DefaultScalarType;
 #else
 	//! default scalar value (currently only double is supported and tested, float is unstable)
 	typedef double DefaultScalarType;
+#endif
 	//! dense vector type 
 	typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
 	//! dense matrix type
@@ -56,7 +58,6 @@
 	typedef Eigen::SelfAdjointEigenSolver<DenseMatrix> DefaultDenseSelfAdjointEigenSolver;
 	//! default sparse solver
 	typedef Eigen::SimplicialLDLT<SparseWeightMatrix> DefaultSparseSolver;
-#endif
 
 #ifdef TAPKEE_CUSTOM_PROPERTIES
 	#include TAPKEE_CUSTOM_PROPERTIES

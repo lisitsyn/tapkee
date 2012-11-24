@@ -135,7 +135,7 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 
 		timed_context context("Embeding with MDS");
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
-		mds_process_matrix(distance_matrix);
+		distance_matrix.centerMatrix();
 		EmbeddingResult result = eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
 			distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 		
@@ -161,7 +161,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 		DenseSymmetricMatrix distance_matrix = 
 			compute_distance_matrix(begin,landmarks,distance_callback);
 		DenseVector landmark_distances_squared = distance_matrix.colwise().mean();
-		mds_process_matrix(distance_matrix);
+		distance_matrix.centerMatrix();
 		EmbeddingResult landmarks_embedding = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
 					distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);

@@ -28,7 +28,6 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 	RandomAccessIterator iter;
 	RandomAccessIterator iter_begin = begin, iter_end = end;
 	DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
-	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
 	DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
 	G.col(0).setConstant(1/sqrt(DefaultScalarType(k)));
@@ -50,11 +49,7 @@ SparseWeightMatrix kltsa_weight_matrix(RandomAccessIterator begin, RandomAccessI
 			}
 		}
 		
-		col_means = gram_matrix.colwise().mean();
-		DefaultScalarType grand_mean = gram_matrix.mean();
-		gram_matrix.array() += grand_mean;
-		gram_matrix.rowwise() -= col_means.transpose();
-		gram_matrix.colwise() -= col_means;
+		gram_matrix.centerMatrix();
 
 		UNRESTRICT_ALLOC;
 		if (partial_eigendecomposer)
@@ -155,7 +150,6 @@ SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 
 	RandomAccessIterator iter_begin = begin, iter_end = end;
 	DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
-	DenseVector col_means(k), row_means(k);
 	DenseVector rhs = DenseVector::Ones(k);
 	DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
 
@@ -173,16 +167,6 @@ SparseWeightMatrix hlle_weight_matrix(RandomAccessIterator begin, RandomAccessIt
 				gram_matrix(j,i) = kij;
 			}
 		}
-		
-		for (unsigned int i=0; i<k; ++i)
-		{
-			col_means[i] = gram_matrix.col(i).mean();
-			row_means[i] = gram_matrix.row(i).mean();
-		}
-		DefaultScalarType grand_mean = gram_matrix.mean();
-		gram_matrix.array() += grand_mean;
-		gram_matrix.rowwise() -= col_means.transpose();
-		gram_matrix.colwise() -= row_means;
 		
 		DefaultDenseSelfAdjointEigenSolver sae_solver;
 		sae_solver.compute(gram_matrix);

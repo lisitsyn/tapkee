@@ -72,11 +72,7 @@ DenseSymmetricMatrix compute_centered_kernel_matrix(RandomAccessIterator begin, 
 		}
 	}
 
-	DenseVector col_means = kernel_matrix.colwise().mean();
-	DefaultScalarType grand_mean = kernel_matrix.mean();
-	kernel_matrix.array() += grand_mean;
-	kernel_matrix.colwise() -= col_means;
-	kernel_matrix.rowwise() -= col_means.transpose();
+	kernel_matrix.centerMatrix();
 
 	return kernel_matrix;
 };
