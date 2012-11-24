@@ -20,6 +20,16 @@
 using std::nth_element;
 using std::pair;
 
+std::string get_neighbors_method_name(TAPKEE_NEIGHBORS_METHOD m)
+{
+	switch (m)
+	{
+		case BRUTE_FORCE: return "Brute force";
+		case COVER_TREE: return "Cover tree";
+		default: return "Unknown neighbors finding method (yes it is a bug)";
+	}
+}
+
 template <class DistanceRecord>
 struct distances_comparator
 {
@@ -115,9 +125,10 @@ Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessItera
 	if (k > (end-begin-1))
 	{
 		LoggingSingleton::instance().message_warning("Number of neighbors is greater than number of objects to embed. "
-		                                             "Using greatest possible number of neighbors");
+		                                             "Using greatest possible number of neighbors.");
 		k = (end-begin-1);
 	}
+	LoggingSingleton::instance().message_info("Using " + get_neighbors_method_name(method) + " neighbors computation method.");
 	switch (method)
 	{
 		case BRUTE_FORCE: return find_neighbors_bruteforce_impl(begin,end,callback,k);

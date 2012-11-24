@@ -57,7 +57,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 	}
 	catch (const anyimpl::bad_any_cast&)
 	{
-		throw std::runtime_error("Wrong method specified");
+		throw std::runtime_error("Wrong method specified.");
 	}
 
 #define CALL_IMPLEMENTATION(X) embedding_impl<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>().embed(\
@@ -68,6 +68,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 
 	try 
 	{
+		LoggingSingleton::instance().message_info("Using " + get_method_name(method) + " method.");
 		switch (method)
 		{
 			HANDLE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING);

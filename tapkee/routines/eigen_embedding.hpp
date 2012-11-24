@@ -22,6 +22,17 @@
 #include "matrix_operations.hpp"
 #include "../tapkee_defines.hpp"
 
+std::string get_eigen_embedding_name(TAPKEE_EIGEN_EMBEDDING_METHOD m)
+{
+	switch (m)
+	{
+		case ARPACK: return "ARPACK library";
+		case RANDOMIZED: return "randomized (redsvd)";
+		case EIGEN_DENSE_SELFADJOINT_SOLVER: return "dense (Eigen3)";
+		default: return "Unknown eigendecomposition method (yes it is a bug)";
+	}
+}
+
 namespace eigen_embedding_internal
 {
 
@@ -48,7 +59,8 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 #ifdef TAPKEE_NO_ARPACK
 		return EmbeddingResult();
 #else
-		ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixTypeOperation> arpack(wm,target_dimension+skip,MatrixTypeOperation::ARPACK_CODE);
+		ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixTypeOperation> 
+			arpack(wm,target_dimension+skip,MatrixTypeOperation::ARPACK_CODE);
 
 		if (arpack.info() == Eigen::Success)
 		{
@@ -189,6 +201,8 @@ template <class MatrixType, class MatrixTypeOperation>
 EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const MatrixType& m, 
                                 unsigned int target_dimension, unsigned int skip)
 {
+	LoggingSingleton::instance().message_info("Using " + get_eigen_embedding_name(method) +
+			" eigendecomposition.");
 	switch (method)
 	{
 		case ARPACK: 

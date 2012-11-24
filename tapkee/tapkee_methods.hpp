@@ -22,6 +22,29 @@
 #include "routines/spe.hpp"
 #include "neighbors/neighbors.hpp"
 
+std::string get_method_name(TAPKEE_METHOD m)
+{
+	switch (m)
+	{
+		case KERNEL_LOCALLY_LINEAR_EMBEDDING: return "Locally Linear Embedding";
+		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT: return "Local Tangent Space Alignment";
+		case DIFFUSION_MAP: return "Diffusion Map";
+		case MULTIDIMENSIONAL_SCALING: return "Classic MultiDimensional Scaling";
+		case LANDMARK_MULTIDIMENSIONAL_SCALING: return "Landmark MultiDimensional Scaling";
+		case ISOMAP: return "Isomap";
+		case LANDMARK_ISOMAP: return "Landmark Isomap";
+		case NEIGHBORHOOD_PRESERVING_EMBEDDING: return "Neighborhood Preserving Embedding";
+		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT: return "Linear Local Tangent Space Alignment";
+		case HESSIAN_LOCALLY_LINEAR_EMBEDDING: return "Hessian Locally Linear Embedding";
+		case LAPLACIAN_EIGENMAPS: return "Laplacian Eigenmaps";
+		case LOCALITY_PRESERVING_PROJECTIONS: return "Locality Preserving Embedding";
+		case PCA: return "Principal Component Analysis";
+		case KERNEL_PCA: return "Kernel Principal Component Analysis";
+		case STOCHASTIC_PROXIMITY_EMBEDDING: return "Stochastic Proximity Embedding";
+		default: return "Method name unknown (yes this is a bug)";
+	}
+}
+
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback, int IMPLEMENTATION>
 struct embedding_impl
 {
