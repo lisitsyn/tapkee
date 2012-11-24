@@ -24,24 +24,58 @@ using std::string;
 		void disable_##LEVEL() { LEVEL##_enabled = false; };	\
 		void message_##LEVEL(const string& msg)					\
 		{														\
-			if (LEVEL##_enabled && os_ && os_->good())			\
+			if (LEVEL##_enabled)								\
+				impl->message_##LEVEL(msg);						\
+		}
+#define LEVEL_HANDLERS_DECLARATION(LEVEL) \
+		virtual void message_##LEVEL(const string& msg) = 0;
+#define LEVEL_HANDLERS_DEFAULT_IMPL(LEVEL) \
+		virtual void message_##LEVEL(const string& msg)			\
+		{														\
+			if (os_ && os_->good())								\
 				(*os_) << "["#LEVEL"] " << msg << "\n";			\
 		}
+
+class LoggerImplementation
+{
+public:
+	virtual ~LoggerImplementation() {}
+	LEVEL_HANDLERS_DECLARATION(info);
+	LEVEL_HANDLERS_DECLARATION(warning);
+	LEVEL_HANDLERS_DECLARATION(error);
+	LEVEL_HANDLERS_DECLARATION(benchmark);
+};
+
+class DefaultLoggerImplementation : public LoggerImplementation
+{
+public:
+	DefaultLoggerImplementation() : os_(&cout) {}
+	virtual ~DefaultLoggerImplementation() {}
+	ostream* os_;
+	LEVEL_HANDLERS_DEFAULT_IMPL(info);
+	LEVEL_HANDLERS_DEFAULT_IMPL(warning);
+	LEVEL_HANDLERS_DEFAULT_IMPL(error);
+	LEVEL_HANDLERS_DEFAULT_IMPL(benchmark)
+};
 
 class LoggingSingleton
 {
 	private:
-		LoggingSingleton() : os_(&cout),
+		LoggingSingleton() : impl(new DefaultLoggerImplementation),
 			LEVEL_ENABLED_FIELD_INITIALIZER(info,false),
 			LEVEL_ENABLED_FIELD_INITIALIZER(warning,true),
 			LEVEL_ENABLED_FIELD_INITIALIZER(error,true),
 			LEVEL_ENABLED_FIELD_INITIALIZER(benchmark,false)
 		{
 		};
+		~LoggingSingleton()
+		{
+			delete impl;
+		}
 		LoggingSingleton(const LoggingSingleton& ls);
 		void operator=(const LoggingSingleton& ls);
 
-		ostream* os_;
+		LoggerImplementation* impl;
 
 		LEVEL_ENABLED_FIELD(info);
 		LEVEL_ENABLED_FIELD(warning);
