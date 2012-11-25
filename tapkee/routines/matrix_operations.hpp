@@ -85,4 +85,68 @@ struct DenseImplicitSquareMatrixOperation
 };
 const char* DenseImplicitSquareMatrixOperation::ARPACK_CODE = "LM";
 
+#ifdef TAPKEE_GPU
+struct GPUDenseImplicitSquareMatrixOperation
+{
+	GPUDenseImplicitSquareMatrixOperation(const DenseMatrix& matrix)
+	{
+		timed_context c("Storing matrices");
+		mat = viennacl::matrix<DefaultScalarType>(matrix.cols(),matrix.rows());
+		vec = viennacl::matrix<DefaultScalarType>(matrix.cols(),1);
+		res = viennacl::matrix<DefaultScalarType>(matrix.cols(),1);
+		viennacl::copy(matrix,mat);
+	}
+	//! Computes matrix product of the matrix and provided right-hand 
+	//! side matrix twice
+	//! 
+	//! @param rhs right-hand side matrix
+	//!
+	inline DenseMatrix operator()(const DenseMatrix& rhs)
+	{
+		timed_context c("Computing product");
+		viennacl::copy(rhs,vec);
+		res = viennacl::linalg::prod(mat, vec);
+		vec = res;
+		res = viennacl::linalg::prod(mat, vec);
+		DenseMatrix result(rhs);
+		viennacl::copy(res,result);
+		return result;
+	}
+	viennacl::matrix<DefaultScalarType> mat;
+	viennacl::matrix<DefaultScalarType> vec;
+	viennacl::matrix<DefaultScalarType> res;
+	static const char* ARPACK_CODE;
+};
+const char* GPUDenseImplicitSquareMatrixOperation::ARPACK_CODE = "LM";
+
+struct GPUDenseMatrixOperation
+{
+	GPUDenseMatrixOperation(const DenseMatrix& matrix)
+	{
+		mat = viennacl::matrix<DefaultScalarType>(matrix.cols(),matrix.rows());
+		vec = viennacl::matrix<DefaultScalarType>(matrix.cols(),1);
+		res = viennacl::matrix<DefaultScalarType>(matrix.cols(),1);
+		viennacl::copy(matrix,mat);
+	}
+	//! Computes matrix product of the matrix and provided right-hand 
+	//! side matrix twice
+	//! 
+	//! @param rhs right-hand side matrix
+	//!
+	inline DenseMatrix operator()(const DenseMatrix& rhs)
+	{
+		viennacl::copy(rhs,vec);
+		res = viennacl::linalg::prod(mat, vec);
+		DenseMatrix result(rhs);
+		viennacl::copy(res,result);
+		return result;
+	}
+	viennacl::matrix<DefaultScalarType> mat;
+	viennacl::matrix<DefaultScalarType> vec;
+	viennacl::matrix<DefaultScalarType> res;
+	static const char* ARPACK_CODE;
+};
+const char* GPUDenseMatrixOperation::ARPACK_CODE = "LM";
+#endif
+
 #endif

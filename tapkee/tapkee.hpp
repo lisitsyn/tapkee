@@ -91,7 +91,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 	}
 	catch (const std::bad_alloc& ba)
 	{
-		LoggingSingleton::instance().message_error("Not enough memory available");
+		LoggingSingleton::instance().message_error("Not enough memory available.");
 	}
 	catch (const std::exception& ex)
 	{

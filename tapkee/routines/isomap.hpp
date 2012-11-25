@@ -2,7 +2,6 @@
 #define TAPKEE_ISOMAP_H_
 
 #include "../utils/fibonacci_heap.hpp"
-
 #include <limits>
 using std::numeric_limits;
 

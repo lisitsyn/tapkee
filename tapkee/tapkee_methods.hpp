@@ -119,7 +119,13 @@ CONCRETE_IMPLEMENTATION(DIFFUSION_MAP)
 		timed_context context("Embedding with diffusion map");
 		DenseSymmetricMatrix diffusion_matrix =
 			compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
-		return eigen_embedding<DenseSymmetricMatrix, DenseImplicitSquareMatrixOperation>(eigen_method,
+		return eigen_embedding<DenseSymmetricMatrix,
+				#ifdef TAPKEE_GPU
+					GPUDenseImplicitSquareMatrixOperation
+				#else 
+					DenseImplicitSquareMatrixOperation 
+				#endif
+				>(eigen_method,
 			diffusion_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 	}
 };
@@ -136,7 +142,13 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 		timed_context context("Embeding with MDS");
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
 		distance_matrix.centerMatrix();
-		EmbeddingResult result = eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
+		EmbeddingResult result = eigen_embedding<DenseSymmetricMatrix,
+				#ifdef TAPKEE_GPU
+						GPUDenseMatrixOperation
+				#else
+						DenseMatrixOperation
+				#endif
+				>(eigen_method,
 			distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 		
 		for (unsigned int i=0; i<target_dimension; i++)

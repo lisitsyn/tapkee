@@ -1,4 +1,4 @@
-CXX=g++
+CXX=clang++
 CFLAGS=-fPIC -Wall -Wextra
 SOURCES=$(wildcard src/**/*.cpp)
 OBJECTS=$(SOURCES:%.cpp=%.o)
@@ -6,7 +6,10 @@ OBJECTS=$(SOURCES:%.cpp=%.o)
 all: default
 
 default: 
-	$(CXX) $(CFLAGS) -fopenmp -O3 -o tapkee_app src/main.cpp $(SOURCES) -I./tapkee -larpack $(LDFLAGS)
+	$(CXX) $(CFLAGS) -fopenmp -O3 -o tapkee_app src/main.cpp $(SOURCES) -isystem /usr/include/eigen3 -I./tapkee -larpack $(LDFLAGS)
+
+gpu:
+	$(CXX) $(CFLAGS) -DTAPKEE_GPU -fopenmp -O3 -o tapkee_app src/main.cpp $(SOURCES) -isystem /usr/include/eigen3 -I./tapkee -larpack -lOpenCL $(LDFLAGS)
 
 noarpack:
 	$(CXX) $(CFLAGS) -O3 -o tapkee_app src/main.cpp $(SOURCES) -DTAPKEE_NO_ARPACK -fopenmp $(LDFLAGS)

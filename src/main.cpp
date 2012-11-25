@@ -26,9 +26,8 @@ using namespace ez;
 using namespace Eigen;
 using namespace std;
 
-DenseMatrix read_data(const string& filename)
+DenseMatrix read_data(ifstream& ifs)
 {
-	ifstream ifs(filename.c_str());
 	string str;
 	vector< vector<DefaultScalarType> > input_data;
 	while (!ifs.eof())
@@ -105,9 +104,7 @@ TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 	if (!strcmp(str,"dense"))
 		return EIGEN_DENSE_SELFADJOINT_SOLVER;
 
-	printf("Method %s is not supported (yet?)\n",str);
-	exit(EXIT_FAILURE);
-	return RANDOMIZED;
+	return UNKNOWN_EIGEN_METHOD;
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
@@ -127,13 +124,15 @@ DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterato
 int main(int argc, const char** argv)
 {
 	ezOptionParser opt;
-	opt.footer = "\n";
+	opt.footer = "Copyright (C) 2012 Sergey Lisitsyn, Fernando Iglesias\n";
 	opt.overview = "Tapkee library sample application for dense matrix embedding.";
 	opt.example = "Run kernel locally linear embedding with k=10 with arpack "
-                  "eigensolver on some dataset \n\n"
-	              "tapkee --method klle -em arpack -k 10";
-	opt.syntax = "tapkee_app [options]";
+                  "eigensolver on data from input.dat saving embedding to output.dat \n\n"
+	              "tapkee -i input.dat -o output.dat --method klle --eigen_method arpack -k 10\n";
+	opt.syntax = "tapkee_app [options]\n";
 
+	opt.add("",0,1,0,"Input file","-i","--input-file");
+	opt.add("",0,1,0,"Output file","-o","--output-file");
 	opt.add("",0,0,0,"Display help","-h","--help");
 	opt.add("",0,0,0,"Output benchmark information","--benchmark");
 	opt.add("",0,0,0,"Output more information","--verbose");
@@ -254,10 +253,9 @@ int main(int argc, const char** argv)
 	else
 		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
 
+
 	{
 		// keep it static yet
-		parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
-		parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(1000.0);
 		parameters[SPE_TOLERANCE] = static_cast<DefaultScalarType>(1e-5);
 		parameters[SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
 		parameters[LANDMARK_RATIO] = static_cast<DefaultScalarType>(0.2);
@@ -265,7 +263,28 @@ int main(int argc, const char** argv)
 	}
 
 	// Load data
-	DenseMatrix input_data = read_data("input.dat");
+	string input_filename;
+	string output_filename;
+	if (!opt.isSet("--input-file"))
+	{
+		LoggingSingleton::instance().message_error("No input file specified");
+		return 0;
+	}
+	else
+		opt.get("--input-file")->getString(input_filename);
+
+	if (!opt.isSet("--output-file"))
+	{
+		LoggingSingleton::instance().message_error("No output file specified");
+		return 0;
+	}
+	else
+		opt.get("--output-file")->getString(output_filename);
+
+	ifstream ifs(input_filename.c_str());
+	ofstream ofs(output_filename.c_str());
+
+	DenseMatrix input_data = read_data(ifs);
 	parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
 	
 	std::stringstream ss;
@@ -296,7 +315,6 @@ int main(int argc, const char** argv)
 	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 #endif
 	// Save obtained data
-	ofstream ofs("output.dat");
 	ofs << embedding;
 	ofs.close();
 	return 0;

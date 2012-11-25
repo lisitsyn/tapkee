@@ -26,10 +26,17 @@
 #define EIGEN_RUNTIME_NO_MALLOC
 #define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
 #define EIGEN_DONT_PARALLELIZE
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/SparseCholesky>
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+#include <Eigen/SparseCholesky>
 //#include <eigen3/Eigen/SuperLUSupport>
+
+#ifdef TAPKEE_GPU
+	#define VIENNACL_HAVE_EIGEN 1
+	#include <viennacl/vector.hpp>
+	#include <viennacl/matrix.hpp>
+	#include <viennacl/linalg/prod.hpp>
+#endif
 
 #ifdef EIGEN_RUNTIME_NO_MALLOC
 	#define RESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(false);
@@ -44,7 +51,7 @@
 	typedef TAPKEE_CUSTOM_INTERNAL_NUMTYPE DefaultScalarType;
 #else
 	//! default scalar value (currently only double is supported and tested, float is unstable)
-	typedef double DefaultScalarType;
+	typedef float DefaultScalarType;
 #endif
 	//! dense vector type 
 	typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
