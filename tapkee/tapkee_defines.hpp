@@ -51,7 +51,7 @@
 	typedef TAPKEE_CUSTOM_INTERNAL_NUMTYPE DefaultScalarType;
 #else
 	//! default scalar value (currently only double is supported and tested, float is unstable)
-	typedef float DefaultScalarType;
+	typedef double DefaultScalarType;
 #endif
 	//! dense vector type 
 	typedef Eigen::Matrix<DefaultScalarType,Eigen::Dynamic,1> DenseVector;
