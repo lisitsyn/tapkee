@@ -57,6 +57,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
 	if (!strcmp(str,"klle"))
 		return KERNEL_LOCALLY_LINEAR_EMBEDDING;
+	if (!strcmp(str,"hlle"))
+		return HESSIAN_LOCALLY_LINEAR_EMBEDDING;
 	if (!strcmp(str,"mds"))
 		return MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"lmds"))
