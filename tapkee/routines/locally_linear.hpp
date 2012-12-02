@@ -10,8 +10,8 @@
 #ifndef TAPKEE_LOCALLY_LINEAR_H_
 #define TAPKEE_LOCALLY_LINEAR_H_
 
-#include "eigen_embedding.hpp"
-#include "../tapkee_defines.hpp"
+#include <routines/eigen_embedding.hpp>
+#include <tapkee_defines.hpp>
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
@@ -151,10 +151,9 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 
 	RandomAccessIterator iter_begin = begin, iter_end = end;
 	DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
-	DenseVector rhs = DenseVector::Ones(k);
 
 	unsigned int dp = target_dimension*(target_dimension+1)/2;
-	DenseMatrix Yi = DenseMatrix::Ones(k,1+target_dimension+dp);
+	DenseMatrix Yi(k,1+target_dimension+dp);
 
 	RandomAccessIterator iter;
 	for (iter=iter_begin; iter!=iter_end; ++iter)
@@ -171,9 +170,12 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 			}
 		}
 		
+		gram_matrix.centerMatrix();
+		
 		DefaultDenseSelfAdjointEigenSolver sae_solver;
 		sae_solver.compute(gram_matrix);
 
+		Yi.col(0).setConstant(1.0);
 		Yi.block(0,1,k,target_dimension) = sae_solver.eigenvectors().rightCols(target_dimension);
 
 		unsigned int ct = 0;
