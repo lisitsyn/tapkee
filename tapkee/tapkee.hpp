@@ -86,6 +86,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 			HANDLE_IMPLEMENTATION(PCA);
 			HANDLE_IMPLEMENTATION(KERNEL_PCA);
 			HANDLE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING);
+			HANDLE_IMPLEMENTATION(PASS_THRU);
 			default: break;
 		}
 	}

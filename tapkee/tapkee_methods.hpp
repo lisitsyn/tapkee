@@ -41,6 +41,7 @@ std::string get_method_name(TAPKEE_METHOD m)
 		case PCA: return "Principal Component Analysis";
 		case KERNEL_PCA: return "Kernel Principal Component Analysis";
 		case STOCHASTIC_PROXIMITY_EMBEDDING: return "Stochastic Proximity Embedding";
+		case PASS_THRU: return "passing through";
 		default: return "Method name unknown (yes this is a bug)";
 	}
 }
@@ -427,6 +428,25 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 		timed_context context("Embedding with SPE");
 		return spe_embedding(begin,end,distance_callback,neighbors,
 				target_dimension,global_strategy,tolerance,nupdates);
+	}
+};
+
+CONCRETE_IMPLEMENTATION(PASS_THRU)
+{
+	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
+                          KernelCallback, DistanceCallback, FeatureVectorCallback feature_callback, 
+                          ParametersMap options)
+	{
+		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
+
+		DenseMatrix feature_matrix(dimension,(end-begin));
+		DenseVector feature_vector(dimension);
+		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+		{
+			feature_callback(*iter,feature_vector);
+			feature_matrix.col(iter-begin).array() = feature_vector;
+		}
+		return EmbeddingResult(feature_matrix.transpose(),DenseVector());
 	}
 };
 

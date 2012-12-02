@@ -83,6 +83,8 @@ TAPKEE_METHOD parse_reduction_method(const char* str)
 		return STOCHASTIC_PROXIMITY_EMBEDDING;
 	if (!strcmp(str,"lisomap"))
 		return LANDMARK_ISOMAP;
+	if (!strcmp(str,"passthru"))
+		return PASS_THRU;
 
 	return UNKNOWN_METHOD;
 }
