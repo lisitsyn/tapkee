@@ -179,11 +179,8 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 		unsigned int ct = 0;
 		for (unsigned int j=0; j<target_dimension; ++j)
 		{
-			std::cout << " j = " << j << std::endl;
 			for (unsigned int p=0; p<target_dimension-j; ++p)
 			{
-				std::cout << "d: " << ct+p+1+target_dimension << "," << j+1 << "," << j+p+1 << std::endl; 
-				std::cout << "Yi cols " << Yi.cols() << std::endl;
 				Yi.col(ct+p+1+target_dimension).array() = Yi.col(j+1).cwiseProduct(Yi.col(j+p+1));
 			}
 			ct += ct + target_dimension - j;
