@@ -10,8 +10,6 @@
 #ifndef TAPKEE_PCA_H_
 #define TAPKEE_PCA_H_
 
-#include "../utils/time.hpp"
-
 template <class RandomAccessIterator, class FeatureVectorCallback>
 EmbeddingResult project(const ProjectionResult& projection_result, RandomAccessIterator begin,
                         RandomAccessIterator end, FeatureVectorCallback callback, unsigned int dimension)

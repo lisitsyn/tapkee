@@ -1,7 +1,7 @@
 #ifndef COVERTREE_H_
 #define COVERTREE_H_
 
-#include "covertree_point.hpp"
+#include <neighbors/covertree_point.hpp>
 #include <cmath>
 #include <limits>
 #include <stdio.h>

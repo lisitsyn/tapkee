@@ -12,7 +12,7 @@
 #include <ctime>
 #include <string>
 #include <sstream>
-#include "logging.hpp"
+#include <utils/logging.hpp>
 
 using std::string;
 using std::stringstream;
@@ -27,7 +27,7 @@ struct timed_context
 	~timed_context()
 	{
 		stringstream msg_stream;
-		msg_stream << operation_name << " took " << double(clock()-start_clock)/CLOCKS_PER_SEC << " seconds"; 
+		msg_stream << operation_name << " took " << double(clock()-start_clock)/CLOCKS_PER_SEC << " seconds."; 
 		LoggingSingleton::instance().message_benchmark(msg_stream.str());
 	}
 };

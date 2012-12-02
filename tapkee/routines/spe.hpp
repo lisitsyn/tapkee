@@ -14,8 +14,6 @@
 #include <algorithm>
 #include <ctime>
 
-#include "../utils/time.hpp"
-
 template <class RandomAccessIterator, class PairwiseCallback>
 EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator end,
 		PairwiseCallback callback, const Neighbors& neighbors,

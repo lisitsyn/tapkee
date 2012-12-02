@@ -17,10 +17,10 @@
 #define TAPKEE_EIGEN_EMBEDDING_H_
 
 #ifndef TAPKEE_NO_ARPACK
-	#include "../utils/arpack_wrapper.hpp"
+	#include <utils/arpack_wrapper.hpp>
 #endif
-#include "matrix_operations.hpp"
-#include "../tapkee_defines.hpp"
+#include <routines/matrix_operations.hpp>
+#include <tapkee_defines.hpp>
 
 std::string get_eigen_embedding_name(TAPKEE_EIGEN_EMBEDDING_METHOD m)
 {

@@ -10,8 +10,8 @@
 #ifndef TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
 #define TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
 
-#include "../utils/arpack_wrapper.hpp"
-#include "matrix_operations.hpp"
+#include <utils/arpack_wrapper.hpp>
+#include <routines/matrix_operations.hpp>
 
 namespace generalized_eigen_embedding_internal
 {

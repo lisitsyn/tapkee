@@ -77,7 +77,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		SparseWeightMatrix weight_matrix =
-			klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
+			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
 	}
@@ -99,7 +99,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		SparseWeightMatrix weight_matrix = 
-			kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
+			tangent_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
 	}
@@ -257,7 +257,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		SparseWeightMatrix weight_matrix = 
-			klle_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
+			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
 		DenseSymmetricMatrixPair eig_matrices =
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
@@ -284,7 +284,7 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		SparseWeightMatrix weight_matrix =
-			hlle_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
+			hessian_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE);
 	}
@@ -395,7 +395,7 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
 		SparseWeightMatrix weight_matrix = 
-			kltsa_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
+			tangent_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
 		DenseSymmetricMatrixPair eig_matrices =
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);

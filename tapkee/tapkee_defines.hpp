@@ -13,9 +13,9 @@
 #ifndef TAPKEE_DEFINES_H_
 #define TAPKEE_DEFINES_H_
 
-#include "utils/any.hpp"
-#include "utils/time.hpp"
-#include "utils/logging.hpp"
+#include <utils/any.hpp>
+#include <utils/time.hpp>
+#include <utils/logging.hpp>
 #include <map>
 #include <vector>
 #include <utility>
@@ -27,12 +27,10 @@
 		#define EIGEN_NO_DEBUG
 	#endif
 	#define EIGEN_RUNTIME_NO_MALLOC
-	#define EIGEN_MATRIXBASE_PLUGIN "utils/matrix.hpp"
-	#define EIGEN_DONT_PARALLELIZE
+	#define EIGEN_MATRIXBASE_PLUGIN <utils/matrix.hpp>
 	#include <Eigen/Dense>
 	#include <Eigen/Sparse>
 	#include <Eigen/SparseCholesky>
-	//#include <eigen3/Eigen/SuperLUSupport>
 #endif
 
 #ifdef TAPKEE_GPU
@@ -166,7 +164,7 @@ typedef INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricM
 #undef INTERNAL_VECTOR
 #undef INTERNAL_PAIR
 
-#include "callbacks/traits.hpp"
+#include <callbacks/traits.hpp>
 
 struct ProjectingImplementation
 {
