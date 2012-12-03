@@ -176,14 +176,14 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 		sae_solver.compute(gram_matrix);
 
 		Yi.col(0).setConstant(1.0);
-		Yi.block(0,1,k,target_dimension) = sae_solver.eigenvectors().rightCols(target_dimension);
+		Yi.block(0,1,k,target_dimension).noalias() = sae_solver.eigenvectors().rightCols(target_dimension);
 
 		unsigned int ct = 0;
 		for (unsigned int j=0; j<target_dimension; ++j)
 		{
 			for (unsigned int p=0; p<target_dimension-j; ++p)
 			{
-				Yi.col(ct+p+1+target_dimension).array() = Yi.col(j+1).cwiseProduct(Yi.col(j+p+1));
+				Yi.col(ct+p+1+target_dimension).noalias() = Yi.col(j+1).cwiseProduct(Yi.col(j+p+1));
 			}
 			ct += ct + target_dimension - j;
 		}
