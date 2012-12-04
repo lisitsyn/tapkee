@@ -25,9 +25,6 @@ struct pimpl_kernel_callback
 	}
 	Implementation* impl;
 };
-// That's mandatory to specify that kernel_callback
-// is a kernel (and it is good to know that it is linear).
-TAPKEE_CALLBACK_IS_KERNEL(pimpl_kernel_callback);
 
 // Distance function callback that provides
 // dissimilarity function values on vectors
@@ -43,8 +40,5 @@ struct pimpl_distance_callback
 	}
 	Implementation* impl;
 };
-// That's mandatory to specify that distance_callback
-// is a distance
-TAPKEE_CALLBACK_IS_DISTANCE(pimpl_distance_callback);
 
 #endif
