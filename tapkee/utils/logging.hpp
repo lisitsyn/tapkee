@@ -36,6 +36,9 @@ using std::string;
 				(*os_) << "["#LEVEL"] " << msg << "\n";			\
 		}
 
+namespace tapkee
+{
+
 class LoggerImplementation
 {
 public:
@@ -104,5 +107,6 @@ class LoggingSingleton
 #undef LEVEL_HANDLERS_DEFAULT_IMPL
 #undef LEVEL_ENABLED_FIELD
 #undef LEVEL_ENABLED_FIELD_INITIALIZER
+}
 
 #endif

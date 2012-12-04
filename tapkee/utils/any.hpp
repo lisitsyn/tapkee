@@ -13,6 +13,9 @@
 
 #include <stdexcept>
 
+namespace tapkee
+{
+
 namespace anyimpl
 {
 	struct bad_any_cast 
@@ -216,4 +219,6 @@ public:
         return policy == x.policy;
     }
 };
+
+}
 #endif

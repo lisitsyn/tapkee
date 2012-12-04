@@ -170,13 +170,13 @@ int main(int argc, const char** argv)
 
 	if (opt.isSet("--verbose"))
 	{
-		LoggingSingleton::instance().enable_info();
+		tapkee::LoggingSingleton::instance().enable_info();
 	}
 
 	if (opt.isSet("--benchmark"))
 	{
-		LoggingSingleton::instance().enable_benchmark();
-		LoggingSingleton::instance().message_info("Benchmarking enabled");
+		tapkee::LoggingSingleton::instance().enable_benchmark();
+		tapkee::LoggingSingleton::instance().message_info("Benchmarking enabled");
 	}
 	
 	tapkee::ParametersMap parameters;
@@ -187,7 +187,7 @@ int main(int argc, const char** argv)
 		tapkee::TAPKEE_METHOD tapkee_method = parse_reduction_method(method.c_str());
 		if (tapkee_method==tapkee::UNKNOWN_METHOD)
 		{
-			LoggingSingleton::instance().message_error(string("Unknown method ") + method);
+			tapkee::LoggingSingleton::instance().message_error(string("Unknown method ") + method);
 			return 0;
 		}
 		else
@@ -199,7 +199,7 @@ int main(int argc, const char** argv)
 		tapkee::TAPKEE_NEIGHBORS_METHOD tapkee_neighbors_method = parse_neighbors_method(method.c_str());
 		if (tapkee_neighbors_method==tapkee::UNKNOWN_NEIGHBORS_METHOD)
 		{
-			LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
+			tapkee::LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
 			return 0;
 		}
 		else
@@ -211,7 +211,7 @@ int main(int argc, const char** argv)
 		tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD tapkee_eigen_method = parse_eigen_method(method.c_str());
 		if (tapkee_eigen_method==tapkee::UNKNOWN_EIGEN_METHOD)
 		{
-			LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
+			tapkee::LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
 			return 0;
 		}
 		else
@@ -222,7 +222,7 @@ int main(int argc, const char** argv)
 		opt.get("--target_dimension")->getInt(target_dimension);
 		if (target_dimension < 0)
 		{
-			LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
+			tapkee::LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
 			                                           "Please visit other universe");
 			return 0;
 		}
@@ -233,7 +233,7 @@ int main(int argc, const char** argv)
 		int k = 1;
 		opt.get("--n_neighbors")->getInt(k);
 		if (k < 3)
-			LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
+			tapkee::LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
 		else
 			parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(k);
 	}
@@ -241,13 +241,13 @@ int main(int argc, const char** argv)
 		double width = 1.0;
 		opt.get("--width")->getDouble(width);
 		if (width < 0.0)
-			LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
+			tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
 		else
 			parameters[tapkee::GAUSSIAN_KERNEL_WIDTH] = static_cast<tapkee::DefaultScalarType>(width);
 		int timesteps = 1;
 		opt.get("--timesteps")->getInt(timesteps);
 		if (timesteps < 0)
-			LoggingSingleton::instance().message_error("Number of timesteps is negative.");
+			tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
 		else
 			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
 	}
@@ -271,7 +271,7 @@ int main(int argc, const char** argv)
 	string output_filename;
 	if (!opt.isSet("--input-file"))
 	{
-		LoggingSingleton::instance().message_error("No input file specified");
+		tapkee::LoggingSingleton::instance().message_error("No input file specified");
 		return 0;
 	}
 	else
@@ -279,7 +279,7 @@ int main(int argc, const char** argv)
 
 	if (!opt.isSet("--output-file"))
 	{
-		LoggingSingleton::instance().message_error("No output file specified");
+		tapkee::LoggingSingleton::instance().message_error("No output file specified");
 		return 0;
 	}
 	else
@@ -293,7 +293,7 @@ int main(int argc, const char** argv)
 	
 	std::stringstream ss;
 	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
-	LoggingSingleton::instance().message_info(ss.str());
+	tapkee::LoggingSingleton::instance().message_info(ss.str());
 	
 	vector<int> data_indices;
 	for (int i=0; i<input_data.cols(); i++)

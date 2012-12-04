@@ -17,6 +17,9 @@
 using std::string;
 using std::stringstream;
 
+namespace tapkee
+{
+
 struct timed_context
 {
 	clock_t start_clock;
@@ -31,4 +34,6 @@ struct timed_context
 		LoggingSingleton::instance().message_benchmark(msg_stream.str());
 	}
 };
+
+}
 #endif
