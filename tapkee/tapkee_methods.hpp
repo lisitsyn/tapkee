@@ -11,6 +11,7 @@
 #define TAPKEE_METHODS_H_
 
 #include "tapkee_defines.hpp"
+#include "utils/matrix.hpp"
 #include "routines/locally_linear.hpp"
 #include "routines/eigen_embedding.hpp"
 #include "routines/generalized_eigen_embedding.hpp"
@@ -21,6 +22,11 @@
 #include "routines/pca.hpp"
 #include "routines/spe.hpp"
 #include "neighbors/neighbors.hpp"
+
+namespace tapkee
+{
+namespace tapkee_internal
+{
 
 std::string get_method_name(TAPKEE_METHOD m)
 {
@@ -142,7 +148,7 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 
 		timed_context context("Embeding with MDS");
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
-		distance_matrix.centerMatrix();
+		centerMatrix(distance_matrix);
 		EmbeddingResult result = eigen_embedding<DenseSymmetricMatrix,
 				#ifdef TAPKEE_GPU
 						GPUDenseMatrixOperation
@@ -174,7 +180,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 		DenseSymmetricMatrix distance_matrix = 
 			compute_distance_matrix(begin,landmarks,distance_callback);
 		DenseVector landmark_distances_squared = distance_matrix.colwise().mean();
-		distance_matrix.centerMatrix();
+		centerMatrix(distance_matrix);
 		EmbeddingResult landmarks_embedding = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
 					distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
@@ -450,6 +456,8 @@ CONCRETE_IMPLEMENTATION(PASS_THRU)
 	}
 };
 
+}
+}
 #undef CONCRETE_IMPLEMENTATION
 #undef OBTAIN_PARAMETER
 #undef SKIP_ONE_EIGENVALUE

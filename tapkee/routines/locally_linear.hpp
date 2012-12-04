@@ -13,6 +13,11 @@
 #include <routines/eigen_embedding.hpp>
 #include <tapkee_defines.hpp>
 
+namespace tapkee
+{
+namespace tapkee_internal
+{
+
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
                                          const Neighbors& neighbors, PairwiseCallback callback, 
@@ -49,7 +54,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 			}
 		}
 		
-		gram_matrix.centerMatrix();
+		centerMatrix(gram_matrix);
 
 		UNRESTRICT_ALLOC;
 		if (partial_eigendecomposer)
@@ -170,7 +175,7 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 			}
 		}
 		
-		gram_matrix.centerMatrix();
+		centerMatrix(gram_matrix);
 		
 		DefaultDenseSelfAdjointEigenSolver sae_solver;
 		sae_solver.compute(gram_matrix);
@@ -300,6 +305,9 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 	UNRESTRICT_ALLOC;
 
 	return DenseSymmetricMatrixPair(lhs,rhs);
+}
+
+}
 }
 
 #endif

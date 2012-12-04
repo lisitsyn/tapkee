@@ -13,6 +13,9 @@
 #include <tapkee_defines.hpp>
 #include <tapkee_methods.hpp>
 
+namespace tapkee
+{
+
 //! Main entry-point of the library. Constructs dense embedding with specified dimension
 //! using provided data and callbacks.
 //!
@@ -60,7 +63,8 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 		throw std::runtime_error("Wrong method specified.");
 	}
 
-#define CALL_IMPLEMENTATION(X) embedding_impl<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>().embed(\
+#define CALL_IMPLEMENTATION(X) \
+		tapkee_internal::embedding_impl<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>().embed(\
 		begin,end,kernel_callback,distance_callback,feature_vector_callback,options)
 #define HANDLE_IMPLEMENTATION(X) \
 	case X: embedding_result = CALL_IMPLEMENTATION(X); break
@@ -68,7 +72,7 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 
 	try 
 	{
-		LoggingSingleton::instance().message_info("Using " + get_method_name(method) + " method.");
+		LoggingSingleton::instance().message_info("Using " + tapkee_internal::get_method_name(method) + " method.");
 		switch (method)
 		{
 			HANDLE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING);
@@ -104,6 +108,8 @@ DenseMatrix embed(RandomAccessIterator begin, RandomAccessIterator end,
 #undef NO_IMPLEMENTATION_YET
 
 	return embedding_result.first;
-}
+};
+
+} // namespace tapkee
 
 #endif

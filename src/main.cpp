@@ -26,23 +26,23 @@ using namespace ez;
 using namespace Eigen;
 using namespace std;
 
-DenseMatrix read_data(ifstream& ifs)
+tapkee::DenseMatrix read_data(ifstream& ifs)
 {
 	string str;
-	vector< vector<DefaultScalarType> > input_data;
+	vector< vector<tapkee::DefaultScalarType> > input_data;
 	while (!ifs.eof())
 	{
 		getline(ifs,str);
 		if (str.size())
 		{
 			stringstream strstr(str);
-			istream_iterator<DefaultScalarType> it(strstr);
-			istream_iterator<DefaultScalarType> end;
-			vector<DefaultScalarType> row(it, end);
+			istream_iterator<tapkee::DefaultScalarType> it(strstr);
+			istream_iterator<tapkee::DefaultScalarType> end;
+			vector<tapkee::DefaultScalarType> row(it, end);
 			input_data.push_back(row);
 		}
 	}
-	DenseMatrix fm(input_data[0].size(),input_data.size());
+	tapkee::DenseMatrix fm(input_data[0].size(),input_data.size());
 	for (int i=0; i<fm.rows(); i++)
 	{
 		for (int j=0; j<fm.cols(); j++)
@@ -51,70 +51,70 @@ DenseMatrix read_data(ifstream& ifs)
 	return fm;
 }
 
-TAPKEE_METHOD parse_reduction_method(const char* str)
+tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 {
 	if (!strcmp(str,"kltsa"))
-		return KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
+		return tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
 	if (!strcmp(str,"klle"))
-		return KERNEL_LOCALLY_LINEAR_EMBEDDING;
+		return tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING;
 	if (!strcmp(str,"hlle"))
-		return HESSIAN_LOCALLY_LINEAR_EMBEDDING;
+		return tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING;
 	if (!strcmp(str,"mds"))
-		return MULTIDIMENSIONAL_SCALING;
+		return tapkee::MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"lmds"))
-		return LANDMARK_MULTIDIMENSIONAL_SCALING;
+		return tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"isomap"))
-		return ISOMAP;
+		return tapkee::ISOMAP;
 	if (!strcmp(str,"diffusion_map"))
-		return DIFFUSION_MAP;
+		return tapkee::DIFFUSION_MAP;
 	if (!strcmp(str,"kpca"))
-		return KERNEL_PCA;
+		return tapkee::KERNEL_PCA;
 	if (!strcmp(str,"pca"))
-		return PCA;
+		return tapkee::PCA;
 	if (!strcmp(str,"laplacian_eigenmaps"))
-		return LAPLACIAN_EIGENMAPS;
+		return tapkee::LAPLACIAN_EIGENMAPS;
 	if (!strcmp(str,"lpp"))
-		return LOCALITY_PRESERVING_PROJECTIONS;
+		return tapkee::LOCALITY_PRESERVING_PROJECTIONS;
 	if (!strcmp(str,"npe"))
-		return NEIGHBORHOOD_PRESERVING_EMBEDDING;
+		return tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING;
 	if (!strcmp(str,"lltsa"))
-		return LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
+		return tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
 	if (!strcmp(str,"spe"))
-		return STOCHASTIC_PROXIMITY_EMBEDDING;
+		return tapkee::STOCHASTIC_PROXIMITY_EMBEDDING;
 	if (!strcmp(str,"lisomap"))
-		return LANDMARK_ISOMAP;
+		return tapkee::LANDMARK_ISOMAP;
 	if (!strcmp(str,"passthru"))
-		return PASS_THRU;
+		return tapkee::PASS_THRU;
 
-	return UNKNOWN_METHOD;
+	return tapkee::UNKNOWN_METHOD;
 }
 
-TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
+tapkee::TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 {
 	if (!strcmp(str,"brute"))
-		return BRUTE_FORCE;
+		return tapkee::BRUTE_FORCE;
 	if (!strcmp(str,"covertree"))
-		return COVER_TREE;
+		return tapkee::COVER_TREE;
 
-	return UNKNOWN_NEIGHBORS_METHOD;
+	return tapkee::UNKNOWN_NEIGHBORS_METHOD;
 }
 
-TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
+tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 {
 	if (!strcmp(str,"arpack"))
-		return ARPACK;
+		return tapkee::ARPACK;
 	if (!strcmp(str,"randomized"))
-		return RANDOMIZED;
+		return tapkee::RANDOMIZED;
 	if (!strcmp(str,"dense"))
-		return EIGEN_DENSE_SELFADJOINT_SOLVER;
+		return tapkee::EIGEN_DENSE_SELFADJOINT_SOLVER;
 
-	return UNKNOWN_EIGEN_METHOD;
+	return tapkee::UNKNOWN_EIGEN_METHOD;
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
-DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback)
+tapkee::DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback)
 {
-	DenseMatrix result((end-begin),(end-begin));
+	tapkee::DenseMatrix result((end-begin),(end-begin));
 	for (RandomAccessIterator i_iter=begin; i_iter!=end; ++i_iter)
 	{
 		for (RandomAccessIterator j_iter=begin; j_iter!=end; ++j_iter)
@@ -179,43 +179,43 @@ int main(int argc, const char** argv)
 		LoggingSingleton::instance().message_info("Benchmarking enabled");
 	}
 	
-	ParametersMap parameters;
+	tapkee::ParametersMap parameters;
 
 	{
 		string method;
 		opt.get("--method")->getString(method);
-		TAPKEE_METHOD tapkee_method = parse_reduction_method(method.c_str());
-		if (tapkee_method==UNKNOWN_METHOD)
+		tapkee::TAPKEE_METHOD tapkee_method = parse_reduction_method(method.c_str());
+		if (tapkee_method==tapkee::UNKNOWN_METHOD)
 		{
 			LoggingSingleton::instance().message_error(string("Unknown method ") + method);
 			return 0;
 		}
 		else
-			parameters[REDUCTION_METHOD] = tapkee_method;
+			parameters[tapkee::REDUCTION_METHOD] = tapkee_method;
 	}
 	{
 		string method;
 		opt.get("--neighbors_method")->getString(method);
-		TAPKEE_NEIGHBORS_METHOD tapkee_neighbors_method = parse_neighbors_method(method.c_str());
-		if (tapkee_neighbors_method==UNKNOWN_NEIGHBORS_METHOD)
+		tapkee::TAPKEE_NEIGHBORS_METHOD tapkee_neighbors_method = parse_neighbors_method(method.c_str());
+		if (tapkee_neighbors_method==tapkee::UNKNOWN_NEIGHBORS_METHOD)
 		{
 			LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
 			return 0;
 		}
 		else
-			parameters[NEIGHBORS_METHOD] = tapkee_neighbors_method;
+			parameters[tapkee::NEIGHBORS_METHOD] = tapkee_neighbors_method;
 	}
 	{
 		string method;
 		opt.get("--eigen_method")->getString(method);
-		TAPKEE_EIGEN_EMBEDDING_METHOD tapkee_eigen_method = parse_eigen_method(method.c_str());
-		if (tapkee_eigen_method==UNKNOWN_EIGEN_METHOD)
+		tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD tapkee_eigen_method = parse_eigen_method(method.c_str());
+		if (tapkee_eigen_method==tapkee::UNKNOWN_EIGEN_METHOD)
 		{
 			LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
 			return 0;
 		}
 		else
-			parameters[EIGEN_EMBEDDING_METHOD] = tapkee_eigen_method;
+			parameters[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee_eigen_method;
 	}
 	{
 		int target_dimension = 1;
@@ -227,7 +227,7 @@ int main(int argc, const char** argv)
 			return 0;
 		}
 		else
-			parameters[TARGET_DIMENSION] = static_cast<unsigned int>(target_dimension);
+			parameters[tapkee::TARGET_DIMENSION] = static_cast<unsigned int>(target_dimension);
 	}
 	{
 		int k = 1;
@@ -235,7 +235,7 @@ int main(int argc, const char** argv)
 		if (k < 3)
 			LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
 		else
-			parameters[NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(k);
+			parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(k);
 	}
 	{
 		double width = 1.0;
@@ -243,27 +243,27 @@ int main(int argc, const char** argv)
 		if (width < 0.0)
 			LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
 		else
-			parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<DefaultScalarType>(width);
+			parameters[tapkee::GAUSSIAN_KERNEL_WIDTH] = static_cast<tapkee::DefaultScalarType>(width);
 		int timesteps = 1;
 		opt.get("--timesteps")->getInt(timesteps);
 		if (timesteps < 0)
 			LoggingSingleton::instance().message_error("Number of timesteps is negative.");
 		else
-			parameters[DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
+			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
 	}
 
 	if (opt.isSet("--spe_local"))
-		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(false);
+		parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(false);
 	else
-		parameters[SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
+		parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
 
 
 	{
 		// keep it static yet
-		parameters[SPE_TOLERANCE] = static_cast<DefaultScalarType>(1e-5);
-		parameters[SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
-		parameters[LANDMARK_RATIO] = static_cast<DefaultScalarType>(0.2);
-		parameters[EIGENSHIFT] = static_cast<DefaultScalarType>(1e-9);
+		parameters[tapkee::SPE_TOLERANCE] = static_cast<tapkee::DefaultScalarType>(1e-5);
+		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
+		parameters[tapkee::LANDMARK_RATIO] = static_cast<tapkee::DefaultScalarType>(0.2);
+		parameters[tapkee::EIGENSHIFT] = static_cast<tapkee::DefaultScalarType>(1e-9);
 	}
 
 	// Load data
@@ -288,8 +288,8 @@ int main(int argc, const char** argv)
 	ifstream ifs(input_filename.c_str());
 	ofstream ofs(output_filename.c_str());
 
-	DenseMatrix input_data = read_data(ifs);
-	parameters[CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
+	tapkee::DenseMatrix input_data = read_data(ifs);
+	parameters[tapkee::CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
 	
 	std::stringstream ss;
 	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
@@ -299,24 +299,24 @@ int main(int argc, const char** argv)
 	for (int i=0; i<input_data.cols(); i++)
 		data_indices.push_back(i);
 	// Embed
-	DenseMatrix embedding;
+	tapkee::DenseMatrix embedding;
 	
 #ifdef USE_PRECOMPUTED
-	DenseMatrix distance_matrix = 
+	tapkee::DenseMatrix distance_matrix = 
 		matrix_from_callback(data_indices.begin(),data_indices.end(),distance_callback(input_data));
 	precomputed_distance_callback dcb(distance_matrix);
-	DenseMatrix kernel_matrix = 
+	tapkee::DenseMatrix kernel_matrix = 
 		matrix_from_callback(data_indices.begin(),data_indices.end(),kernel_callback(input_data));
 	precomputed_kernel_callback kcb(kernel_matrix);
 	feature_vector_callback fvcb(input_data);
 
-	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 #else
 	distance_callback dcb(input_data);
 	kernel_callback kcb(input_data);
 	feature_vector_callback fvcb(input_data);
 
-	embedding = embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 #endif
 	// Save obtained data
 	ofs << embedding;

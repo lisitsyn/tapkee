@@ -19,6 +19,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <callbacks/traits.hpp>
 
 #ifdef TAPKEE_EIGEN_INCLUDE_FILE
 	#include TAPKEE_EIGEN_INCLUDE_FILE
@@ -27,7 +28,6 @@
 		#define EIGEN_NO_DEBUG
 	#endif
 	#define EIGEN_RUNTIME_NO_MALLOC
-	#define EIGEN_MATRIXBASE_PLUGIN <utils/matrix.hpp>
 	#include <Eigen/Dense>
 	#include <Eigen/Sparse>
 	#include <Eigen/SparseCholesky>
@@ -47,6 +47,9 @@
 	#define RESTRICT_ALLOC
 	#define UNRESTRICT_ALLOC
 #endif
+
+namespace tapkee 
+{
 
 // Customizable types
 #ifdef TAPKEE_CUSTOM_INTERNAL_NUMTYPE
@@ -165,7 +168,6 @@ typedef INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricM
 #undef INTERNAL_VECTOR
 #undef INTERNAL_PAIR
 
-#include <callbacks/traits.hpp>
 
 struct ProjectingImplementation
 {
@@ -182,5 +184,7 @@ struct ProjectingFunction
 	}
 	ProjectingImplementation* implementation;
 };
+
+} // namespace tapkee
 
 #endif

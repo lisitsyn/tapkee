@@ -14,6 +14,11 @@
 #include <algorithm>
 #include <ctime>
 
+namespace tapkee
+{
+namespace tapkee_internal
+{
+
 template <class RandomAccessIterator, class PairwiseCallback>
 EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator end,
 		PairwiseCallback callback, const Neighbors& neighbors,
@@ -164,5 +169,8 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 
 	return EmbeddingResult(Y.transpose(),DenseVector());
 };
+
+}
+}
 
 #endif /* TAPKEE_SPE_H_ */

@@ -19,7 +19,7 @@ template<class Implementation>
 struct pimpl_kernel_callback
 {
 	pimpl_kernel_callback(Implementation* i) : impl(i) {};
-	inline DefaultScalarType operator()(int a, int b) const
+	inline tapkee::DefaultScalarType operator()(int a, int b) const
 	{
 		return impl->kernel(a,b);
 	}
@@ -37,7 +37,7 @@ template<class Implementation>
 struct pimpl_distance_callback
 {
 	pimpl_distance_callback(Implementation* i) : impl(i) {};
-	inline DefaultScalarType operator()(int a, int b) const
+	inline tapkee::DefaultScalarType operator()(int a, int b) const
 	{
 		return impl->distance(a,b);
 	}
