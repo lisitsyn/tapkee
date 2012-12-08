@@ -22,6 +22,7 @@
 #include "routines/pca.hpp"
 #include "routines/spe.hpp"
 #include "neighbors/neighbors.hpp"
+#include "neighbors/connected.hpp"
 
 namespace tapkee
 {
@@ -84,10 +85,13 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 
 		timed_context context("Embedding with KLLE");
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		SparseWeightMatrix weight_matrix =
 			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
@@ -106,10 +110,13 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with KLTSA");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		SparseWeightMatrix weight_matrix = 
 			tangent_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
@@ -206,10 +213,13 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 
 		timed_context context("Embedding with Isomap");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		DenseSymmetricMatrix shortest_distances_matrix = 
 			compute_shortest_distances_matrix(begin,end,neighbors,distance_callback);
 		return eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
@@ -264,10 +274,13 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with NPE");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		SparseWeightMatrix weight_matrix = 
 			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
 		DenseSymmetricMatrixPair eig_matrices =
@@ -291,10 +304,13 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with HLLE");
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		SparseWeightMatrix weight_matrix =
 			hessian_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
 		return eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
@@ -313,10 +329,13 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(DefaultScalarType,width,GAUSSIAN_KERNEL_WIDTH);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with Laplacian Eigenmaps");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
 		return generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,InverseSparseMatrixOperation>(
@@ -336,10 +355,13 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(DefaultScalarType,width,GAUSSIAN_KERNEL_WIDTH);
 		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with LPP");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
 		DenseSymmetricMatrixPair eigenproblem_matrices =
@@ -402,10 +424,13 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(unsigned int,dimension,CURRENT_DIMENSION);
 		OBTAIN_PARAMETER(DefaultScalarType,eigenshift,EIGENSHIFT);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with LLTSA");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k);
+		if (check_connectivity && !is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 		SparseWeightMatrix weight_matrix = 
 			tangent_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
 		DenseSymmetricMatrixPair eig_matrices =
@@ -431,10 +456,16 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 		OBTAIN_PARAMETER(bool,global_strategy,SPE_GLOBAL_STRATEGY);
 		OBTAIN_PARAMETER(DefaultScalarType,tolerance,SPE_TOLERANCE);
 		OBTAIN_PARAMETER(unsigned int,nupdates,SPE_NUM_UPDATES);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 
 		Neighbors neighbors;
 		if (!global_strategy)
+		{
 			neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k);
+
+			if (check_connectivity && !is_connected(begin,end,neighbors))
+				LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
+		}
 
 		timed_context context("Embedding with SPE");
 		return spe_embedding(begin,end,distance_callback,neighbors,

@@ -93,7 +93,8 @@ enum TAPKEE_PARAMETERS
 	/* DefaultScalarType */ SPE_TOLERANCE,
 	/* unsigned int */ SPE_NUM_UPDATES,
 	/* DefaultScalarType */ LANDMARK_RATIO,
-	/* DefaultScalarType */ EIGENSHIFT
+	/* DefaultScalarType */ EIGENSHIFT,
+	/* bool */ CHECK_CONNECTIVITY
 };
 //! Parameters map type
 typedef std::map<TAPKEE_PARAMETERS, any> ParametersMap;

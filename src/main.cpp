@@ -158,6 +158,7 @@ int main(int argc, const char** argv)
 	opt.add("1.0",0,1,0,"Width of gaussian kernel (default 1.0)","-w","--width");
 	opt.add("1",0,1,0,"Number of timesteps for diffusion map (default 1)","--timesteps");
 	opt.add("0",0,0,0,"Local strategy in SPE (default global)", "--spe_local");
+	opt.add("0",0,0,0,"Check if neighborhood graph is connected (detaulf do not check)", "--check_connectivity");
 	opt.parse(argc, argv);
 
 	if (opt.isSet("-h"))
@@ -257,6 +258,10 @@ int main(int argc, const char** argv)
 	else
 		parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
 
+	if (opt.isSet("--check_connectivity"))
+		parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(true);
+	else
+		parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(false);
 
 	{
 		// keep it static yet
