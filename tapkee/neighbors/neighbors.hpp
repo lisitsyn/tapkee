@@ -13,6 +13,7 @@
 #define TAPKEE_NEIGHBORS_H_
 
 #include <neighbors/covertree.hpp>
+#include "neighbors/connected.hpp"
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -125,7 +126,7 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessIterator& begin, 
                          const RandomAccessIterator& end, const PairwiseCallback& callback, 
-                         unsigned int k)
+                         unsigned int k, bool check_connectivity)
 {
 	if (k > (end-begin-1))
 	{
@@ -134,13 +135,21 @@ Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessItera
 		k = (end-begin-1);
 	}
 	LoggingSingleton::instance().message_info("Using " + get_neighbors_method_name(method) + " neighbors computation method.");
+	Neighbors neighbors;
 	switch (method)
 	{
-		case BRUTE_FORCE: return find_neighbors_bruteforce_impl(begin,end,callback,k);
-		case COVER_TREE: return find_neighbors_covertree_impl(begin,end,callback,k);
+		case BRUTE_FORCE: neighbors = find_neighbors_bruteforce_impl(begin,end,callback,k); break;
+		case COVER_TREE: neighbors = find_neighbors_covertree_impl(begin,end,callback,k); break;
 		default: break;
 	}
-	return Neighbors();
+
+	if (check_connectivity)
+	{
+		timed_context connectivity("Checking connectivity");
+		if (!is_connected(begin,end,neighbors))
+			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
+	}
+	return neighbors;
 };
 
 }
