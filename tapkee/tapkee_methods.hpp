@@ -64,6 +64,11 @@ struct embedding_impl
 	template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback> \
 	struct embedding_impl<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,METHOD>
 #define OBTAIN_PARAMETER(TYPE,NAME,CODE) \
+	if (!options.count(CODE)) \
+	{ \
+		LoggingSingleton::instance().message_error("No "#NAME" ("#TYPE") parameter set. Should be in map as "#CODE); \
+		return EmbeddingResult(); \
+	} \
 	TYPE NAME = options[CODE].cast<TYPE>()
 #define SKIP_ONE_EIGENVALUE 1
 #define SKIP_NO_EIGENVALUES 0
