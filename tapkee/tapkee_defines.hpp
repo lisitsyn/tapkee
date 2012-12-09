@@ -170,20 +170,22 @@ typedef INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricM
 #undef INTERNAL_PAIR
 
 
-struct ProjectingImplementation
+struct ProjectionImplementation
 {
-	virtual ~ProjectingImplementation();
+	virtual ~ProjectionImplementation()
+	{
+	}
 	virtual DenseVector project(const DenseVector& vec) = 0;
 };
 
 struct ProjectingFunction
 {
-	ProjectingFunction(ProjectingImplementation* impl) : implementation(impl) {};
+	ProjectingFunction(ProjectionImplementation* impl) : implementation(impl) {};
 	inline DenseVector operator()(const DenseVector& vec)
 	{
 		return implementation->project(vec);
 	}
-	ProjectingImplementation* implementation;
+	ProjectionImplementation* implementation;
 };
 
 } // namespace tapkee

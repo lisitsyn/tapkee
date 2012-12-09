@@ -21,6 +21,7 @@
 #include "routines/isomap.hpp"
 #include "routines/pca.hpp"
 #include "routines/spe.hpp"
+#include "routines/matrix_projection.hpp"
 #include "neighbors/neighbors.hpp"
 
 namespace tapkee
@@ -280,7 +281,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
-		// TODO to be improved with out-of-sample projection
+		ProjectingFunction projecting_function(new MatrixProjectionImplementation(projection_result.first));
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
 };
@@ -355,6 +356,7 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
 				eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
+		ProjectingFunction projecting_function(new MatrixProjectionImplementation(projection_result.first));
 		// TODO to be improved with out-of-sample projection
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
@@ -375,7 +377,7 @@ CONCRETE_IMPLEMENTATION(PCA)
 			compute_covariance_matrix(begin,end,feature_vector_callback,dimension);
 		ProjectionResult projection_result = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
-		// TODO to be improved with out-of-sample projection
+		ProjectingFunction projecting_function(new MatrixProjectionImplementation(projection_result.first));
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
 };
@@ -422,7 +424,7 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		ProjectionResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
-		// TODO to be improved with out-of-sample projection
+		ProjectingFunction projecting_function(new MatrixProjectionImplementation(projection_result.first));
 		return project(projection_result,begin,end,feature_vector_callback,dimension);
 	}
 };
