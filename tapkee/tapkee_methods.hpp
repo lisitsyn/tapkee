@@ -22,6 +22,7 @@
 #include "routines/pca.hpp"
 #include "routines/spe.hpp"
 #include "routines/matrix_projection.hpp"
+#include "routines/mvu.hpp"
 #include "neighbors/neighbors.hpp"
 
 namespace tapkee
@@ -49,6 +50,7 @@ std::string get_method_name(TAPKEE_METHOD m)
 		case KERNEL_PCA: return "Kernel Principal Component Analysis";
 		case STOCHASTIC_PROXIMITY_EMBEDDING: return "Stochastic Proximity Embedding";
 		case PASS_THRU: return "passing through";
+		case MAXIMUM_VARIANCE_UNFOLDING: return "Maximum Variance Unfolding";
 		default: return "Method name unknown (yes this is a bug)";
 	}
 }
@@ -471,6 +473,25 @@ CONCRETE_IMPLEMENTATION(PASS_THRU)
 			feature_matrix.col(iter-begin).array() = feature_vector;
 		}
 		return EmbeddingResult(feature_matrix.transpose(),DenseVector());
+	}
+};
+
+CONCRETE_IMPLEMENTATION(MAXIMUM_VARIANCE_UNFOLDING)
+{
+	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
+                          KernelCallback, DistanceCallback distance_callback,
+                          FeatureVectorCallback, ParametersMap options)
+	{
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
+
+		Neighbors neighbors =
+			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
+
+		timed_context context("Embedding with MVU");
+		return mvu_embedding(begin,end,distance_callback,neighbors,target_dimension);
 	}
 };
 

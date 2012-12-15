@@ -85,6 +85,8 @@ tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 		return tapkee::LANDMARK_ISOMAP;
 	if (!strcmp(str,"passthru"))
 		return tapkee::PASS_THRU;
+	if (!strcmp(str,"mvu"))
+		return tapkee::MAXIMUM_VARIANCE_UNFOLDING;
 
 	return tapkee::UNKNOWN_METHOD;
 }
@@ -143,7 +145,7 @@ int main(int argc, const char** argv)
 	opt.add("klle",0,1,0,
 			"Dimension reduction method (default klle). One of the following: "
 			"klle, npe, kltsa, lltsa, hlle, laplacian_eigenmaps, lpp, "
-			"diffusion_map, isomap, lisomap, mds, lmds, spe, kpca, pca.",
+			"diffusion_map, isomap, lisomap, mds, mvu, lmds, spe, kpca, pca.",
 			"-m","--method");
 	opt.add("covertree",0,1,0,
 			"Neighbors search method (default covertree). One of the following "
