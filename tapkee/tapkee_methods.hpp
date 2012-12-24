@@ -486,12 +486,13 @@ CONCRETE_IMPLEMENTATION(MAXIMUM_VARIANCE_UNFOLDING)
 		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
 		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
 		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 
 		timed_context context("Embedding with MVU");
-		return mvu_embedding(begin,end,distance_callback,neighbors,target_dimension);
+		return mvu_embedding(begin,end,distance_callback,neighbors,target_dimension,eigen_method);
 	}
 };
 
