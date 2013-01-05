@@ -423,7 +423,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 	// Error codes are returned in here, initial value of 0 indicates a random initial
 	// residual vector is used, any other values means resid contains the initial residual
 	// vector, possibly from a previous run
-	int info = 0;
+	int cinfo = 0;
 
 	Scalar scale = 1.0;
 	/*
@@ -447,7 +447,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 		//std::cout << "Entering main loop\n";
 		internal::arpack_wrapper<Scalar, RealScalar>::saupd(&ido, bmat, &n, whch, &nev, &tol, resid, 
 		                                                    &ncv, v, &ldv, iparam, ipntr, workd, workl,
-		                                                    &lworkl, &info);
+		                                                    &lworkl, &cinfo);
 		if (ido == -1 || ido == 1)
 		{
 			Scalar *in  = workd + ipntr[0] - 1;
@@ -509,22 +509,22 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 		
 	//std::cout << "Finsihed\n";
 
-	if (info == 1)
+	if (cinfo == 1)
 	{
 		//std::cout << "FAILED WITH NO CONV\n";
 		m_info = NoConvergence;
 	}
-	else if (info == 3)
+	else if (cinfo == 3)
 	{
 		//std::cout << "FAILED WITH NUMERICAL ISSUE\n";
 		m_info = NumericalIssue;
 	}
-	else if (info < 0)
+	else if (cinfo < 0)
 	{
 		//std::cout << "FAILED WITH INVALID INPUT " << info << "\n";
 		m_info = InvalidInput;
 	}
-	else if (info != 0)
+	else if (cinfo != 0)
 		eigen_assert(false && "Unknown ARPACK return value!");
 	else
 	{
@@ -542,11 +542,11 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 
 		internal::arpack_wrapper<Scalar, RealScalar>::seupd(&rvec, howmny, select, m_eivalues.data(), v, &ldv,
 		                                                    &sigma, bmat, &n, whch, &nev, &tol, resid, &ncv,
-		                                                    v, &ldv, iparam, ipntr, workd, workl, &lworkl, &info);
+		                                                    v, &ldv, iparam, ipntr, workd, workl, &lworkl, &cinfo);
 
-		if (info == -14)
+		if (cinfo == -14)
 			m_info = NoConvergence;
-		else if (info != 0)
+		else if (cinfo != 0)
 			m_info = InvalidInput;
 		else
 		{
