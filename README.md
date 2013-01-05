@@ -9,7 +9,7 @@ dimensionality reduction. We always encourage contributions and distribute our s
 under free GPLv3 license.
 
 Tapkee uses highly effective Eigen3 template linear algebra library and 
-optionally makes use of the ARPACK and the Feast eigensolvers.
+optionally makes use of the ARPACK eigensolver.
 
 Interface
 ---------
@@ -21,8 +21,8 @@ dense feature vector access function. It is worth to notice that most of methods
 kernel or distance while all linear (projective) methods require access to feature vector.
 
 Callback interface enables user to reach great flexibility: ability to set up some caching strategy,
-lazy initialization of resources and various more. As an example we provide simple dense feature 
-matrices callback set.
+lazy initialization of resources and various more. As an example we provide simple callback set
+for dense feature matrices.
 
 Application
 -----------
@@ -34,7 +34,8 @@ Tapkee comes with a sample application used to embed dense representations, for 
 Supported platforms
 -------------------
 
-Tapkee is tested to be functional on Linux and Mac OS X platforms using GCC and Clang compilers.
+Tapkee is tested to be fully functional on Linux (ICC, GCC, Clang compilers) 
+and Mac OS X (GCC and Clang compilers).
 
 Supported dimension reduction methods
 -------------------------------------
@@ -53,10 +54,10 @@ Tapkee provides implementations of the following dimension reduction methods:
 * Isomap and landmark Isomap 
 * Stochastic Proximity Embedding (SPE)
 * Kernel PCA (kPCA)
-* Neighborhood Component Analysis (NCA)
 
 The following methods are under development:
 
 * Coordinated Factor Analysis (CFA)
+* Neighborhood Component Analysis (NCA)
 * Maximum Variance Unfolding and landmark Maximum Variance Unfolding (MVU)
 * t-Distributed Stochastic Neighbor Embedding (t-SNE)
