@@ -12,6 +12,7 @@
 
 #include <routines/eigen_embedding.hpp>
 #include <tapkee_defines.hpp>
+#include <utils/matrix.hpp>
 
 namespace tapkee
 {
@@ -38,7 +39,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 	G.col(0).setConstant(1/sqrt(DefaultScalarType(k)));
 	DefaultDenseSelfAdjointEigenSolver solver;
 
-	RESTRICT_ALLOC;
+	//RESTRICT_ALLOC;
 //#pragma omp parallel for private(iter,gram_matrix,G)
 	for (iter=iter_begin; iter<iter_end; ++iter)
 	{
@@ -56,7 +57,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 		
 		centerMatrix(gram_matrix);
 
-		UNRESTRICT_ALLOC;
+		//UNRESTRICT_ALLOC;
 		if (partial_eigendecomposer)
 		{
 			G.rightCols(target_dimension).noalias() = eigen_embedding<DenseMatrix,DenseMatrixOperation>(ARPACK,gram_matrix,target_dimension,0).first;
@@ -66,7 +67,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 			solver.compute(gram_matrix);
 			G.rightCols(target_dimension).noalias() = solver.eigenvectors().rightCols(target_dimension);
 		}
-		RESTRICT_ALLOC;
+		//RESTRICT_ALLOC;
 		gram_matrix.noalias() = G * G.transpose();
 		
 		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,shift));
@@ -78,10 +79,18 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 				                                        -gram_matrix(i,j)));
 		}
 	}
-	UNRESTRICT_ALLOC;
+	//UNRESTRICT_ALLOC;
 
+#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+	Eigen::DynamicSparseMatrix<DefaultScalarType> dynamic_weight_matrix(end-begin,end-begin);
+	dynamic_weight_matrix.reserve(sparse_triplets.size());
+	for (SparseTriplets::const_iterator it=sparse_triplets.begin(); it!=sparse_triplets.end(); ++it)
+		dynamic_weight_matrix.coeffRef(it->col(),it->row()) += it->value();
+	SparseWeightMatrix weight_matrix(dynamic_weight_matrix);
+#else
 	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
+#endif
 
 	return weight_matrix;
 }
@@ -103,7 +112,7 @@ SparseWeightMatrix linear_weight_matrix(RandomAccessIterator begin, RandomAccess
 	DenseVector rhs = DenseVector::Ones(k);
 	DenseVector weights;
 	
-	RESTRICT_ALLOC;
+	//RESTRICT_ALLOC;
 	for (iter=iter_begin; iter!=iter_end; ++iter)
 	{
 		DefaultScalarType kernel_value = callback(*iter,*iter);
@@ -135,10 +144,18 @@ SparseWeightMatrix linear_weight_matrix(RandomAccessIterator begin, RandomAccess
 				                                        +weights(i)*weights(j)));
 		}
 	}
-	UNRESTRICT_ALLOC;
+	//UNRESTRICT_ALLOC;
 
+#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+	Eigen::DynamicSparseMatrix<DefaultScalarType> dynamic_weight_matrix(end-begin,end-begin);
+	dynamic_weight_matrix.reserve(sparse_triplets.size());
+	for (SparseTriplets::const_iterator it=sparse_triplets.begin(); it!=sparse_triplets.end(); ++it)
+		dynamic_weight_matrix.coeffRef(it->col(),it->row()) += it->value();
+	SparseWeightMatrix weight_matrix(dynamic_weight_matrix);
+#else
 	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
+#endif
 
 	return weight_matrix;
 }
@@ -221,8 +238,16 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 		}
 	}
 
+#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+	Eigen::DynamicSparseMatrix<DefaultScalarType> dynamic_weight_matrix(end-begin,end-begin);
+	dynamic_weight_matrix.reserve(sparse_triplets.size());
+	for (SparseTriplets::const_iterator it=sparse_triplets.begin(); it!=sparse_triplets.end(); ++it)
+		dynamic_weight_matrix.coeffRef(it->col(),it->row()) += it->value();
+	SparseWeightMatrix weight_matrix(dynamic_weight_matrix);
+#else
 	SparseWeightMatrix weight_matrix(end-begin,end-begin);
 	weight_matrix.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
+#endif
 
 	return weight_matrix;
 };
@@ -240,7 +265,7 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 	DenseVector rank_update_vector_i(dimension);
 	DenseVector rank_update_vector_j(dimension);
 
-	RESTRICT_ALLOC;
+	//RESTRICT_ALLOC;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		feature_vector_callback(*iter,rank_update_vector_i);
@@ -257,10 +282,10 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 		}
 	}
 	
-	rhs += rhs.transpose();
+	rhs += rhs.transpose().eval();
 	rhs /= 2;
 
-	UNRESTRICT_ALLOC;
+	//UNRESTRICT_ALLOC;
 
 	return DenseSymmetricMatrixPair(lhs,rhs);
 }
@@ -279,7 +304,7 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 	DenseVector rank_update_vector_j(dimension);
 	DenseVector sum = DenseVector::Zero(dimension);
 	
-	RESTRICT_ALLOC;
+	//RESTRICT_ALLOC;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		feature_vector_callback(*iter,rank_update_vector_i);
@@ -299,10 +324,10 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 	}
 	lhs.selfadjointView<Eigen::Upper>().rankUpdate(sum,-1./(end-begin));
 
-	rhs += rhs.transpose();
+	rhs += rhs.transpose().eval();
 	rhs /= 2;
 
-	UNRESTRICT_ALLOC;
+	//UNRESTRICT_ALLOC;
 
 	return DenseSymmetricMatrixPair(lhs,rhs);
 }

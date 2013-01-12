@@ -224,7 +224,7 @@ int main(int argc, const char** argv)
 		if (target_dimension < 0)
 		{
 			tapkee::LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
-			                                           "Please visit other universe");
+			                                                   "Please visit other universe");
 			return 0;
 		}
 		else
