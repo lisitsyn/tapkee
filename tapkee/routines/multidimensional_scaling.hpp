@@ -1,7 +1,6 @@
 #ifndef tapkee_mds_h_
 #define tapkee_mds_h_
 
-#include <omp.h>
 #include <algorithm>
 
 using std::random_shuffle;
@@ -67,8 +66,6 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 	for (unsigned int i=0; i<target_dimension; ++i)
 		landmarks_embedding.first.col(i).array() /= landmarks_embedding.second(i);
 
-//	landmarks_embedding.first.transposeInPlace();
-	
 	RandomAccessIterator iter;
 	DenseVector distances_to_landmarks;
 
