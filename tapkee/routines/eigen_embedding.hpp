@@ -4,12 +4,12 @@
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * Copyright (c) 2012, Sergey Lisitsyn
+ * Copyright (c) 2012-2013 Sergey Lisitsyn
  *
  * Randomized eigendecomposition code is inspired by the redsvd library
  * code which is distributed under BSD 3-clause license.
  *
- * Copyright (c) 2010, Daisuke Okanohara
+ * Copyright (c) 2010-2013 Daisuke Okanohara
  *
  */
 
