@@ -10,19 +10,18 @@
 #ifndef TAPKEE_METHODS_H_
 #define TAPKEE_METHODS_H_
 
-#include "tapkee_defines.hpp"
-#include "utils/matrix.hpp"
-#include "routines/locally_linear.hpp"
-#include "routines/eigen_embedding.hpp"
-#include "routines/generalized_eigen_embedding.hpp"
-#include "routines/multidimensional_scaling.hpp"
-#include "routines/diffusion_maps.hpp"
-#include "routines/laplacian_eigenmaps.hpp"
-#include "routines/isomap.hpp"
-#include "routines/pca.hpp"
-#include "routines/spe.hpp"
-#include "routines/matrix_projection.hpp"
-#include "neighbors/neighbors.hpp"
+#include <tapkee_defines.hpp>
+#include <routines/locally_linear.hpp>
+#include <routines/eigen_embedding.hpp>
+#include <routines/generalized_eigen_embedding.hpp>
+#include <routines/multidimensional_scaling.hpp>
+#include <routines/diffusion_maps.hpp>
+#include <routines/laplacian_eigenmaps.hpp>
+#include <routines/isomap.hpp>
+#include <routines/pca.hpp>
+#include <routines/spe.hpp>
+#include <routines/matrix_projection.hpp>
+#include <neighbors/neighbors.hpp>
 
 namespace tapkee
 {
@@ -154,9 +153,10 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
 		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
 
-		timed_context context("Embeding with MDS");
+		timed_context context("Embedding with MDS");
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
 		centerMatrix(distance_matrix);
+		distance_matrix.array() *= -0.5;
 		EmbeddingResult result = eigen_embedding<DenseSymmetricMatrix,
 				#ifdef TAPKEE_GPU
 						GPUDenseMatrixOperation
@@ -165,7 +165,7 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 				#endif
 				>(eigen_method,
 			distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
-		
+
 		for (unsigned int i=0; i<target_dimension; i++)
 			result.first.col(i).array() *= sqrt(result.second(i));
 		return result;
@@ -189,6 +189,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 			compute_distance_matrix(begin,landmarks,distance_callback);
 		DenseVector landmark_distances_squared = distance_matrix.colwise().mean();
 		centerMatrix(distance_matrix);
+		distance_matrix.array() *= -0.5;
 		EmbeddingResult landmarks_embedding = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
 					distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
@@ -223,26 +224,27 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 
 CONCRETE_IMPLEMENTATION(LANDMARK_ISOMAP)
 {
-	EmbeddingResult embed(RandomAccessIterator /*begin*/, RandomAccessIterator /*end*/,
-                          KernelCallback, DistanceCallback /*distance_callback*/,
-                          FeatureVectorCallback, ParametersMap /*options*/)
+	EmbeddingResult embed(RandomAccessIterator begin, RandomAccessIterator end,
+                          KernelCallback, DistanceCallback distance_callback,
+                          FeatureVectorCallback, ParametersMap options)
 	{
-		//OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
-		//OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
-		//OBTAIN_PARAMETER(DefaultScalarType,ratio,LANDMARK_RATIO);
-		//OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
-		//OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(unsigned int,target_dimension,TARGET_DIMENSION);
+		OBTAIN_PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD,eigen_method,EIGEN_EMBEDDING_METHOD);
+		OBTAIN_PARAMETER(DefaultScalarType,ratio,LANDMARK_RATIO);
+		OBTAIN_PARAMETER(unsigned int,k,NUMBER_OF_NEIGHBORS);
+		OBTAIN_PARAMETER(TAPKEE_NEIGHBORS_METHOD,neighbors_method,NEIGHBORS_METHOD);
+		OBTAIN_PARAMETER(bool,check_connectivity,CHECK_CONNECTIVITY);
 
 		timed_context context("Embedding with Landmark Isomap");
-		/*
 		Neighbors neighbors = 
-			find_neighbors(neighbors_method,begin,end,distance_callback,k);
+			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		Landmarks landmarks = 
 			select_landmarks_random(begin,end,ratio);
 		DenseSymmetricMatrix distance_matrix = 
 			compute_shortest_distances_matrix(begin,end,landmarks,neighbors,distance_callback);
 		DenseVector landmark_distances_squared = distance_matrix.colwise().mean();
-		mds_process_matrix(distance_matrix);
+		centerMatrix(distance_matrix);
+		distance_matrix.array() *= -0.5;
 		EmbeddingResult landmarks_embedding = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
 					distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
@@ -250,8 +252,6 @@ CONCRETE_IMPLEMENTATION(LANDMARK_ISOMAP)
 			landmarks_embedding.first.col(i).array() *= sqrt(landmarks_embedding.second(i));
 		return triangulate(begin,end,distance_callback,landmarks,
 			landmark_distances_squared,landmarks_embedding,target_dimension);
-		*/
-		return EmbeddingResult();
 	}
 };
 
