@@ -1,0 +1,13 @@
+language: cpp
+compiler:
+    - gcc
+    - clang
+branches:
+   only:
+    - master
+notifications:
+    email: false
+before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq libeigen3-dev libarpack2-dev
+script: make
