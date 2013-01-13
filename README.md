@@ -3,7 +3,7 @@ Tapkee: an efficient dimension reduction toolbox
 
 Tapkee is a C++ template library for dimensionality reduction with some bias on 
 spectral methods. The Tapkee origins from the code developed during GSoC 2011 as 
-the part of the Shogun machine learning toolbox (https://github.com/shogun-toolbox/shogun). 
+the part of the [Shogun machine learning toolbox](https://github.com/shogun-toolbox/shogun). 
 The project aim is to provide standalone efficient and flexible library for 
 dimensionality reduction. We always encourage contributions and distribute our software
 under free GPLv3 license.
@@ -24,12 +24,25 @@ Callback interface enables user to reach great flexibility: ability to set up so
 lazy initialization of resources and various more. As an example we provide simple callback set
 for dense feature matrices.
 
+Integration with other libraries
+--------------------------------
+
+The Tapkee library is designed to be easily integrated to other codebases. 
+For examples of such integration see [Shogun machine learning toolbox](https://github.com/shogun-toolbox/shogun).
+
 Application
 -----------
 
 Tapkee comes with a sample application used to embed dense representations, for more information run
 
 `./tapkee_app -h`
+
+
+Need help?
+----------
+
+If you need any help or advice don't hesitate to send [an email](mailto://lisitsyn.s.o@gmail.com "Send mail
+to Sergey Lisitsyn") or fire [an issue at github](https://github.com/lisitsyn/tapkee/issues/new "New Tapkee Issue").
 
 Supported platforms
 -------------------
