@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+echo "===== Locally Linear Embedding (k=15) ======"
+../tapkee_app -i input.dat -o output.dat -m klle -k 15
+echo "===== Neighborhood preserving embedding (k=15) ======"
+../tapkee_app -i input.dat -o output.dat -m npe -k 15
+echo "===== Local Tangent Space Alignment (k=15) ======"
+../tapkee_app -i input.dat -o output.dat -m kltsa -k 15
+echo "===== Linear Local Tangent Space Alignment (k=15) ======"
+../tapkee_app -i input.dat -o output.dat -m lltsa -k 15
+echo "===== Hessian Locally Linear Embedding (k=15) ======"
+../tapkee_app -i input.dat -o output.dat -m hlle -k 15
+echo "===== Diffusion map (t=3, w=1000.0, arpack) ======"
+../tapkee_app -i input.dat -o output.dat -m diffusion_map -t 3 -w 1000.0
+echo "===== Diffusion map (t=3, w=1000.0, randomized) ======"
+../tapkee_app -i input.dat -o output.dat -m diffusion_map -em randomized -t 3 -w 1000.0
+echo "===== Multidimensional scaling (arpack) ======"
+../tapkee_app -i input.dat -o output.dat -m mds
+echo "===== Multidimensional scaling (randomized) ======"
+../tapkee_app -i input.dat -o output.dat -m mds -em randomized
+echo "===== Landmark Multidimensional scaling (arpack) ======"
+../tapkee_app -i input.dat -o output.dat -m lmds
+echo "===== Landmark Multidimensional scaling (randomized) ======"
+../tapkee_app -i input.dat -o output.dat -m lmds -em randomized
+echo "===== Isomap (k=15, arpack) ======"
+../tapkee_app -i input.dat -o output.dat -m isomap -k 15
+echo "===== Isomap (k=15, randomized) ======"
+../tapkee_app -i input.dat -o output.dat -m isomap -k 15 -em randomized
+echo "===== Laplacian Eigenmaps (w=1000.0) ======"
+../tapkee_app -i input.dat -o output.dat -m laplacian_eigenmaps -w 1000.0
+echo "===== Locality Preserving Projections (w=1000.0) ======"
+../tapkee_app -i input.dat -o output.dat -m lpp -w 1000.0
+echo "===== PCA (arpack) ======"
+../tapkee_app -i input.dat -o output.dat -m pca 
+echo "===== PCA (randomized) ======"
+../tapkee_app -i input.dat -o output.dat -m pca -em randomized
+echo "===== Kernel PCA (arpack) ======"
+../tapkee_app -i input.dat -o output.dat -m kpca
+echo "===== Kernel PCA (randomized) ======"
+../tapkee_app -i input.dat -o output.dat -m kpca -em randomized
+
