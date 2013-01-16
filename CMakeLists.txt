@@ -9,6 +9,7 @@ set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
 find_package(Eigen3 REQUIRED)
 include_directories("${EIGEN3_INCLUDE_DIR}")
 find_package(Arpack REQUIRED)
+link_directories("${ARPACK_PATH}")
 
 include_directories("${TAPKEE_INCLUDE_DIR}")
 
