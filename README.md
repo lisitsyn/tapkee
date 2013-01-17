@@ -27,8 +27,21 @@ for dense feature matrices.
 Integration with other libraries
 --------------------------------
 
-The Tapkee library is designed to be easily integrated to other codebases. 
-For examples of such integration see [Shogun machine learning toolbox](https://github.com/shogun-toolbox/shogun).
+The Tapkee library is designed to be easily integrated to other codebases. To use full 
+functionality of the Tapkee one should define three functors: kernel, distance and
+feature vector access.
+
+It is also required to identify these functors using the following macroses:
+`TAPKEE_CALLBACK_IS_KERNEL(your_kernel_callback)`
+`TAPKEE_CALLBACK_IS_DISTANCE(your_distance_callback)`
+
+If your library includes Eigen3 at some point - let the Tapkee know about that with the following define:
+`#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
+
+For an example of integration see  
+[Tapkee adapter in Shogun](https://github.com/shogun-toolbox/shogun/blob/master/src/shogun/lib/tapkee/tapkee_shogun.cpp). 
+
+We welcome any integration so please contact authors if you have got any questions.
 
 Application
 -----------
@@ -37,6 +50,7 @@ Tapkee comes with a sample application used to embed dense representations, for 
 
 `./tapkee_app -h`
 
+To compile the application please use CMake.
 
 Need help?
 ----------
