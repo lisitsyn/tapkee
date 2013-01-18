@@ -35,10 +35,13 @@ functionality of the Tapkee one should define three functors: kernel, distance a
 feature vector access.
 
 It is also required to identify these functors using the following macroses:
+
 `TAPKEE_CALLBACK_IS_KERNEL(your_kernel_callback)`
+
 `TAPKEE_CALLBACK_IS_DISTANCE(your_distance_callback)`
 
 If your library includes Eigen3 at some point - let the Tapkee know about that with the following define:
+
 `#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
 For an example of integration see  
@@ -49,11 +52,20 @@ We welcome any integration so please contact authors if you have got any questio
 Application
 -----------
 
-Tapkee comes with a sample application used to embed dense representations, for more information run
+Tapkee comes with a sample application used to embed dense representations, for more information run:
 
-`./tapkee_app -h`
+`./tapkee -h`
 
-To compile the application please use CMake.
+To compile the application please use CMake. The workflow of compilation with CMake is usual. When using Unix-based
+systems you may use the following command to compile the Tapkee application:
+
+`mkdir build && cd build && cmake .. && make`
+
+The compilation requires ARPACK and Eigen3 to be available in your path.
+
+On Ubuntu Linux these packages can be installed with `sudo apt-get install libeigen3-dev libarpack2-dev`
+
+If you are using Mac OS X and Macports install `sudo port install eigen3 && sudo port install arpack`
 
 Need help?
 ----------
@@ -65,25 +77,28 @@ Supported platforms
 -------------------
 
 Tapkee is tested to be fully functional on Linux (ICC, GCC, Clang compilers) 
-and Mac OS X (GCC and Clang compilers).
+and Mac OS X (GCC and Clang compilers). In general, Tapkee uses no platform specific
+code and should work on other systems as well. Please [let us know](mailto://lisitsyn.s.o@gmail.com) if you have
+successfully compiled or have got issues on any other system not listed above.
 
 Supported dimension reduction methods
 -------------------------------------
 
 Tapkee provides implementations of the following dimension reduction methods:
 
-* Locally Linear Embedding / Kernel Locally Linear Embedding (LLE/KLLE)
-* Neighborhood Preserving Embedding (NPE)
-* Local Tangent Space Alignment / Kernel Local Tangent Space Alignment (LTSA/KLTSA)
-* Linear Local Tangent Space Alignment (LLTSA)
-* Hessian Locally Linear Embedding (HLLE)
-* Diffusion map
-* Laplacian eigenmaps
-* Locality Preserving Projections (LPP)
-* Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)
-* Isomap and landmark Isomap 
-* Stochastic Proximity Embedding (SPE)
-* Kernel PCA (kPCA)
+* [Locally Linear Embedding / Kernel Locally Linear Embedding (LLE/KLLE)](http://lisitsyn.github.com/tapkee/methods/lle.html)
+* [Neighborhood Preserving Embedding (NPE)](http://lisitsyn.github.com/tapkee/methods/npe.html)
+* [Local Tangent Space Alignment / (LTSA)](http://lisitsyn.github.com/tapkee/methods/ltsa.html)
+* [Linear Local Tangent Space Alignment (LLTSA)](http://lisitsyn.github.com/tapkee/methods/lltsa.html)
+* [Hessian Locally Linear Embedding (HLLE)](http://lisitsyn.github.com/tapkee/methods/hlle.html)
+* [Diffusion map](http://lisitsyn.github.com/tapkee/methods/diffusion_map.html)
+* [Laplacian eigenmaps](http://lisitsyn.github.com/tapkee/methods/laplacian_eigenmaps.html)
+* [Locality Preserving Projections (LPP)](http://lisitsyn.github.com/tapkee/methods/lpp.html)
+* [Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)](http://lisitsyn.github.com/tapkee/methods/mds.html)
+* [Isomap and landmark Isomap](http://lisitsyn.github.com/tapkee/methods/isomap.html)
+* [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
+* [PCA](http://lisitsyn.github.com/tapkee/methods/pca.html)
+* [Kernel PCA (kPCA)](http://lisitsyn.github.com/tapkee/methods/kpca.html)
 
 The following methods are under development:
 
