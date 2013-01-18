@@ -9,5 +9,6 @@ notifications:
     email: false
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install -qq libeigen3-dev libarpack2-dev
-script: make
+    - sudo apt-get install -qq libeigen3-dev libarpack2-dev cmake
+script:
+    - mkdir build && cd build && cmake .. && make
