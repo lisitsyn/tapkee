@@ -11,6 +11,9 @@ under free GPLv3 license.
 Tapkee uses highly effective Eigen3 template linear algebra library and 
 optionally makes use of the ARPACK eigensolver.
 
+We are happy to use [Travis](https://travis-ci.org) as a continuous integration platform. The current status of 
+build is [![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee).
+
 Interface
 ---------
 
