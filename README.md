@@ -94,11 +94,11 @@ Tapkee provides implementations of the following dimension reduction methods:
 * [Diffusion map](http://lisitsyn.github.com/tapkee/methods/diffusion_map.html)
 * [Laplacian eigenmaps](http://lisitsyn.github.com/tapkee/methods/laplacian_eigenmaps.html)
 * [Locality Preserving Projections (LPP)](http://lisitsyn.github.com/tapkee/methods/lpp.html)
-* [Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)](http://lisitsyn.github.com/tapkee/methods/mds.html)
-* [Isomap and landmark Isomap](http://lisitsyn.github.com/tapkee/methods/isomap.html)
-* [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
-* [PCA](http://lisitsyn.github.com/tapkee/methods/pca.html)
-* [Kernel PCA (kPCA)](http://lisitsyn.github.com/tapkee/methods/kpca.html)
+* Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)
+* Isomap and landmark Isomap
+* Stochastic Proximity Embedding (SPE)
+* PCA
+* Kernel PCA (kPCA)
 
 The following methods are under development:
 
