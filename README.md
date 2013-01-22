@@ -44,10 +44,18 @@ If your library includes Eigen3 at some point - let the Tapkee know about that w
 
 `#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
+Please note that if you don't use Eigen3 in your projects there is no need to define that variable, Eigen3 will
+be included by Tapkee header in this case.
+
+When compiling your software that includes Tapkee be sure Eigen3 headers are in include path and your code
+is linked against ARPACK library (-larpack key for g++ and clang++).
+
 For an example of integration see  
 [Tapkee adapter in Shogun](https://github.com/shogun-toolbox/shogun/blob/master/src/shogun/lib/tapkee/tapkee_shogun.cpp). 
 
-We welcome any integration so please contact authors if you have got any questions.
+We welcome any integration so please contact authors if you have got any questions. If you have 
+successfully used the library please also let authors know about that - mentions of any 
+applications are very appreciated.
 
 Application
 -----------
