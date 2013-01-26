@@ -65,6 +65,8 @@ tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 		return tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"isomap"))
 		return tapkee::ISOMAP;
+	if (!strcmp(str,"lisomap"))
+		return tapkee::LANDMARK_ISOMAP;
 	if (!strcmp(str,"diffusion_map"))
 		return tapkee::DIFFUSION_MAP;
 	if (!strcmp(str,"kpca"))
@@ -250,7 +252,7 @@ int main(int argc, const char** argv)
 		if (timesteps < 0)
 			tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
 		else
-			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(3);
+			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(timesteps);
 	}
 
 	if (opt.isSet("--spe_local"))
