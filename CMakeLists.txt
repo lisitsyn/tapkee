@@ -17,6 +17,16 @@ set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
 target_link_libraries(tapkee arpack)
 
+if (TAPKEE_CUSTOM_INSTALL_DIR)
+	set (TAPKEE_INSTALL_DIR
+		"${TAPKEE_CUSTOM_INSTALL_DIR}")
+else()
+	set (TAPKEE_INSTALL_DIR
+		"${CMAKE_INSTALL_PREFIX}/include")
+endif()
+
+install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
+
 if (CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "-O3 -Wall")
 	set(CMAKE_EXE_LINKER_FLAGS "-s")
