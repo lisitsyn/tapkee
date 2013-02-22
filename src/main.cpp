@@ -12,125 +12,22 @@
 #include <callbacks/eigen_callbacks.hpp>
 #include <callbacks/precomputed_callbacks.hpp>
 #include <utils/logging.hpp>
-
-#include "ezoptionparser.hpp"
-
 #include <algorithm>
 #include <string>
-#include <istream>
-#include <fstream>
 #include <vector>
 #include <iterator>
+
+#include "ezoptionparser.hpp"
+#include "util.hpp"
 
 using namespace ez;
 using namespace Eigen;
 using namespace std;
 
-tapkee::DenseMatrix read_data(ifstream& ifs)
-{
-	string str;
-	vector< vector<tapkee::DefaultScalarType> > input_data;
-	while (!ifs.eof())
-	{
-		getline(ifs,str);
-		if (str.size())
-		{
-			stringstream strstr(str);
-			istream_iterator<tapkee::DefaultScalarType> it(strstr);
-			istream_iterator<tapkee::DefaultScalarType> end;
-			vector<tapkee::DefaultScalarType> row(it, end);
-			input_data.push_back(row);
-		}
-	}
-	tapkee::DenseMatrix fm(input_data[0].size(),input_data.size());
-	for (int i=0; i<fm.rows(); i++)
-	{
-		for (int j=0; j<fm.cols(); j++)
-			fm(i,j) = input_data[j][i];
-	}
-	return fm;
-}
-
-tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
-{
-	if (!strcmp(str,"kltsa"))
-		return tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	if (!strcmp(str,"klle"))
-		return tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING;
-	if (!strcmp(str,"hlle"))
-		return tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING;
-	if (!strcmp(str,"mds"))
-		return tapkee::MULTIDIMENSIONAL_SCALING;
-	if (!strcmp(str,"lmds"))
-		return tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING;
-	if (!strcmp(str,"isomap"))
-		return tapkee::ISOMAP;
-	if (!strcmp(str,"lisomap"))
-		return tapkee::LANDMARK_ISOMAP;
-	if (!strcmp(str,"diffusion_map"))
-		return tapkee::DIFFUSION_MAP;
-	if (!strcmp(str,"kpca"))
-		return tapkee::KERNEL_PCA;
-	if (!strcmp(str,"pca"))
-		return tapkee::PCA;
-	if (!strcmp(str,"laplacian_eigenmaps"))
-		return tapkee::LAPLACIAN_EIGENMAPS;
-	if (!strcmp(str,"lpp"))
-		return tapkee::LOCALITY_PRESERVING_PROJECTIONS;
-	if (!strcmp(str,"npe"))
-		return tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING;
-	if (!strcmp(str,"lltsa"))
-		return tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	if (!strcmp(str,"spe"))
-		return tapkee::STOCHASTIC_PROXIMITY_EMBEDDING;
-	if (!strcmp(str,"lisomap"))
-		return tapkee::LANDMARK_ISOMAP;
-	if (!strcmp(str,"passthru"))
-		return tapkee::PASS_THRU;
-
-	return tapkee::UNKNOWN_METHOD;
-}
-
-tapkee::TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
-{
-	if (!strcmp(str,"brute"))
-		return tapkee::BRUTE_FORCE;
-	if (!strcmp(str,"covertree"))
-		return tapkee::COVER_TREE;
-
-	return tapkee::UNKNOWN_NEIGHBORS_METHOD;
-}
-
-tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
-{
-	if (!strcmp(str,"arpack"))
-		return tapkee::ARPACK;
-	if (!strcmp(str,"randomized"))
-		return tapkee::RANDOMIZED;
-	if (!strcmp(str,"dense"))
-		return tapkee::EIGEN_DENSE_SELFADJOINT_SOLVER;
-
-	return tapkee::UNKNOWN_EIGEN_METHOD;
-}
-
-template <class RandomAccessIterator, class PairwiseCallback>
-tapkee::DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback)
-{
-	tapkee::DenseMatrix result((end-begin),(end-begin));
-	for (RandomAccessIterator i_iter=begin; i_iter!=end; ++i_iter)
-	{
-		for (RandomAccessIterator j_iter=begin; j_iter!=end; ++j_iter)
-		{
-			result((i_iter-begin),(j_iter-begin)) = callback(*i_iter,*j_iter);
-		}
-	}
-	return result;
-}
-
 int main(int argc, const char** argv)
 {
 	ezOptionParser opt;
-	opt.footer = "Copyright (C) 2012 Sergey Lisitsyn, Fernando Iglesias\n";
+	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn, Fernando Iglesias\n";
 	opt.overview = "Tapkee library sample application for dense matrix embedding.";
 	opt.example = "Run kernel locally linear embedding with k=10 with arpack "
                   "eigensolver on data from input.dat saving embedding to output.dat \n\n"
@@ -286,8 +183,8 @@ int main(int argc, const char** argv)
 
 	if (!opt.isSet("--output-file"))
 	{
-		tapkee::LoggingSingleton::instance().message_error("No output file specified");
-		return 0;
+		tapkee::LoggingSingleton::instance().message_warning("No output file specified, using /dev/tty");
+		output_filename = "/dev/tty";
 	}
 	else
 		opt.get("--output-file")->getString(output_filename);
@@ -305,15 +202,27 @@ int main(int argc, const char** argv)
 	vector<int> data_indices;
 	for (int i=0; i<input_data.cols(); i++)
 		data_indices.push_back(i);
-	// Embed
+	
 	tapkee::DenseMatrix embedding;
 	
 #ifdef USE_PRECOMPUTED
-	tapkee::DenseMatrix distance_matrix = 
-		matrix_from_callback(data_indices.begin(),data_indices.end(),distance_callback(input_data));
+	tapkee::DenseMatrix distance_matrix;
+	tapkee::DenseMatrix kernel_matrix;
+	{
+		tapkee::timed_context context("Distance matrix computation");
+		tapkee::TAPKEE_METHOD method = parameters[tapkee::REDUCTION_METHOD].cast<tapkee::TAPKEE_METHOD>();
+		if (method_needs_kernel(method))
+		{
+			distance_matrix = 
+				matrix_from_callback(data_indices.begin(),data_indices.end(),distance_callback(input_data));
+		} 
+		if (method_needs_distance(method))
+		{
+			kernel_matrix = 
+				matrix_from_callback(data_indices.begin(),data_indices.end(),kernel_callback(input_data));
+		}
+	}
 	precomputed_distance_callback dcb(distance_matrix);
-	tapkee::DenseMatrix kernel_matrix = 
-		matrix_from_callback(data_indices.begin(),data_indices.end(),kernel_callback(input_data));
 	precomputed_kernel_callback kcb(kernel_matrix);
 	feature_vector_callback fvcb(input_data);
 

@@ -69,11 +69,15 @@ systems you may use the following command to compile the Tapkee application:
 
 `mkdir build && cd build && cmake .. && make`
 
-The compilation requires ARPACK and Eigen3 to be available in your path.
+The compilation requires ARPACK and Eigen3 to be available in your path. On Ubuntu Linux these packages can be installed with 
 
-On Ubuntu Linux these packages can be installed with `sudo apt-get install libeigen3-dev libarpack2-dev`
+`sudo apt-get install libeigen3-dev libarpack2-dev`
 
-If you are using Mac OS X and Macports install `sudo port install eigen3 && sudo port install arpack`
+If you are using Mac OS X and Macports you can install packages with 
+
+`sudo port install eigen3 && sudo port install arpack`
+
+In case you want to use some non-default compiler use `CC=your C compiler CXX=your C++ compiler cmake ..` when using cmake.
 
 Need help?
 ----------
@@ -92,7 +96,7 @@ successfully compiled or have got issues on any other system not listed above.
 Supported dimension reduction methods
 -------------------------------------
 
-Tapkee provides implementations of the following dimension reduction methods:
+Tapkee provides implementations of the following dimension reduction methods (urls to descriptions provided):
 
 * [Locally Linear Embedding / Kernel Locally Linear Embedding (LLE/KLLE)](http://lisitsyn.github.com/tapkee/methods/lle.html)
 * [Neighborhood Preserving Embedding (NPE)](http://lisitsyn.github.com/tapkee/methods/npe.html)
@@ -104,7 +108,7 @@ Tapkee provides implementations of the following dimension reduction methods:
 * [Locality Preserving Projections (LPP)](http://lisitsyn.github.com/tapkee/methods/lpp.html)
 * Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)
 * Isomap and landmark Isomap
-* Stochastic Proximity Embedding (SPE)
+* [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
 * PCA
 * Kernel PCA (kPCA)
 
