@@ -32,4 +32,7 @@ endif()
 
 install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
 
+exec_program("git" ARGS "describe --always" OUTPUT_VARIABLE VERSION)
+add_definitions(-DGIT_INFO="${VERSION}")
+
 set(CMAKE_BUILD_TYPE Release)

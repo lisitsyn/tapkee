@@ -20,6 +20,12 @@
 #include "ezoptionparser.hpp"
 #include "util.hpp"
 
+#ifdef GIT_INFO
+	#define TAPKEE_CURRENT_GIT_INFO GIT_INFO
+#else
+	#define TAPKEE_CURRENT_GIT_INFO "unknown"
+#endif
+
 using namespace ez;
 using namespace Eigen;
 using namespace std;
@@ -28,7 +34,8 @@ int main(int argc, const char** argv)
 {
 	ezOptionParser opt;
 	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn, Fernando Iglesias\n";
-	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.";
+	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.\n"
+	               "Git " TAPKEE_CURRENT_GIT_INFO;
 	opt.example = "Run kernel locally linear embedding with k=10 with arpack "
                   "eigensolver on data from input.dat saving embedding to output.dat \n\n"
 	              "tapkee -i input.dat -o output.dat --method klle --eigen_method arpack -k 10\n";
