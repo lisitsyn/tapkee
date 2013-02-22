@@ -28,7 +28,7 @@ int main(int argc, const char** argv)
 {
 	ezOptionParser opt;
 	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn, Fernando Iglesias\n";
-	opt.overview = "Tapkee library sample application for dense matrix embedding.";
+	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.";
 	opt.example = "Run kernel locally linear embedding with k=10 with arpack "
                   "eigensolver on data from input.dat saving embedding to output.dat \n\n"
 	              "tapkee -i input.dat -o output.dat --method klle --eigen_method arpack -k 10\n";
@@ -58,6 +58,10 @@ int main(int argc, const char** argv)
 	opt.add("1",0,1,0,"Number of timesteps for diffusion map (default 1)","--timesteps");
 	opt.add("0",0,0,0,"Local strategy in SPE (default global)", "--spe_local");
 	opt.add("0",0,0,0,"Check if neighborhood graph is connected (detaulf do not check)", "--check_connectivity");
+	opt.add("1e-9",0,1,0,"Regularization diagonal shift for weight matrix","--eigenshift");
+	opt.add("0.2",0,1,0,"Ratio of landmarks. Should be in (0,1) range","--landmark_ratio");
+	opt.add("1e-5",0,1,0,"Tolerance for SPE","--spe_tolerance");
+	opt.add("100",0,1,0,"Number of SPE updates","--spe_num_updates");
 	opt.parse(argc, argv);
 
 	if (opt.isSet("-h"))
@@ -151,23 +155,37 @@ int main(int argc, const char** argv)
 		else
 			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(timesteps);
 	}
-
-	if (opt.isSet("--spe_local"))
-		parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(false);
-	else
-		parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
-
-	if (opt.isSet("--check_connectivity"))
-		parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(true);
-	else
-		parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(false);
-
 	{
-		// keep it static yet
-		parameters[tapkee::SPE_TOLERANCE] = static_cast<tapkee::DefaultScalarType>(1e-5);
-		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<unsigned int>(100);
-		parameters[tapkee::LANDMARK_RATIO] = static_cast<tapkee::DefaultScalarType>(0.2);
-		parameters[tapkee::EIGENSHIFT] = static_cast<tapkee::DefaultScalarType>(1e-9);
+		double eigenshift = 1e-9;
+		opt.get("--eigenshift")->getDouble(eigenshift);
+		parameters[tapkee::EIGENSHIFT] = static_cast<tapkee::DefaultScalarType>(eigenshift);
+	}
+	{
+		double landmark_ratio = 0.0;
+		opt.get("--landmark_ratio")->getDouble(landmark_ratio);
+		parameters[tapkee::LANDMARK_RATIO] = static_cast<tapkee::DefaultScalarType>(landmark_ratio);
+	}
+	{
+		if (opt.isSet("--spe_local"))
+			parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(false);
+		else
+			parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
+	}
+	{
+		if (opt.isSet("--check_connectivity"))
+			parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(true);
+		else
+			parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(false);
+	}
+	{
+		double spe_tolerance = 1e-5;
+		opt.get("--spe_tolerance")->getDouble(spe_tolerance);
+		parameters[tapkee::SPE_TOLERANCE] = static_cast<tapkee::DefaultScalarType>(spe_tolerance);
+	}
+	{
+		int spe_num_updates = 100;
+		opt.get("--spe_num_updates")->getInt(spe_num_updates);
+		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<unsigned int>(spe_num_updates);
 	}
 
 	// Load data
@@ -175,7 +193,7 @@ int main(int argc, const char** argv)
 	string output_filename;
 	if (!opt.isSet("--input-file"))
 	{
-		tapkee::LoggingSingleton::instance().message_error("No input file specified");
+		tapkee::LoggingSingleton::instance().message_error("No input file specified. Please use -h flag if stucked");
 		return 0;
 	}
 	else
