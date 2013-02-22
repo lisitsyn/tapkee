@@ -236,12 +236,12 @@ int main(int argc, const char** argv)
 	{
 		tapkee::timed_context context("Distance matrix computation");
 		tapkee::TAPKEE_METHOD method = parameters[tapkee::REDUCTION_METHOD].cast<tapkee::TAPKEE_METHOD>();
-		if (method_needs_kernel(method))
+		if (method_needs_distance(method))
 		{
 			distance_matrix = 
 				matrix_from_callback(data_indices.begin(),data_indices.end(),distance_callback(input_data));
 		} 
-		if (method_needs_distance(method))
+		if (method_needs_kernel(method))
 		{
 			kernel_matrix = 
 				matrix_from_callback(data_indices.begin(),data_indices.end(),kernel_callback(input_data));
