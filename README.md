@@ -59,6 +59,17 @@ We welcome any integration so please contact authors if you have got any questio
 successfully used the library please also let authors know about that - mentions of any 
 applications are very appreciated.
 
+Customization
+-------------
+
+Tapkee is supposed to be highly customizable with preprocessor definitions.
+
+If you want to use float as numeric type you may do that using definition of `TAPKEE_CUSTOM_NUMTYPE`.
+
+If you use some non-standard STL-compatible realization of vector, map and pair you may redefine them
+with `TAPKEE_INTERNAL_VECTOR`, `TAPKEE_INTERNAL_PAIR`, `TAPKEE_INTERNAL_MAP` (std::vector, std::pair, std::map by
+default).
+
 Application
 -----------
 
