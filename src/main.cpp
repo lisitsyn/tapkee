@@ -153,14 +153,22 @@ int main(int argc, const char** argv)
 	{
 		double width = 1.0;
 		opt.get("--width")->getDouble(width);
-		if (width < 0.0)
+		if (width < 0.0) 
+		{
 			tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
+			return 0;
+		}
 		else
 			parameters[tapkee::GAUSSIAN_KERNEL_WIDTH] = static_cast<tapkee::DefaultScalarType>(width);
+	}
+	{
 		int timesteps = 1;
 		opt.get("--timesteps")->getInt(timesteps);
 		if (timesteps < 0)
+		{
 			tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
+			return 0;
+		}
 		else
 			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(timesteps);
 	}
