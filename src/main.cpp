@@ -44,7 +44,7 @@ int main(int argc, const char** argv)
 
 	opt.add("",0,1,0,"Input file","-i","--input-file");
 	opt.add("",0,1,0,"Output file","-o","--output-file");
-	opt.add("",0,1,0,"Output file for projection matrix","-op","--output_projection_file");
+	opt.add("",0,1,0,"Output file for projection matrix","-op","--output-projection-file");
 	opt.add("",0,0,0,"Display help","-h","--help");
 	opt.add("",0,0,0,"Output benchmark information","--benchmark");
 	opt.add("",0,0,0,"Output more information","--verbose");
@@ -146,7 +146,10 @@ int main(int argc, const char** argv)
 		int k = 1;
 		opt.get("--n_neighbors")->getInt(k);
 		if (k < 3)
+		{
 			tapkee::LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
+			return 0;
+		}
 		else
 			parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(k);
 	}
@@ -228,7 +231,6 @@ int main(int argc, const char** argv)
 	std::string output_matrix_filename = "/dev/null";
 	if (opt.isSet("--output-projection-file"))
 	{
-		tapkee::LoggingSingleton::instance().message_warning("OUTTTTTTTTTTT");
 		output_projection = true;
 		opt.get("--output-projection-file")->getString(output_matrix_filename);
 	}
