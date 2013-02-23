@@ -50,8 +50,6 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
                    KernelCallback kernel_callback, DistanceCallback distance_callback,
                    FeatureVectorCallback feature_vector_callback, ParametersMap options)
 {
-	Eigen::initParallel();
-	Eigen::setNbThreads(1);
 	ReturnResult return_result;
 
 	TAPKEE_METHOD method;

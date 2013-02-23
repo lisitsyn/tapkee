@@ -38,7 +38,6 @@
 		#endif
 	#else
 		#define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-		#define TAPKEE_OLD_EIGEN
 		#include <unsupported/Eigen/SparseExtra>
 	#endif
 #endif
@@ -72,7 +71,7 @@ namespace tapkee
 	//! default selfadjoint solver
 	typedef Eigen::SelfAdjointEigenSolver<DenseMatrix> DefaultDenseSelfAdjointEigenSolver;
 	//! default sparse solver
-#ifdef TAPKEE_OLD_EIGEN
+#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 	typedef Eigen::SimplicialCholesky<SparseWeightMatrix> DefaultSparseSolver;
 #else
 	#if defined(TAPKEE_SUPERLU_AVAILABLE) && defined(TAPKEE_USE_SUPERLU)
@@ -189,7 +188,7 @@ enum TAPKEE_EIGEN_EMBEDDING_METHOD
 	#define TAPKEE_INTERNAL_MAP std::map
 #endif
 
-#ifdef TAPKEE_OLD_EIGEN
+#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 	namespace tapkee {
 	template <typename T>
 	struct Triplet
