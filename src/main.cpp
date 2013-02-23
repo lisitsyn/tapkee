@@ -220,6 +220,7 @@ int main(int argc, const char** argv)
 	std::string output_matrix_filename = "/dev/null";
 	if (opt.isSet("--output-projection-file"))
 	{
+		tapkee::LoggingSingleton::instance().message_warning("OUTTTTTTTTTTT");
 		output_projection = true;
 		opt.get("--output-projection-file")->getString(output_matrix_filename);
 	}
@@ -274,8 +275,12 @@ int main(int argc, const char** argv)
 	ofs << embedding.first;
 	ofs.close();
 
-	ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mat;
-	embedding.second.clear();
+	if (output_projection)
+	{
+		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mat;
+		embedding.second.clear();
+	}
+
 	ofs_matrix.close();
 	return 0;
 }
