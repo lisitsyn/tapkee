@@ -55,14 +55,15 @@ Laplacian compute_laplacian(RandomAccessIterator begin,
 			DefaultScalarType distance = callback(*iter,begin[current_neighbors[i]]);
 			DefaultScalarType heat = exp(-distance*distance/width);
 			D(iter-begin) += heat;
-			//sparse_triplets.push_back(SparseTriplet(begin[current_neighbors[i]],(iter-begin),-heat));
+			D(current_neighbors[i]) += heat;
+			sparse_triplets.push_back(SparseTriplet(current_neighbors[i],(iter-begin),-heat));
 			sparse_triplets.push_back(SparseTriplet((iter-begin),current_neighbors[i],-heat));
 		}
 	}
 	for (unsigned int i=0; i<(end-begin); ++i)
 		sparse_triplets.push_back(SparseTriplet(i,i,D(i)));
 
-#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+#ifdef TAPKEE_OLD_EIGEN
 	Eigen::DynamicSparseMatrix<DefaultScalarType> dynamic_weight_matrix(end-begin,end-begin);
 	dynamic_weight_matrix.reserve(sparse_triplets.size());
 	for (SparseTriplets::const_iterator it=sparse_triplets.begin(); it!=sparse_triplets.end(); ++it)
