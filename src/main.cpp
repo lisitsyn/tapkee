@@ -246,15 +246,16 @@ int main(int argc, const char** argv)
 	tapkee::DenseMatrix distance_matrix;
 	tapkee::DenseMatrix kernel_matrix;
 	{
-		tapkee::timed_context context("Distance matrix computation");
 		tapkee::TAPKEE_METHOD method = parameters[tapkee::REDUCTION_METHOD].cast<tapkee::TAPKEE_METHOD>();
 		if (method_needs_distance(method))
 		{
+			tapkee::timed_context context("Distance matrix computation");
 			distance_matrix = 
 				matrix_from_callback(data_indices.begin(),data_indices.end(),distance_callback(input_data));
 		} 
 		if (method_needs_kernel(method))
 		{
+			tapkee::timed_context context("Kernel matrix computation");
 			kernel_matrix = 
 				matrix_from_callback(data_indices.begin(),data_indices.end(),kernel_callback(input_data));
 		}
@@ -276,10 +277,9 @@ int main(int argc, const char** argv)
 	ofs.close();
 
 	if (output_projection)
-	{
 		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mat;
-		embedding.second.clear();
-	}
+
+	embedding.second.clear();
 
 	ofs_matrix.close();
 	return 0;

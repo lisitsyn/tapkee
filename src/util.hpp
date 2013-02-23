@@ -153,13 +153,15 @@ template <class RandomAccessIterator, class PairwiseCallback>
 tapkee::DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback)
 {
 	tapkee::DenseMatrix result((end-begin),(end-begin));
-	for (RandomAccessIterator i_iter=begin; i_iter!=end; ++i_iter)
+	const int N = end-begin;
+	unsigned int i,j;
+	for (i=0; i<N; ++i)
 	{
-		for (RandomAccessIterator j_iter=begin; j_iter!=end; ++j_iter)
+		for (j=i; j<N; j++)
 		{
-			tapkee::DefaultScalarType res = callback(*i_iter,*j_iter);
-			result((i_iter-begin),(j_iter-begin)) = res;
-			result((j_iter-begin),(i_iter-begin)) = res;
+			tapkee::DefaultScalarType res = callback(begin[i],begin[j]);
+			result(i,j) = res;
+			result(j,i) = res;
 		}
 	}
 	return result;
