@@ -9,6 +9,7 @@
 
 #include <tapkee.hpp>
 #include <tapkee_defines.hpp>
+#include <tapkee_projection.hpp>
 #include <callbacks/eigen_callbacks.hpp>
 #include <callbacks/precomputed_callbacks.hpp>
 #include <utils/logging.hpp>
@@ -43,6 +44,7 @@ int main(int argc, const char** argv)
 
 	opt.add("",0,1,0,"Input file","-i","--input-file");
 	opt.add("",0,1,0,"Output file","-o","--output-file");
+	opt.add("",0,1,0,"Output file for projection matrix","-op","--output_projection_file");
 	opt.add("",0,0,0,"Display help","-h","--help");
 	opt.add("",0,0,0,"Output benchmark information","--benchmark");
 	opt.add("",0,0,0,"Output more information","--verbose");
@@ -214,8 +216,17 @@ int main(int argc, const char** argv)
 	else
 		opt.get("--output-file")->getString(output_filename);
 
+	bool output_projection = false;
+	std::string output_matrix_filename = "/dev/null";
+	if (opt.isSet("--output-projection-file"))
+	{
+		output_projection = true;
+		opt.get("--output-projection-file")->getString(output_matrix_filename);
+	}
+
 	ifstream ifs(input_filename.c_str());
 	ofstream ofs(output_filename.c_str());
+	ofstream ofs_matrix(output_matrix_filename.c_str());
 
 	tapkee::DenseMatrix input_data = read_data(ifs);
 	parameters[tapkee::CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
@@ -228,7 +239,7 @@ int main(int argc, const char** argv)
 	for (int i=0; i<input_data.cols(); i++)
 		data_indices.push_back(i);
 	
-	tapkee::DenseMatrix embedding;
+	tapkee::ReturnResult embedding;
 	
 #ifdef USE_PRECOMPUTED
 	tapkee::DenseMatrix distance_matrix;
@@ -260,7 +271,11 @@ int main(int argc, const char** argv)
 	embedding = tapkee::embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 #endif
 	// Save obtained data
-	ofs << embedding;
+	ofs << embedding.first;
 	ofs.close();
+
+	ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mat;
+	embedding.second.clear();
+	ofs_matrix.close();
 	return 0;
 }

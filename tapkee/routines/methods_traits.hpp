@@ -23,7 +23,7 @@ template <int method> struct MethodTraits
 	static bool needs_kernel() { return kernel_needed; } \
 	static bool needs_distance() { return distance_needed; } \
 	static bool needs_feature_vector() { return feature_vector_needed; } \
-};
+}
 
 #define METHOD_THAT_NEEDS_ONLY_KERNEL_IS(X) METHOD_TRAIT(X,true,false,false)
 #define METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(X) METHOD_TRAIT(X,false,true,false)

@@ -20,7 +20,7 @@ namespace tapkee_internal
 {
 
 template <class RandomAccessIterator, class PairwiseCallback>
-EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator end,
+DenseMatrix spe_embedding(RandomAccessIterator begin, RandomAccessIterator end,
 		PairwiseCallback callback, const Neighbors& neighbors,
 		unsigned int target_dimension, bool global_strategy,
 		DefaultScalarType tolerance, int nupdates)
@@ -167,7 +167,7 @@ EmbeddingResult spe_embedding(RandomAccessIterator begin, RandomAccessIterator e
 		lambda = lambda - ( lambda / max_iter );
 	}
 
-	return EmbeddingResult(Y.transpose(),DenseVector());
+	return Y.transpose();
 };
 
 }
