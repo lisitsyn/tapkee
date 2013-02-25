@@ -33,6 +33,7 @@ using namespace std;
 
 int main(int argc, const char** argv)
 {
+	srand(time(NULL));
 	ezOptionParser opt;
 	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn, Fernando Iglesias\n";
 	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.\n"
@@ -45,13 +46,14 @@ int main(int argc, const char** argv)
 	opt.add("",0,1,0,"Input file","-i","--input-file");
 	opt.add("",0,1,0,"Output file","-o","--output-file");
 	opt.add("",0,1,0,"Output file for projection matrix","-op","--output-projection-file");
+	opt.add("",0,1,0,"Output file for mean of data","-omp","--output-mean-file");
 	opt.add("",0,0,0,"Display help","-h","--help");
 	opt.add("",0,0,0,"Output benchmark information","--benchmark");
 	opt.add("",0,0,0,"Output more information","--verbose");
 	opt.add("klle",0,1,0,
 			"Dimension reduction method (default klle). One of the following: "
 			"klle, npe, kltsa, lltsa, hlle, laplacian_eigenmaps, lpp, "
-			"diffusion_map, isomap, lisomap, mds, lmds, spe, kpca, pca.",
+			"diffusion_map, isomap, lisomap, mds, lmds, spe, kpca, pca, random_projection.",
 			"-m","--method");
 	opt.add("covertree",0,1,0,
 			"Neighbors search method (default covertree). One of the following "
@@ -286,8 +288,8 @@ int main(int argc, const char** argv)
 	ofs << embedding.first;
 	ofs.close();
 
-	if (output_projection)
-		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mat;
+	if (output_projection && embedding.second.implementation)
+		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->proj_mat;
 
 	embedding.second.clear();
 

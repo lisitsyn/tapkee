@@ -52,6 +52,7 @@ bool method_needs_kernel(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_KERNEL(tapkee::DIFFUSION_MAP);
 		IF_NEEDS_KERNEL(tapkee::KERNEL_PCA);
 		IF_NEEDS_KERNEL(tapkee::PCA);
+		IF_NEEDS_KERNEL(tapkee::RANDOM_PROJECTION);
 		IF_NEEDS_KERNEL(tapkee::LAPLACIAN_EIGENMAPS);
 		IF_NEEDS_KERNEL(tapkee::LOCALITY_PRESERVING_PROJECTIONS);
 		IF_NEEDS_KERNEL(tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING);
@@ -78,6 +79,7 @@ bool method_needs_distance(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_DISTANCE(tapkee::DIFFUSION_MAP);
 		IF_NEEDS_DISTANCE(tapkee::KERNEL_PCA);
 		IF_NEEDS_DISTANCE(tapkee::PCA);
+		IF_NEEDS_DISTANCE(tapkee::RANDOM_PROJECTION);
 		IF_NEEDS_DISTANCE(tapkee::LAPLACIAN_EIGENMAPS);
 		IF_NEEDS_DISTANCE(tapkee::LOCALITY_PRESERVING_PROJECTIONS);
 		IF_NEEDS_DISTANCE(tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING);
@@ -111,6 +113,8 @@ tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 		return tapkee::KERNEL_PCA;
 	if (!strcmp(str,"pca"))
 		return tapkee::PCA;
+	if (!strcmp(str,"random_projection"))
+		return tapkee::RANDOM_PROJECTION;
 	if (!strcmp(str,"laplacian_eigenmaps"))
 		return tapkee::LAPLACIAN_EIGENMAPS;
 	if (!strcmp(str,"lpp"))
