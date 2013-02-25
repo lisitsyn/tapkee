@@ -122,7 +122,7 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)
 * Isomap and landmark Isomap
 * [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
-* PCA
+* PCA and randomized PCA
 * Kernel PCA (kPCA)
 
 The following methods are under development:
