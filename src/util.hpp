@@ -59,6 +59,7 @@ bool method_needs_kernel(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_KERNEL(tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT);
 		IF_NEEDS_KERNEL(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
 		IF_NEEDS_KERNEL(tapkee::PASS_THRU);
+		IF_NEEDS_KERNEL(tapkee::FACTOR_ANALYSIS);
 		IF_NEEDS_KERNEL(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_KERNEL
 	}
@@ -86,6 +87,7 @@ bool method_needs_distance(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_DISTANCE(tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT);
 		IF_NEEDS_DISTANCE(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
 		IF_NEEDS_DISTANCE(tapkee::PASS_THRU);
+		IF_NEEDS_DISTANCE(tapkee::FACTOR_ANALYSIS);
 		IF_NEEDS_DISTANCE(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_DISTANCE
 	}
@@ -127,6 +129,8 @@ tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 		return tapkee::STOCHASTIC_PROXIMITY_EMBEDDING;
 	if (!strcmp(str,"passthru"))
 		return tapkee::PASS_THRU;
+	if (!strcmp(str,"fa"))
+		return tapkee::FACTOR_ANALYSIS;
 
 	return tapkee::UNKNOWN_METHOD;
 }
