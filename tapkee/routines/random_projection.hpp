@@ -8,6 +8,9 @@
  *
  */
 
+#ifndef TAPKEE_RANDOM_PROJECTION_H_
+#define TAPKEE_RANDOM_PROJECTION_H_
+
 namespace tapkee
 {
 namespace tapkee_internal
@@ -33,3 +36,5 @@ DenseMatrix gaussian_projection_matrix(unsigned int target_dimension, unsigned i
 
 }
 }
+
+#endif
