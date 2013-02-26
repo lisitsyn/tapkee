@@ -91,6 +91,7 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 			HANDLE_IMPLEMENTATION(RANDOM_PROJECTION);
 			HANDLE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING);
 			HANDLE_IMPLEMENTATION(PASS_THRU);
+			HANDLE_IMPLEMENTATION(FACTOR_ANALYSIS);
 			case UNKNOWN_METHOD: throw std::runtime_error("unknown method"); break;
 		}
 	}

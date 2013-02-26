@@ -53,7 +53,7 @@ int main(int argc, const char** argv)
 	opt.add("klle",0,1,0,
 			"Dimension reduction method (default klle). One of the following: "
 			"klle, npe, kltsa, lltsa, hlle, laplacian_eigenmaps, lpp, "
-			"diffusion_map, isomap, lisomap, mds, lmds, spe, kpca, pca, random_projection.",
+			"diffusion_map, isomap, lisomap, mds, lmds, spe, kpca, pca, random_projection, fa.",
 			"-m","--method");
 	opt.add("covertree",0,1,0,
 			"Neighbors search method (default covertree). One of the following "
@@ -73,6 +73,8 @@ int main(int argc, const char** argv)
 	opt.add("0.2",0,1,0,"Ratio of landmarks. Should be in (0,1) range","--landmark_ratio");
 	opt.add("1e-5",0,1,0,"Tolerance for SPE","--spe_tolerance");
 	opt.add("100",0,1,0,"Number of SPE updates","--spe_num_updates");
+	opt.add("200",0,1,0,"Maximum number of FA iterations","--fa_max_iters");
+	opt.add("1e-5",0,1,0,"FA convergence criterion","--fa_epsilon");
 	opt.parse(argc, argv);
 
 	if (opt.isSet("-h"))
@@ -208,6 +210,16 @@ int main(int argc, const char** argv)
 		int spe_num_updates = 100;
 		opt.get("--spe_num_updates")->getInt(spe_num_updates);
 		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<unsigned int>(spe_num_updates);
+	}
+	{
+		int fa_max_iters = 200;
+		opt.get("--fa_max_iters")->getInt(fa_max_iters);
+		parameters[tapkee::FA_MAX_ITERS] = static_cast<unsigned int>(fa_max_iters);
+	}
+	{
+		double fa_epsilon = 1e-5;
+		opt.get("--fa_epsilon")->getDouble(fa_epsilon);
+		parameters[tapkee::FA_EPSILON] = static_cast<tapkee::DefaultScalarType>(fa_epsilon);
 	}
 
 	// Load data
