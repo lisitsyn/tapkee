@@ -124,6 +124,7 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
 * PCA and randomized PCA
 * Kernel PCA (kPCA)
+* Random projection
 
 The following methods are under development:
 
