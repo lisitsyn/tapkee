@@ -73,7 +73,7 @@ int main(int argc, const char** argv)
 	opt.add("0.2",0,1,0,"Ratio of landmarks. Should be in (0,1) range","--landmark_ratio");
 	opt.add("1e-5",0,1,0,"Tolerance for SPE","--spe_tolerance");
 	opt.add("100",0,1,0,"Number of SPE updates","--spe_num_updates");
-	opt.add("200",0,1,0,"Maximum number of FA iterations","--fa_max_iters");
+	opt.add("200",0,1,0,"Maximum number of iterations","--max_iters");
 	opt.add("1e-5",0,1,0,"FA convergence criterion","--fa_epsilon");
 	opt.parse(argc, argv);
 
@@ -212,9 +212,9 @@ int main(int argc, const char** argv)
 		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<unsigned int>(spe_num_updates);
 	}
 	{
-		int fa_max_iters = 200;
-		opt.get("--fa_max_iters")->getInt(fa_max_iters);
-		parameters[tapkee::FA_MAX_ITERS] = static_cast<unsigned int>(fa_max_iters);
+		int max_iters = 200;
+		opt.get("--max_iters")->getInt(max_iters);
+		parameters[tapkee::MAX_ITERATION] = static_cast<unsigned int>(max_iters);
 	}
 	{
 		double fa_epsilon = 1e-5;

@@ -100,12 +100,11 @@ enum TAPKEE_PARAMETERS
 	/* DefaultScalarType */ GAUSSIAN_KERNEL_WIDTH,
 	/* unsigned int */ MAX_ITERATION,
 	/* bool */ SPE_GLOBAL_STRATEGY,
-	/* DefaultScalarType */ SPE_TOLERANCE,
 	/* unsigned int */ SPE_NUM_UPDATES,
+	/* DefaultScalarType */ SPE_TOLERANCE,
 	/* DefaultScalarType */ LANDMARK_RATIO,
 	/* DefaultScalarType */ EIGENSHIFT,
 	/* bool */ CHECK_CONNECTIVITY,
-	/* unsigned int */ FA_MAX_ITERS,
 	/* DefaultScalarType */ FA_EPSILON,
 };
 
