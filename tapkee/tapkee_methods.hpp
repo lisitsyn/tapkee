@@ -219,6 +219,9 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		DenseSymmetricMatrix shortest_distances_matrix = 
 			compute_shortest_distances_matrix(begin,end,neighbors,distance_callback);
+		shortest_distances_matrix = shortest_distances_matrix.array().square();
+		centerMatrix(shortest_distances_matrix);
+		shortest_distances_matrix.array() *= -0.5;
 		return ReturnResult(eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
 			shortest_distances_matrix,target_dimension,SKIP_NO_EIGENVALUES).first, tapkee::ProjectingFunction());
 	}
@@ -242,18 +245,27 @@ CONCRETE_IMPLEMENTATION(LANDMARK_ISOMAP)
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		Landmarks landmarks = 
 			select_landmarks_random(begin,end,ratio);
-		DenseSymmetricMatrix distance_matrix = 
+		DenseMatrix distance_matrix = 
 			compute_shortest_distances_matrix(begin,end,landmarks,neighbors,distance_callback);
-		DenseVector landmark_distances_squared = distance_matrix.colwise().mean();
-		centerMatrix(distance_matrix);
+		distance_matrix = distance_matrix.array().square();
+		
+		DenseVector col_means = distance_matrix.colwise().mean();
+		DenseVector row_means = distance_matrix.rowwise().mean();
+		DefaultScalarType grand_mean = distance_matrix.mean();
+		distance_matrix.array() += grand_mean;
+		distance_matrix.colwise() -= row_means;
+		distance_matrix.rowwise() -= col_means.transpose();
 		distance_matrix.array() *= -0.5;
+
 		EmbeddingResult landmarks_embedding = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
-					distance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
+					distance_matrix*distance_matrix.transpose(),target_dimension,SKIP_NO_EIGENVALUES);
+
+		DenseMatrix embedding = distance_matrix.transpose()*landmarks_embedding.first;
+
 		for (unsigned int i=0; i<target_dimension; i++)
-			landmarks_embedding.first.col(i).array() *= sqrt(landmarks_embedding.second(i));
-		return ReturnResult(triangulate(begin,end,distance_callback,landmarks,
-			landmark_distances_squared,landmarks_embedding,target_dimension).first, tapkee::ProjectingFunction());
+			embedding.col(i).array() /= sqrt(sqrt(landmarks_embedding.second(i)));
+		return ReturnResult(embedding,tapkee::ProjectingFunction());
 	}
 };
 
