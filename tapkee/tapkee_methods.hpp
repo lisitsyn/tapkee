@@ -222,8 +222,14 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 		shortest_distances_matrix = shortest_distances_matrix.array().square();
 		centerMatrix(shortest_distances_matrix);
 		shortest_distances_matrix.array() *= -0.5;
-		return ReturnResult(eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
-			shortest_distances_matrix,target_dimension,SKIP_NO_EIGENVALUES).first, tapkee::ProjectingFunction());
+		
+		EmbeddingResult embedding = eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
+			shortest_distances_matrix,target_dimension,SKIP_NO_EIGENVALUES);
+
+		for (unsigned int i=0; i<target_dimension; i++)
+			embedding.first.col(i).array() *= sqrt(embedding.second(i));
+		
+		return ReturnResult(embedding.first, tapkee::ProjectingFunction());
 	}
 };
 
