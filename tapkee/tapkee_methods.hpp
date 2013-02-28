@@ -49,6 +49,7 @@ std::string get_method_name(TAPKEE_METHOD m)
 		case KERNEL_PCA: return "Kernel Principal Component Analysis";
 		case STOCHASTIC_PROXIMITY_EMBEDDING: return "Stochastic Proximity Embedding";
 		case PASS_THRU: return "passing through";
+		case RANDOM_PROJECTION: return "Random Projection";
 		case FACTOR_ANALYSIS: return "Factor Analysis";
 		default: return "Method name unknown (yes this is a bug)";
 	}

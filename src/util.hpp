@@ -95,23 +95,23 @@ bool method_needs_distance(tapkee::TAPKEE_METHOD method)
 
 tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 {
-	if (!strcmp(str,"kltsa"))
+	if (!strcmp(str,"local_tangent_space_alignment"))
 		return tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	if (!strcmp(str,"klle"))
+	if (!strcmp(str,"locally_linear_embedding"))
 		return tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING;
-	if (!strcmp(str,"hlle"))
+	if (!strcmp(str,"hessian_locally_linear_embedding"))
 		return tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING;
-	if (!strcmp(str,"mds"))
+	if (!strcmp(str,"multidimensional_scaling"))
 		return tapkee::MULTIDIMENSIONAL_SCALING;
-	if (!strcmp(str,"lmds"))
+	if (!strcmp(str,"landmark_multidimensional_scaling"))
 		return tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"isomap"))
 		return tapkee::ISOMAP;
-	if (!strcmp(str,"lisomap"))
+	if (!strcmp(str,"landmark_isomap"))
 		return tapkee::LANDMARK_ISOMAP;
 	if (!strcmp(str,"diffusion_map"))
 		return tapkee::DIFFUSION_MAP;
-	if (!strcmp(str,"kpca"))
+	if (!strcmp(str,"kernel_pca"))
 		return tapkee::KERNEL_PCA;
 	if (!strcmp(str,"pca"))
 		return tapkee::PCA;
@@ -119,17 +119,17 @@ tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 		return tapkee::RANDOM_PROJECTION;
 	if (!strcmp(str,"laplacian_eigenmaps"))
 		return tapkee::LAPLACIAN_EIGENMAPS;
-	if (!strcmp(str,"lpp"))
+	if (!strcmp(str,"locality_preserving_projections"))
 		return tapkee::LOCALITY_PRESERVING_PROJECTIONS;
-	if (!strcmp(str,"npe"))
+	if (!strcmp(str,"neighborhood_preserving_embedding"))
 		return tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING;
-	if (!strcmp(str,"lltsa"))
+	if (!strcmp(str,"linear_local_tangent_space_alignment"))
 		return tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	if (!strcmp(str,"spe"))
+	if (!strcmp(str,"stochastic_proximity_embedding"))
 		return tapkee::STOCHASTIC_PROXIMITY_EMBEDDING;
 	if (!strcmp(str,"passthru"))
 		return tapkee::PASS_THRU;
-	if (!strcmp(str,"fa"))
+	if (!strcmp(str,"factor_analysis"))
 		return tapkee::FACTOR_ANALYSIS;
 
 	return tapkee::UNKNOWN_METHOD;

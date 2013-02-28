@@ -35,49 +35,75 @@ int main(int argc, const char** argv)
 {
 	srand(time(NULL));
 	ezOptionParser opt;
-	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn, Fernando Iglesias\n";
+	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn <lisitsyn.s.o@gmail.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n";
 	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.\n"
 	               "Git " TAPKEE_CURRENT_GIT_INFO;
 	opt.example = "Run kernel locally linear embedding with k=10 with arpack "
                   "eigensolver on data from input.dat saving embedding to output.dat \n\n"
-	              "tapkee -i input.dat -o output.dat --method klle --eigen_method arpack -k 10\n";
+	              "tapkee -i input.dat -o output.dat --method klle --eigen-method arpack -k 10\n\n";
 	opt.syntax = "tapkee_app [options]\n";
 
-	opt.add("",0,1,0,"Input file","-i","--input-file");
-	opt.add("",0,1,0,"Output file","-o","--output-file");
-	opt.add("",0,1,0,"Output file for projection matrix","-op","--output-projection-file");
-	opt.add("",0,1,0,"Output file for mean of data","-omp","--output-mean-file");
-	opt.add("",0,0,0,"Display help","-h","--help");
-	opt.add("",0,0,0,"Output benchmark information","--benchmark");
-	opt.add("",0,0,0,"Output more information","--verbose");
-	opt.add("klle",0,1,0,
-			"Dimension reduction method (default klle). One of the following: "
-			"klle, npe, kltsa, lltsa, hlle, laplacian_eigenmaps, lpp, "
-			"diffusion_map, isomap, lisomap, mds, lmds, spe, kpca, pca, random_projection, fa.",
-			"-m","--method");
+#define INPUT_FILE_KEYWORD "--input-file"
+	opt.add("",0,1,0,"Input file","-i",INPUT_FILE_KEYWORD);
+#define OUTPUT_FILE_KEYWORD "--output-file"
+	opt.add("",0,1,0,"Output file","-o",OUTPUT_FILE_KEYWORD);
+#define OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD "--output-projection-matrix-file"
+	opt.add("",0,1,0,"Output file for projection matrix","-opmat",OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD);
+#define OUTPUT_PROJECTION_MEAN_FILE_KEYWORD "--output-projection-mean-file"
+	opt.add("",0,1,0,"Output file for mean of data","-opmean",OUTPUT_PROJECTION_MEAN_FILE_KEYWORD);
+#define HELP_KEYWORD "--help"
+	opt.add("",0,0,0,"Display help","-h",HELP_KEYWORD);
+#define BENCHMARK_KEYWORD "--benchmark"
+	opt.add("",0,0,0,"Output benchmark information",BENCHMARK_KEYWORD);
+#define VERBOSE_KEYWORD "--verbose"
+	opt.add("",0,0,0,"Output more information",VERBOSE_KEYWORD);
+#define METHOD_KEYWORD "--method"
+	opt.add("locally_linear_embedding",0,1,0,
+			"Dimension reduction method (default klle). One of the following: \n"
+			"locally_linear_embedding, neighborhood_preserving_embedding, \n"
+			"local_tangent_space_alignment, linear_local_tangent_space_alignment, \n"
+			"hessian_locally_linear_embedding, laplacian_eigenmaps, locality_preserving_projections, \n"
+			"diffusion_map, isomap, landmark_isomap, multidimensional_scaling, \n"
+			"landmark_multidimensional_scaling, stochastic_proximity_embedding, \n"
+			"kernel_pca, pca, random_projection, factor_analysis.",
+			"-m",METHOD_KEYWORD);
+#define NEIGHBORS_METHOD_KEYWORD "--neighbors-method"
 	opt.add("covertree",0,1,0,
 			"Neighbors search method (default covertree). One of the following "
 			"covertree, brute.",
-			"-nm","--neighbors_method");
+			"-nm",NEIGHBORS_METHOD_KEYWORD);
+#define EIGEN_METHOD_KEYWORD "--eigen-method"
 	opt.add("arpack",0,1,0,
 			"Eigendecomposition method (default arpack). One of the following "
 			"arpack, randomized, dense.",
-			"-em","--eigen_method");
-	opt.add("2",0,1,0,"Target dimension (default 2)","-td","--target_dimension");
-	opt.add("10",0,1,0,"Number of neighbors (default 10)","-nn","-k","--n_neighbors");
-	opt.add("1.0",0,1,0,"Width of gaussian kernel (default 1.0)","-w","--width");
-	opt.add("1",0,1,0,"Number of timesteps for diffusion map (default 1)","--timesteps");
-	opt.add("0",0,0,0,"Local strategy in SPE (default global)", "--spe_local");
-	opt.add("0",0,0,0,"Check if neighborhood graph is connected (detaulf do not check)", "--check_connectivity");
-	opt.add("1e-9",0,1,0,"Regularization diagonal shift for weight matrix","--eigenshift");
-	opt.add("0.2",0,1,0,"Ratio of landmarks. Should be in (0,1) range","--landmark_ratio");
-	opt.add("1e-5",0,1,0,"Tolerance for SPE","--spe_tolerance");
-	opt.add("100",0,1,0,"Number of SPE updates","--spe_num_updates");
-	opt.add("200",0,1,0,"Maximum number of iterations","--max_iters");
-	opt.add("1e-5",0,1,0,"FA convergence criterion","--fa_epsilon");
+			"-em",EIGEN_METHOD_KEYWORD);
+#define TARGET_DIMENSION_KEYWORD "--target-dimension"
+	opt.add("2",0,1,0,"Target dimension (default 2)","-td",TARGET_DIMENSION_KEYWORD);
+#define NUM_NEIGHBORS_KEYWORD "--num-neighbors"
+	opt.add("10",0,1,0,"Number of neighbors (default 10)","-nn","-k",NUM_NEIGHBORS_KEYWORD);
+#define GAUSSIAN_WIDTH_KEYWORD "--gaussian-width"
+	opt.add("1.0",0,1,0,"Width of gaussian kernel (default 1.0)","-gw",GAUSSIAN_WIDTH_KEYWORD);
+#define TIMESTEPS_KEYWORD "--timesteps"
+	opt.add("1",0,1,0,"Number of timesteps for diffusion map (default 1)",TIMESTEPS_KEYWORD);
+#define SPE_LOCAL_KEYWORD "--spe-local"
+	opt.add("0",0,0,0,"Local strategy in SPE (default global)",SPE_LOCAL_KEYWORD);
+#define CHECK_CONNECTIVITY_KEYWORD "--check-connectivity"
+	opt.add("0",0,0,0,"Check if neighborhood graph is connected (detaulf do not check)",CHECK_CONNECTIVITY_KEYWORD);
+#define EIGENSHIFT_KEYWORD "--eigenshift"
+	opt.add("1e-9",0,1,0,"Regularization diagonal shift for weight matrix",EIGENSHIFT_KEYWORD);
+#define LANDMARK_RATIO_KEYWORD "--landmark-ratio"
+	opt.add("0.2",0,1,0,"Ratio of landmarks. Should be in (0,1) range",LANDMARK_RATIO_KEYWORD);
+#define SPE_TOLERANCE_KEYWORD "--spe-tolerance"
+	opt.add("1e-5",0,1,0,"Tolerance for SPE",SPE_TOLERANCE_KEYWORD);
+#define SPE_NUM_UPDATES_KEYWORD "--spe-num-updates"
+	opt.add("100",0,1,0,"Number of SPE updates",SPE_NUM_UPDATES_KEYWORD);
+#define MAX_ITERS_KEYWORD "--max-iters"
+	opt.add("200",0,1,0,"Maximum number of iterations",MAX_ITERS_KEYWORD);
+#define FA_EPSILON_KEYWORD "--fa-epsilon"
+	opt.add("1e-5",0,1,0,"FA convergence criterion",FA_EPSILON_KEYWORD);
 	opt.parse(argc, argv);
 
-	if (opt.isSet("-h"))
+	if (opt.isSet(HELP_KEYWORD))
 	{
 		string usage;
 		opt.getUsage(usage);
@@ -85,12 +111,12 @@ int main(int argc, const char** argv)
 		return 0;
 	}
 
-	if (opt.isSet("--verbose"))
+	if (opt.isSet(VERBOSE_KEYWORD))
 	{
 		tapkee::LoggingSingleton::instance().enable_info();
 	}
 
-	if (opt.isSet("--benchmark"))
+	if (opt.isSet(BENCHMARK_KEYWORD))
 	{
 		tapkee::LoggingSingleton::instance().enable_benchmark();
 		tapkee::LoggingSingleton::instance().message_info("Benchmarking enabled");
@@ -100,7 +126,7 @@ int main(int argc, const char** argv)
 
 	{
 		string method;
-		opt.get("--method")->getString(method);
+		opt.get(METHOD_KEYWORD)->getString(method);
 		tapkee::TAPKEE_METHOD tapkee_method = parse_reduction_method(method.c_str());
 		if (tapkee_method==tapkee::UNKNOWN_METHOD)
 		{
@@ -112,7 +138,7 @@ int main(int argc, const char** argv)
 	}
 	{
 		string method;
-		opt.get("--neighbors_method")->getString(method);
+		opt.get(NEIGHBORS_METHOD_KEYWORD)->getString(method);
 		tapkee::TAPKEE_NEIGHBORS_METHOD tapkee_neighbors_method = parse_neighbors_method(method.c_str());
 		if (tapkee_neighbors_method==tapkee::UNKNOWN_NEIGHBORS_METHOD)
 		{
@@ -124,7 +150,7 @@ int main(int argc, const char** argv)
 	}
 	{
 		string method;
-		opt.get("--eigen_method")->getString(method);
+		opt.get(EIGEN_METHOD_KEYWORD)->getString(method);
 		tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD tapkee_eigen_method = parse_eigen_method(method.c_str());
 		if (tapkee_eigen_method==tapkee::UNKNOWN_EIGEN_METHOD)
 		{
@@ -136,7 +162,7 @@ int main(int argc, const char** argv)
 	}
 	{
 		int target_dimension = 1;
-		opt.get("--target_dimension")->getInt(target_dimension);
+		opt.get(TARGET_DIMENSION_KEYWORD)->getInt(target_dimension);
 		if (target_dimension < 0)
 		{
 			tapkee::LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
@@ -148,7 +174,7 @@ int main(int argc, const char** argv)
 	}
 	{
 		int k = 1;
-		opt.get("--n_neighbors")->getInt(k);
+		opt.get(NUM_NEIGHBORS_KEYWORD)->getInt(k);
 		if (k < 3)
 		{
 			tapkee::LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
@@ -159,7 +185,7 @@ int main(int argc, const char** argv)
 	}
 	{
 		double width = 1.0;
-		opt.get("--width")->getDouble(width);
+		opt.get(GAUSSIAN_WIDTH_KEYWORD)->getDouble(width);
 		if (width < 0.0) 
 		{
 			tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
@@ -170,7 +196,7 @@ int main(int argc, const char** argv)
 	}
 	{
 		int timesteps = 1;
-		opt.get("--timesteps")->getInt(timesteps);
+		opt.get(TIMESTEPS_KEYWORD)->getInt(timesteps);
 		if (timesteps < 0)
 		{
 			tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
@@ -181,77 +207,80 @@ int main(int argc, const char** argv)
 	}
 	{
 		double eigenshift = 1e-9;
-		opt.get("--eigenshift")->getDouble(eigenshift);
+		opt.get(EIGENSHIFT_KEYWORD)->getDouble(eigenshift);
 		parameters[tapkee::EIGENSHIFT] = static_cast<tapkee::DefaultScalarType>(eigenshift);
 	}
 	{
 		double landmark_ratio = 0.0;
-		opt.get("--landmark_ratio")->getDouble(landmark_ratio);
+		opt.get(LANDMARK_RATIO_KEYWORD)->getDouble(landmark_ratio);
 		parameters[tapkee::LANDMARK_RATIO] = static_cast<tapkee::DefaultScalarType>(landmark_ratio);
 	}
 	{
-		if (opt.isSet("--spe_local"))
+		if (opt.isSet(SPE_LOCAL_KEYWORD))
 			parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(false);
 		else
 			parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
 	}
 	{
-		if (opt.isSet("--check_connectivity"))
+		if (opt.isSet(CHECK_CONNECTIVITY_KEYWORD))
 			parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(true);
 		else
 			parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(false);
 	}
 	{
 		double spe_tolerance = 1e-5;
-		opt.get("--spe_tolerance")->getDouble(spe_tolerance);
+		opt.get(SPE_TOLERANCE_KEYWORD)->getDouble(spe_tolerance);
 		parameters[tapkee::SPE_TOLERANCE] = static_cast<tapkee::DefaultScalarType>(spe_tolerance);
 	}
 	{
 		int spe_num_updates = 100;
-		opt.get("--spe_num_updates")->getInt(spe_num_updates);
+		opt.get(SPE_NUM_UPDATES_KEYWORD)->getInt(spe_num_updates);
 		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<unsigned int>(spe_num_updates);
 	}
 	{
 		int max_iters = 200;
-		opt.get("--max_iters")->getInt(max_iters);
+		opt.get(MAX_ITERS_KEYWORD)->getInt(max_iters);
 		parameters[tapkee::MAX_ITERATION] = static_cast<unsigned int>(max_iters);
 	}
 	{
 		double fa_epsilon = 1e-5;
-		opt.get("--fa_epsilon")->getDouble(fa_epsilon);
+		opt.get(FA_EPSILON_KEYWORD)->getDouble(fa_epsilon);
 		parameters[tapkee::FA_EPSILON] = static_cast<tapkee::DefaultScalarType>(fa_epsilon);
 	}
 
 	// Load data
 	string input_filename;
 	string output_filename;
-	if (!opt.isSet("--input-file"))
+	if (!opt.isSet(INPUT_FILE_KEYWORD))
 	{
 		tapkee::LoggingSingleton::instance().message_error("No input file specified. Please use -h flag if stucked");
 		return 0;
 	}
 	else
-		opt.get("--input-file")->getString(input_filename);
+		opt.get(INPUT_FILE_KEYWORD)->getString(input_filename);
 
-	if (!opt.isSet("--output-file"))
+	if (!opt.isSet(OUTPUT_FILE_KEYWORD))
 	{
 		tapkee::LoggingSingleton::instance().message_warning("No output file specified, using /dev/tty");
 		output_filename = "/dev/tty";
 	}
 	else
-		opt.get("--output-file")->getString(output_filename);
+		opt.get(OUTPUT_FILE_KEYWORD)->getString(output_filename);
 
 	bool output_projection = false;
 	std::string output_matrix_filename = "/dev/null";
-	if (opt.isSet("--output-projection-file"))
+	std::string output_mean_filename = "/dev/null";
+	if (opt.isSet(OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD) && opt.isSet(OUTPUT_PROJECTION_MEAN_FILE_KEYWORD))
 	{
 		output_projection = true;
-		opt.get("--output-projection-file")->getString(output_matrix_filename);
+		opt.get(OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD)->getString(output_matrix_filename);
+		opt.get(OUTPUT_PROJECTION_MEAN_FILE_KEYWORD)->getString(output_mean_filename);
 	}
 
 	ifstream ifs(input_filename.c_str());
 	ofstream ofs(output_filename.c_str());
 	ofstream ofs_matrix(output_matrix_filename.c_str());
+	ofstream ofs_mean(output_matrix_filename.c_str());
 
 	tapkee::DenseMatrix input_data = read_data(ifs);
 	parameters[tapkee::CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
@@ -300,11 +329,12 @@ int main(int argc, const char** argv)
 	ofs << embedding.first;
 	ofs.close();
 
-	if (output_projection && embedding.second.implementation)
+	if (output_projection && embedding.second.implementation) {
 		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->proj_mat;
-
+		ofs_mean << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mean_vec;
+	}
 	embedding.second.clear();
-
 	ofs_matrix.close();
+	ofs_mean.close();
 	return 0;
 }
