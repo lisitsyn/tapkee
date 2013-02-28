@@ -13,7 +13,7 @@
 
 #include <utils/fibonacci_heap.hpp>
 #include <limits>
-#include <stdio.h>
+
 using std::numeric_limits;
 
 namespace tapkee
