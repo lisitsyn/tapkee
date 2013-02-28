@@ -125,6 +125,7 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * PCA and randomized PCA
 * Kernel PCA (kPCA)
 * Random projection
+* Factor analysis
 
 The following methods are under development:
 
