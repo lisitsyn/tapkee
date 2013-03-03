@@ -63,6 +63,7 @@ bool method_needs_kernel(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_KERNEL(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_KERNEL
 	}
+	return false;
 }
 
 bool method_needs_distance(tapkee::TAPKEE_METHOD method)
@@ -91,6 +92,7 @@ bool method_needs_distance(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_DISTANCE(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_DISTANCE
 	}
+	return false;
 }
 
 tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)

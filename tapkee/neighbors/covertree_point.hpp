@@ -122,19 +122,19 @@ struct CoverTreePoint
 
 /** Functions declared out of the class definition to respect CoverTree 
  *  structure */
-template <class RandomAccessIterator, class DistanceCallback>
-inline ScalarType distance(const DistanceCallback& dcb, const CoverTreePoint<RandomAccessIterator>& l,
-		const CoverTreePoint<RandomAccessIterator>& r, ScalarType upper_bound)
+template <class RandomAccessIterator, class Callback>
+inline ScalarType distance(const Callback& cb, const CoverTreePoint<RandomAccessIterator>& l,
+		const CoverTreePoint<RandomAccessIterator>& r, ScalarType /*upper_bound*/)
 {
-	assert(upper_bound>=0);
+	//assert(upper_bound>=0);
 
 	if (l.iter_==r.iter_)
 		return 0.0;
 
-	if (BasicCallbackTraits<DistanceCallback>::is_kernel())
-		return sqrt(l.norm_ + r.norm_ - 2*dcb(*r.iter_,*l.iter_));
+	if (BasicCallbackTraits<Callback>::is_kernel())
+		return sqrt(l.norm_ + r.norm_ - 2*cb(*r.iter_,*l.iter_));
 	else	// distance_kernel
-		return dcb(*l.iter_,*r.iter_);
+		return cb(*l.iter_,*r.iter_);
 }
 
 /** Print the information of the CoverTree point */

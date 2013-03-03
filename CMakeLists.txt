@@ -9,7 +9,7 @@ set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
 
 # Eigen3 detection
 find_package(Eigen3 REQUIRED)
-include_directories("${EIGEN3_INCLUDE_DIR}")
+include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 
 # ARPACK detection
 find_package(Arpack REQUIRED)
@@ -28,7 +28,7 @@ set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
 target_link_libraries(tapkee arpack)
 
-add_definitions(-DUSE_PRECOMPUTED)
+#add_definitions(-DUSE_PRECOMPUTED)
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
 	set (TAPKEE_INSTALL_DIR
@@ -42,5 +42,9 @@ install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
 
 exec_program("git" ARGS "describe --always" OUTPUT_VARIABLE VERSION)
 add_definitions(-DGIT_INFO="${VERSION}")
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra")
+endif()
 
 set(CMAKE_BUILD_TYPE Release)

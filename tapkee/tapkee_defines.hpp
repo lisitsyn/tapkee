@@ -22,6 +22,38 @@
 #include <vector>
 #include <utility>
 
+/// Eigen 3 library includes
+
+#ifdef TAPKEE_EIGEN_INCLUDE_FILE
+	#include TAPKEE_EIGEN_INCLUDE_FILE
+#else 
+	#ifndef TAPKEE_DEBUG
+		#define EIGEN_NO_DEBUG
+	#endif
+	#define EIGEN_RUNTIME_NO_MALLOC
+	#include <Eigen/Eigen>
+	#include <Eigen/Dense>
+	#if EIGEN_VERSION_AT_LEAST(3,1,0)
+		#include <Eigen/Sparse>
+		#if defined(TAPKEE_SUPERLU_AVAILABLE) && defined(TAPKEE_USE_SUPERLU)
+			#include <Eigen/SuperLUSupport>
+		#endif
+	#else
+		#define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+		#include <unsupported/Eigen/SparseExtra>
+	#endif
+#endif
+
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+	#define RESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(false);
+	#define UNRESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(true);
+#else
+	#define RESTRICT_ALLOC
+	#define UNRESTRICT_ALLOC
+#endif
+
+/// end of Eigen 3 library includes
+
 namespace tapkee 
 {
 	//! Parameters that are used by the library
@@ -70,7 +102,6 @@ namespace tapkee
 		UNKNOWN_METHOD
 	};
 
-
 	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KERNEL_LOCALLY_LINEAR_EMBEDDING);
 	METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(NEIGHBORHOOD_PRESERVING_EMBEDDING);
 	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT);
@@ -90,40 +121,36 @@ namespace tapkee
 	METHOD_THAT_NEEDS_NOTHING_IS(PASS_THRU);
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(FACTOR_ANALYSIS);
 	METHOD_THAT_NEEDS_NOTHING_IS(UNKNOWN_METHOD);
-}
 
-#ifdef TAPKEE_EIGEN_INCLUDE_FILE
-	#include TAPKEE_EIGEN_INCLUDE_FILE
-#else 
-	#ifndef TAPKEE_DEBUG
-		#define EIGEN_NO_DEBUG
-	#endif
-	#define EIGEN_RUNTIME_NO_MALLOC
-	#include <Eigen/Eigen>
-	#include <Eigen/Dense>
-	#if EIGEN_VERSION_AT_LEAST(3,1,0)
-		#include <Eigen/Sparse>
-		#if defined(TAPKEE_SUPERLU_AVAILABLE) && defined(TAPKEE_USE_SUPERLU)
-			#include <Eigen/SuperLUSupport>
-		#endif
-	#else
-		#define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-		#include <unsupported/Eigen/SparseExtra>
-	#endif
-#endif
+	//! Neighbors computation method
+	enum TAPKEE_NEIGHBORS_METHOD
+	{
+		//! Brute force method with not least than 
+		//! \f$ O(N N \log k) \f$ time complexity.
+		//! Recommended to be used only in debug purposes.
+		BRUTE_FORCE,
+		//! Covertree-based method with \f$ O(\log N) \f$ time complexity.
+		//! Recommended to be used as a default method.
+		COVER_TREE,
+		UNKNOWN_NEIGHBORS_METHOD
+	};
 
-#ifdef EIGEN_RUNTIME_NO_MALLOC
-	#define RESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(false);
-	#define UNRESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(true);
-#else
-	#define RESTRICT_ALLOC
-	#define UNRESTRICT_ALLOC
-#endif
+	//! Eigendecomposition-based embedding methods enumeration
+	enum TAPKEE_EIGEN_EMBEDDING_METHOD
+	{
+		//! ARPACK-based method (requires the ARPACK library
+		//! binaries to be available around). Recommended to be used as a 
+		//! default method. Supports both generalized and standard eigenproblems.
+		ARPACK,
+		//! Randomized method (implementation taken from the redsvd lib). 
+		//! Supports only standard but not generalized eigenproblems.
+		RANDOMIZED,
+		//! Eigen library dense method (useful for debugging). Computes
+		//! all eigenvectors thus can be very slow doing large-scale.
+		EIGEN_DENSE_SELFADJOINT_SOLVER,
+		UNKNOWN_EIGEN_METHOD
+	};
 
-namespace tapkee 
-{
-
-// Customizable types
 #ifdef TAPKEE_CUSTOM_INTERNAL_NUMTYPE
 	typedef TAPKEE_CUSTOM_INTERNAL_NUMTYPE ScalarType;
 #else
@@ -157,35 +184,6 @@ namespace tapkee
 #else
 	#define COVERTREE_BASE 1.3
 #endif
-
-//! Neighbors computation method
-enum TAPKEE_NEIGHBORS_METHOD
-{
-	//! Brute force method with not least than 
-	//! \f$ O(N N \log k) \f$ time complexity.
-	//! Recommended to be used only in debug purposes.
-	BRUTE_FORCE,
-	//! Covertree-based method with \f$ O(\log N) \f$ time complexity.
-	//! Recommended to be used as a default method.
-	COVER_TREE,
-	UNKNOWN_NEIGHBORS_METHOD
-};
-
-//! Eigendecomposition-based embedding methods enumeration
-enum TAPKEE_EIGEN_EMBEDDING_METHOD
-{
-	//! ARPACK-based method (requires the ARPACK library
-	//! binaries to be available around). Recommended to be used as a 
-	//! default method. Supports both generalized and standard eigenproblems.
-	ARPACK,
-	//! Randomized method (implementation taken from the redsvd lib). 
-	//! Supports only standard but not generalized eigenproblems.
-	RANDOMIZED,
-	//! Eigen library dense method (useful for debugging). Computes
-	//! all eigenvectors thus can be very slow doing large-scale.
-	EIGEN_DENSE_SELFADJOINT_SOLVER,
-	UNKNOWN_EIGEN_METHOD
-};
 
 // Internal types (can be overrided)
 #ifndef TAPKEE_INTERNAL_VECTOR
@@ -225,14 +223,13 @@ typedef TAPKEE_INTERNAL_VECTOR<SparseTriplet> SparseTriplets;
 typedef TAPKEE_INTERNAL_VECTOR<IndexType> LocalNeighbors;
 typedef TAPKEE_INTERNAL_VECTOR<LocalNeighbors> Neighbors;
 typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,DenseVector> EmbeddingResult;
-#include <tapkee_projection.hpp>
-typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,tapkee::ProjectingFunction> ReturnResult;
-typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,DenseVector> ProjectionResult;
 typedef Eigen::DiagonalMatrix<ScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
 typedef TAPKEE_INTERNAL_VECTOR<IndexType> Landmarks;
 typedef TAPKEE_INTERNAL_PAIR<SparseWeightMatrix,DenseDiagonalMatrix> Laplacian;
 typedef TAPKEE_INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricMatrixPair;
 
+#include <tapkee_projection.hpp>
+typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,tapkee::ProjectingFunction> ReturnResult;
 
 } // namespace tapkee
 

@@ -65,16 +65,41 @@ struct implementation
                             FeatureVectorCallback feature_vector_callback, ParametersMap options);
 };
 
+// concrete implementation macro to make code little shorter 
 #define CONCRETE_IMPLEMENTATION(METHOD) \
 	template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback> \
 	struct implementation<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,METHOD>
-#define PARAMETER(TYPE,NAME,CODE) \
+
+// pure magic, for the brave souls 
+#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL(__VA_ARGS__,5,4,3,2,1)
+#define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,N,...) N
+#define MACRO_DISPATCHER(func, ...) MACRO_DISPATCHER_(func, VA_NUM_ARGS(__VA_ARGS__))
+#define MACRO_DISPATCHER_(func, nargs) MACRO_DISPATCHER__(func, nargs)
+#define MACRO_DISPATCHER__(func, nargs) func ## nargs
+
+// parameter macro definition
+#define PARAMETER(...) MACRO_DISPATCHER(PARAMETER, __VA_ARGS__)(__VA_ARGS__)
+#define PARAMETER3(TYPE,NAME,CODE) PARAMETER_IMPL(TYPE,NAME,CODE,NO_CHECK)
+#define PARAMETER4(TYPE,NAME,CODE,CHECKER) PARAMETER_IMPL(TYPE,NAME,CODE,CHECKER)
+
+// implementation of parameter macro
+#define PARAMETER_IMPL(TYPE,NAME,CODE,CHECKER) \
 	if (!options.count(CODE)) \
-	{ \
-		LoggingSingleton::instance().message_error("No "#NAME" ("#TYPE") parameter set. Should be in map as "#CODE); \
-		return ReturnResult(); \
-	} \
-	TYPE NAME = options[CODE].cast<TYPE>()
+		throw missed_parameter_error("No "#NAME" ("#TYPE") parameter set. Should be in map as "#CODE); \
+	TYPE NAME = options[CODE].cast<TYPE>(); \
+	if (!CHECKER) \
+		throw wrong_parameter_error("Check failed "#CHECKER)
+
+// checkers
+#define NO_CHECK true
+#define IN_RANGE(VARIABLE,LOWER,UPPER) \
+	((VARIABLE>=LOWER) && (VARIABLE<UPPER))
+#define NOT(VARIABLE,VALUE) \
+	(VARIABLE!=VALUE)
+#define POSITIVE(VARIABLE) \
+	(VARIABLE>0)
+
+// eigenvalues parameters
 #define SKIP_ONE_EIGENVALUE 1
 #define SKIP_NO_EIGENVALUES 0
 
@@ -84,10 +109,10 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
                             KernelCallback kernel_callback, DistanceCallback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 
@@ -107,10 +132,10 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
                             KernelCallback kernel_callback, DistanceCallback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
@@ -130,10 +155,10 @@ CONCRETE_IMPLEMENTATION(DIFFUSION_MAP)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION);
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD,  NOT(eigen_method, UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,        IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(ScalarType,                    width,            GAUSSIAN_KERNEL_WIDTH,   POSITIVE(width));
 		PARAMETER(IndexType,                     timesteps,        DIFFUSION_MAP_TIMESTEPS);
-		PARAMETER(ScalarType,                    width,            GAUSSIAN_KERNEL_WIDTH);
 		
 		timed_context context("Embedding with diffusion map");
 		DenseSymmetricMatrix diffusion_matrix =
@@ -155,8 +180,8 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD);
+		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
 
 		timed_context context("Embedding with MDS");
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
@@ -183,9 +208,9 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD);
-		PARAMETER(ScalarType,                    ratio,            LANDMARK_RATIO);
+		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(ScalarType,                    ratio,            LANDMARK_RATIO,         IN_RANGE(ratio,1/(end-begin),1.0));
 
 		timed_context context("Embedding with Landmark MDS");
 		Landmarks landmarks = 
@@ -211,10 +236,10 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 
 		timed_context context("Embedding with Isomap");
@@ -242,11 +267,11 @@ CONCRETE_IMPLEMENTATION(LANDMARK_ISOMAP)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(ScalarType,                    ratio,              LANDMARK_RATIO);
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(ScalarType,                    ratio,              LANDMARK_RATIO,         IN_RANGE(ratio,1/(end-begin),1.0));
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 
 		timed_context context("Embedding with Landmark Isomap");
@@ -284,11 +309,11 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
                             KernelCallback kernel_callback, DistanceCallback,
                             FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
-		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION);
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
+		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
@@ -300,7 +325,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		DenseSymmetricMatrixPair eig_matrices =
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
-		ProjectionResult projection_result = 
+		EmbeddingResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		DenseVector mean_vector = 
@@ -316,10 +341,10 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
                             KernelCallback kernel_callback, DistanceCallback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with HLLE");
@@ -338,11 +363,11 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
-		PARAMETER(ScalarType,                    width,              GAUSSIAN_KERNEL_WIDTH);
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
+		PARAMETER(ScalarType,                    width,              GAUSSIAN_KERNEL_WIDTH,  POSITIVE(width));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with Laplacian Eigenmaps");
@@ -361,12 +386,12 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
-		PARAMETER(ScalarType,                    width,              GAUSSIAN_KERNEL_WIDTH);
-		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION);
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
+		PARAMETER(ScalarType,                    width,              GAUSSIAN_KERNEL_WIDTH,  POSITIVE(width));
+		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
 		timed_context context("Embedding with LPP");
@@ -377,7 +402,7 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 		DenseSymmetricMatrixPair eigenproblem_matrices =
 			construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
 					feature_vector_callback,dimension);
-		ProjectionResult projection_result = 
+		EmbeddingResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
 				eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		DenseVector mean_vector = 
@@ -393,16 +418,16 @@ CONCRETE_IMPLEMENTATION(PCA)
                             KernelCallback, DistanceCallback,
                             FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     dimension,        CURRENT_DIMENSION);
+		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     dimension,        CURRENT_DIMENSION,      POSITIVE(dimension));
 		
 		timed_context context("Embedding with PCA");
 		DenseVector mean_vector = 
 			compute_mean(begin,end,feature_vector_callback,dimension);
 		DenseSymmetricMatrix centered_covariance_matrix = 
 			compute_covariance_matrix(begin,end,mean_vector,feature_vector_callback,dimension);
-		ProjectionResult projection_result = 
+		EmbeddingResult projection_result = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,SKIP_NO_EIGENVALUES);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
 		return ReturnResult(project(projection_result.first,mean_vector,begin,end,feature_vector_callback,dimension), projecting_function);
@@ -415,8 +440,8 @@ CONCRETE_IMPLEMENTATION(RANDOM_PROJECTION)
 	                        KernelCallback, DistanceCallback, FeatureVectorCallback feature_vector_callback,
 	                        ParametersMap options)
 	{
-		PARAMETER(IndexType, target_dimension, TARGET_DIMENSION);
-		PARAMETER(IndexType, dimension,        CURRENT_DIMENSION);
+		PARAMETER(IndexType, target_dimension, TARGET_DIMENSION,  IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(IndexType, dimension,        CURRENT_DIMENSION, POSITIVE(dimension));
 
 		timed_context context("Embedding with Random Projection");
 
@@ -438,8 +463,8 @@ CONCRETE_IMPLEMENTATION(KERNEL_PCA)
                             KernelCallback kernel_callback, DistanceCallback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD);
+		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
 
 		timed_context context("Embedding with kPCA");
 		DenseSymmetricMatrix centered_kernel_matrix = 
@@ -455,11 +480,11 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
                            KernelCallback kernel_callback, DistanceCallback,
                            FeatureVectorCallback feature_vector_callback, ParametersMap options)
 	{
-		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION);
-		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD);
-		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD);
-		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION);
+		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
+		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
@@ -471,7 +496,7 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		DenseSymmetricMatrixPair eig_matrices =
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
-		ProjectionResult projection_result = 
+		EmbeddingResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		DenseVector mean_vector = 
@@ -488,14 +513,14 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
                             KernelCallback, DistanceCallback distance_callback,
                             FeatureVectorCallback, ParametersMap options)
 	{
-		PARAMETER(IndexType,               target_dimension,   TARGET_DIMENSION);
-		PARAMETER(IndexType,               k,                  NUMBER_OF_NEIGHBORS);
-		PARAMETER(TAPKEE_NEIGHBORS_METHOD, neighbors_method,   NEIGHBORS_METHOD);
-		PARAMETER(bool,                    global_strategy,    SPE_GLOBAL_STRATEGY);
-		PARAMETER(ScalarType,              tolerance,          SPE_TOLERANCE);
-		PARAMETER(IndexType,               nupdates,           SPE_NUM_UPDATES);
-		PARAMETER(bool,                    check_connectivity, CHECK_CONNECTIVITY);
+		PARAMETER(IndexType,               target_dimension,   TARGET_DIMENSION,    IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(IndexType,               k,                  NUMBER_OF_NEIGHBORS, IN_RANGE(k,3,end-begin));
+		PARAMETER(TAPKEE_NEIGHBORS_METHOD, neighbors_method,   NEIGHBORS_METHOD,    NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
+		PARAMETER(ScalarType,              tolerance,          SPE_TOLERANCE,       POSITIVE(tolerance));
 		PARAMETER(IndexType,               max_iteration,      MAX_ITERATION);
+		PARAMETER(IndexType,               nupdates,           SPE_NUM_UPDATES);
+		PARAMETER(bool,                    global_strategy,    SPE_GLOBAL_STRATEGY);
+		PARAMETER(bool,                    check_connectivity, CHECK_CONNECTIVITY);
 
 		Neighbors neighbors;
 		if (!global_strategy)
@@ -515,7 +540,7 @@ CONCRETE_IMPLEMENTATION(PASS_THRU)
                             KernelCallback, DistanceCallback, FeatureVectorCallback feature_callback, 
                             ParametersMap options)
 	{
-		PARAMETER(IndexType, dimension, CURRENT_DIMENSION);
+		PARAMETER(IndexType, dimension, CURRENT_DIMENSION, POSITIVE(dimension));
 
 		DenseMatrix feature_matrix(dimension,(end-begin));
 		DenseVector feature_vector(dimension);
@@ -534,10 +559,10 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
                             KernelCallback, DistanceCallback,
                             FeatureVectorCallback callback, ParametersMap options)
 	{
-		PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION);
-		PARAMETER(IndexType,  target_dimension,  TARGET_DIMENSION);
+		PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION, POSITIVE(current_dimension));
+		PARAMETER(IndexType,  target_dimension,  TARGET_DIMENSION,  IN_RANGE(target_dimension,1,end-begin));
+		PARAMETER(ScalarType, epsilon,           FA_EPSILON, POSITIVE(epsilon));
 		PARAMETER(IndexType,  max_iteration,     MAX_ITERATION);
-		PARAMETER(ScalarType, epsilon,           FA_EPSILON);
 
 		timed_context context("Embedding with FA");
 		DenseVector mean_vector = compute_mean(begin,end,callback,current_dimension);

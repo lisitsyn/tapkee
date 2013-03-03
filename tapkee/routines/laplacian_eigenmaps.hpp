@@ -43,7 +43,7 @@ Laplacian compute_laplacian(RandomAccessIterator begin,
 
 	timed_context context("Laplacian computation");
 	const IndexType k = neighbors[0].size();
-	sparse_triplets.reserve(k*(end-begin));
+	sparse_triplets.reserve((k+1)*(end-begin));
 
 	DenseVector D = DenseVector::Zero(end-begin);
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
