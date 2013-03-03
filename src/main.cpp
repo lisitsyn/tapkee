@@ -170,7 +170,7 @@ int main(int argc, const char** argv)
 			return 0;
 		}
 		else
-			parameters[tapkee::TARGET_DIMENSION] = static_cast<unsigned int>(target_dimension);
+			parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(target_dimension);
 	}
 	{
 		int k = 1;
@@ -181,7 +181,7 @@ int main(int argc, const char** argv)
 			return 0;
 		}
 		else
-			parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<unsigned int>(k);
+			parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(k);
 	}
 	{
 		double width = 1.0;
@@ -192,7 +192,7 @@ int main(int argc, const char** argv)
 			return 0;
 		}
 		else
-			parameters[tapkee::GAUSSIAN_KERNEL_WIDTH] = static_cast<tapkee::DefaultScalarType>(width);
+			parameters[tapkee::GAUSSIAN_KERNEL_WIDTH] = static_cast<tapkee::ScalarType>(width);
 	}
 	{
 		int timesteps = 1;
@@ -203,17 +203,17 @@ int main(int argc, const char** argv)
 			return 0;
 		}
 		else
-			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<unsigned int>(timesteps);
+			parameters[tapkee::DIFFUSION_MAP_TIMESTEPS] = static_cast<tapkee::IndexType>(timesteps);
 	}
 	{
 		double eigenshift = 1e-9;
 		opt.get(EIGENSHIFT_KEYWORD)->getDouble(eigenshift);
-		parameters[tapkee::EIGENSHIFT] = static_cast<tapkee::DefaultScalarType>(eigenshift);
+		parameters[tapkee::EIGENSHIFT] = static_cast<tapkee::ScalarType>(eigenshift);
 	}
 	{
 		double landmark_ratio = 0.0;
 		opt.get(LANDMARK_RATIO_KEYWORD)->getDouble(landmark_ratio);
-		parameters[tapkee::LANDMARK_RATIO] = static_cast<tapkee::DefaultScalarType>(landmark_ratio);
+		parameters[tapkee::LANDMARK_RATIO] = static_cast<tapkee::ScalarType>(landmark_ratio);
 	}
 	{
 		if (opt.isSet(SPE_LOCAL_KEYWORD))
@@ -230,22 +230,22 @@ int main(int argc, const char** argv)
 	{
 		double spe_tolerance = 1e-5;
 		opt.get(SPE_TOLERANCE_KEYWORD)->getDouble(spe_tolerance);
-		parameters[tapkee::SPE_TOLERANCE] = static_cast<tapkee::DefaultScalarType>(spe_tolerance);
+		parameters[tapkee::SPE_TOLERANCE] = static_cast<tapkee::ScalarType>(spe_tolerance);
 	}
 	{
 		int spe_num_updates = 100;
 		opt.get(SPE_NUM_UPDATES_KEYWORD)->getInt(spe_num_updates);
-		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<unsigned int>(spe_num_updates);
+		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<tapkee::IndexType>(spe_num_updates);
 	}
 	{
 		int max_iters = 200;
 		opt.get(MAX_ITERS_KEYWORD)->getInt(max_iters);
-		parameters[tapkee::MAX_ITERATION] = static_cast<unsigned int>(max_iters);
+		parameters[tapkee::MAX_ITERATION] = static_cast<tapkee::IndexType>(max_iters);
 	}
 	{
 		double fa_epsilon = 1e-5;
 		opt.get(FA_EPSILON_KEYWORD)->getDouble(fa_epsilon);
-		parameters[tapkee::FA_EPSILON] = static_cast<tapkee::DefaultScalarType>(fa_epsilon);
+		parameters[tapkee::FA_EPSILON] = static_cast<tapkee::ScalarType>(fa_epsilon);
 	}
 
 	// Load data
@@ -283,7 +283,7 @@ int main(int argc, const char** argv)
 	ofstream ofs_mean(output_matrix_filename.c_str());
 
 	tapkee::DenseMatrix input_data = read_data(ifs);
-	parameters[tapkee::CURRENT_DIMENSION] = static_cast<unsigned int>(input_data.rows());
+	parameters[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(input_data.rows());
 	
 	std::stringstream ss;
 	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();

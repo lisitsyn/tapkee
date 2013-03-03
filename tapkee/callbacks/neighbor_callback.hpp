@@ -6,7 +6,7 @@
 template<class RandomAccessIterator>
 struct neighbors_finder
 {
-	virtual Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, unsigned int k);
+	virtual Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, IndexType k);
 };
 
 #endif

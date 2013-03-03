@@ -28,7 +28,7 @@ bool is_connected(RandomAccessIterator begin, RandomAccessIterator end,
 	// The number of data points
 	int N = end-begin;
 	// The number of neighbors used in KNN
-	unsigned int k = neighbors[0].size();
+	IndexType k = neighbors[0].size();
 
 	typedef std::stack<int> DFSStack;
 	typedef std::vector<bool> VisitedVector;
@@ -53,7 +53,7 @@ bool is_connected(RandomAccessIterator begin, RandomAccessIterator end,
 
 		const LocalNeighbors& current_neighbors = neighbors[current];
 
-		for(unsigned int j=0; j<k; ++j)
+		for(IndexType j=0; j<k; ++j)
 		{
 			int neighbor = current_neighbors[j];
 			if (!visited[neighbor])

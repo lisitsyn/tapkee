@@ -13,10 +13,10 @@
 template <class RandomAccessIterator, class DistanceCallback>
 EmbeddingResult sammon_mapping(RandomAccessIterator begin, RandomAccessIterator end,
 		DistanceCallback callback,
-		unsigned int target_dimension, DefaultScalarType tolerance)
+		IndexType target_dimension, ScalarType tolerance)
 {
 	DenseMatrix distance_matrix = compute_distance_matrix(begin,end,callback);
-	DefaultScalarType scale = 0.5 / distance_matrix.array().sum();
+	ScalarType scale = 0.5 / distance_matrix.array().sum();
 	distance_matrix.noalias() += DenseMatrix::Identity((end-begin),(end-begin));
 
 	DenseMatrix Y = DenseMatrix::Random(target_dimension, (end-begin));

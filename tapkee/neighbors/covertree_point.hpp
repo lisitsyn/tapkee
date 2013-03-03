@@ -39,7 +39,7 @@ class v_array{
 		/** Element access operator
 		 *  @param i of the element to be read
 		 *  @return the corresponding element */
-		T& operator[](unsigned int i) { return elements[i]; }
+		T& operator[](IndexType i) { return elements[i]; }
 
 	public:
 		/** Pointer to the last element of the v_array */
@@ -111,20 +111,20 @@ struct CoverTreePoint
 	CoverTreePoint() : iter_(NULL), norm_(0.0)
 	{
 	};
-	CoverTreePoint(const RandomAccessIterator& iter, DefaultScalarType norm) :
+	CoverTreePoint(const RandomAccessIterator& iter, ScalarType norm) :
 		iter_(iter), norm_(norm)
 	{
 	};
 
 	RandomAccessIterator iter_;
-	DefaultScalarType norm_;
+	ScalarType norm_;
 }; /* struct JLCoverTreePoint */
 
 /** Functions declared out of the class definition to respect CoverTree 
  *  structure */
 template <class RandomAccessIterator, class DistanceCallback>
-inline DefaultScalarType distance(const DistanceCallback& dcb, const CoverTreePoint<RandomAccessIterator>& l,
-		const CoverTreePoint<RandomAccessIterator>& r, DefaultScalarType upper_bound)
+inline ScalarType distance(const DistanceCallback& dcb, const CoverTreePoint<RandomAccessIterator>& l,
+		const CoverTreePoint<RandomAccessIterator>& r, ScalarType upper_bound)
 {
 	assert(upper_bound>=0);
 

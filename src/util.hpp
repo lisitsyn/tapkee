@@ -15,16 +15,16 @@ using namespace std;
 tapkee::DenseMatrix read_data(ifstream& ifs)
 {
 	string str;
-	vector< vector<tapkee::DefaultScalarType> > input_data;
+	vector< vector<tapkee::ScalarType> > input_data;
 	while (!ifs.eof())
 	{
 		getline(ifs,str);
 		if (str.size())
 		{
 			stringstream strstr(str);
-			istream_iterator<tapkee::DefaultScalarType> it(strstr);
-			istream_iterator<tapkee::DefaultScalarType> end;
-			vector<tapkee::DefaultScalarType> row(it, end);
+			istream_iterator<tapkee::ScalarType> it(strstr);
+			istream_iterator<tapkee::ScalarType> end;
+			vector<tapkee::ScalarType> row(it, end);
 			input_data.push_back(row);
 		}
 	}
@@ -167,7 +167,7 @@ tapkee::DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAcces
 	{
 		for (j=i; j<N; j++)
 		{
-			tapkee::DefaultScalarType res = callback(begin[i],begin[j]);
+			tapkee::ScalarType res = callback(begin[i],begin[j]);
 			result(i,j) = res;
 			result(j,i) = res;
 		}

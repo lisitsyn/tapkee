@@ -21,7 +21,7 @@
 struct precomputed_kernel_callback
 {
 	precomputed_kernel_callback(const tapkee::DenseMatrix& matrix) : kernel_matrix(matrix) {};
-	inline tapkee::DefaultScalarType operator()(int a, int b) const
+	inline tapkee::ScalarType operator()(int a, int b) const
 	{
 		return kernel_matrix(a,b);
 	}
@@ -38,7 +38,7 @@ TAPKEE_CALLBACK_IS_KERNEL(precomputed_kernel_callback);
 struct precomputed_distance_callback
 {
 	precomputed_distance_callback(const tapkee::DenseMatrix& matrix) : distance_matrix(matrix) {};
-	inline tapkee::DefaultScalarType operator()(int a, int b) const
+	inline tapkee::ScalarType operator()(int a, int b) const
 	{
 		return distance_matrix(a,b);
 	}

@@ -37,12 +37,12 @@ namespace tapkee_internal
 template<class RandomAccessIterator, class DistanceCallback>
 Laplacian compute_laplacian(RandomAccessIterator begin, 
 			RandomAccessIterator end,const Neighbors& neighbors, 
-			DistanceCallback callback, DefaultScalarType width)
+			DistanceCallback callback, ScalarType width)
 {
 	SparseTriplets sparse_triplets;
 
 	timed_context context("Laplacian computation");
-	const unsigned int k = neighbors[0].size();
+	const IndexType k = neighbors[0].size();
 	sparse_triplets.reserve(k*(end-begin));
 
 	DenseVector D = DenseVector::Zero(end-begin);
@@ -50,21 +50,21 @@ Laplacian compute_laplacian(RandomAccessIterator begin,
 	{
 		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
 
-		for (unsigned int i=0; i<k; ++i)
+		for (IndexType i=0; i<k; ++i)
 		{
-			DefaultScalarType distance = callback(*iter,begin[current_neighbors[i]]);
-			DefaultScalarType heat = exp(-distance*distance/width);
+			ScalarType distance = callback(*iter,begin[current_neighbors[i]]);
+			ScalarType heat = exp(-distance*distance/width);
 			D(iter-begin) += heat;
 			D(current_neighbors[i]) += heat;
 			sparse_triplets.push_back(SparseTriplet(current_neighbors[i],(iter-begin),-heat));
 			sparse_triplets.push_back(SparseTriplet((iter-begin),current_neighbors[i],-heat));
 		}
 	}
-	for (unsigned int i=0; i<(end-begin); ++i)
+	for (IndexType i=0; i<(end-begin); ++i)
 		sparse_triplets.push_back(SparseTriplet(i,i,D(i)));
 
 #ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-	Eigen::DynamicSparseMatrix<DefaultScalarType> dynamic_weight_matrix(end-begin,end-begin);
+	Eigen::DynamicSparseMatrix<ScalarType> dynamic_weight_matrix(end-begin,end-begin);
 	dynamic_weight_matrix.reserve(sparse_triplets.size());
 	for (SparseTriplets::const_iterator it=sparse_triplets.begin(); it!=sparse_triplets.end(); ++it)
 		dynamic_weight_matrix.coeffRef(it->col(),it->row()) += it->value();
@@ -80,7 +80,7 @@ Laplacian compute_laplacian(RandomAccessIterator begin,
 template<class RandomAccessIterator, class FeatureVectorCallback>
 DenseSymmetricMatrixPair construct_locality_preserving_eigenproblem(SparseWeightMatrix L,
 		DenseDiagonalMatrix D, RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback feature_vector_callback,
-		unsigned int dimension)
+		IndexType dimension)
 {
 	timed_context context("Constructing LPP eigenproblem");
 

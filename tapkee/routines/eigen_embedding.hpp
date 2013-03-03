@@ -47,14 +47,14 @@ struct eigen_embedding_impl
 	//! @param target_dimension target dimension of embedding (number of eigenvectors to find)
 	//! @param skip number of eigenvectors to skip
 	//!
-	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip);
+	EmbeddingResult embed(const MatrixType& wm, IndexType target_dimension, unsigned int skip);
 };
 
 //! ARPACK implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixTypeOperation> 
 struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 {
-	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip)
+	EmbeddingResult embed(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 	{
 		timed_context context("ARPACK eigendecomposition");
 
@@ -86,12 +86,12 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 template <class MatrixType, class MatrixTypeOperation> 
 struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJOINT_SOLVER>
 {
-	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip)
+	EmbeddingResult embed(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 	{
 		timed_context context("Eigen library dense eigendecomposition");
 
 		DenseMatrix dense_wm = wm;
-		DefaultDenseSelfAdjointEigenSolver solver(dense_wm);
+		DenseSelfAdjointEigenSolver solver(dense_wm);
 
 		if (solver.info() == Eigen::Success)
 		{
@@ -111,41 +111,41 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJ
 template <class MatrixType, class MatrixTypeOperation> 
 struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 {
-	EmbeddingResult embed(const MatrixType& wm, unsigned int target_dimension, unsigned int skip)
+	EmbeddingResult embed(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 	{
 		timed_context context("Randomized eigendecomposition");
 		
 		DenseMatrix O(wm.rows(), target_dimension+skip);
-		for (unsigned int i=0; i<O.rows(); ++i)
+		for (IndexType i=0; i<O.rows(); ++i)
 		{
-			unsigned int j=0;
+			IndexType j=0;
 			for ( ; j+1 < O.cols(); j+= 2)
 			{
-				DefaultScalarType v1 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
-				DefaultScalarType v2 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
-				DefaultScalarType len = sqrt(-2.f*log(v1));
+				ScalarType v1 = (ScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				ScalarType v2 = (ScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				ScalarType len = sqrt(-2.f*log(v1));
 				O(i,j) = len*cos(2.f*M_PI*v2);
 				O(i,j+1) = len*sin(2.f*M_PI*v2);
 			}
 			for ( ; j < O.cols(); j++)
 			{
-				DefaultScalarType v1 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
-				DefaultScalarType v2 = (DefaultScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
-				DefaultScalarType len = sqrt(-2.f*log(v1));
+				ScalarType v1 = (ScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				ScalarType v2 = (ScalarType)(rand()+1.f)/((float)RAND_MAX+2.f);
+				ScalarType len = sqrt(-2.f*log(v1));
 				O(i,j) = len*cos(2.f*M_PI*v2);
 			}
 		}
 		MatrixTypeOperation operation(wm);
 
 		DenseMatrix Y = operation(O);
-		for (unsigned int i=0; i<Y.cols(); i++)
+		for (IndexType i=0; i<Y.cols(); i++)
 		{
-			for (unsigned int j=0; j<i; j++)
+			for (IndexType j=0; j<i; j++)
 			{
-				DefaultScalarType r = Y.col(i).dot(Y.col(j));
+				ScalarType r = Y.col(i).dot(Y.col(j));
 				Y.col(i) -= r*Y.col(j);
 			}
-			DefaultScalarType norm = Y.col(i).norm();
+			ScalarType norm = Y.col(i).norm();
 			if (norm < 1e-4)
 			{
 				for (int k = i; k<Y.cols(); k++)
@@ -156,7 +156,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 
 		DenseMatrix B1 = operation(Y);
 		DenseMatrix B = Y.householderQr().solve(B1);
-		DefaultDenseSelfAdjointEigenSolver eigenOfB(B);
+		DenseSelfAdjointEigenSolver eigenOfB(B);
 
 		if (eigenOfB.info() == Eigen::Success)
 		{
@@ -202,7 +202,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 //!
 template <class MatrixType, class MatrixTypeOperation>
 EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const MatrixType& m, 
-                                unsigned int target_dimension, unsigned int skip)
+                                IndexType target_dimension, unsigned int skip)
 {
 	LoggingSingleton::instance().message_info("Using " + get_eigen_embedding_name(method) +
 			" eigendecomposition.");

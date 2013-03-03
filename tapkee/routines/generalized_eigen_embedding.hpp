@@ -29,14 +29,14 @@ struct generalized_eigen_embedding_impl
 	 * @param target_dimension target dimension of embedding (number of eigenvectors to find)
 	 * @param skip number of eigenvectors to skip
 	 */
-	virtual EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, unsigned int target_dimension, unsigned int skip);
+	virtual EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, IndexType target_dimension, unsigned int skip);
 };
 
 //! ARPACK implementation of eigendecomposition-based embedding
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation> 
 struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation, ARPACK>
 {
-	EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, unsigned int target_dimension, unsigned int skip)
+	EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, IndexType target_dimension, unsigned int skip)
 	{
 		timed_context context("ARPACK DSXUPD generalized eigendecomposition");
 
@@ -56,7 +56,7 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOper
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation> 
 struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJOINT_SOLVER>
 {
-	EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, unsigned int target_dimension, unsigned int skip)
+	EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, IndexType target_dimension, unsigned int skip)
 	{
 		timed_context context("Eigen dense generalized eigendecomposition");
 
@@ -79,7 +79,7 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOper
 template <class LMatrixType, class RMatrixType, class MatrixTypeOperation>
 EmbeddingResult generalized_eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const LMatrixType& lhs,
                                             const RMatrixType& rhs,
-                                            unsigned int target_dimension, unsigned int skip)
+                                            IndexType target_dimension, unsigned int skip)
 {
 	switch (method)
 	{
@@ -92,7 +92,7 @@ EmbeddingResult generalized_eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method
 			return generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOperation,
 				EIGEN_DENSE_SELFADJOINT_SOLVER>().embed(lhs, rhs, target_dimension, skip);
 		case RANDOMIZED:
-			// TODO fail here
+			throw unsupported_method_error("Randomized method is not supported for generalized eigenproblems");
 			return EmbeddingResult();
 		default: break;
 	}
