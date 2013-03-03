@@ -59,7 +59,7 @@ int main(int argc, const char** argv)
 	opt.add("",0,0,0,"Output more information",VERBOSE_KEYWORD);
 #define METHOD_KEYWORD "--method"
 	opt.add("locally_linear_embedding",0,1,0,
-			"Dimension reduction method (default klle). One of the following: \n"
+			"Dimension reduction method (default locally_linear_embedding). One of the following: \n"
 			"locally_linear_embedding, neighborhood_preserving_embedding, \n"
 			"local_tangent_space_alignment, linear_local_tangent_space_alignment, \n"
 			"hessian_locally_linear_embedding, laplacian_eigenmaps, locality_preserving_projections, \n"
@@ -88,19 +88,19 @@ int main(int argc, const char** argv)
 #define SPE_LOCAL_KEYWORD "--spe-local"
 	opt.add("0",0,0,0,"Local strategy in SPE (default global)",SPE_LOCAL_KEYWORD);
 #define CHECK_CONNECTIVITY_KEYWORD "--check-connectivity"
-	opt.add("0",0,0,0,"Check if neighborhood graph is connected (detaulf do not check)",CHECK_CONNECTIVITY_KEYWORD);
+	opt.add("0",0,0,0,"Check if neighborhood graph is connected (default - do not check)",CHECK_CONNECTIVITY_KEYWORD);
 #define EIGENSHIFT_KEYWORD "--eigenshift"
-	opt.add("1e-9",0,1,0,"Regularization diagonal shift for weight matrix",EIGENSHIFT_KEYWORD);
+	opt.add("1e-9",0,1,0,"Regularization diagonal shift for weight matrix (default 1e-9)",EIGENSHIFT_KEYWORD);
 #define LANDMARK_RATIO_KEYWORD "--landmark-ratio"
-	opt.add("0.2",0,1,0,"Ratio of landmarks. Should be in (0,1) range",LANDMARK_RATIO_KEYWORD);
+	opt.add("0.2",0,1,0,"Ratio of landmarks. Should be in (0,1) range (default 0.2, i.e. 20%)",LANDMARK_RATIO_KEYWORD);
 #define SPE_TOLERANCE_KEYWORD "--spe-tolerance"
-	opt.add("1e-5",0,1,0,"Tolerance for SPE",SPE_TOLERANCE_KEYWORD);
+	opt.add("1e-5",0,1,0,"Tolerance for SPE (default 1e-5)",SPE_TOLERANCE_KEYWORD);
 #define SPE_NUM_UPDATES_KEYWORD "--spe-num-updates"
-	opt.add("100",0,1,0,"Number of SPE updates",SPE_NUM_UPDATES_KEYWORD);
+	opt.add("100",0,1,0,"Number of SPE updates (default 100)",SPE_NUM_UPDATES_KEYWORD);
 #define MAX_ITERS_KEYWORD "--max-iters"
-	opt.add("200",0,1,0,"Maximum number of iterations",MAX_ITERS_KEYWORD);
+	opt.add("200",0,1,0,"Maximum number of iterations (default 200)",MAX_ITERS_KEYWORD);
 #define FA_EPSILON_KEYWORD "--fa-epsilon"
-	opt.add("1e-5",0,1,0,"FA convergence criterion",FA_EPSILON_KEYWORD);
+	opt.add("1e-5",0,1,0,"FA convergence criterion (default 1e-5)",FA_EPSILON_KEYWORD);
 	opt.parse(argc, argv);
 
 	if (opt.isSet(HELP_KEYWORD))
