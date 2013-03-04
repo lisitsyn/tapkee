@@ -26,7 +26,12 @@ endif()
 include_directories("${TAPKEE_INCLUDE_DIR}")
 set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
-target_link_libraries(tapkee arpack)
+if (ARPACK_FOUND)
+	target_link_libraries(arpack)
+else()
+	add_definitions(-DTAPKEE_NO_ARPACK)
+endif()
+target_link_libraries(tapkee)
 
 #add_definitions(-DUSE_PRECOMPUTED)
 
@@ -40,8 +45,8 @@ endif()
 
 install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
 
-exec_program("git" ARGS "describe --always" OUTPUT_VARIABLE VERSION)
-add_definitions(-DGIT_INFO="${VERSION}")
+#exec_program("git" ARGS "describe --always" OUTPUT_VARIABLE VERSION)
+#add_definitions(-DGIT_INFO="${VERSION}")
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra")
