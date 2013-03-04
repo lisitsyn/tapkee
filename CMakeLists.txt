@@ -30,7 +30,6 @@ if (ARPACK_FOUND)
 	target_link_libraries(tapkee arpack)
 else()
 	add_definitions(-DTAPKEE_NO_ARPACK)
-	target_link_libraries(tapkee)
 endif()
 
 #add_definitions(-DUSE_PRECOMPUTED)
