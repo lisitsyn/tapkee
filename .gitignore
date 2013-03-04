@@ -1,5 +1,1 @@
-tapkee_app
-*.swp
-colormap.dat
-input.dat
-output.dat
+build/
