@@ -41,11 +41,22 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOper
 		timed_context context("ARPACK DSXUPD generalized eigendecomposition");
 
 #ifndef TAPKEE_NO_ARPACK
-		ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixTypeOperation> arpack(lhs,rhs,target_dimension+skip,"SM");
-
-		DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,lhs.cols(),target_dimension);
-
-		return EmbeddingResult(embedding_feature_matrix,arpack.eigenvalues().tail(target_dimension));
+		ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixTypeOperation> 
+			arpack(lhs,rhs,target_dimension+skip,"SM");
+		
+		if (arpack.info() == Eigen::Success)
+		{
+			stringstream ss;
+			ss << "Took " << arpack.getNbrIterations() << " iterations.";
+			LoggingSingleton::instance().message_info(ss.str());
+			DenseMatrix embedding_feature_matrix = (arpack.eigenvectors()).block(0,skip,lhs.cols(),target_dimension);
+			return EmbeddingResult(embedding_feature_matrix,arpack.eigenvalues().tail(target_dimension));
+		}
+		else
+		{
+			throw eigendecomposition_error("eigendecomposition failed");
+		}
+		return EmbeddingResult();
 #else
 		return EmbeddingResult();
 #endif
@@ -63,10 +74,17 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixTypeOper
 		DenseMatrix dense_lhs = lhs;
 		DenseMatrix dense_rhs = rhs;
 		Eigen::GeneralizedSelfAdjointEigenSolver<DenseMatrix> solver(dense_lhs, dense_rhs);
+		if (solver.info() == Eigen::Success)
+		{
+			DenseMatrix embedding_feature_matrix = (solver.eigenvectors()).block(0,skip,lhs.cols(),target_dimension);
+			return EmbeddingResult(embedding_feature_matrix,solver.eigenvalues().tail(target_dimension));
+		}
+		else
+		{
+			throw eigendecomposition_error("eigendecomposition failed");
+		}
 
-		DenseMatrix embedding_feature_matrix = (solver.eigenvectors()).block(0,skip,lhs.cols(),target_dimension);
-
-		return EmbeddingResult(embedding_feature_matrix,solver.eigenvalues().tail(target_dimension));
+		return EmbeddingResult();
 	}
 };
 

@@ -74,8 +74,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, ARPACK>
 		}
 		else
 		{
-			LoggingSingleton::instance().message_error("Eigendecomposition failed");
-			throw std::runtime_error("eigendecomposition failed");
+			throw eigendecomposition_error("eigendecomposition failed");
 		}
 		return EmbeddingResult();
 #endif
@@ -100,8 +99,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, EIGEN_DENSE_SELFADJ
 		}
 		else
 		{
-			LoggingSingleton::instance().message_error("Eigendecomposition failed");
-			throw std::runtime_error("eigendecomposition failed");
+			throw eigendecomposition_error("eigendecomposition failed");
 		}
 		return EmbeddingResult();
 	}
@@ -165,8 +163,7 @@ struct eigen_embedding_impl<MatrixType, MatrixTypeOperation, RANDOMIZED>
 		}
 		else
 		{
-			LoggingSingleton::instance().message_error("Eigendecomposition failed");
-			throw std::runtime_error("eigendecomposition failed");
+			throw eigendecomposition_error("eigendecomposition failed");
 		}
 		return EmbeddingResult();
 	}
