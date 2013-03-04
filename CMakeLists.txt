@@ -27,11 +27,11 @@ include_directories("${TAPKEE_INCLUDE_DIR}")
 set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
 if (ARPACK_FOUND)
-	target_link_libraries(arpack)
+	target_link_libraries(tapkee arpack)
 else()
 	add_definitions(-DTAPKEE_NO_ARPACK)
+	target_link_libraries(tapkee)
 endif()
-target_link_libraries(tapkee)
 
 #add_definitions(-DUSE_PRECOMPUTED)
 
