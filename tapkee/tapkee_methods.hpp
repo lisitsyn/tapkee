@@ -4,7 +4,7 @@
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * Copyright (c) 2012, Sergey Lisitsyn
+ * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
 
 #ifndef TAPKEE_METHODS_H_
@@ -13,6 +13,7 @@
 #include <tapkee_defines.hpp>
 #include <utils/time.hpp>
 #include <utils/logging.hpp>
+#include <utils/parameters.hpp>
 #include <routines/locally_linear.hpp>
 #include <routines/eigen_embedding.hpp>
 #include <routines/generalized_eigen_embedding.hpp>
@@ -25,6 +26,8 @@
 #include <routines/spe.hpp>
 #include <routines/fa.hpp>
 #include <neighbors/neighbors.hpp>
+
+//#include <external/barnes_hut_sne/tsne.hpp>
 
 namespace tapkee
 {
@@ -53,6 +56,7 @@ std::string get_method_name(TAPKEE_METHOD m)
 		case PASS_THRU: return "passing through";
 		case RANDOM_PROJECTION: return "Random Projection";
 		case FACTOR_ANALYSIS: return "Factor Analysis";
+		case TSNE: return "t-SNE";
 		default: return "Method name unknown (yes this is a bug)";
 	}
 }
@@ -69,37 +73,6 @@ struct implementation
 #define CONCRETE_IMPLEMENTATION(METHOD) \
 	template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback> \
 	struct implementation<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,METHOD>
-
-// pure magic, for the brave souls 
-#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL_((__VA_ARGS__, 5,4,3,2,1))
-#define VA_NUM_ARGS_IMPL_(tuple) VA_NUM_ARGS_IMPL tuple
-#define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,N,...) N
-#define macro_dispatcher(macro, ...) macro_dispatcher_(macro, VA_NUM_ARGS(__VA_ARGS__))
-#define macro_dispatcher_(macro, nargs) macro_dispatcher__(macro, nargs)
-#define macro_dispatcher__(macro, nargs) macro_dispatcher___(macro, nargs)
-#define macro_dispatcher___(macro, nargs) macro ## nargs
-
-// parameter macro definition
-#define PARAMETER(...) macro_dispatcher(PARAMETER, __VA_ARGS__)(__VA_ARGS__)
-#define PARAMETER3(TYPE,NAME,CODE) PARAMETER_IMPL(TYPE,NAME,CODE,NO_CHECK)
-#define PARAMETER4(TYPE,NAME,CODE,CHECKER) PARAMETER_IMPL(TYPE,NAME,CODE,CHECKER)
-
-// implementation of parameter macro
-#define PARAMETER_IMPL(TYPE,NAME,CODE,CHECKER) \
-	if (!options.count(CODE)) \
-		throw missed_parameter_error("No "#NAME" ("#TYPE") parameter set. Should be in map as "#CODE); \
-	TYPE NAME = options[CODE].cast<TYPE>(); \
-	if (!CHECKER) \
-		throw wrong_parameter_error("Check failed "#CHECKER)
-
-// checkers
-#define NO_CHECK true
-#define IN_RANGE(VARIABLE,LOWER,UPPER) \
-	((VARIABLE>=LOWER) && (VARIABLE<UPPER))
-#define NOT(VARIABLE,VALUE) \
-	(VARIABLE!=VALUE)
-#define POSITIVE(VARIABLE) \
-	(VARIABLE>0)
 
 // eigenvalues parameters
 #define SKIP_ONE_EIGENVALUE 1
@@ -573,10 +546,42 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
 	}
 };
 
+CONCRETE_IMPLEMENTATION(TSNE)
+{
+	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
+                            KernelCallback, DistanceCallback,
+                            FeatureVectorCallback callback, ParametersMap options)
+	{
+/*
+		const IndexType N = end-begin;
+		
+		PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION, POSITIVE(current_dimension));
+		PARAMETER(IndexType,  target_dimension,  TARGET_DIMENSION,  EXACTLY(target_dimension,2));
+		PARAMETER(ScalarType, perplexity,        SNE_PERPLEXITY,    IN_RANGE(perplexity,0,(N-1)/3));
+		PARAMETER(ScalarType, theta,             SNE_THETA,         NON_NEGATIVE(theta));
+
+		timed_context context("Embedding with t-SNE");
+		DenseMatrix data(current_dimension,(end-begin));
+		DenseVector feature_vector(current_dimension);
+		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
+		{
+			callback(*iter,feature_vector);
+			data.col(iter-begin).array() = feature_vector;
+		}
+
+		DenseMatrix embedding(target_dimension,N);
+		tsne::TSNE* tsne = new tsne::TSNE;
+		tsne->run(data.data(),N,current_dimension,embedding.data(),target_dimension,perplexity,theta);
+		delete tsne;
+
+		return ReturnResult(embedding.transpose(),tapkee::ProjectingFunction());
+*/
+		return ReturnResult();
+	}
+};
+
 }
 }
 #undef CONCRETE_IMPLEMENTATION
 #undef PARAMETER
-#undef SKIP_ONE_EIGENVALUE
-#undef SKIP_NO_EIGENVALUES
 #endif

@@ -57,15 +57,17 @@ int main(int argc, const char** argv)
 	opt.add("",0,0,0,"Output benchmark information",BENCHMARK_KEYWORD);
 #define VERBOSE_KEYWORD "--verbose"
 	opt.add("",0,0,0,"Output more information",VERBOSE_KEYWORD);
+#define DEBUG_KEYWORD "--debug"
+	opt.add("",0,0,0,"Output debug information",DEBUG_KEYWORD);
 #define METHOD_KEYWORD "--method"
 	opt.add("locally_linear_embedding",0,1,0,
 			"Dimension reduction method (default locally_linear_embedding). One of the following: \n"
-			"locally_linear_embedding, neighborhood_preserving_embedding, \n"
-			"local_tangent_space_alignment, linear_local_tangent_space_alignment, \n"
-			"hessian_locally_linear_embedding, laplacian_eigenmaps, locality_preserving_projections, \n"
-			"diffusion_map, isomap, landmark_isomap, multidimensional_scaling, \n"
-			"landmark_multidimensional_scaling, stochastic_proximity_embedding, \n"
-			"kernel_pca, pca, random_projection, factor_analysis.",
+			"locally_linear_embedding (lle), neighborhood_preserving_embedding (npe), \n"
+			"local_tangent_space_alignment (ltsa), linear_local_tangent_space_alignment (lltsa), \n"
+			"hessian_locally_linear_embedding (hlle), laplacian_eigenmaps (la), locality_preserving_projections (lpp), \n"
+			"diffusion_map (dm), isomap, landmark_isomap (l-isomap), multidimensional_scaling (mds), \n"
+			"landmark_multidimensional_scaling (l-mds), stochastic_proximity_embedding (spe), \n"
+			"kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), t-stochastic_neighborhood_embedding (t-sne).",
 			"-m",METHOD_KEYWORD);
 #define NEIGHBORS_METHOD_KEYWORD "--neighbors-method"
 	opt.add("covertree",0,1,0,
@@ -101,6 +103,10 @@ int main(int argc, const char** argv)
 	opt.add("200",0,1,0,"Maximum number of iterations (default 200)",MAX_ITERS_KEYWORD);
 #define FA_EPSILON_KEYWORD "--fa-epsilon"
 	opt.add("1e-5",0,1,0,"FA convergence criterion (default 1e-5)",FA_EPSILON_KEYWORD);
+#define SNE_PERPLEXITY_KEYWORD "--sne-perplexity"
+	opt.add("30.0",0,1,0,"Perplexity for the t-SNE algorithm (default 30.0)",SNE_PERPLEXITY_KEYWORD);
+#define SNE_THETA_KEYWORD "--sne-theta"
+	opt.add("0.5",0,1,0,"Theta for the t-SNE algorithm (defualt 0.5)",SNE_THETA_KEYWORD);
 	opt.parse(argc, argv);
 
 	if (opt.isSet(HELP_KEYWORD))
@@ -114,6 +120,11 @@ int main(int argc, const char** argv)
 	if (opt.isSet(VERBOSE_KEYWORD))
 	{
 		tapkee::LoggingSingleton::instance().enable_info();
+	}
+	if (opt.isSet(DEBUG_KEYWORD))
+	{
+		tapkee::LoggingSingleton::instance().enable_debug();
+		tapkee::LoggingSingleton::instance().message_info("Debug messages enabled");
 	}
 
 	if (opt.isSet(BENCHMARK_KEYWORD))
@@ -246,6 +257,16 @@ int main(int argc, const char** argv)
 		double fa_epsilon = 1e-5;
 		opt.get(FA_EPSILON_KEYWORD)->getDouble(fa_epsilon);
 		parameters[tapkee::FA_EPSILON] = static_cast<tapkee::ScalarType>(fa_epsilon);
+	}
+	{
+		double perplexity = 30.0;
+		opt.get(SNE_PERPLEXITY_KEYWORD)->getDouble(perplexity);
+		parameters[tapkee::SNE_PERPLEXITY] = static_cast<tapkee::ScalarType>(perplexity);
+	}
+	{
+		double theta = 0.5;
+		opt.get(SNE_THETA_KEYWORD)->getDouble(theta);
+		parameters[tapkee::SNE_THETA] = static_cast<tapkee::ScalarType>(theta);
 	}
 
 	// Load data

@@ -60,6 +60,7 @@ bool method_needs_kernel(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_KERNEL(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
 		IF_NEEDS_KERNEL(tapkee::PASS_THRU);
 		IF_NEEDS_KERNEL(tapkee::FACTOR_ANALYSIS);
+		IF_NEEDS_KERNEL(tapkee::TSNE);
 		IF_NEEDS_KERNEL(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_KERNEL
 	}
@@ -89,6 +90,7 @@ bool method_needs_distance(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_DISTANCE(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
 		IF_NEEDS_DISTANCE(tapkee::PASS_THRU);
 		IF_NEEDS_DISTANCE(tapkee::FACTOR_ANALYSIS);
+		IF_NEEDS_DISTANCE(tapkee::TSNE);
 		IF_NEEDS_DISTANCE(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_DISTANCE
 	}
@@ -97,42 +99,44 @@ bool method_needs_distance(tapkee::TAPKEE_METHOD method)
 
 tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 {
-	if (!strcmp(str,"local_tangent_space_alignment"))
+	if (!strcmp(str,"local_tangent_space_alignment") || !strcmp(str,"ltsa"))
 		return tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	if (!strcmp(str,"locally_linear_embedding"))
+	if (!strcmp(str,"locally_linear_embedding") || !strcmp(str,"lle"))
 		return tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING;
-	if (!strcmp(str,"hessian_locally_linear_embedding"))
+	if (!strcmp(str,"hessian_locally_linear_embedding") || !strcmp(str,"hlle"))
 		return tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING;
-	if (!strcmp(str,"multidimensional_scaling"))
+	if (!strcmp(str,"multidimensional_scaling") || !strcmp(str,"mds"))
 		return tapkee::MULTIDIMENSIONAL_SCALING;
-	if (!strcmp(str,"landmark_multidimensional_scaling"))
+	if (!strcmp(str,"landmark_multidimensional_scaling") || !strcmp(str,"l-mds"))
 		return tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING;
 	if (!strcmp(str,"isomap"))
 		return tapkee::ISOMAP;
-	if (!strcmp(str,"landmark_isomap"))
+	if (!strcmp(str,"landmark_isomap") || !strcmp(str,"l-isomap"))
 		return tapkee::LANDMARK_ISOMAP;
-	if (!strcmp(str,"diffusion_map"))
+	if (!strcmp(str,"diffusion_map") || !strcmp(str,"dm"))
 		return tapkee::DIFFUSION_MAP;
-	if (!strcmp(str,"kernel_pca"))
+	if (!strcmp(str,"kernel_pca") || !strcmp(str,"kpca"))
 		return tapkee::KERNEL_PCA;
 	if (!strcmp(str,"pca"))
 		return tapkee::PCA;
-	if (!strcmp(str,"random_projection"))
+	if (!strcmp(str,"random_projection") || !strcmp(str,"ra"))
 		return tapkee::RANDOM_PROJECTION;
-	if (!strcmp(str,"laplacian_eigenmaps"))
+	if (!strcmp(str,"laplacian_eigenmaps") || !strcmp(str,"la"))
 		return tapkee::LAPLACIAN_EIGENMAPS;
-	if (!strcmp(str,"locality_preserving_projections"))
+	if (!strcmp(str,"locality_preserving_projections") || !strcmp(str,"lpp"))
 		return tapkee::LOCALITY_PRESERVING_PROJECTIONS;
-	if (!strcmp(str,"neighborhood_preserving_embedding"))
+	if (!strcmp(str,"neighborhood_preserving_embedding") || !strcmp(str,"npe"))
 		return tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING;
-	if (!strcmp(str,"linear_local_tangent_space_alignment"))
+	if (!strcmp(str,"linear_local_tangent_space_alignment") || !strcmp(str,"lltsa"))
 		return tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	if (!strcmp(str,"stochastic_proximity_embedding"))
+	if (!strcmp(str,"stochastic_proximity_embedding") || !strcmp(str,"spe"))
 		return tapkee::STOCHASTIC_PROXIMITY_EMBEDDING;
 	if (!strcmp(str,"passthru"))
 		return tapkee::PASS_THRU;
-	if (!strcmp(str,"factor_analysis"))
+	if (!strcmp(str,"factor_analysis") || !strcmp(str,"fa"))
 		return tapkee::FACTOR_ANALYSIS;
+	if (!strcmp(str,"t-stochastic_neighbor_embedding") || !strcmp(str,"t-sne"))
+		return tapkee::TSNE;
 
 	return tapkee::UNKNOWN_METHOD;
 }
