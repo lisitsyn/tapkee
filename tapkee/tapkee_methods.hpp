@@ -96,7 +96,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix =
 			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
-		return ReturnResult(eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
+		return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 	}
 };
@@ -119,7 +119,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix = 
 			tangent_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension,eigenshift);
-		return ReturnResult(eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
+		return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 	}
 };
@@ -301,7 +301,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
 		EmbeddingResult projection_result = 
-			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
+			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		DenseVector mean_vector = 
 			compute_mean(begin,end,feature_vector_callback,dimension);
@@ -327,7 +327,7 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix =
 			hessian_weight_matrix(begin,end,neighbors,kernel_callback,target_dimension);
-		return ReturnResult(eigen_embedding<SparseWeightMatrix,InverseSparseMatrixOperation>(eigen_method,
+		return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 	}
 };
@@ -350,7 +350,7 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
-		return ReturnResult(generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,InverseSparseMatrixOperation>(
+		return ReturnResult(generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,SparseInverseMatrixOperation>(
 			eigen_method,laplacian.first,laplacian.second,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 	}
 };
@@ -378,7 +378,7 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 			construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
 					feature_vector_callback,dimension);
 		EmbeddingResult projection_result = 
-			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
+			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
 				eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		DenseVector mean_vector = 
 			compute_mean(begin,end,feature_vector_callback,dimension);
@@ -472,7 +472,7 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
 		EmbeddingResult projection_result = 
-			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseMatrixOperation>(
+			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SKIP_NO_EIGENVALUES);
 		DenseVector mean_vector = 
 			compute_mean(begin,end,feature_vector_callback,dimension);
