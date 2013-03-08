@@ -35,12 +35,14 @@ int main(int argc, const char** argv)
 {
 	srand(time(NULL));
 	ezOptionParser opt;
-	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn <lisitsyn.s.o@gmail.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n";
+	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn <lisitsyn.s.o@gmail.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n"
+	             "This is free software: you are free to change and redistribute it.\n"
+	             "There is NO WARRANTY, to the extent permitted by law.";
 	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.\n"
 	               "Git " TAPKEE_CURRENT_GIT_INFO;
-	opt.example = "Run kernel locally linear embedding with k=10 with arpack "
+	opt.example = "Run locally linear embedding with k=10 with arpack "
                   "eigensolver on data from input.dat saving embedding to output.dat \n\n"
-	              "tapkee -i input.dat -o output.dat --method klle --eigen-method arpack -k 10\n\n";
+	              "tapkee -i input.dat -o output.dat --method lle --eigen-method arpack -k 10\n\n";
 	opt.syntax = "tapkee_app [options]\n";
 
 #define INPUT_FILE_KEYWORD "--input-file"
