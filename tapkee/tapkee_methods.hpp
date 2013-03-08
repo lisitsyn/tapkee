@@ -350,7 +350,7 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance_callback,width);
-		return ReturnResult(generalized_eigen_embedding<SparseWeightMatrix,DenseSymmetricMatrix,SparseInverseMatrixOperation>(
+		return ReturnResult(generalized_eigen_embedding<SparseWeightMatrix,DenseDiagonalMatrix,SparseInverseMatrixOperation>(
 			eigen_method,laplacian.first,laplacian.second,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 	}
 };
