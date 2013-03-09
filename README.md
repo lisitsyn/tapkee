@@ -90,7 +90,14 @@ low-dimensional representations of feature matrices. For more information on its
 To compile the application please use CMake. The workflow of compilation with CMake is usual. When using Unix-based
 systems you may use the following command to compile the Tapkee application:
 
-`mkdir build && cd build && cmake .. && make`
+`mkdir build && cd build && cmake [definitions] .. && make`
+
+There are a few cases when you'd want to put some definitions:
+
+- To enable unit-tests compilation add to `-Dbuild_tests` to `[definitions]` when building.
+
+- To enable precomputation of kernel/distance matrices which can speed-up algorithms (but requires much more memory) add
+  `-DPRECOMPUTED=1` to `[definitions]` when building.
 
 The compilation requires Eigen3 to be available in your path. The ARPACK library is also highly recommended. 
 On Ubuntu Linux these packages can be installed with 
@@ -102,7 +109,7 @@ If you are using Mac OS X and Macports you can install these packages with
 `sudo port install eigen3 && sudo port install arpack`
 
 In case you want to use some non-default 
-compiler use `CC=your-C-compiler CXX=your-C++-compiler cmake ..` when running cmake.
+compiler use `CC=your-C-compiler CXX=your-C++-compiler cmake` when running cmake.
 
 Need help?
 ----------
