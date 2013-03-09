@@ -25,7 +25,7 @@ if (OPENMP_FOUND)
 endif()
 
 # Google Mock detection
-find_package(GoogleMockMinimal REQUIRED)
+find_package(GoogleMockMinimal)
 include_directories("${GMOCKMINIMAL_INCLUDE_DIRS}")
 
 # Main executable
@@ -55,6 +55,10 @@ endif()
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
+endif()
+
+if (PRECOMPUTED)
+	add_definitions(-DUSE_PRECOMPUTED)
 endif()
 
 # Testing
