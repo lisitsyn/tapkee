@@ -5,6 +5,7 @@ cmake_minimum_required (VERSION 2.6.2)
 # set paths
 set (TAPKEE_INCLUDE_DIR "tapkee")
 set (TAPKEE_SRC_DIR "src")
+set (TAPKEE_TESTS_DIR "test")
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
 
 # Eigen3 detection
@@ -23,6 +24,11 @@ if (OPENMP_FOUND)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+# Google Mock detection
+find_package(GoogleMockMinimal REQUIRED)
+include_directories("${GMOCKMINIMAL_INCLUDE_DIRS}")
+
+# Main executable
 include_directories("${TAPKEE_INCLUDE_DIR}")
 set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
@@ -31,8 +37,6 @@ if (ARPACK_FOUND)
 else()
 	add_definitions(-DTAPKEE_NO_ARPACK)
 endif()
-
-#add_definitions(-DUSE_PRECOMPUTED)
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
 	set (TAPKEE_INSTALL_DIR
@@ -44,11 +48,20 @@ endif()
 
 install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
 
-#exec_program("git" ARGS "describe --always" OUTPUT_VARIABLE VERSION)
-#add_definitions(-DGIT_INFO="${VERSION}")
-
+# G++ specific flags
 if (CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra")
 endif()
 
-set(CMAKE_BUILD_TYPE Release)
+if (NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Testing
+if (build_tests)
+	enable_testing()
+	set (TESTS ${TAPKEE_TESTS_DIR}/simple.cpp)
+	add_executable(tapkee_tests ${TESTS})
+	target_link_libraries(tapkee_tests gmock gmock_main arpack)
+	add_test(tapkee tapkee_tests)
+endif()
