@@ -92,7 +92,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 
-		timed_context context("Embedding with KLLE");
+		timed_context context("[+] Embedding with KLLE");
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix =
@@ -115,7 +115,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
-		timed_context context("Embedding with KLTSA");
+		timed_context context("[+] Embedding with KLTSA");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix = 
@@ -136,7 +136,7 @@ CONCRETE_IMPLEMENTATION(DIFFUSION_MAP)
 		PARAMETER(ScalarType,                    width,            GAUSSIAN_KERNEL_WIDTH,   POSITIVE(width));
 		PARAMETER(IndexType,                     timesteps,        DIFFUSION_MAP_TIMESTEPS);
 		
-		timed_context context("Embedding with diffusion map");
+		timed_context context("[+] Embedding with diffusion map");
 		DenseSymmetricMatrix diffusion_matrix =
 			compute_diffusion_matrix(begin,end,distance_callback,timesteps,width);
 		return ReturnResult(eigen_embedding<DenseSymmetricMatrix,
@@ -159,7 +159,7 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
 
-		timed_context context("Embedding with MDS");
+		timed_context context("[+] Embedding with MDS");
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance_callback);
 		centerMatrix(distance_matrix);
 		distance_matrix.array() *= -0.5;
@@ -188,7 +188,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
 		PARAMETER(ScalarType,                    ratio,            LANDMARK_RATIO,         IN_RANGE(ratio,1/(end-begin),1.0));
 
-		timed_context context("Embedding with Landmark MDS");
+		timed_context context("[+] Embedding with Landmark MDS");
 		Landmarks landmarks = 
 			select_landmarks_random(begin,end,ratio);
 		DenseSymmetricMatrix distance_matrix = 
@@ -218,7 +218,7 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 
-		timed_context context("Embedding with Isomap");
+		timed_context context("[+] Embedding with Isomap");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		DenseSymmetricMatrix shortest_distances_matrix = 
@@ -250,7 +250,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_ISOMAP)
 		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 
-		timed_context context("Embedding with Landmark Isomap");
+		timed_context context("[+] Embedding with Landmark Isomap");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		Landmarks landmarks = 
@@ -293,7 +293,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
-		timed_context context("Embedding with NPE");
+		timed_context context("[+] Embedding with NPE");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix = 
@@ -323,7 +323,7 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
-		timed_context context("Embedding with HLLE");
+		timed_context context("[+] Embedding with HLLE");
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix =
@@ -346,7 +346,7 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
 		PARAMETER(ScalarType,                    width,              GAUSSIAN_KERNEL_WIDTH,  POSITIVE(width));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
-		timed_context context("Embedding with Laplacian Eigenmaps");
+		timed_context context("[+] Embedding with Laplacian Eigenmaps");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		Laplacian laplacian = 
@@ -370,7 +370,7 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
-		timed_context context("Embedding with LPP");
+		timed_context context("[+] Embedding with LPP");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		Laplacian laplacian = 
@@ -398,7 +398,7 @@ CONCRETE_IMPLEMENTATION(PCA)
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
 		PARAMETER(IndexType,                     dimension,        CURRENT_DIMENSION,      POSITIVE(dimension));
 		
-		timed_context context("Embedding with PCA");
+		timed_context context("[+] Embedding with PCA");
 		DenseVector mean_vector = 
 			compute_mean(begin,end,feature_vector_callback,dimension);
 		DenseSymmetricMatrix centered_covariance_matrix = 
@@ -419,7 +419,7 @@ CONCRETE_IMPLEMENTATION(RANDOM_PROJECTION)
 		PARAMETER(IndexType, target_dimension, TARGET_DIMENSION,  IN_RANGE(target_dimension,1,end-begin));
 		PARAMETER(IndexType, dimension,        CURRENT_DIMENSION, POSITIVE(dimension));
 
-		timed_context context("Embedding with Random Projection");
+		timed_context context("[+] Embedding with Random Projection");
 
 		DenseMatrix projection_matrix = 
 			gaussian_projection_matrix(dimension, target_dimension);
@@ -442,7 +442,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_PCA)
 		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,1,end-begin));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
 
-		timed_context context("Embedding with kPCA");
+		timed_context context("[+] Embedding with kPCA");
 		DenseSymmetricMatrix centered_kernel_matrix = 
 			compute_centered_kernel_matrix(begin,end,kernel_callback);
 		return ReturnResult(eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
@@ -464,7 +464,7 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
-		timed_context context("Embedding with LLTSA");
+		timed_context context("[+] Embedding with LLTSA");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix = 
@@ -504,7 +504,7 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 			neighbors = find_neighbors(neighbors_method,begin,end,distance_callback,k,check_connectivity);
 		}
 
-		timed_context context("Embedding with SPE");
+		timed_context context("[+] Embedding with SPE");
 		return ReturnResult(spe_embedding(begin,end,distance_callback,neighbors,
 				target_dimension,global_strategy,tolerance,nupdates,max_iteration), tapkee::ProjectingFunction());
 	}
@@ -540,7 +540,7 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
 		PARAMETER(ScalarType, epsilon,           FA_EPSILON, POSITIVE(epsilon));
 		PARAMETER(IndexType,  max_iteration,     MAX_ITERATION);
 
-		timed_context context("Embedding with FA");
+		timed_context context("[+] Embedding with FA");
 		DenseVector mean_vector = compute_mean(begin,end,callback,current_dimension);
 		return ReturnResult(project(begin,end,callback,current_dimension,max_iteration,epsilon,
                                     target_dimension, mean_vector), tapkee::ProjectingFunction());
