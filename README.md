@@ -35,15 +35,15 @@ Integration with other libraries
 The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/blob/master/tapkee/tapkee.hpp) method
 which requires the following parameters:
 
-* RandomAccessIterator begin iterator pointing to the first object to be processed;
-* RandomAccessIterator end iterator pointing after the last object to be processed;
-* KernelCallback implementing operator()(RandomAccessIterator, RandomAccessIterator) which computes
+* `RandomAccessIterator begin` iterator pointing to the first object to be processed;
+* `RandomAccessIterator end` iterator pointing after the last object to be processed;
+* `KernelCallback` implementing operator()(RandomAccessIterator, RandomAccessIterator) which computes
   similarity between two objects pointed by given iterators (standard case is linear kernel (dot product of vectors));
-* DistanceCallback implementing operator()(RandomAccessIterator,RandomAccessIterator) which computes
+* `DistanceCallback` implementing operator()(RandomAccessIterator,RandomAccessIterator) which computes
   dissimilarity between two objects pointed by given iterators (standard case is euclidean distance between vectors);
-* FeatureVectorCallback feature_vector_callback implementing operator()(RandomAccessIterator,DenseVector) which
+* `FeatureVectorCallback` feature_vector_callback implementing operator()(RandomAccessIterator,DenseVector) which
   stores a vector pointed by the iterator to the given vector.
-* ParametersMap storing all required parameters.
+* `ParametersMap` storing all required parameters.
 
 It is also required to identify callback functors using the following macroses:
 
