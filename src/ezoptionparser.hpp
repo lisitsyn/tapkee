@@ -28,6 +28,7 @@
 #include <sstream>
 #include <cstring>
 
+//! Namespace for EZOptionParser implementation
 namespace ez {
 #define DEBUGLINE() printf("%s:%d\n", __FILE__, __LINE__);
 

@@ -19,7 +19,8 @@ using std::stringstream;
 
 namespace tapkee
 {
-
+namespace tapkee_internal
+{
 #ifdef _OPENMP
 	#define CLOCK_TYPE double
 	#define CLOCK_GET omp_get_wtime()
@@ -44,6 +45,6 @@ struct timed_context
 		LoggingSingleton::instance().message_benchmark(msg_stream.str());
 	}
 };
-
+}
 }
 #endif

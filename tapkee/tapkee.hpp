@@ -17,28 +17,31 @@ namespace tapkee
 {
 
 //! Main entry-point of the library. Constructs dense embedding with specified dimension
-//! using provided data and callbacks. Returns DenseMatrix and ProjectingFunction with 
-//! corresponding ProjectionImplementation.
+//! using provided data and callbacks. Returns ReturnType that is essentially a pair of 
+//! DenseMatrix (embedding of provided data) and ProjectingFunction with 
+//! corresponding ProjectionImplementation used to project data out of sample.
 //!
-//! Has four template parameters:
-//! 
-//! RandomAccessIterator basic random access iterator with no specific capabilities.
+//! @tparam RandomAccessIterator basic random access iterator with no specific capabilities.
 //!
-//! KernelCallback that defines ScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation 
-//! between two iterators. The operation should return value of Mercer kernel function 
-//! between vectors/objects iterators pointing to. KernelCallback should be marked as a kernel function using
-//! TAPKEE_CALLBACK_IS_KERNEL macro (fails on compilation in other case).
+//! @tparam KernelCallback that defines 
+//! @code ScalarType operator()( RandomAccessIterator, RandomAccessIterator) @endcode 
+//! function of two iterators. This method should return value of Mercer kernel function 
+//! between vectors/objects iterators pointing to. The callback should be marked as a kernel function using
+//! @ref tapkee::TAPKEE_CALLBACK_IS_KERNEL macro (fails on compilation in other case).
 //!
-//! DistanceCallback that defines ScalarType operator()(RandomAccessIterator, RandomAccessIterator) operation
-//! between two iterators. DistanceCallback should be marked as a distance function using 
-//! TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
+//! @tparam DistanceCallback that defines 
+//! @code ScalarType operator()(RandomAccessIterator, RandomAccessIterator) @endcode 
+//! function of two iterators. The callback should be marked as a distance function using 
+//! @ref TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
 //!
-//! FeatureVectorCallback that defines void operator()(RandomAccessIterator, DenseVector) operation
-//! used to access feature vector pointed by iterator. The callback should put the feature vector pointed by iterator
-//! to the vector of second argument.
+//! @tparam FeatureVectorCallback that defines 
+//! @code void operator()(RandomAccessIterator, DenseVector) @endcode function
+//! used to access feature vector pointed by iterator. The callback should put the feature vector 
+//! pointed by iterator to the second argument vector.
 //!
-//! Parameters required by the chosen algorithm are obtained from the parameter map. It fails during runtime and
-//! throws exception if some of required parameters are not specified or have improper values.
+//! Parameters required by the chosen algorithm are obtained from the parameter map. It gracefully 
+//! fails during runtime and throws an exception if some of required 
+//! parameters are not specified or have improper values.
 //!
 //! @param begin begin iterator of data
 //! @param end end iterator of data

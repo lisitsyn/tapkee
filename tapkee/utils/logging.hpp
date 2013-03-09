@@ -40,6 +40,7 @@ using std::string;
 namespace tapkee
 {
 
+//! A base class for logger required by the library
 class LoggerImplementation
 {
 public:
@@ -55,6 +56,7 @@ private:
 	LoggerImplementation(const LoggerImplementation&);
 };
 
+//! Default std::cout implementation of @ref LoggerImplementation
 class DefaultLoggerImplementation : public LoggerImplementation
 {
 public:
@@ -72,6 +74,9 @@ private:
 	ostream* os_;
 };
 
+//! Main logging singleton used by the library. Can use provided
+//! @ref LoggerImplementation if necessary. By default uses
+//! @ref DefaultLoggerImplementation.
 class LoggingSingleton
 {
 	private:
@@ -99,13 +104,18 @@ class LoggingSingleton
 		LEVEL_ENABLED_FIELD(benchmark);
 
 	public:
+		//! @return instance of the singleton
 		static LoggingSingleton& instance()
 		{
 			static LoggingSingleton s;
 			return s;
 		}
 
+		//! getter for logger implementation
+		//! @return current logger implementation
 		LoggerImplementation* get_logger_impl() const { return impl; }
+		//! setter for logger implementation
+		//! @param i logger implementation to be set
 		void set_logger_impl(LoggerImplementation* i) { delete impl; impl = i; }
 
 		LEVEL_HANDLERS(info);

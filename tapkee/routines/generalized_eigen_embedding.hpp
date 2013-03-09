@@ -25,7 +25,8 @@ template <class LMatrixType, class RMatrixType, class MatrixOperationType, int I
 struct generalized_eigen_embedding_impl
 {
 	/** Construct embedding
-	 * @param wm weight matrix to eigendecompose
+	 * @param lhs left hand side matrix of eigenproblem
+	 * @param rhs right hand side matrix of eigenproblem
 	 * @param target_dimension target dimension of embedding (number of eigenvectors to find)
 	 * @param skip number of eigenvectors to skip
 	 */

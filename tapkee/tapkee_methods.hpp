@@ -31,6 +31,7 @@
 
 namespace tapkee
 {
+//! Main namespace for all internal routines, should not be exposed as public API
 namespace tapkee_internal
 {
 
