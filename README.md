@@ -1,4 +1,4 @@
-Tapkee: an efficient dimension reduction toolbox
+Tapkee: an efficient dimension reduction library
 ================================================
 
 Tapkee is a C++ template library for dimensionality reduction with some bias on 
