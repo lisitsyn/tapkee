@@ -29,7 +29,11 @@ struct BasicCallbackTraits
 	static bool is_kernel() { return true; }; \
 	static bool is_linear_kernel() { return false; }; \
 	static bool is_distance() { return false; }; \
-}; 
+};
+/** Macro used to indicate that callback X is a kernel function */
+#define TAPKEE_IS_KERNEL(X) TAPKEE_CALLBACK_IS_KERNEL(X)
+/** Macro used to indicate that callback X is a kernel function */
+#define TAPKEE_IS_KERNEL_CALLBACK(X) TAPKEE_CALLBACK_IS_KERNEL(X)
 /** Macro used to indicate that callback X is a kernel function */
 #define TAPKEE_CALLBACK_IS_LINEAR_KERNEL(X) template<> struct BasicCallbackTraits<X> \
 { \
@@ -37,6 +41,10 @@ struct BasicCallbackTraits
 	static bool is_linear_kernel() { return true; }; \
 	static bool is_distance() { return true; }; \
 };
+/** Macro used to indicate that callback X is a kernel function */
+#define TAPKEE_IS_LINEAR_KERNEL(X) TAPKEE_CALLBACK_IS_LINEAR_KERNEL(X)
+/** Macro used to indicate that callback X is a kernel function */
+#define TAPKEE_IS_LINEAR_KERNEL_CALLBACK(X) TAPKEE_CALLBACK_IS_LINEAR_KERNEL(X)
 /** Macro used to indicate that callback X is a distance function */
 #define TAPKEE_CALLBACK_IS_DISTANCE(X) template<> struct BasicCallbackTraits<X> \
 { \
@@ -44,6 +52,10 @@ struct BasicCallbackTraits
 	static bool is_linear_kernel() { return false; }; \
 	static bool is_distance() { return true; }; \
 };
+/** Macro used to indicate that callback X is a distance function */
+#define TAPKEE_IS_DISTANCE(X) TAPKEE_CALLBACK_IS_DISTANCE(X)
+/** Macro used to indicate that callback X is a distance function */
+#define TAPKEE_IS_DISTANCE_CALLBACK(X) TAPKEE_CALLBACK_IS_DISTANCE(X)
 
 template <class Callback>
 struct BatchCallbackTraits
@@ -54,5 +66,6 @@ struct BatchCallbackTraits
 { \
 	static bool supports_batch() { return true; }; \
 };
+
 
 #endif
