@@ -549,9 +549,9 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
 
 CONCRETE_IMPLEMENTATION(TSNE)
 {
-	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
+	ReturnResult operator()(RandomAccessIterator, RandomAccessIterator,
                             KernelCallback, DistanceCallback,
-                            FeatureVectorCallback callback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap)
 	{
 /*
 		const IndexType N = end-begin;
