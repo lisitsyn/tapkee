@@ -33,7 +33,7 @@ namespace tapkee_internal
 //!
 template <class RandomAccessIterator, class DistanceCallback>
 DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-		const Neighbors& neighbors, const DistanceCallback& callback)
+		const Neighbors& neighbors, DistanceCallback callback)
 {
 	timed_context context("Distances shortest path relaxing");
 	const IndexType n_neighbors = neighbors[0].size();
@@ -126,7 +126,7 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 //!
 template <class RandomAccessIterator, class DistanceCallback>
 DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-		const Landmarks& landmarks, const Neighbors& neighbors, const DistanceCallback& callback)
+		const Landmarks& landmarks, const Neighbors& neighbors, DistanceCallback callback)
 {
 	timed_context context("Distances shortest path relaxing");
 	const IndexType n_neighbors = neighbors[0].size();

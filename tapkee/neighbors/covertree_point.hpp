@@ -123,7 +123,7 @@ struct CoverTreePoint
 /** Functions declared out of the class definition to respect CoverTree 
  *  structure */
 template <class RandomAccessIterator, class Callback>
-inline ScalarType distance(const Callback& cb, const CoverTreePoint<RandomAccessIterator>& l,
+inline ScalarType distance(Callback cb, const CoverTreePoint<RandomAccessIterator>& l,
 		const CoverTreePoint<RandomAccessIterator>& r, ScalarType /*upper_bound*/)
 {
 	//assert(upper_bound>=0);

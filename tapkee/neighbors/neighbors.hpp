@@ -88,7 +88,7 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
 
 template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                         const PairwiseCallback& callback, IndexType k)
+                                         PairwiseCallback callback, IndexType k)
 {
 	timed_context context("Distance sorting based neighbors search");
 	typedef std::pair<RandomAccessIterator, ScalarType> DistanceRecord;
