@@ -26,7 +26,9 @@ endif()
 
 # Google Mock detection
 find_package(GoogleMockMinimal)
-include_directories("${GMOCKMINIMAL_INCLUDE_DIRS}")
+if (GMOCKMINIMAL_FOUND)
+	include_directories("${GMOCKMINIMAL_INCLUDE_DIRS}")
+endif()
 
 # Main executable
 include_directories("${TAPKEE_INCLUDE_DIR}")
