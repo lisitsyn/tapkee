@@ -254,7 +254,7 @@ namespace tapkee_internal
 		IndexType row_;
 		T value_;
 	};
-	typedef tapkee::Triplet<ScalarType> SparseTriplet;
+	typedef Triplet<ScalarType> SparseTriplet;
 #else
 	typedef Eigen::Triplet<ScalarType> SparseTriplet;
 #endif
