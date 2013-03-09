@@ -167,8 +167,9 @@ template <class RandomAccessIterator, class PairwiseCallback>
 tapkee::DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback)
 {
 	tapkee::DenseMatrix result((end-begin),(end-begin));
-	const int N = end-begin;
-	unsigned int i,j;
+	const tapkee::IndexType N = end-begin;
+	tapkee::IndexType i,j;
+#pragma omp parallel for shared(callback,result,begin) private(j) default(none)
 	for (i=0; i<N; ++i)
 	{
 		for (j=i; j<N; j++)
