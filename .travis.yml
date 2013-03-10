@@ -10,5 +10,18 @@ notifications:
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq libeigen3-dev libarpack2-dev cmake
-script:
-    - mkdir build && cd build && cmake -DBUILD_TESTS=1 .. && make && ctest -VV
+    - wget http://googletest.googlecode.com/files/gtest-1.6.0.zip
+    - unzip -q gtest-1.6.0.zip
+    - cd gtest-1.6.0
+    - cmake . && make
+    - cd ..
+    - cmake -DBUILD_TESTS=1
+script: make
+after_script: make test
+#env:
+#    matrix:
+#        - CMAKE_BUILD_TYPE=Debug
+#        - CMAKE_BUILD_TYPE=Release
+notifications:
+    email:
+        on_failure: always
