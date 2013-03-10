@@ -166,8 +166,11 @@ The library is distributed under the [BSD 3-clause](LICENSE) license.
 
 Exceptions are:
 
-- Covertree code by John Langford and Dinoj Surendran which is distributed under the [LGPLv3 license](LGPL-LICENSE).
+- [Covertree code](tapkee/neighbors/covertree.hpp) by John Langford and Dinoj Surendran 
+  which is distributed under the [LGPLv3 license](LGPL-LICENSE).
 
-- Any type by Christopher Diggins which is distributed under the [Boost v.1.0 license](http://www.boost.org/LICENSE_1_0.txt).
+- [Any type](tapkee/utils/any.hpp) by Christopher Diggins which is distributed under 
+  the [Boost v.1.0 license](http://www.boost.org/LICENSE_1_0.txt).
 
-- EZOptionsParser by Remik Ziemlinski which is distributed under the [MIT license](MIT-LICENSE).
+- [EZOptionsParser](src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed 
+  under the [MIT license](MIT-LICENSE).
