@@ -70,7 +70,11 @@ if (BUILD_TESTS)
 	endif()
 
 	enable_testing()
+
 	add_executable(tapkee_interface_tests "${TAPKEE_TESTS_DIR}/interface.cpp")
 	target_link_libraries(tapkee_interface_tests gmock gmock_main arpack)
-	add_test(tapkee tapkee_interface_tests)
+	add_executable(tapkee_eigenembedding_tests "${TAPKEE_TESTS_DIR}/eigenembedding.cpp")
+	target_link_libraries(tapkee_eigenembedding_tests gmock gmock_main arpack)
+	add_test("Interface" tapkee_interface_tests)
+	add_test("Eigenembedding" tapkee_eigenembedding_tests)
 endif()
