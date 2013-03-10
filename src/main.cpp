@@ -68,9 +68,18 @@ int main(int argc, const char** argv)
 			"kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), t-stochastic_neighborhood_embedding (t-sne).",
 			"-m",METHOD_KEYWORD);
 #define NEIGHBORS_METHOD_KEYWORD "--neighbors-method"
-	opt.add("covertree",0,1,0,
-			"Neighbors search method (default covertree). One of the following "
-			"covertree, brute.",
+	opt.add(
+#ifdef TAPKEE_USE_LGPL_COVERTREE
+			"covertree",
+#else
+			"brute",
+#endif
+			0,1,0,"Neighbors search method (default covertree if available, brute otherwise). One of the following: "
+			"brute"
+#ifdef TAPKEE_USE_LGPL_COVERTREE
+			",covertree"
+#endif
+			".",
 			"-nm",NEIGHBORS_METHOD_KEYWORD);
 #define EIGEN_METHOD_KEYWORD "--eigen-method"
 	opt.add("arpack",0,1,0,

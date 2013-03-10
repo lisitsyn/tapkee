@@ -160,9 +160,11 @@ namespace tapkee
 		//! \f$ O(N N \log k) \f$ time complexity.
 		//! Recommended to be used only in debug purposes.
 		BRUTE_FORCE,
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 		//! Covertree-based method with approximate \f$ O(\log N) \f$ time complexity.
 		//! Recommended to be used as a default method.
 		COVER_TREE,
+#endif
 		//! Unknown method
 		UNKNOWN_NEIGHBORS_METHOD
 	};

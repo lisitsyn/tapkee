@@ -8,7 +8,7 @@
 
 /* Tapkee includes */
 #include <tapkee_defines.hpp>
-#ifdef TAPKEE_USE_GPL_COVERTREE
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 	#include <neighbors/covertree.hpp>
 #endif
 #include <neighbors/connected.hpp>
@@ -31,7 +31,7 @@ std::string get_neighbors_method_name(TAPKEE_NEIGHBORS_METHOD m)
 	switch (m)
 	{
 		case BRUTE_FORCE: return "Brute force";
-#ifdef TAPKEE_USE_GPL_COVERTREE
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 		case COVER_TREE: return "Cover tree";
 #endif
 		default: return "Unknown neighbors finding method (yes it is a bug)";
@@ -47,7 +47,7 @@ struct distances_comparator
 	}
 };
 
-#ifdef TAPKEE_USE_GPL_COVERTREE
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 template <class RandomAccessIterator, class PairwiseCallback>
 Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
                          PairwiseCallback callback, IndexType k)
@@ -143,7 +143,7 @@ Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessItera
 	switch (method)
 	{
 		case BRUTE_FORCE: neighbors = find_neighbors_bruteforce_impl(begin,end,callback,k); break;
-#ifdef TAPKEE_USE_GPL_COVERTREE
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 		case COVER_TREE: neighbors = find_neighbors_covertree_impl(begin,end,callback,k); break;
 #endif
 		default: break;

@@ -150,7 +150,7 @@ tapkee::TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 {
 	if (!strcmp(str,"brute"))
 		return tapkee::BRUTE_FORCE;
-#ifdef TAPKEE_USE_GPL_COVERTREE
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 	if (!strcmp(str,"covertree"))
 		return tapkee::COVER_TREE;
 #endif
