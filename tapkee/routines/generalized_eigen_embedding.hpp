@@ -1,8 +1,4 @@
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+/* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
@@ -10,10 +6,12 @@
 #ifndef TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
 #define TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
 
-#ifndef TAPKEE_NO_ARPACK
+/* Tapkee includes */
+#ifdef TAPKEE_WITH_ARPACK
 	#include <utils/arpack_wrapper.hpp>
 #endif
 #include <routines/matrix_operations.hpp>
+/* End of Tapkee includes */
 
 namespace tapkee
 {
@@ -33,6 +31,7 @@ struct generalized_eigen_embedding_impl
 	virtual EmbeddingResult embed(const LMatrixType& lhs, const RMatrixType& rhs, IndexType target_dimension, unsigned int skip);
 };
 
+#ifdef TAPKEE_WITH_ARPACK
 //! ARPACK implementation of eigendecomposition-based embedding
 template <class LMatrixType, class RMatrixType, class MatrixOperationType> 
 struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixOperationType, ARPACK>
@@ -41,7 +40,6 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixOperatio
 	{
 		timed_context context("ARPACK DSXUPD generalized eigendecomposition");
 
-#ifndef TAPKEE_NO_ARPACK
 		ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperationType> 
 			arpack(lhs,rhs,target_dimension+skip,"SM");
 		
@@ -58,12 +56,9 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixOperatio
 			throw eigendecomposition_error("eigendecomposition failed");
 		}
 		return EmbeddingResult();
-#else
-		throw new unsupported_method_error("ARPACK is not available");
-		return EmbeddingResult();
-#endif
 	}
 };
+#endif
 
 //! Eigen library dense implementation of eigendecomposition
 template <class LMatrixType, class RMatrixType, class MatrixOperationType> 
@@ -112,7 +107,7 @@ EmbeddingResult generalized_eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method
 {
 	switch (method)
 	{
-#ifndef TAPKEE_NO_ARPACK
+#ifdef TAPKEE_WITH_ARPACK
 		case ARPACK: 
 			return generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixOperationType, 
 				ARPACK>().embed(lhs, rhs, target_dimension, skip);

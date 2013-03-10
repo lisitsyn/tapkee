@@ -2,17 +2,22 @@ Tapkee: an efficient dimension reduction library
 ================================================
 
 Tapkee is a C++ template library for dimensionality reduction with some bias on 
-spectral methods. The Tapkee origins from the code developed during GSoC 2011 as 
+spectral methods. The Tapkee origins from the code developed during 
+[GSoC 2011](http://www.google-melange.com/gsoc/homepage/google/gsoc2011) as 
 the part of the [Shogun machine learning toolbox](https://github.com/shogun-toolbox/shogun). 
 The project aim is to provide efficient and flexible standalone library for 
 dimensionality reduction which can be easily integrated to existing codebases.
-Tapkee leverages capabilities of effective Eigen3 linear algebra library and 
-optionally makes use of the ARPACK eigensolver. 
+Tapkee leverages capabilities of effective [Eigen3 linear algebra library](http://eigen.tuxfamily.org) and 
+optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/). 
 
-Contributions are very encouraged as we distribute the software under GPLv3 license. 
+Contributions are very encouraged as we distribute our software under permissive BSD 3-clause license 
+(except some parts that are distributed under other open sources licenses, 
+see Licensing section of this document).
 
 We are happy to use [Travis](https://travis-ci.org) as a continuous integration 
-platform [![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee).
+platform. The build status is:
+
+[![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee).
 
 Callback interface
 ------------------
@@ -55,8 +60,12 @@ If your library includes Eigen3 at some point - let the Tapkee know about that w
 
 `#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
-Please note that if you don't use Eigen3 in your projects there is no need to define that variable, Eigen3 will
+Please note that if you don't use Eigen3 in your project there is no need to define that variable, Eigen3 will
 be included by Tapkee in this case.
+
+If you are able to use LGPLv3 license you could define the following variables:
+
+- `TAPKEE_USE_LGPL_COVERTREE` to use Covertree code.
 
 When compiling your software that includes Tapkee be sure Eigen3 headers are in include path and your code
 is linked against ARPACK library (-larpack key for g++ and clang++).
@@ -87,17 +96,20 @@ low-dimensional representations of feature matrices. For more information on its
 
 `./tapkee -h`
 
-To compile the application please use CMake. The workflow of compilation with CMake is usual. When using Unix-based
+To compile the application please use [CMake](http://cmake.org/). The workflow of compilation 
+Tapkee with CMake is usual. When using Unix-based
 systems you may use the following command to compile the Tapkee application:
 
 `mkdir build && cd build && cmake [definitions] .. && make`
 
 There are a few cases when you'd want to put some definitions:
 
-- To enable unit-tests compilation add to `-Dbuild_tests` to `[definitions]` when building.
+- To enable unit-tests compilation add to `-DBUILD_TESTS=1` to `[definitions]` when building.
 
 - To enable precomputation of kernel/distance matrices which can speed-up algorithms (but requires much more memory) add
   `-DPRECOMPUTED=1` to `[definitions]` when building.
+
+- To build application without parts licensed by GPLv3 use `-DGPL_FREE=1` definition.
 
 The compilation requires Eigen3 to be available in your path. The ARPACK library is also highly recommended. 
 On Ubuntu Linux these packages can be installed with 
@@ -146,3 +158,16 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * Kernel PCA (kPCA)
 * Random projection
 * Factor analysis
+
+Licensing
+---------
+
+The library is distributed under the [BSD 3-clause](LICENSE) license.
+
+Exceptions are:
+
+- Covertree code by John Langford and Dinoj Surendran which is distributed under the [LGPLv3 license](LGPL-LICENSE).
+
+- Any type by Christopher Diggins which is distributed under the [Boost v.1.0 license](http://www.boost.org/LICENSE_1_0.txt).
+
+- EZOptionsParser by Remik Ziemlinski which is distributed under the [MIT license](MIT-LICENSE).

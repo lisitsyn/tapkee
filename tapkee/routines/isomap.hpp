@@ -1,19 +1,17 @@
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+/* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
- *
  */
 
 #ifndef TAPKEE_ISOMAP_H_
 #define TAPKEE_ISOMAP_H_
 
+/* Tapkee includes */
 #include <tapkee_defines.hpp>
 #include <utils/fibonacci_heap.hpp>
 #include <utils/time.hpp>
+/* End of Tapkee includes */
+
 #include <limits>
 
 using std::numeric_limits;

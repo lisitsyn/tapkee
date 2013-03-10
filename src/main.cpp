@@ -1,10 +1,6 @@
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+/* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * Copyright (c) 2012-2013 Sergey Lisitsyn
+ * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias 
  */
 
 #include <tapkee.hpp>
@@ -105,10 +101,14 @@ int main(int argc, const char** argv)
 	opt.add("200",0,1,0,"Maximum number of iterations (default 200)",MAX_ITERS_KEYWORD);
 #define FA_EPSILON_KEYWORD "--fa-epsilon"
 	opt.add("1e-5",0,1,0,"FA convergence criterion (default 1e-5)",FA_EPSILON_KEYWORD);
+
+#ifdef TAPKEE_USE_GPL_TSNE
 #define SNE_PERPLEXITY_KEYWORD "--sne-perplexity"
 	opt.add("30.0",0,1,0,"Perplexity for the t-SNE algorithm (default 30.0)",SNE_PERPLEXITY_KEYWORD);
 #define SNE_THETA_KEYWORD "--sne-theta"
 	opt.add("0.5",0,1,0,"Theta for the t-SNE algorithm (defualt 0.5)",SNE_THETA_KEYWORD);
+#endif
+
 	opt.parse(argc, argv);
 
 	if (opt.isSet(HELP_KEYWORD))
@@ -260,6 +260,7 @@ int main(int argc, const char** argv)
 		opt.get(FA_EPSILON_KEYWORD)->getDouble(fa_epsilon);
 		parameters[tapkee::FA_EPSILON] = static_cast<tapkee::ScalarType>(fa_epsilon);
 	}
+#ifdef TAPKEE_USE_GPL_TSNE
 	{
 		double perplexity = 30.0;
 		opt.get(SNE_PERPLEXITY_KEYWORD)->getDouble(perplexity);
@@ -270,6 +271,7 @@ int main(int argc, const char** argv)
 		opt.get(SNE_THETA_KEYWORD)->getDouble(theta);
 		parameters[tapkee::SNE_THETA] = static_cast<tapkee::ScalarType>(theta);
 	}
+#endif
 
 	// Load data
 	string input_filename;

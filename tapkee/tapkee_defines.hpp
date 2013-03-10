@@ -1,22 +1,20 @@
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+/* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando J. Iglesias García
- *
- * This code uses Any type developed by C. Diggins under Boost license, version 1.0.
+ * This code also uses Any type developed by C. Diggins under Boost license, version 1.0.
  * http://www.boost.org/LICENSE_1_0.txt
+ *
+ * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
 
 #ifndef TAPKEE_DEFINES_H_
 #define TAPKEE_DEFINES_H_
 
+/* Tapkee includes */
 #include <tapkee_exceptions.hpp>
 #include <utils/any.hpp>
 #include <callbacks/traits.hpp>
 #include <routines/methods_traits.hpp>
+/* End of Tapkee includes */
 
 #include <map>
 #include <vector>
@@ -76,8 +74,10 @@ namespace tapkee
 		/* ScalarType */ EIGENSHIFT,
 		/* bool */ CHECK_CONNECTIVITY,
 		/* ScalarType */ FA_EPSILON,
+#ifdef TAPKEE_USE_GPL_TSNE
 		/* ScalarType */ SNE_PERPLEXITY,
 		/* ScalarType */ SNE_THETA
+#endif
 	};
 
 
@@ -118,8 +118,10 @@ namespace tapkee
 		RANDOM_PROJECTION,
 		/** Factor Analysis */
 		FACTOR_ANALYSIS,
+#ifdef TAPKEE_USE_GPL_TSNE
 		/** t-SNE and Barnes-Hut-SNE as described in \cite tSNE and \cite Barnes-Hut-SNE */
 		TSNE,
+#endif
 		/** Passing through (doing nothing just passed data through) */
 		PASS_THRU,
 		/** unknown method */
@@ -145,7 +147,9 @@ namespace tapkee
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(RANDOM_PROJECTION);
 	METHOD_THAT_NEEDS_NOTHING_IS(PASS_THRU);
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(FACTOR_ANALYSIS);
+#ifdef TAPKEE_USE_GPL_TSNE
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(TSNE);
+#endif
 	METHOD_THAT_NEEDS_NOTHING_IS(UNKNOWN_METHOD);
 #endif
 
@@ -166,10 +170,12 @@ namespace tapkee
 	//! Eigendecomposition methods
 	enum TAPKEE_EIGEN_EMBEDDING_METHOD
 	{
+#ifdef TAPKEE_WITH_ARPACK
 		//! ARPACK-based method (requires the ARPACK library
 		//! binaries to be available around). Recommended to be used as a 
 		//! default method. Supports both generalized and standard eigenproblems.
 		ARPACK,
+#endif
 		//! Randomized method (implementation taken from the redsvd lib). 
 		//! Supports only standard but not generalized eigenproblems.
 		RANDOMIZED,
@@ -272,11 +278,16 @@ namespace tapkee_internal
 	typedef TAPKEE_INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricMatrixPair;
 };
 
-#include <tapkee_projection.hpp>
+} // namespace tapkee
 
+/* Tapkee includes */
+#include <tapkee_projection.hpp>
+/* End of Tapkee includes */
+
+namespace tapkee 
+{
 //! Return result of the library - a pair of @ref DenseMatrix (embedding) and @ref ProjectingFunction
 typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,tapkee::ProjectingFunction> ReturnResult;
-
-} // namespace tapkee
+}
 
 #endif

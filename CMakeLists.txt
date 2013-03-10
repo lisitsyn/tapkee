@@ -24,20 +24,13 @@ if (OPENMP_FOUND)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-# Google Mock detection
-find_package(GoogleMockMinimal)
-if (GMOCKMINIMAL_FOUND)
-	include_directories("${GMOCKMINIMAL_INCLUDE_DIRS}")
-endif()
-
 # Main executable
 include_directories("${TAPKEE_INCLUDE_DIR}")
 set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee arpack)
-else()
-	add_definitions(-DTAPKEE_NO_ARPACK)
+	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
@@ -63,8 +56,20 @@ if (PRECOMPUTED)
 	add_definitions(-DUSE_PRECOMPUTED)
 endif()
 
+if (NOT GPL_FREE)
+	message("GPL_FREE is not set, including covertree code")
+	#add_definitions(-DTAPKEE_USE_GPL_TSNE)
+	add_definitions(-DTAPKEE_USE_GPL_COVERTREE)
+endif()
+
 # Testing
-if (build_tests)
+if (BUILD_TESTS)
+	# Google Mock detection
+	find_package(GoogleMockMinimal)
+	if (GMOCKMINIMAL_FOUND)
+		include_directories("${GMOCKMINIMAL_INCLUDE_DIRS}")
+	endif()
+
 	enable_testing()
 	set (TESTS ${TAPKEE_TESTS_DIR}/simple.cpp)
 	add_executable(tapkee_tests ${TESTS})

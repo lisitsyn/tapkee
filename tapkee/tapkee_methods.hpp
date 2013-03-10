@@ -1,8 +1,4 @@
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+/* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
@@ -10,6 +6,7 @@
 #ifndef TAPKEE_METHODS_H_
 #define TAPKEE_METHODS_H_
 
+/* Tapkee includes */
 #include <tapkee_defines.hpp>
 #include <utils/time.hpp>
 #include <utils/logging.hpp>
@@ -27,7 +24,10 @@
 #include <routines/fa.hpp>
 #include <neighbors/neighbors.hpp>
 
-//#include <external/barnes_hut_sne/tsne.hpp>
+#ifdef TAPKEE_USE_GPL_TSNE
+#include <external/barnes_hut_sne/tsne.hpp>
+#endif
+/* End of Tapkee includes */
 
 namespace tapkee
 {
@@ -57,7 +57,9 @@ std::string get_method_name(TAPKEE_METHOD m)
 		case PASS_THRU: return "passing through";
 		case RANDOM_PROJECTION: return "Random Projection";
 		case FACTOR_ANALYSIS: return "Factor Analysis";
+#ifdef TAPKEE_USE_GPL_TSNE
 		case TSNE: return "t-SNE";
+#endif
 		default: return "Method name unknown (yes this is a bug)";
 	}
 }
@@ -547,13 +549,13 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
 	}
 };
 
+#ifdef TAPKEE_USE_GPL_TSNE
 CONCRETE_IMPLEMENTATION(TSNE)
 {
 	ReturnResult operator()(RandomAccessIterator, RandomAccessIterator,
                             KernelCallback, DistanceCallback,
                             FeatureVectorCallback, ParametersMap)
 	{
-/*
 		const IndexType N = end-begin;
 		
 		PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION, POSITIVE(current_dimension));
@@ -576,10 +578,9 @@ CONCRETE_IMPLEMENTATION(TSNE)
 		delete tsne;
 
 		return ReturnResult(embedding.transpose(),tapkee::ProjectingFunction());
-*/
-		return ReturnResult();
 	}
 };
+#endif
 
 }
 }

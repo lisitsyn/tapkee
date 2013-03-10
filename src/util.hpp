@@ -1,11 +1,10 @@
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+/* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * Copyright (c) 2012-2013 Sergey Lisitsyn
+ * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias 
  */
+
+#ifndef TAPKEE_APP_UTIL_H_
+#define TAPKEE_APP_UTIL_H_
 
 #include <istream>
 #include <ostream>
@@ -60,7 +59,9 @@ bool method_needs_kernel(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_KERNEL(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
 		IF_NEEDS_KERNEL(tapkee::PASS_THRU);
 		IF_NEEDS_KERNEL(tapkee::FACTOR_ANALYSIS);
+#ifdef TAPKEE_USE_GPL_TSNE
 		IF_NEEDS_KERNEL(tapkee::TSNE);
+#endif
 		IF_NEEDS_KERNEL(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_KERNEL
 	}
@@ -90,7 +91,9 @@ bool method_needs_distance(tapkee::TAPKEE_METHOD method)
 		IF_NEEDS_DISTANCE(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
 		IF_NEEDS_DISTANCE(tapkee::PASS_THRU);
 		IF_NEEDS_DISTANCE(tapkee::FACTOR_ANALYSIS);
+#ifdef TAPKEE_USE_GPL_TSNE
 		IF_NEEDS_DISTANCE(tapkee::TSNE);
+#endif
 		IF_NEEDS_DISTANCE(tapkee::UNKNOWN_METHOD);
 #undef IF_NEEDS_DISTANCE
 	}
@@ -135,8 +138,10 @@ tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 		return tapkee::PASS_THRU;
 	if (!strcmp(str,"factor_analysis") || !strcmp(str,"fa"))
 		return tapkee::FACTOR_ANALYSIS;
+#ifdef TAPKEE_USE_GPL_TSNE
 	if (!strcmp(str,"t-stochastic_neighbor_embedding") || !strcmp(str,"t-sne"))
 		return tapkee::TSNE;
+#endif
 
 	return tapkee::UNKNOWN_METHOD;
 }
@@ -145,16 +150,20 @@ tapkee::TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
 {
 	if (!strcmp(str,"brute"))
 		return tapkee::BRUTE_FORCE;
+#ifdef TAPKEE_USE_GPL_COVERTREE
 	if (!strcmp(str,"covertree"))
 		return tapkee::COVER_TREE;
+#endif
 
 	return tapkee::UNKNOWN_NEIGHBORS_METHOD;
 }
 
 tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 {
+#ifdef TAPKEE_WITH_ARPACK
 	if (!strcmp(str,"arpack"))
 		return tapkee::ARPACK;
+#endif
 	if (!strcmp(str,"randomized"))
 		return tapkee::RANDOMIZED;
 	if (!strcmp(str,"dense"))
@@ -182,4 +191,4 @@ tapkee::DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAcces
 	return result;
 }
 
-
+#endif
