@@ -104,7 +104,10 @@ systems you may use the following command to compile the Tapkee application:
 
 There are a few cases when you'd want to put some definitions:
 
-- To enable unit-tests compilation add to `-DBUILD_TESTS=1` to `[definitions]` when building.
+- To enable unit-tests compilation add to `-DBUILD_TESTS=1` to `[definitions]` when building. Please note that 
+  building unit-tests require googletest. The simplest way to make it available before building is 
+  `wget http://googletest.googlecode.com/files/gtest-1.6.0.zip && unzip -q gtest-1.6.0.zip && cd gtest-1.6.0 && cmake . && make && cd .. && rm gtest-1.6.0.zip`.
+  To run tests use `make test` command or its equivalent.
 
 - To enable precomputation of kernel/distance matrices which can speed-up algorithms (but requires much more memory) add
   `-DPRECOMPUTED=1` to `[definitions]` when building.
