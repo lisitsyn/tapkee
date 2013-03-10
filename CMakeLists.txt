@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 2.6.2)
 # set paths
 set (TAPKEE_INCLUDE_DIR "tapkee")
 set (TAPKEE_SRC_DIR "src")
-set (TAPKEE_TESTS_DIR "test")
+set (TAPKEE_TESTS_DIR "test/gtest")
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
 
 # Eigen3 detection
@@ -57,9 +57,8 @@ if (PRECOMPUTED)
 endif()
 
 if (NOT GPL_FREE)
-	message("GPL_FREE is not set, including covertree code")
 	#add_definitions(-DTAPKEE_USE_GPL_TSNE)
-	add_definitions(-DTAPKEE_USE_GPL_COVERTREE)
+	add_definitions(-DTAPKEE_USE_LGPL_COVERTREE)
 endif()
 
 # Testing
@@ -71,8 +70,7 @@ if (BUILD_TESTS)
 	endif()
 
 	enable_testing()
-	set (TESTS ${TAPKEE_TESTS_DIR}/simple.cpp)
-	add_executable(tapkee_tests ${TESTS})
-	target_link_libraries(tapkee_tests gmock gmock_main arpack)
-	add_test(tapkee tapkee_tests)
+	add_executable(tapkee_interface_tests "${TAPKEE_TESTS_DIR}/interface.cpp")
+	target_link_libraries(tapkee_interface_tests gmock gmock_main arpack)
+	add_test(tapkee tapkee_interface_tests)
 endif()
