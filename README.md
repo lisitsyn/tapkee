@@ -10,14 +10,14 @@ dimensionality reduction which can be easily integrated to existing codebases.
 Tapkee leverages capabilities of effective [Eigen3 linear algebra library](http://eigen.tuxfamily.org) and 
 optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/). 
 
-Contributions are very encouraged as we distribute our software under permissive BSD 3-clause license 
+Contributions are very encouraged as we distribute our software under permissive [BSD 3-clause license](LICENSE) 
 (except some parts that are distributed under other open sources licenses, 
 see Licensing section of this document).
 
 We are happy to use [Travis](https://travis-ci.org) as a continuous integration 
 platform. The build status is:
 
-[![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee).
+[![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee)
 
 Callback interface
 ------------------
@@ -148,16 +148,16 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * [Local Tangent Space Alignment / (LTSA)](http://lisitsyn.github.com/tapkee/methods/ltsa.html)
 * [Linear Local Tangent Space Alignment (LLTSA)](http://lisitsyn.github.com/tapkee/methods/lltsa.html)
 * [Hessian Locally Linear Embedding (HLLE)](http://lisitsyn.github.com/tapkee/methods/hlle.html)
-* [Diffusion map](http://lisitsyn.github.com/tapkee/methods/diffusion_map.html)
 * [Laplacian eigenmaps](http://lisitsyn.github.com/tapkee/methods/laplacian_eigenmaps.html)
-* [Locality Preserving Projections (LPP)](http://lisitsyn.github.com/tapkee/methods/lpp.html)
-* Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)
-* Isomap and landmark Isomap
+* [Locality Preserving Projections](http://lisitsyn.github.com/tapkee/methods/lpp.html)
+* [Diffusion map](http://lisitsyn.github.com/tapkee/methods/diffusion_map.html)
+* [Isomap and landmark Isomap](http://lisitsyn.github.com/tapkee/methods/isomap.html)
+* [Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)](http://lisitsyn.github.com/tapkee/methods/mds.html)
 * [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
-* PCA and randomized PCA
-* Kernel PCA (kPCA)
-* Random projection
-* Factor analysis
+* [PCA and randomized PCA](http://lisitsyn.github.com/tapkee/methods/pca.html)
+* [Kernel PCA (kPCA)](http://lisitsyn.github.com/tapkee/methods/kpca.html)
+* [Random projection](http://lisitsyn.github.com/tapkee/methods/ra.html)
+* [Factor analysis](http://lisitsyn.github.com/tapkee/methods/fa.html)
 
 Licensing
 ---------
