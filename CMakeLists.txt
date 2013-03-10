@@ -7,6 +7,7 @@ set (TAPKEE_INCLUDE_DIR "tapkee")
 set (TAPKEE_SRC_DIR "src")
 set (TAPKEE_TESTS_DIR "test/gtest")
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
+set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 # Eigen3 detection
 find_package(Eigen3 REQUIRED)
@@ -63,18 +64,23 @@ endif()
 
 # Testing
 if (BUILD_TESTS)
-	# Google Mock detection
-	find_package(GoogleMockMinimal)
-	if (GMOCKMINIMAL_FOUND)
-		include_directories("${GMOCKMINIMAL_INCLUDE_DIRS}")
+	if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/gtest-1.6.0/)
+		add_subdirectory(gtest-1.6.0)
+	else()
+		message("gtest-1.6.0 is required to be available in root of the project")
 	endif()
-
+	include_directories(SYSTEM ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 	enable_testing()
 
-	add_executable(tapkee_interface_tests "${TAPKEE_TESTS_DIR}/interface.cpp")
-	target_link_libraries(tapkee_interface_tests gmock gmock_main arpack)
-	add_executable(tapkee_eigenembedding_tests "${TAPKEE_TESTS_DIR}/eigenembedding.cpp")
-	target_link_libraries(tapkee_eigenembedding_tests gmock gmock_main arpack)
-	add_test("Interface" tapkee_interface_tests)
-	add_test("Eigenembedding" tapkee_eigenembedding_tests)
+	aux_source_directory(${TAPKEE_TESTS_DIR} TAPKEE_TESTS_SOURCES)
+	foreach(i ${TAPKEE_TESTS_SOURCES})
+		get_filename_component(exe ${i} NAME_WE)
+		add_executable(test_${exe} ${i})
+		target_link_libraries(test_${exe} gtest gtest_main arpack)
+		add_test(
+			NAME ${exe}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			COMMAND ${EXECUTABLE_OUTPUT_PATH}/test_${exe}
+			--gtest_color=yes)
+	endforeach()
 endif()
