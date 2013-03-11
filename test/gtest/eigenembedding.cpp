@@ -11,11 +11,10 @@
 
 #define PRECISION 1e-7
 
-TEST(EigenEmbedding, EigenLargestEigenvector) 
+TEST(EigenEmbedding, EigenDenseLargestEigenvector) 
 {
 	tapkee::DenseMatrix mat(2,2);
 
-	// eigenv
 	mat << 1, -1, -1, 1;
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
@@ -31,11 +30,30 @@ TEST(EigenEmbedding, EigenLargestEigenvector)
 	ASSERT_NEAR(0.0,(mat*result.first - result.second[0]*result.first).norm(),PRECISION);
 }
 
-TEST(EigenEmbedding, ArpackLargestEigenvector) 
+TEST(EigenEmbedding, EigenSparseSmallestEigenvector) 
+{
+	tapkee::SparseWeightMatrix mat(3,3);
+	tapkee::tapkee_internal::SparseTriplets triplets;
+	for (int i=0; i<3; i++)
+		triplets.push_back(tapkee::tapkee_internal::SparseTriplet(i,i,tapkee::ScalarType(i+1)));
+	mat.setFromTriplets(triplets.begin(), triplets.end());
+
+	tapkee::tapkee_internal::EmbeddingResult result = 
+		tapkee::tapkee_internal::eigen_embedding<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
+		(tapkee::EIGEN_DENSE_SELFADJOINT_SOLVER, mat, 1, 0);
+
+	ASSERT_EQ(1,result.second.size());
+	// smallest eigenvalue is 1
+	ASSERT_NEAR(1,result.second[0],PRECISION);
+	ASSERT_EQ(1,result.first.cols());
+	ASSERT_EQ(3,result.first.rows());
+	// check if it is an eigenvector
+	ASSERT_NEAR(0.0,(mat*result.first - result.second[0]*result.first).norm(),PRECISION);
+}
+
+TEST(EigenEmbedding, ArpackDenseLargestEigenvector) 
 {
 	tapkee::DenseMatrix mat(2,2);
-
-	// eigenv
 	mat << 1, -1, -1, 1;
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
@@ -51,11 +69,30 @@ TEST(EigenEmbedding, ArpackLargestEigenvector)
 	ASSERT_NEAR(0.0,(mat*result.first - result.second[0]*result.first).norm(),PRECISION);
 }
 
-TEST(EigenEmbedding, RandomizedLargestEigenvector) 
+TEST(EigenEmbedding, ArpackSparseSmallestEigenvector) 
+{
+	tapkee::SparseWeightMatrix mat(3,3);
+	tapkee::tapkee_internal::SparseTriplets triplets;
+	for (int i=0; i<3; i++)
+		triplets.push_back(tapkee::tapkee_internal::SparseTriplet(i,i,tapkee::ScalarType(i+1)));
+	mat.setFromTriplets(triplets.begin(), triplets.end());
+
+	tapkee::tapkee_internal::EmbeddingResult result = 
+		tapkee::tapkee_internal::eigen_embedding<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
+		(tapkee::ARPACK, mat, 1, 0);
+
+	ASSERT_EQ(1,result.second.size());
+	// smallest eigenvalue is 1
+	ASSERT_NEAR(1,result.second[0],PRECISION);
+	ASSERT_EQ(1,result.first.cols());
+	ASSERT_EQ(3,result.first.rows());
+	// check if it is an eigenvector
+	ASSERT_NEAR(0.0,(mat*result.first - result.second[0]*result.first).norm(),PRECISION);
+}
+
+TEST(EigenEmbedding, RandomizedDenseLargestEigenvector) 
 {
 	tapkee::DenseMatrix mat(2,2);
-
-	// eigenv
 	mat << 1, -1, -1, 1;
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
