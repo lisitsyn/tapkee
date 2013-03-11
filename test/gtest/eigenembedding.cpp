@@ -7,8 +7,6 @@
 
 #include <cmath>
 
-#include <Eigen/Dense>
-
 #define PRECISION 1e-7
 
 TEST(EigenEmbedding, EigenDenseLargestEigenvector) 
@@ -38,9 +36,9 @@ TEST(EigenEmbedding, EigenSparseSmallestEigenvector)
 		sparse_triplets.push_back(tapkee::tapkee_internal::SparseTriplet(i,i,tapkee::ScalarType(i+1)));
 
 #ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-	Eigen::DynamicSparseMatrix<ScalarType> dynamic_weight_matrix(N,N);
+	Eigen::DynamicSparseMatrix<tapkee::ScalarType> dynamic_weight_matrix(N,N);
 	dynamic_weight_matrix.reserve(sparse_triplets.size());
-	for (SparseTriplets::const_iterator it=sparse_triplets.begin(); it!=sparse_triplets.end(); ++it)
+	for (tapkee::SparseTriplets::const_iterator it=sparse_triplets.begin(); it!=sparse_triplets.end(); ++it)
 		dynamic_weight_matrix.coeffRef(it->col(),it->row()) += it->value();
 	tapkee::SparseWeightMatrix mat(dynamic_weight_matrix);
 #else
