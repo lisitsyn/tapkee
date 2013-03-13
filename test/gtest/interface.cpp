@@ -37,10 +37,10 @@ TEST(Interface, WrongParameterTypePassThru)
 	tapkee::ParametersMap params;
 	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
 	// here is the error (should be static_cast<tapkee::IndexType>(1))
-	params[tapkee::CURRENT_DIMENSION] = 1;
+	params[tapkee::CURRENT_DIMENSION] = 1.0;
 
 	tapkee::ReturnResult result;
-	// fails with wrong parameter type as '1' is not of tapkee::IndexType
+	// fails with wrong parameter type as '1.0' is not of tapkee::IndexType
 	// warning - can be platform specific..
 	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::wrong_parameter_type_error);
 }

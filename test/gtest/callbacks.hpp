@@ -33,7 +33,7 @@ struct float_distance_callback
 {
 	tapkee::ScalarType operator()(float a, float b)
 	{
-		return a-b;
+		return abs(a-b);
 	}
 };
 
