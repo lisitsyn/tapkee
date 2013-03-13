@@ -31,8 +31,9 @@ Full set of callbacks (all three callbacks) makes possible to use all implemente
 
 Callback interface enables user to reach great flexibility: ability to set up some caching strategy,
 lazy initialization of resources and various more. As an example we provide 
-[simple callback set](https://github.com/lisitsyn/tapkee/blob/master/tapkee/callbacks/eigen_callbacks.hpp)
-for dense feature matrices out-of-the-box.
+[simple callback set](master/tapkee/callback/eigen_callbacks.hpp)
+for dense feature matrices out-of-the-box. If you are able to precompute kernel and distance matrices you may find
+[precomputed callbacks](master/tapkee/callback/precomputed_callbacks.hpp) useful.
 
 Integration with other libraries
 --------------------------------
