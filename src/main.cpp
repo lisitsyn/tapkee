@@ -39,7 +39,7 @@ int main(int argc, const char** argv)
 	opt.example = "Run locally linear embedding with k=10 with arpack "
                   "eigensolver on data from input.dat saving embedding to output.dat \n\n"
 	              "tapkee -i input.dat -o output.dat --method lle --eigen-method arpack -k 10\n\n";
-	opt.syntax = "tapkee_app [options]\n";
+	opt.syntax = "tapkee [options]\n";
 
 #define INPUT_FILE_KEYWORD "--input-file"
 	opt.add("",0,1,0,"Input file","-i",INPUT_FILE_KEYWORD);
@@ -74,7 +74,7 @@ int main(int argc, const char** argv)
 #else
 			"brute",
 #endif
-			0,1,0,"Neighbors search method (default covertree if available, brute otherwise). One of the following: "
+			0,1,0,"Neighbors search method (default is 'covertree' if available, 'brute' otherwise). One of the following: "
 			"brute"
 #ifdef TAPKEE_USE_LGPL_COVERTREE
 			",covertree"
@@ -82,10 +82,18 @@ int main(int argc, const char** argv)
 			".",
 			"-nm",NEIGHBORS_METHOD_KEYWORD);
 #define EIGEN_METHOD_KEYWORD "--eigen-method"
-	opt.add("arpack",0,1,0,
-			"Eigendecomposition method (default arpack). One of the following "
-			"arpack, randomized, dense.",
-			"-em",EIGEN_METHOD_KEYWORD);
+	opt.add(
+#ifdef TAPKEE_WITH_ARPACK
+		"arpack",
+#else
+		"dense",
+#endif 
+		0,1,0,"Eigendecomposition method (default is 'arpack' if available, 'dense' otherwise). One of the following: "
+#ifdef TAPKEE_WITH_ARPACK	
+		"arpack, "
+#endif
+		"randomized, dense.",
+		"-em",EIGEN_METHOD_KEYWORD);
 #define TARGET_DIMENSION_KEYWORD "--target-dimension"
 	opt.add("2",0,1,0,"Target dimension (default 2)","-td",TARGET_DIMENSION_KEYWORD);
 #define NUM_NEIGHBORS_KEYWORD "--num-neighbors"

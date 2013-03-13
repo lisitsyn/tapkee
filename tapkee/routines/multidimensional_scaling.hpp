@@ -76,28 +76,26 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 	for (IndexType i=0; i<target_dimension; ++i)
 		landmarks_embedding.first.col(i).array() /= landmarks_embedding.second(i);
 
-	RandomAccessIterator iter;
-	DenseVector distances_to_landmarks;
-
-//#pragma omp parallel private(distances_to_landmarks)
+//#pragma omp parallel shared(distance_callback,landmarks_embedding) default(none)
 	{
-	distances_to_landmarks = DenseVector(landmarks.size());
-//#pragma omp for private(iter) schedule(static)
-	for (iter=begin; iter<end; ++iter)
-	{
-		if (!to_process[iter-begin])
-			continue;
-
-		for (IndexType i=0; i<distances_to_landmarks.size(); ++i)
+		DenseVector distances_to_landmarks = DenseVector(landmarks.size());
+		IndexType index_iter;
+//#pragma omp for nowait
+		for (index_iter=0; index_iter<IndexType(end-begin); ++index_iter)
 		{
-			ScalarType d = distance_callback(*iter,begin[landmarks[i]]);
-			distances_to_landmarks(i) = d*d;
-		}
-		//distances_to_landmarks.array().square();
+			if (!to_process[index_iter])
+				continue;
 
-		distances_to_landmarks -= landmark_distances_squared;
-		embedding.row(iter-begin).noalias() = -0.5*landmarks_embedding.first.transpose()*distances_to_landmarks;
-	}
+			for (IndexType i=0; i<distances_to_landmarks.size(); ++i)
+			{
+				ScalarType d = distance_callback(begin[index_iter],begin[landmarks[i]]);
+				distances_to_landmarks(i) = d*d;
+			}
+			//distances_to_landmarks.array().square();
+
+			distances_to_landmarks -= landmark_distances_squared;
+			embedding.row(index_iter).noalias() = -0.5*landmarks_embedding.first.transpose()*distances_to_landmarks;
+		}
 	}
 
 	delete[] to_process;

@@ -196,7 +196,8 @@ namespace tapkee
 	typedef double ScalarType;
 #endif
 	//! indexing type (non-overridable)
-	typedef unsigned int IndexType;
+	//! set to int for compatibility with OpenMP 2.0
+	typedef int IndexType;
 	//! dense vector type (non-overridable)
 	typedef Eigen::Matrix<ScalarType,Eigen::Dynamic,1> DenseVector;
 	//! dense matrix type (non-overridable) 
