@@ -7,7 +7,7 @@ branches:
     - master
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install -qq libeigen3-dev libarpack2-dev cmake
+    - sudo apt-get install -qq libeigen3-dev libarpack2-dev cmake valgrind
     - wget http://googletest.googlecode.com/files/gtest-1.6.0.zip
     - unzip -q gtest-1.6.0.zip
     - cd gtest-1.6.0
@@ -16,10 +16,14 @@ before_install:
     - cmake -DBUILD_TESTS=1
 script: make
 after_script: make test
-#env:
-#    matrix:
-#        - CMAKE_BUILD_TYPE=Debug
-#        - CMAKE_BUILD_TYPE=Release
+after_success:
+    - cd ..
+    - python test/generate_swissroll.py 100
+    - CALLENV=valgrind TAPKEE_ELF=bin/tapkee INPUT_FILE=input.dat OUTPUT_FILE=/dev/null ./test/valgrind_run_all.sh
+env:
+    matrix:
+        - CMAKE_BUILD_TYPE=Debug
+        - CMAKE_BUILD_TYPE=Release
 notifications:
     email:
         on_failure: always
