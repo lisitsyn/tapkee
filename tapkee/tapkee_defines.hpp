@@ -12,7 +12,7 @@
 /* Tapkee includes */
 #include <tapkee_exceptions.hpp>
 #include <utils/any.hpp>
-#include <callbacks/traits.hpp>
+#include <callback/callback_traits.hpp>
 #include <routines/methods_traits.hpp>
 /* End of Tapkee includes */
 

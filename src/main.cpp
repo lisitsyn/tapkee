@@ -6,8 +6,8 @@
 #include <tapkee.hpp>
 #include <tapkee_defines.hpp>
 #include <tapkee_projection.hpp>
-#include <callbacks/eigen_callbacks.hpp>
-#include <callbacks/precomputed_callbacks.hpp>
+#include <callback/eigen_callbacks.hpp>
+#include <callback/precomputed_callbacks.hpp>
 #include <utils/logging.hpp>
 #include <algorithm>
 #include <string>
