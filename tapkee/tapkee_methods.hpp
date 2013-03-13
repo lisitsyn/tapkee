@@ -198,7 +198,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 		Landmarks landmarks = 
 			select_landmarks_random(begin,end,ratio);
 		DenseSymmetricMatrix distance_matrix = 
-			compute_distance_matrix(begin,landmarks,distance_callback);
+			compute_distance_matrix(begin,end,landmarks,distance_callback);
 		DenseVector landmark_distances_squared = distance_matrix.colwise().mean();
 		centerMatrix(distance_matrix);
 		distance_matrix.array() *= -0.5;
