@@ -106,7 +106,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve((k*k+2*k+1)*(end-begin));
 
-#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets,shift) default(none)
+#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets) default(none)
 	{
 		IndexType index_iter;
 		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
