@@ -58,15 +58,15 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 	p = diffusion_matrix.colwise().sum();
 
 	// compute full matrix as we need to compute sum later
-	for (IndexType i=0; i<(end-begin); i++)
-		for (IndexType j=0; j<(end-begin); j++)
+	for (IndexType i=0; i<IndexType(end-begin); i++)
+		for (IndexType j=0; j<IndexType(end-begin); j++)
 			diffusion_matrix(i,j) /= pow(p(i)*p(j),timesteps);
 
 	// compute sqrt of column sum vector
 	p = diffusion_matrix.colwise().sum().cwiseSqrt();
 	
-	for (IndexType i=0; i<(end-begin); i++)
-		for (IndexType j=i; j<(end-begin); j++)
+	for (IndexType i=0; i<IndexType(end-begin); i++)
+		for (IndexType j=i; j<IndexType(end-begin); j++)
 			diffusion_matrix(i,j) /= p(i)*p(j);
 
 	UNRESTRICT_ALLOC;

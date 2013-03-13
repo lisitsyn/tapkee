@@ -29,7 +29,7 @@ using namespace std;
 
 int main(int argc, const char** argv)
 {
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 	ezOptionParser opt;
 	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn <lisitsyn.s.o@gmail.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n"
 	             "This is free software: you are free to change and redistribute it.\n"

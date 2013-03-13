@@ -106,7 +106,7 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 			case UNKNOWN_METHOD: throw wrong_parameter_error("unknown method"); break;
 		}
 	}
-	catch (const std::bad_alloc& ba)
+	catch (const std::bad_alloc&)
 	{
 		LoggingSingleton::instance().message_error("Not enough memory available.");
 		throw not_enough_memory_error("Not enough memory");

@@ -267,13 +267,13 @@ namespace ez {
 	/* ################################################################### */
 	static void StringsToFloats(std::vector<std::string> & strings, std::vector<float> & out) {
 		for(unsigned int i=0; i < strings.size(); ++i) {
-			out.push_back(atof(strings[i].c_str()));
+			out.push_back(float(atof(strings[i].c_str())));
 		}
 	};
 	/* ################################################################### */
 	static void StringsToFloats(std::vector<std::string*> * strings, std::vector<float> * out) {
 		for(unsigned int i=0; i < strings->size(); ++i) {
-			out->push_back(atof(strings->at(i)->c_str()));
+			out->push_back(float(atof(strings->at(i)->c_str())));
 		}
 	};
 	/* ################################################################### */
@@ -1673,7 +1673,7 @@ bool ezOptionParser::importFile(const char * filename, char comment) {
 	char * memblock = new char[(int)size+1]; // Add one for end of string.
 	file.seekg (0, std::ios::beg);
 	file.read (memblock, size);
-	memblock[size] = '\0';
+	memblock[int(size)] = '\0';
 	file.close();
 
 	// Find comment lines.
