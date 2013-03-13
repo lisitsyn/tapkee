@@ -17,13 +17,8 @@ before_install:
 script: make
 after_script: make test
 after_success:
-    - cd ..
     - python test/generate_swissroll.py 100
     - CALLENV=valgrind TAPKEE_ELF=bin/tapkee INPUT_FILE=input.dat OUTPUT_FILE=/dev/null ./test/valgrind_run_all.sh
-env:
-    matrix:
-        - CMAKE_BUILD_TYPE=Debug
-        - CMAKE_BUILD_TYPE=Release
 notifications:
     email:
         on_failure: always
