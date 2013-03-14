@@ -18,7 +18,8 @@ script: make
 after_script: make test
 after_success:
     - python test/generate_swissroll.py 100
-    - CALLENV=valgrind TAPKEE_ELF=bin/tapkee INPUT_FILE=input.dat OUTPUT_FILE=/dev/null ./test/valgrind_run_all.sh
+    - CALLENV='valgrind --leak-check=full --xml=yes --xml-file=/dev/stdout' TAPKEE_ELF=bin/tapkee INPUT_FILE=input.dat OUTPUT_FILE=/dev/null ./test/valgrind_run_all.sh |
+      xsltproc test/valgrind_tests_transformer.xslt /dev/stdin
 notifications:
     email:
         on_failure: always
