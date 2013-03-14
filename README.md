@@ -38,9 +38,10 @@ Full set of callbacks (all three callbacks) makes possible to use all implemente
 
 Callback interface enables user to reach great flexibility: ability to set up some caching strategy,
 lazy initialization of resources and various more. As an example we provide 
-[simple callback set](tapkee/callback/eigen_callbacks.hpp)
+[simple callback set](https://github.com/lisitsyn/tapkee/tree/master/tapkee/callback/eigen_callbacks.hpp)
 for dense feature matrices out-of-the-box. If you are able to precompute kernel and distance matrices you may find
-[precomputed callbacks](tapkee/callback/precomputed_callbacks.hpp) useful.
+[precomputed callbacks](https://github.com/lisitsyn/tapkee/tree/master/tapkee/callback/precomputed_callbacks.hpp) 
+useful.
 
 It is required to identify your callback functors using the following macroses:
 
@@ -53,7 +54,8 @@ Out-of-the-box callbacks are already 'identified'.
 Integration with other libraries
 --------------------------------
 
-The main entry point of Tapkee is [embed](tapkee/tapkee.hpp) method (see the documentation for more details).
+The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee.hpp) 
+method (see the documentation for more details).
 
 If your library includes Eigen3 at some point - let the Tapkee know about that with the following define:
 
@@ -85,7 +87,7 @@ Tapkee is supposed to be highly customizable with preprocessor definitions.
 
 If you want to use float as numeric type (default is double) you may do 
 that with definition of `#define TAPKEE_CUSTOM_NUMTYPE float` 
-before including [defines header](tapkee/tapkee_defines.hpp).
+before including [defines header](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee_defines.hpp).
 
 If you use some non-standard STL-compatible realization of vector, map and pair you may redefine them
 with `TAPKEE_INTERNAL_VECTOR`, `TAPKEE_INTERNAL_PAIR`, `TAPKEE_INTERNAL_MAP` 
