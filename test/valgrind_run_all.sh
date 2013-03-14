@@ -11,9 +11,9 @@ $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m lltsa -k 15
 echo "===== Hessian Locally Linear Embedding (k=15) ======"
 $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m hlle -k 15
 echo "===== Diffusion map (t=3, w=1000.0, arpack) ======"
-$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -t 3 -w 1000.0
+$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -t 3 -w 10.0
 echo "===== Diffusion map (t=3, w=1000.0, randomized) ======"
-$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -em randomized -t 3 -w 1000.0
+$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -em randomized -t 3 -w 10.0
 echo "===== Multidimensional scaling (arpack) ======"
 $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m mds
 echo "===== Multidimensional scaling (randomized) ======"
