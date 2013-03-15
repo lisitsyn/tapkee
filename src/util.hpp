@@ -8,6 +8,7 @@
 
 #include <istream>
 #include <ostream>
+#include <iterator>
 
 using namespace std;
 
