@@ -13,13 +13,17 @@ before_install:
     - cd gtest-1.6.0
     - cmake . && make
     - cd ..
-    - cmake -DBUILD_TESTS=1
+    - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=1
 script: make
-after_script: make test
-after_success:
+after_success: make test
+after_script:
     - python test/generate_swissroll.py 100
-    - CALLENV='valgrind --leak-check=full --xml=yes --xml-file=/dev/stdout' TAPKEE_ELF=bin/tapkee INPUT_FILE=input.dat OUTPUT_FILE=/dev/null ./test/valgrind_run_all.sh |
-      xsltproc test/valgrind_tests_transformer.xslt /dev/stdin
+    - CALLENV='valgrind --leak-check=full --xml=yes --xml-file=/dev/stdout' 
+      TAPKEE_ELF='bin/tapkee' 
+      INPUT_FILE='input.dat' 
+      OUTPUT_FILE='/dev/null' 
+      TRANSFORM='xsltproc test/valgrind_tests_transformer.xslt /dev/stdin' 
+      test/valgrind_run_all.sh 
 notifications:
     email:
         on_failure: always

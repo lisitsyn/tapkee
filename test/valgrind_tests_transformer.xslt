@@ -6,15 +6,13 @@
 		<xsl:text>: </xsl:text>
 		<xsl:value-of select="xwhat/text"/>
 		<xsl:for-each select="stack/frame">
-			<xsl:if test="position() = last()">
-				<xsl:text> at </xsl:text>
-				<xsl:value-of select="dir"/>
-				<xsl:text>/</xsl:text>
-				<xsl:value-of select="file"/>
-				<xsl:text>:</xsl:text>
-				<xsl:value-of select="line"/>
-				<xsl:text>&#10;</xsl:text>
-			</xsl:if>
+			<xsl:text> at </xsl:text>
+			<xsl:value-of select="dir"/>
+			<xsl:text>/</xsl:text>
+			<xsl:value-of select="file"/>
+			<xsl:text>:</xsl:text>
+			<xsl:value-of select="line"/>
+			<xsl:text>&#10;</xsl:text>
 		</xsl:for-each>
 	</xsl:for-each>
 </xsl:template>
