@@ -15,7 +15,7 @@ before_install:
     - cd ..
     - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=1
 script: make
-after_success: make test
+after_success: ctest -VV
 after_script:
     - python test/generate_swissroll.py 100
     - CALLENV='valgrind --leak-check=full --xml=yes --xml-file=/dev/stdout' 
