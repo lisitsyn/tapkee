@@ -1,4 +1,5 @@
 -I./tapkee
+-I/usr/local/include/eigen3
 -I/usr/include/superlu
 -I/usr/include/atlas
-
+-I/usr/include/feast
