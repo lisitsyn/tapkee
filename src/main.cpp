@@ -368,7 +368,7 @@ int run(int argc, const char** argv)
 	embedding = tapkee::embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 #endif
 	// Save obtained data
-	ofs << embedding.first;
+	ofs << embedding.first.transpose();
 	ofs.close();
 
 	if (output_projection && embedding.second.implementation) {
