@@ -27,7 +27,7 @@ using namespace ez;
 using namespace Eigen;
 using namespace std;
 
-int main(int argc, const char** argv)
+int run(int argc, const char** argv)
 {
 	srand(static_cast<unsigned int>(time(NULL)));
 	ezOptionParser opt;
@@ -379,4 +379,17 @@ int main(int argc, const char** argv)
 	ofs_matrix.close();
 	ofs_mean.close();
 	return 0;
+
+}
+
+int main(int argc, const char** argv)
+{
+	try 
+	{
+		return run(argc,argv);
+	}
+	catch (const std::exception& exc) 
+	{
+		std::cout << "Some error occured: " << exc.what() << std::endl;
+	}
 }

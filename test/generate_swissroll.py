@@ -12,4 +12,4 @@ X = numpy.array([tt*numpy.cos(tt), 10*height, tt*numpy.sin(tt)])
 #show()
 
 numpy.savetxt('colormap.dat',tt)
-numpy.savetxt('input.dat',X.T)
+numpy.savetxt('input.dat',X)

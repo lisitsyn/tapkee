@@ -6,12 +6,22 @@
 #ifndef TAPKEE_APP_UTIL_H_
 #define TAPKEE_APP_UTIL_H_
 
+#include "../tapkee/tapkee_defines.hpp"
+
 #include <istream>
+#include <fstream>
 #include <ostream>
 #include <iterator>
 
 using namespace std;
 
+inline bool is_wrong_char(char c) {
+	if (!(isdigit(c) || c == ' ' || c == '.' || c == '-' || c == 'e'))
+		return true;
+	return false;
+} 
+
+// TODO this absolutely unexceptionally definitive should be improved later
 tapkee::DenseMatrix read_data(ifstream& ifs)
 {
 	string str;
@@ -19,6 +29,10 @@ tapkee::DenseMatrix read_data(ifstream& ifs)
 	while (!ifs.eof())
 	{
 		getline(ifs,str);
+
+		if (find_if(str.begin(), str.end(), is_wrong_char) != str.end())
+			throw std::runtime_error("Input file contains some junk, please check it");
+
 		if (str.size())
 		{
 			stringstream strstr(str);
@@ -28,11 +42,18 @@ tapkee::DenseMatrix read_data(ifstream& ifs)
 			input_data.push_back(row);
 		}
 	}
-	tapkee::DenseMatrix fm(input_data[0].size(),input_data.size());
+
+	tapkee::DenseMatrix fm(input_data.size(),input_data[0].size());
 	for (int i=0; i<fm.rows(); i++)
 	{
+		if (static_cast<tapkee::DenseMatrix::Index>(input_data[i].size()) != fm.cols()) 
+		{
+			stringstream ss;
+			ss << "Wrong data at line " << i;
+			throw std::runtime_error(ss.str());
+		}
 		for (int j=0; j<fm.cols(); j++)
-			fm(i,j) = input_data[j][i];
+			fm(i,j) = input_data[i][j];
 	}
 	return fm;
 }

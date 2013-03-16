@@ -19,4 +19,4 @@ pylab.show()
 
 # Save data
 numpy.savetxt('colormap.dat', tt)
-numpy.savetxt('input.dat', X.T)
+numpy.savetxt('input.dat', X)
