@@ -58,10 +58,11 @@ std::string get_method_name(TAPKEE_METHOD m)
 		case RANDOM_PROJECTION: return "Random Projection";
 		case FACTOR_ANALYSIS: return "Factor Analysis";
 #ifdef TAPKEE_USE_GPL_TSNE
-		case TSNE: return "t-SNE";
+		case T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING: return "t-distributed Stochastic Neighbor Embedding";
 #endif
-		default: return "Method name unknown (yes this is a bug)";
+		case UNKNOWN_METHOD: return "this should not happen, call police";
 	}
+	return "hello";
 }
 
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback, int IMPLEMENTATION>
@@ -69,7 +70,7 @@ struct implementation
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback kernel_callback, DistanceCallback distance_callback,
-                            FeatureVectorCallback feature_vector_callback, ParametersMap options);
+                            FeatureVectorCallback feature_vector_callback, ParametersMap parameters);
 };
 
 // concrete implementation macro to make code little shorter 
@@ -92,7 +93,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback kernel_callback, DistanceCallback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -115,7 +116,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback kernel_callback, DistanceCallback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -138,7 +139,7 @@ CONCRETE_IMPLEMENTATION(DIFFUSION_MAP)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD,  NOT(eigen_method, UNKNOWN_EIGEN_METHOD));
 		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,        IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
@@ -163,7 +164,7 @@ CONCRETE_IMPLEMENTATION(MULTIDIMENSIONAL_SCALING)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -191,7 +192,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_MULTIDIMENSIONAL_SCALING)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -219,7 +220,7 @@ CONCRETE_IMPLEMENTATION(ISOMAP)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -250,7 +251,7 @@ CONCRETE_IMPLEMENTATION(LANDMARK_ISOMAP)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -292,7 +293,7 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback kernel_callback, DistanceCallback,
-                            FeatureVectorCallback feature_vector_callback, ParametersMap options)
+                            FeatureVectorCallback feature_vector_callback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -324,7 +325,7 @@ CONCRETE_IMPLEMENTATION(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback kernel_callback, DistanceCallback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -346,7 +347,7 @@ CONCRETE_IMPLEMENTATION(LAPLACIAN_EIGENMAPS)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -369,7 +370,7 @@ CONCRETE_IMPLEMENTATION(LOCALITY_PRESERVING_PROJECTIONS)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback feature_vector_callback, ParametersMap options)
+                            FeatureVectorCallback feature_vector_callback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -401,7 +402,7 @@ CONCRETE_IMPLEMENTATION(PCA)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback,
-                            FeatureVectorCallback feature_vector_callback, ParametersMap options)
+                            FeatureVectorCallback feature_vector_callback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -423,7 +424,7 @@ CONCRETE_IMPLEMENTATION(RANDOM_PROJECTION)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
 	                        KernelCallback, DistanceCallback, FeatureVectorCallback feature_vector_callback,
-	                        ParametersMap options)
+	                        ParametersMap parameters)
 	{
 		PARAMETER(IndexType, target_dimension, TARGET_DIMENSION,  IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(IndexType, dimension,        CURRENT_DIMENSION, POSITIVE(dimension));
@@ -446,7 +447,7 @@ CONCRETE_IMPLEMENTATION(KERNEL_PCA)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback kernel_callback, DistanceCallback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -463,7 +464,7 @@ CONCRETE_IMPLEMENTATION(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                            KernelCallback kernel_callback, DistanceCallback,
-                           FeatureVectorCallback feature_vector_callback, ParametersMap options)
+                           FeatureVectorCallback feature_vector_callback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
@@ -496,7 +497,7 @@ CONCRETE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback distance_callback,
-                            FeatureVectorCallback, ParametersMap options)
+                            FeatureVectorCallback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,               target_dimension,   TARGET_DIMENSION,    IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(IndexType,               k,                  NUMBER_OF_NEIGHBORS, IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
@@ -523,7 +524,7 @@ CONCRETE_IMPLEMENTATION(PASS_THRU)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback, FeatureVectorCallback feature_callback, 
-                            ParametersMap options)
+                            ParametersMap parameters)
 	{
 		PARAMETER(IndexType, dimension, CURRENT_DIMENSION, POSITIVE(dimension));
 
@@ -542,7 +543,7 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback,
-                            FeatureVectorCallback callback, ParametersMap options)
+                            FeatureVectorCallback callback, ParametersMap parameters)
 	{
 		PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION, POSITIVE(current_dimension));
 		PARAMETER(IndexType,  target_dimension,  TARGET_DIMENSION,  IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
@@ -557,11 +558,11 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
 };
 
 #ifdef TAPKEE_USE_GPL_TSNE
-CONCRETE_IMPLEMENTATION(TSNE)
+CONCRETE_IMPLEMENTATION(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING)
 {
 	ReturnResult operator()(RandomAccessIterator begin, RandomAccessIterator end,
                             KernelCallback, DistanceCallback,
-                            FeatureVectorCallback callback, ParametersMap options)
+                            FeatureVectorCallback callback, ParametersMap parameters)
 	{
 		const IndexType N = NUM_VECTORS;
 		

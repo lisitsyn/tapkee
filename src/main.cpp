@@ -290,6 +290,8 @@ int run(int argc, const char** argv)
 	}
 #endif
 
+	parameters[tapkee::OUTPUT_FEATURE_VECTORS_ARE_COLUMNS] = true;
+
 	// Load data
 	string input_filename;
 	string output_filename;
@@ -368,7 +370,7 @@ int run(int argc, const char** argv)
 	embedding = tapkee::embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
 #endif
 	// Save obtained data
-	ofs << embedding.first.transpose();
+	ofs << embedding.first;
 	ofs.close();
 
 	if (output_projection && embedding.second.implementation) {

@@ -12,16 +12,14 @@ optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/softwa
 great flexibility we provide a callback interface which decouples dimension reduction algorithms from
 the data representation and storage schemes (see Callback interface section).
 
-Contributions are very encouraged as we distribute our software under permissive [BSD 3-clause license](LICENSE) 
-(except some parts that are distributed under other open sources licenses, 
-see Licensing section of this document).
+Contributions are very encouraged as we distribute our software under permissive 
+[BSD 3-clause license](LICENSE) (except some parts that are distributed under other 
+open sources licenses, see Licensing section of this document).
 
 To achieve code quality we employ [googletest](https://code.google.com/p/googletest/) as a testing
 framework (tests can be found [here](test/gtest)), [valgrind](http://valgrind.org/) for dynamic 
 analysis and [clang static analyzer](http://clang-analyzer.llvm.org/) as a tool for static code 
-analysis.
-
-We are happy to use [Travis](https://travis-ci.org) as a continuous integration 
+analysis. We are happy to use [Travis](https://travis-ci.org) as a continuous integration 
 platform. The build status is:
 
 [![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee)
@@ -49,7 +47,7 @@ It is required to identify your callback functors using the following macroses:
 
 `TAPKEE_CALLBACK_IS_DISTANCE(your_distance_callback)`
 
-Out-of-the-box callbacks are already 'identified'.
+Out-of-the-box callbacks are already 'identified' - no need to use any macroses for them.
 
 Integration with other libraries
 --------------------------------
@@ -57,12 +55,13 @@ Integration with other libraries
 The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee.hpp) 
 method (see the documentation for more details).
 
-If your library includes Eigen3 at some point - let the Tapkee know about that with the following define:
+If your library includes Eigen3 (and only if) at some point - 
+let the Tapkee know about that with the following define:
 
 `#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
-Please note that if you don't use Eigen3 in your project there is no need to define that variable, Eigen3 will
-be included by Tapkee in this case.
+Please note that if you don't include Eigen3 in your project there is no need to define that variable -
+Eigen3 will be included by Tapkee in this case.
 
 If you are able to use less restrictive licenses (such as GPLv3 and LGPLv3) you could define 
 the following variables:
@@ -103,6 +102,10 @@ Tapkee comes with a sample application which can be used to construct
 low-dimensional representations of feature matrices. For more information on its usage please run:
 
 `./tapkee -h`
+
+The application takes plain ASCII file containing dense matrix (each vector is a column and each
+line contains values of some feature). The output of the application is stored into the provided
+file in the same format (each line is feature).
 
 To compile the application please use [CMake](http://cmake.org/). The workflow of compilation 
 Tapkee with CMake is usual. When using Unix-based
