@@ -16,8 +16,10 @@
 using namespace std;
 
 inline bool is_wrong_char(char c) {
-	if (!(isdigit(c) || c == ' ' || c == '.' || c == '-' || c == 'e'))
+	if (!(isdigit(c) || isblank(c) || c == '.' || c == '-' || c == '+' || c == 'e'))
+	{
 		return true;
+	}
 	return false;
 } 
 
