@@ -116,8 +116,8 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 #undef HANDLE_IMPLEMENTATION
 
 	return return_result;
-};
+}
 
-} // namespace tapkee
+} // End of namespace tapkee
 
 #endif

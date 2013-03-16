@@ -21,7 +21,6 @@
 #include <utility>
 
 //// Eigen 3 library includes
-
 #ifdef TAPKEE_EIGEN_INCLUDE_FILE
 	#include TAPKEE_EIGEN_INCLUDE_FILE
 #else 
@@ -49,12 +48,12 @@
 	#define RESTRICT_ALLOC
 	#define UNRESTRICT_ALLOC
 #endif
-
 //// end of Eigen 3 library includes
 
 //! Main namespace of the library, contains all public API definitions
 namespace tapkee 
 {
+
 	//! Parameters that are used by the library
 	enum TAPKEE_PARAMETERS
 	{
@@ -128,7 +127,9 @@ namespace tapkee
 		UNKNOWN_METHOD
 	};
 
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
+	// Methods identification
 	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KERNEL_LOCALLY_LINEAR_EMBEDDING);
 	METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(NEIGHBORHOOD_PRESERVING_EMBEDDING);
 	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT);
@@ -149,9 +150,10 @@ namespace tapkee
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(FACTOR_ANALYSIS);
 #ifdef TAPKEE_USE_GPL_TSNE
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(TSNE);
-#endif
+#endif // TAPKEE_USE_GPL_TSNE
 	METHOD_THAT_NEEDS_NOTHING_IS(UNKNOWN_METHOD);
-#endif
+#endif // DOXYGEN_SHOULD_SKIP_THS
+
 
 	//! Neighbors computation methods
 	enum TAPKEE_NEIGHBORS_METHOD
@@ -168,6 +170,7 @@ namespace tapkee
 		//! Unknown method
 		UNKNOWN_NEIGHBORS_METHOD
 	};
+
 
 	//! Eigendecomposition methods
 	enum TAPKEE_EIGEN_EMBEDDING_METHOD
@@ -218,7 +221,7 @@ namespace tapkee
 #else
 	#if defined(TAPKEE_SUPERLU_AVAILABLE) && defined(TAPKEE_USE_SUPERLU)
 		typedef Eigen::SuperLU<SparseWeightMatrix> SparseSolver;
-	#else
+	#else 
 		typedef Eigen::SimplicialLDLT<SparseWeightMatrix> SparseSolver;
 	#endif
 #endif
@@ -241,18 +244,16 @@ namespace tapkee
 	#define TAPKEE_INTERNAL_MAP std::map
 #endif
 	
-	//! Parameters map with keys being values of @ref TAPKEE_PARAMETERS and 
-	//! values set to corresponding values wrapped to @ref any type
-	typedef TAPKEE_INTERNAL_MAP<TAPKEE_PARAMETERS, any> ParametersMap;
-
+//! Parameters map with keys being values of @ref TAPKEE_PARAMETERS and 
+//! values set to corresponding values wrapped to @ref any type
+typedef TAPKEE_INTERNAL_MAP<TAPKEE_PARAMETERS, any> ParametersMap;
 
 namespace tapkee_internal 
 {
 #ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-	template <typename T>
-	struct Triplet
+	template <typename T> struct Triplet
 	{
-		Triplet(IndexType colIndex, unsigned int rowIndex, T valueT) : 
+		Triplet(IndexType colIndex, IndexType rowIndex, T valueT) : 
 			col_(colIndex), row_(rowIndex), value_(valueT)
 		{
 		}
@@ -264,10 +265,10 @@ namespace tapkee_internal
 		T value_;
 	};
 	typedef Triplet<ScalarType> SparseTriplet;
-#else
+#else // EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 	typedef Eigen::Triplet<ScalarType> SparseTriplet;
-#endif
-};
+#endif // EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
+} // End of namespace tapkee_internal
 
 namespace tapkee_internal
 {
@@ -279,9 +280,9 @@ namespace tapkee_internal
 	typedef TAPKEE_INTERNAL_VECTOR<IndexType> Landmarks;
 	typedef TAPKEE_INTERNAL_PAIR<SparseWeightMatrix,DenseDiagonalMatrix> Laplacian;
 	typedef TAPKEE_INTERNAL_PAIR<DenseSymmetricMatrix,DenseSymmetricMatrix> DenseSymmetricMatrixPair;
-};
 
-} // namespace tapkee
+} // End of namespace tapkee_internal
+} // End of namespace tapkee
 
 /* Tapkee includes */
 #include <tapkee_projection.hpp>
@@ -289,8 +290,10 @@ namespace tapkee_internal
 
 namespace tapkee 
 {
-//! Return result of the library - a pair of @ref DenseMatrix (embedding) and @ref ProjectingFunction
-typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,tapkee::ProjectingFunction> ReturnResult;
-}
 
-#endif
+	//! Return result of the library - a pair of @ref DenseMatrix (embedding) and @ref ProjectingFunction
+	typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,tapkee::ProjectingFunction> ReturnResult;
+
+} // End of namespace tapkee
+
+#endif // TAPKEE_DEFINES_H_
