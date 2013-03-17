@@ -93,6 +93,8 @@ if (BUILD_TESTS)
 			add_library(gtest STATIC ${GTEST_SOURCE_DIR}/src/gtest-all.cc)
 			add_library(gtest_main STATIC ${GTEST_SOURCE_DIR}/src/gtest_main.cc)
 			target_link_libraries(gtest_main gtest)
+			find_package(Threads)
+			target_link_libraries(gtest ${CMAKE_THREAD_LIBS_INIT})
 		else()
 			message(FATAL_ERROR "gtest-1.6.0 is required to be available in the root of the project or reachable 
 			                     by GTEST_SOURCE_DIR and GTEST_INCLUDE_DIR")
