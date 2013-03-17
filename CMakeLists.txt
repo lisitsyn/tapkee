@@ -7,7 +7,10 @@ set (TAPKEE_INCLUDE_DIR "tapkee")
 set (TAPKEE_SRC_DIR "src")
 set (TAPKEE_TESTS_DIR "test/gtest")
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
-set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 # Eigen3 detection
 find_package(Eigen3 REQUIRED)
@@ -15,7 +18,9 @@ include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 
 # ARPACK detection
 find_package(Arpack)
-link_directories("${ARPACK_PATH}")
+if (ARPACK_FOUND)
+	link_directories("${ARPACK_PATH}")
+endif()
 
 # OpenMP detection
 find_package(OpenMP)
@@ -46,30 +51,53 @@ install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
 
 # G++ specific flags
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra -pedantic -Wno-long-long")
 endif()
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 
+option(PRECOMPUTED "Precompute kernel/distance matrices before reducing dimensionality" OFF)
+
 if (PRECOMPUTED)
 	add_definitions(-DUSE_PRECOMPUTED)
 endif()
+
+option(GPL_FREE "Build without GPL-licensed components" OFF)
 
 if (NOT GPL_FREE)
 	#add_definitions(-DTAPKEE_USE_GPL_TSNE)
 	add_definitions(-DTAPKEE_USE_LGPL_COVERTREE)
 endif()
 
-# Testing
+option(BUILD_TESTS "Build tests" OFF)
+
 if (BUILD_TESTS)
 	if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/gtest-1.6.0/)
 		add_subdirectory(gtest-1.6.0)
+		set(GTEST_SOURCE_DIR ${gtest_SOURCE_DIR})
+		include_directories(SYSTEM ${GTEST_SOURCE_DIR}/include ${GTEST_SOURCE_DIR})
 	else()
-		message(FATAL_ERROR "gtest-1.6.0 is required to be available in root of the project")
+		if (NOT GTEST_SOURCE_DIR)
+			# try with default ubuntu location
+			set(GTEST_SOURCE_DIR /usr/src/gtest)
+		endif()
+		if (NOT GTEST_INCLUDE_DIR)
+			# try with default ubuntu location
+			set(GTEST_INCLUDE_DIR /usr/include/gtest)
+		endif()
+		if (GTEST_SOURCE_DIR AND GTEST_INCLUDE_DIR)
+			include_directories(${GTEST_SOURCE_DIR})
+			include_directories(${GTEST_INCLUDE_DIR}/include)
+			add_library(gtest STATIC ${GTEST_SOURCE_DIR}/src/gtest-all.cc)
+			add_library(gtest_main STATIC ${GTEST_SOURCE_DIR}/src/gtest_main.cc)
+			target_link_libraries(gtest_main gtest)
+		else()
+			message(FATAL_ERROR "gtest-1.6.0 is required to be available in the root of the project or reachable 
+			                     by GTEST_SOURCE_DIR and GTEST_INCLUDE_DIR")
+		endif()
 	endif()
-	include_directories(SYSTEM ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 	enable_testing()
 
 	aux_source_directory(${TAPKEE_TESTS_DIR} TAPKEE_TESTS_SOURCES)
@@ -80,7 +108,7 @@ if (BUILD_TESTS)
 		add_test(
 			NAME ${exe}
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			COMMAND ${EXECUTABLE_OUTPUT_PATH}/test_${exe}
+			COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_${exe}
 			--gtest_color=yes)
 	endforeach()
 endif()
