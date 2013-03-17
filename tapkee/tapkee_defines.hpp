@@ -244,6 +244,18 @@ namespace tapkee
 		 * be quite close to zero.
 		 */
 		EIGENSHIFT,
+		/** The key of the parameter map to store
+		 * regularization shift of locally linear embedding
+		 * weights computation.
+		 *
+		 * Default is 1e-6.
+		 *
+		 * Should be set for @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING only.
+		 *
+		 * The corresponding value should have type @ref tapkee::ScalarType and
+		 * be quite close to zero.
+		 */
+		KLLE_TRACE_SHIFT,
 		/** The key of the parameter map to indicate
 		 * whether graph connectivity check should be done.
 		 *

@@ -98,7 +98,8 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                        const Neighbors& neighbors, PairwiseCallback callback, const ScalarType shift)
+                                        const Neighbors& neighbors, PairwiseCallback callback,
+                                        const ScalarType shift, const ScalarType trace_shift)
 {
 	timed_context context("KLLE weight computation");
 	const IndexType k = neighbors[0].size();
@@ -133,7 +134,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
 			}
 			
 			ScalarType trace = gram_matrix.trace();
-			gram_matrix.diagonal().array() += 1e-3*trace;
+			gram_matrix.diagonal().array() += trace_shift*trace;
 			weights = gram_matrix.selfadjointView<Eigen::Upper>().ldlt().solve(rhs);
 			weights /= weights.sum();
 

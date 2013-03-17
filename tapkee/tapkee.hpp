@@ -113,6 +113,7 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 	//// defaults
 	PUT_DEFAULT(OUTPUT_FEATURE_VECTORS_ARE_COLUMNS,bool,false);
 	PUT_DEFAULT(EIGENSHIFT,ScalarType,1e-9);
+	PUT_DEFAULT(KLLE_TRACE_SHIFT,ScalarType,1e-6);
 	PUT_DEFAULT(CHECK_CONNECTIVITY,bool,true);
 	//// end of defaults
 

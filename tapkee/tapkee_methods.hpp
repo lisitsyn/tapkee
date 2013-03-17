@@ -100,13 +100,14 @@ CONCRETE_IMPLEMENTATION(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
+		PARAMETER(ScalarType,                    traceshift,         KLLE_TRACE_SHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 
 		timed_context context("[+] Embedding with KLLE");
 		Neighbors neighbors =
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix =
-			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
+			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift,traceshift);
 		return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 	}
@@ -301,13 +302,14 @@ CONCRETE_IMPLEMENTATION(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 		PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 		PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
 		PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
+		PARAMETER(ScalarType,                    traceshift,         KLLE_TRACE_SHIFT);
 		PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
 		
 		timed_context context("[+] Embedding with NPE");
 		Neighbors neighbors = 
 			find_neighbors(neighbors_method,begin,end,kernel_callback,k,check_connectivity);
 		SparseWeightMatrix weight_matrix = 
-			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift);
+			linear_weight_matrix(begin,end,neighbors,kernel_callback,eigenshift,traceshift);
 		DenseSymmetricMatrixPair eig_matrices =
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
 				feature_vector_callback,dimension);
