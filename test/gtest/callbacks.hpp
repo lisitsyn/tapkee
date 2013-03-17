@@ -14,7 +14,7 @@ struct dummy_distance_callback
 };
 struct dummy_feature_callback
 {
-	void operator()(int i, const tapkee::DenseVector&)
+	void operator()(int, const tapkee::DenseVector&)
 	{
 	}
 };

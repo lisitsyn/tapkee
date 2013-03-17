@@ -119,9 +119,12 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 
 		LocalNeighbors local_neighbors;
 		local_neighbors.reserve(k);
-		for (typename Distances::const_iterator neighbors_iter=distances.begin()+1; 
+		for (typename Distances::const_iterator neighbors_iter=distances.begin(); 
 				neighbors_iter!=distances.begin()+k+1; ++neighbors_iter)
-			local_neighbors.push_back(neighbors_iter->first - begin);
+		{
+			if (neighbors_iter->first != iter) 
+				local_neighbors.push_back(neighbors_iter->first - begin);
+		}
 		neighbors.push_back(local_neighbors);
 	}
 	return neighbors;
