@@ -299,6 +299,35 @@ namespace tapkee
 		 * The corresponding value should have bool type.
 		 */
 		OUTPUT_FEATURE_VECTORS_ARE_COLUMNS,
+		/** The key of the parameter map to store a pointer
+		 * to the function which could be called to indicate progress
+		 * that was made (it is called with an argument in range [0,1],
+		 * where 0 means 0% progress and 1 means 100% progress).
+		 *
+		 * Is not supported yet thus won't be used.
+		 *
+		 * The corresponding value should have type 
+		 * @code void (*)(double) @endcode 
+		 * (i.e. a pointer to some function that takes
+		 *  double argument and returns nothing).
+		 */
+		PROGRESS_FUNCTION,
+		/** The key of the parameter map to store a pointer 
+		 * to the function which could be called to check if 
+		 * computations were cancelled (the function should return 
+		 * true if computations were cancelled).
+		 *
+		 * It is called only once when method is starting to work.
+		 * 
+		 * If function returns true the library immediately 
+		 * throws @ref tapkee::cancelled_exception.
+		 *
+		 * The corresponding value should have type
+		 * @code bool (*)() @endcode 
+		 * (i.e. a pointer to some function that takes
+		 *  nothing and returns boolean).
+		 */
+		CANCEL_FUNCTION,
 #ifdef TAPKEE_USE_GPL_TSNE
 		/** The key of the parameter map to store perplelixity
 		 * parameter of t-SNE.

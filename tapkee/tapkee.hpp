@@ -69,7 +69,7 @@ namespace tapkee
 * - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
 *
 * @param feature_vector_callback the feature vector callback implementing
-* @code void operator()(RandomAccessIterator, DenseVector) @endcode function
+* @code void operator()(RandomAccessIterator, DenseVector) @endcode
 *
 * Used by the following methods:
 * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
@@ -106,7 +106,7 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 		throw wrong_parameter_type_error("Wrong method type specified.");
 	}
 
-#define PUT_DEFAULT(KEY,TYPE,VALUE)              \
+#define PUT_DEFAULT(KEY,TYPE,VALUE)                 \
 	if (!parameters.count(KEY))                     \
 		parameters[KEY] = static_cast<TYPE>(VALUE); 
 
@@ -119,9 +119,20 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 
 #undef PUT_DEFAULT
 
-#define CALL_IMPLEMENTATION(X)                                                                                           \
-		tapkee_internal::implementation<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>()  \
-		(begin,end,kernel_callback,distance_callback,feature_vector_callback,parameters)
+	void (*progress_function)(double) = NULL;
+	bool (*cancel_function)() = NULL;
+
+	if (parameters.count(PROGRESS_FUNCTION))
+		progress_function = parameters[PROGRESS_FUNCTION].cast<void (*)(double)>();
+	if (parameters.count(CANCEL_FUNCTION))
+		cancel_function = parameters[CANCEL_FUNCTION].cast<bool (*)()>();
+
+	tapkee_internal::Context context(progress_function,cancel_function);
+
+#define CALL_IMPLEMENTATION(X)                                                                                              \
+		tapkee_internal::Implementation<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>()     \
+		(begin,end,tapkee_internal::Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>(kernel_callback,       \
+		distance_callback,feature_vector_callback),parameters,context)
 #define HANDLE_IMPLEMENTATION(X)                          \
 	case X: return_result = CALL_IMPLEMENTATION(X); break
 

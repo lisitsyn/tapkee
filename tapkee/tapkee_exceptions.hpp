@@ -60,6 +60,14 @@ class not_enough_memory_error : public std::runtime_error
 		explicit not_enough_memory_error(const string& what_msg) : std::runtime_error(what_msg) {};
 };
 
+//! An exception type that is thrown when computations were 
+//! cancelled.
+class cancelled_exception : public std::exception
+{
+	public:
+		explicit cancelled_exception() : std::exception() {};
+};
+
 //! An exception type that is thrown when eigendecomposition
 //! is failed.
 class eigendecomposition_error : public std::runtime_error

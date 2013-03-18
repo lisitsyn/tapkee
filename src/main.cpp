@@ -27,6 +27,11 @@ using namespace ez;
 using namespace Eigen;
 using namespace std;
 
+bool cancel()
+{
+	return false;
+}
+
 int run(int argc, const char** argv)
 {
 	srand(static_cast<unsigned int>(time(NULL)));
@@ -291,6 +296,7 @@ int run(int argc, const char** argv)
 #endif
 
 	parameters[tapkee::OUTPUT_FEATURE_VECTORS_ARE_COLUMNS] = true;
+	parameters[tapkee::CANCEL_FUNCTION] = static_cast<bool (*)()>(cancel);
 
 	// Load data
 	string input_filename;

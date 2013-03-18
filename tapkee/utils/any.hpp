@@ -104,7 +104,12 @@ namespace anyimpl
 	SMALL_POLICY(signed long);
 	SMALL_POLICY(unsigned long);
 	SMALL_POLICY(float);
+	SMALL_POLICY(double);
 	SMALL_POLICY(bool);
+	SMALL_POLICY(void (*)());
+	SMALL_POLICY(void (*)(double));
+	SMALL_POLICY(bool (*)());
+	SMALL_POLICY(double (*)());
 
 	#undef SMALL_POLICY
 
