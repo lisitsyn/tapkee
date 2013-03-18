@@ -75,6 +75,9 @@ is linked against ARPACK library (-larpack key for g++ and clang++).
 For an example of integration you may check 
 [Tapkee adapter in Shogun](https://github.com/shogun-toolbox/shogun/blob/master/src/shogun/lib/tapkee/tapkee_shogun.cpp). 
 
+To control the flow you may also provide callbacks that track progress
+and indicate if computations were cancelled (`tapkee::PROGRESS_FUNCTION` and `tapkee::CANCEL_FUNCTION` keys).
+
 We welcome any integration so please contact authors if you have got any questions. If you have 
 successfully used the library please also let authors know about that - mentions of any
 applications are very appreciated.
