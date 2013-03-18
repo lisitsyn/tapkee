@@ -73,7 +73,8 @@ namespace anyimpl
 	template<typename T>
 	struct choose_policy 
 	{
-		typedef big_any_policy<T> type;
+		// default policy is small_any_policy (was big_any_policy)
+		typedef small_any_policy<T> type;
 	};
 
 	template<typename T> 
@@ -92,7 +93,9 @@ namespace anyimpl
 		typedef void type;
 	};
 
+	
 	/// Specializations for small types.
+	/*
 	#define SMALL_POLICY(ANYTYPE) template<> struct choose_policy<ANYTYPE> { typedef small_any_policy<ANYTYPE> type; }
 
 	SMALL_POLICY(signed char);
@@ -110,7 +113,7 @@ namespace anyimpl
 	SMALL_POLICY(void (*)(double));
 	SMALL_POLICY(bool (*)());
 	SMALL_POLICY(double (*)());
-
+	*/
 	#undef SMALL_POLICY
 
 	/// This function will return a different policy for each type. 
