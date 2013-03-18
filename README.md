@@ -67,7 +67,7 @@ If you are able to use less restrictive licenses (such as GPLv3 and LGPLv3) you 
 the following variables:
 
 - `TAPKEE_USE_LGPL_COVERTREE` to use Covertree code by John Langford.
-- `TAPKEE_USE_GPL_TSNE` to use Barnes-Hut-SNE code by Laurens van der Maaten.
+- `TAPKEE_USE_GPL_TSNE` to use Barnes-Hut-SNE code by Laurens van der Maaten (not yet possible).
 
 When compiling your software that includes Tapkee be sure Eigen3 headers are in include path and your code
 is linked against ARPACK library (-larpack key for g++ and clang++).
@@ -178,8 +178,8 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * [Kernel PCA (kPCA)](http://lisitsyn.github.com/tapkee/methods/kpca.html)
 * [Random projection](http://lisitsyn.github.com/tapkee/methods/ra.html)
 * [Factor analysis](http://lisitsyn.github.com/tapkee/methods/fa.html)
-* [t-SNE](http://lisitsyn.github.com/tapkee/method/tsne.html)
-* [Barnes-Hut-SNE](htpp://lisitsyn.github.com/tapkee/method/barnes_hut_sne.html)
+* [t-SNE](http://lisitsyn.github.com/tapkee/method/tsne.html) (not yet included)
+* [Barnes-Hut-SNE](htpp://lisitsyn.github.com/tapkee/method/barnes_hut_sne.html) (not yet included)
 
 Licensing
 ---------
@@ -189,7 +189,7 @@ The library is distributed under the [BSD 3-clause](LICENSE) license.
 Exceptions are:
 
 - [Barnes-Hut-SNE code](tapkee/external/barnes_hut_sne/) by Laurens van der Maaten which
-  is distributed under the [GPLv3 license](GPL-LICENSE).
+  is distributed under the [GPLv3 license](GPL-LICENSE), not yet included.
 
 - [Covertree code](tapkee/neighbors/covertree.hpp) by John Langford and Dinoj Surendran 
   which is distributed under the [LGPLv3 license](LGPL-LICENSE).
