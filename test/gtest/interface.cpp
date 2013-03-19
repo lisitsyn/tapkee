@@ -112,6 +112,22 @@ TEST(Interface, NoCurrentDimensionSetFailPassThru)
 	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::missed_parameter_error);
 }
 
+TEST(Interface, WrongMethodParameterType) 
+{
+	std::vector<int> data;
+	ASSERT_EQ(0,data.size());
+	dummy_kernel_callback kcb;
+	dummy_distance_callback dcb;
+	dummy_feature_callback fcb;
+	tapkee::ParametersMap params;
+	params[tapkee::REDUCTION_METHOD] = "diamonds are forever";
+	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(1);
+
+	tapkee::ReturnResult result;
+	// fails with wrong parameter type as '1.0' is not of tapkee::IndexType
+	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::wrong_parameter_type_error);
+}
+
 TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 {
 	std::vector<int> data;
