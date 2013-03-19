@@ -37,12 +37,50 @@ TEST(Interface, WrongParameterTypePassThru)
 	tapkee::ParametersMap params;
 	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
 	// here is the error (should be static_cast<tapkee::IndexType>(1))
-	params[tapkee::CURRENT_DIMENSION] = 1.0;
+	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::ScalarType>(1.0);
 
 	tapkee::ReturnResult result;
 	// fails with wrong parameter type as '1.0' is not of tapkee::IndexType
-	// warning - can be platform specific..
 	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::wrong_parameter_type_error);
+}
+
+TEST(Interface, WrongParameterValuePassThru) 
+{
+	std::vector<int> data;
+	ASSERT_EQ(0,data.size());
+	dummy_kernel_callback kcb;
+	dummy_distance_callback dcb;
+	dummy_feature_callback fcb;
+	tapkee::ParametersMap params;
+	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
+	// here is the error (should be positive)
+	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(-1);
+
+	tapkee::ReturnResult result;
+	// fails with wrong parameter type as '-1' is not a valid value.
+	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::wrong_parameter_error);
+}
+
+bool always_cancel()
+{
+	return true;
+}
+
+TEST(Interface, CancellationPassThru)
+{
+	std::vector<int> data;
+	ASSERT_EQ(0,data.size());
+	dummy_kernel_callback kcb;
+	dummy_distance_callback dcb;
+	dummy_feature_callback fcb;
+	tapkee::ParametersMap params;
+	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
+	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(1);
+	params[tapkee::CANCEL_FUNCTION] = static_cast<bool (*)()>(always_cancel);
+
+	tapkee::ReturnResult result;
+	// fails with wrong parameter type as '-1' is not a valid value.
+	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::cancelled_exception);
 }
 
 TEST(Interface, NoReductionMethodSetFailPassThru)
@@ -95,6 +133,24 @@ TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 
 	tapkee::ReturnResult result;
 	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::unsupported_method_error);
+}
+
+TEST(Interface, EigenDecompositionFailMDS)
+{
+	std::vector<int> data;
+	for (int i=0; i<10; i++) 
+		data.push_back(i);
+	
+	dummy_kernel_callback kcb;
+	dummy_distance_callback dcb;
+	dummy_feature_callback fcb;
+	tapkee::ParametersMap params;
+	params[tapkee::REDUCTION_METHOD] = tapkee::MULTIDIMENSIONAL_SCALING;
+	params[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee::RANDOMIZED;
+	params[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(3); 
+
+	tapkee::ReturnResult result;
+	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::eigendecomposition_error);
 }
 
 TEST(Interface, NotEnoughMemoryMDS)
