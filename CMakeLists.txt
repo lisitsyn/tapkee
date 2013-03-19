@@ -3,9 +3,9 @@ project (Tapkee)
 cmake_minimum_required (VERSION 2.6.2)
 
 # set paths
-set (TAPKEE_INCLUDE_DIR "tapkee")
-set (TAPKEE_SRC_DIR "src")
-set (TAPKEE_TESTS_DIR "test/gtest")
+set (TAPKEE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set (TAPKEE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set (TAPKEE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/gtest")
 set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake")
 
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
@@ -32,6 +32,7 @@ endif()
 
 # Main executable
 include_directories("${TAPKEE_INCLUDE_DIR}")
+message("${TAPKEE_INCLUDE_DIR}")
 set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
 if (ARPACK_FOUND)

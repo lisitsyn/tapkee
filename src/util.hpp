@@ -6,8 +6,6 @@
 #ifndef TAPKEE_APP_UTIL_H_
 #define TAPKEE_APP_UTIL_H_
 
-#include "../tapkee/tapkee_defines.hpp"
-
 #include <istream>
 #include <fstream>
 #include <ostream>
