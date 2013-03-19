@@ -50,8 +50,23 @@ endif()
 install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
 
 # G++ specific flags
+option(USE_GCOV "Use gcov to analyze test coverage" OFF)
+
 if (CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra -pedantic -Wno-long-long")
+	if (USE_GCOV)
+		set(CMAKE_BUILD_TYPE Debug)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+
+		add_custom_target(lcov)
+		add_custom_command(TARGET lcov COMMAND mkdir -p coverage WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+		add_custom_command(TARGET lcov COMMAND lcov --directory . --zerocounters WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+		add_custom_command(TARGET lcov COMMAND make test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+		add_custom_command(TARGET lcov COMMAND lcov --directory . --capture --output-file ./coverage/out.info WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+		add_custom_command(TARGET lcov COMMAND lcov --remove ./coverage/out.info /usr/local/include\\* /usr/include\\* gtest\\* --output ./coverage/clean.info ${CMAKE_BINARY_DIR})
+		add_custom_command(TARGET lcov COMMAND genhtml -o ./coverage ./coverage/clean.info --branch-coverage --demangle-cpp WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	endif()
 endif()
 
 if (NOT CMAKE_BUILD_TYPE)
