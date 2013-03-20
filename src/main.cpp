@@ -124,12 +124,10 @@ int run(int argc, const char** argv)
 #define FA_EPSILON_KEYWORD "--fa-epsilon"
 	opt.add("1e-5",0,1,0,"FA convergence criterion (default 1e-5)",FA_EPSILON_KEYWORD);
 
-#ifdef TAPKEE_USE_GPL_TSNE
 #define SNE_PERPLEXITY_KEYWORD "--sne-perplexity"
 	opt.add("30.0",0,1,0,"Perplexity for the t-SNE algorithm (default 30.0)",SNE_PERPLEXITY_KEYWORD);
 #define SNE_THETA_KEYWORD "--sne-theta"
 	opt.add("0.5",0,1,0,"Theta for the t-SNE algorithm (defualt 0.5)",SNE_THETA_KEYWORD);
-#endif
 
 	opt.parse(argc, argv);
 
@@ -282,7 +280,6 @@ int run(int argc, const char** argv)
 		opt.get(FA_EPSILON_KEYWORD)->getDouble(fa_epsilon);
 		parameters[tapkee::FA_EPSILON] = static_cast<tapkee::ScalarType>(fa_epsilon);
 	}
-#ifdef TAPKEE_USE_GPL_TSNE
 	{
 		double perplexity = 30.0;
 		opt.get(SNE_PERPLEXITY_KEYWORD)->getDouble(perplexity);
@@ -293,7 +290,6 @@ int run(int argc, const char** argv)
 		opt.get(SNE_THETA_KEYWORD)->getDouble(theta);
 		parameters[tapkee::SNE_THETA] = static_cast<tapkee::ScalarType>(theta);
 	}
-#endif
 
 	parameters[tapkee::OUTPUT_FEATURE_VECTORS_ARE_COLUMNS] = true;
 	parameters[tapkee::CANCEL_FUNCTION] = static_cast<bool (*)()>(cancel);

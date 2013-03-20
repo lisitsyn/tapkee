@@ -328,7 +328,6 @@ namespace tapkee
 		 *  nothing and returns boolean).
 		 */
 		CANCEL_FUNCTION,
-#ifdef TAPKEE_USE_GPL_TSNE
 		/** The key of the parameter map to store perplelixity
 		 * parameter of t-SNE.
 		 *
@@ -345,7 +344,6 @@ namespace tapkee
 		 * The corresponding value should have type @ref tapkee::ScalarType.
 		 */
 		SNE_THETA
-#endif
 	};
 
 
@@ -386,10 +384,8 @@ namespace tapkee
 		RANDOM_PROJECTION,
 		/** Factor Analysis */
 		FACTOR_ANALYSIS,
-#ifdef TAPKEE_USE_GPL_TSNE
 		/** t-SNE and Barnes-Hut-SNE as described in \cite tSNE and \cite Barnes-Hut-SNE */
 		T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING,
-#endif
 		/** Passing through (doing nothing just passes data through) */
 		PASS_THRU,
 		/** unknown method */
@@ -417,9 +413,7 @@ namespace tapkee
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(RANDOM_PROJECTION);
 	METHOD_THAT_NEEDS_NOTHING_IS(PASS_THRU);
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(FACTOR_ANALYSIS);
-#ifdef TAPKEE_USE_GPL_TSNE
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING);
-#endif
 	METHOD_THAT_NEEDS_NOTHING_IS(UNKNOWN_METHOD);
 #endif // DOXYGEN_SHOULD_SKIP_THS
 

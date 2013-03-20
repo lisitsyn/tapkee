@@ -23,10 +23,7 @@
 #include <routines/spe.hpp>
 #include <routines/fa.hpp>
 #include <neighbors/neighbors.hpp>
-
-#ifdef TAPKEE_USE_GPL_TSNE
 #include <external/barnes_hut_sne/tsne.hpp>
-#endif
 /* End of Tapkee includes */
 
 namespace tapkee
@@ -57,9 +54,7 @@ std::string get_method_name(TAPKEE_METHOD m)
 		case PASS_THRU: return "passing through";
 		case RANDOM_PROJECTION: return "Random Projection";
 		case FACTOR_ANALYSIS: return "Factor Analysis";
-#ifdef TAPKEE_USE_GPL_TSNE
 		case T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING: return "t-distributed Stochastic Neighbor Embedding";
-#endif
 		case UNKNOWN_METHOD: return "this should not happen, call police";
 	}
 	return "hello";
@@ -608,7 +603,6 @@ CONCRETE_IMPLEMENTATION(FACTOR_ANALYSIS)
 	}
 };
 
-#ifdef TAPKEE_USE_GPL_TSNE
 CONCRETE_IMPLEMENTATION(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING)
 {
 	CONCRETE_IMPLEMENTATION_SIGNATURE
@@ -640,7 +634,6 @@ CONCRETE_IMPLEMENTATION(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING)
 		return ReturnResult(embedding.transpose(),tapkee::ProjectingFunction());
 	}
 };
-#endif
 
 }
 }

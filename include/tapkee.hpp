@@ -159,9 +159,7 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 			HANDLE_IMPLEMENTATION(STOCHASTIC_PROXIMITY_EMBEDDING);
 			HANDLE_IMPLEMENTATION(PASS_THRU);
 			HANDLE_IMPLEMENTATION(FACTOR_ANALYSIS);
-#ifdef TAPKEE_USE_GPL_TSNE
 			HANDLE_IMPLEMENTATION(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING);
-#endif
 			case UNKNOWN_METHOD: throw wrong_parameter_error("unknown method"); break;
 		}
 	}
