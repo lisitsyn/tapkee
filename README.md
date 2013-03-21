@@ -125,6 +125,9 @@ There are a few cases when you'd want to put some definitions:
   Downloaded sources will be used by Tapkee on build.
   To run tests use `make test` command (or better 'ctest -VV').
 
+- To let make script store test coverage information using GCOV and 
+  add a target for output test coverage in HTML with LCOV add the `-DUSE_GCOV=1` flag to `[definitions]`.
+
 - To enable precomputation of kernel/distance matrices which can speed-up algorithms (but requires much more memory) add
   `-DPRECOMPUTED=1` to `[definitions]` when building.
 
