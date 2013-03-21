@@ -335,10 +335,6 @@ int run(int argc, const char** argv)
 	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
 	tapkee::LoggingSingleton::instance().message_info(ss.str());
 	
-	vector<int> data_indices;
-	for (int i=0; i<input_data.cols(); i++)
-		data_indices.push_back(i);
-	
 	tapkee::ReturnResult embedding;
 	
 #ifdef USE_PRECOMPUTED
@@ -363,13 +359,13 @@ int run(int argc, const char** argv)
 	precomputed_kernel_callback kcb(kernel_matrix);
 	feature_vector_callback fvcb(input_data);
 
-	embedding = tapkee::embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::embed(static_cast<tapkee::IndexType>(input_data.cols()),kcb,dcb,fvcb,parameters);
 #else
 	distance_callback dcb(input_data);
 	kernel_callback kcb(input_data);
 	feature_vector_callback fvcb(input_data);
 
-	embedding = tapkee::embed(data_indices.begin(),data_indices.end(),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::embed(static_cast<tapkee::IndexType>(input_data.cols()),kcb,dcb,fvcb,parameters);
 #endif
 	// Save obtained data
 	ofs << embedding.first;

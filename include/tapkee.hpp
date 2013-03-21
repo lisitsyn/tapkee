@@ -14,75 +14,77 @@
 namespace tapkee
 {
 
-/** Main entry-point of the library. Constructs dense embedding with specified dimension
-* using provided data and callbacks. Returns ReturnType that is essentially a pair of 
-* DenseMatrix (embedding of provided data) and ProjectingFunction with 
-* corresponding ProjectionImplementation used to project data out of sample.
-*
-* @tparam RandomAccessIterator basic random access iterator with no specific capabilities.
-*
-* @tparam KernelCallback that defines 
-* @code ScalarType operator()( RandomAccessIterator, RandomAccessIterator) @endcode 
-* function of two iterators. This method should return value of Mercer kernel function 
-* between vectors/objects iterators pointing to. The callback should be marked as a kernel function using
-* @ref tapkee::TAPKEE_CALLBACK_IS_KERNEL macro (fails on compilation in other case).
-*
-* @tparam DistanceCallback that defines 
-* @code ScalarType operator()(RandomAccessIterator, RandomAccessIterator) @endcode 
-* function of two iterators. The callback should be marked as a distance function using 
-* @ref TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
-*
-* @tparam FeatureVectorCallback that defines 
-* @code void operator()(RandomAccessIterator, DenseVector) @endcode function
-* used to access feature vector pointed by iterator. The callback should put the feature vector 
-* pointed by iterator to the second argument vector.
-*
-* Parameters required by the chosen algorithm are obtained from the parameter map. It gracefully 
-* fails during runtime and throws an exception if some of required 
-* parameters are not specified or have improper values.
-*
-* @param begin begin iterator of data
-* @param end end iterator of data
-* @param kernel_callback the kernel callback implementing
-* @code ScalarType operator()(RandomAccessIterator, RandomAccessIterator) @endcode 
-*
-* Used by the following methods: 
-* - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
-* - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-* - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
-* - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-* - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
-* - @ref tapkee::KERNEL_PCA
-*
-* @param distance_callback the distance callback implementing
-* @code ScalarType operator()(RandomAccessIterator, RandomAccessIterator) @endcode 
-*
-* Used by the following methods: 
-* - @ref tapkee::LAPLACIAN_EIGENMAPS
-* - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
-* - @ref tapkee::DIFFUSION_MAP
-* - @ref tapkee::ISOMAP
-* - @ref tapkee::LANDMARK_ISOMAP
-* - @ref tapkee::MULTIDIMENSIONAL_SCALING
-* - @ref tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING
-* - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING
-* - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
-*
-* @param feature_vector_callback the feature vector callback implementing
-* @code void operator()(RandomAccessIterator, DenseVector) @endcode
-*
-* Used by the following methods:
-* - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-* - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-* - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
-* - @ref tapkee::PCA
-* - @ref tapkee::RANDOM_PROJECTION
-* - @ref tapkee::FACTOR_ANALYSIS
-* - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
-* - @ref tapkee::PASS_THRU
-*
-* @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
-*/
+/** Main entry-point of the library. Constructs a dense embedding with specified 
+ * dimensionality using provided data represented by random access iterators 
+ * and provided callbacks. Returns ReturnType that is essentially a pair of 
+ * DenseMatrix (embedding of provided data) and a ProjectingFunction with 
+ * corresponding ProjectionImplementation used to project 
+ * data out of the sample.
+ *
+ * @tparam RandomAccessIterator basic random access iterator with no specific capabilities.
+ *
+ * @tparam KernelCallback that defines 
+ * @code ScalarType operator()( RandomAccessIterator, RandomAccessIterator) @endcode 
+ * function of two iterators. This method should return value of Mercer kernel function 
+ * between vectors/objects iterators pointing to. The callback should be marked as a kernel function using
+ * @ref tapkee::TAPKEE_CALLBACK_IS_KERNEL macro (fails on compilation in other case).
+ *
+ * @tparam DistanceCallback that defines 
+ * @code ScalarType operator()(RandomAccessIterator, RandomAccessIterator) @endcode 
+ * function of two iterators. The callback should be marked as a distance function using 
+ * @ref TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
+ *
+ * @tparam FeatureVectorCallback that defines 
+ * @code void operator()(RandomAccessIterator, DenseVector) @endcode function
+ * used to access feature vector pointed by iterator. The callback should put the feature vector 
+ * pointed by iterator to the second argument vector.
+ *
+ * Parameters required by the chosen algorithm are obtained from the parameter map. It gracefully 
+ * fails during runtime and throws an exception if some of required 
+ * parameters are not specified or have improper values.
+ *
+ * @param begin begin iterator of data
+ * @param end end iterator of data
+ * @param kernel_callback the kernel callback implementing
+ * @code ScalarType operator()(RandomAccessIterator, RandomAccessIterator) @endcode 
+ *
+ * Used by the following methods: 
+ * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
+ * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
+ * - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
+ * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
+ * - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
+ * - @ref tapkee::KERNEL_PCA
+ *
+ * @param distance_callback the distance callback implementing
+ * @code ScalarType operator()(RandomAccessIterator, RandomAccessIterator) @endcode 
+ *
+ * Used by the following methods: 
+ * - @ref tapkee::LAPLACIAN_EIGENMAPS
+ * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
+ * - @ref tapkee::DIFFUSION_MAP
+ * - @ref tapkee::ISOMAP
+ * - @ref tapkee::LANDMARK_ISOMAP
+ * - @ref tapkee::MULTIDIMENSIONAL_SCALING
+ * - @ref tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING
+ * - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING
+ * - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
+ *
+ * @param feature_vector_callback the feature vector callback implementing
+ * @code void operator()(RandomAccessIterator, DenseVector) @endcode
+ *
+ * Used by the following methods:
+ * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
+ * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
+ * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
+ * - @ref tapkee::PCA
+ * - @ref tapkee::RANDOM_PROJECTION
+ * - @ref tapkee::FACTOR_ANALYSIS
+ * - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
+ * - @ref tapkee::PASS_THRU
+ *
+ * @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
+ */
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
 ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
                    KernelCallback kernel_callback, DistanceCallback distance_callback,
@@ -176,6 +178,88 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 		return_result.first.transposeInPlace();
 
 	return return_result;
+}
+
+/** Additional entry-point of the library. Constructs a dense embedding with specified 
+ * dimensionality using provided number of vectors and callbacks. This function 
+ * enumerates vectors with 0..N-1 values and use these indices with provided 
+ * callbacks. Returns ReturnType that is essentially a pair of a DenseMatrix 
+ * (embedding of provided data) and a ProjectingFunction with corresponding 
+ * ProjectionImplementation which can be used to project data out of the sample.
+ *
+ * @tparam KernelCallback that defines 
+ * @code ScalarType operator()(IndexType, IndexType) @endcode 
+ * function of two indices in range 0..N-1. This method should return value of Mercer kernel function 
+ * between vectors/objects with specified indices. The callback should be marked as a
+ * kernel function using @ref tapkee::TAPKEE_CALLBACK_IS_KERNEL 
+ * macro (fails on compilation in other case).
+ *
+ * @tparam DistanceCallback that defines 
+ * @code ScalarType operator()(IndexType, IndexType) @endcode 
+ * function of two indices in range 0..N-1. The callback should be marked as a 
+ * distance function using @ref TAPKEE_CALLBACK_IS_DISTANCE macro 
+ * (fails during compilation in other case).
+ *
+ * @tparam FeatureVectorCallback that defines 
+ * @code void operator()(IndexType, DenseVector) @endcode function
+ * used to access feature vector pointed by its index. The callback should put the feature vector 
+ * with the index to the second argument vector.
+ *
+ * Parameters required by the chosen algorithm are obtained from the parameter map. It gracefully 
+ * fails during runtime and throws an exception if some of required 
+ * parameters are not specified or have improper values.
+ *
+ * @param N total number of vectors
+ * @param kernel_callback the kernel callback implementing
+ * @code ScalarType operator()(IndexType, IndexType) @endcode 
+ *
+ * Used by the following methods: 
+ * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
+ * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
+ * - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
+ * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
+ * - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
+ * - @ref tapkee::KERNEL_PCA
+ *
+ * @param distance_callback the distance callback implementing
+ * @code ScalarType operator()(IndexType, RandomAccessIterator) @endcode 
+ *
+ * Used by the following methods: 
+ * - @ref tapkee::LAPLACIAN_EIGENMAPS
+ * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
+ * - @ref tapkee::DIFFUSION_MAP
+ * - @ref tapkee::ISOMAP
+ * - @ref tapkee::LANDMARK_ISOMAP
+ * - @ref tapkee::MULTIDIMENSIONAL_SCALING
+ * - @ref tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING
+ * - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING
+ * - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
+ *
+ * @param feature_vector_callback the feature vector callback implementing
+ * @code void operator()(IndexType, DenseVector) @endcode
+ *
+ * Used by the following methods:
+ * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
+ * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
+ * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
+ * - @ref tapkee::PCA
+ * - @ref tapkee::RANDOM_PROJECTION
+ * - @ref tapkee::FACTOR_ANALYSIS
+ * - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
+ * - @ref tapkee::PASS_THRU
+ *
+ * @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
+ */
+template <class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
+ReturnResult embed(IndexType N, KernelCallback kernel_callback, DistanceCallback distance_callback,
+                   FeatureVectorCallback feature_vector_callback, ParametersMap parameters)
+{
+	tapkee_internal::VectorIndices indices(N);
+	for (IndexType i=0; i<N; ++i) 
+		indices[i] = i;
+
+	return embed(indices.begin(),indices.end(),kernel_callback,distance_callback,
+	             feature_vector_callback,parameters);
 }
 
 } // End of namespace tapkee
