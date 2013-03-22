@@ -191,7 +191,7 @@ tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 }
 
 template <class PairwiseCallback>
-tapkee::DenseMatrix matrix_from_callback(tapkee::IndexType N, PairwiseCallback callback)
+tapkee::DenseMatrix matrix_from_callback(const tapkee::IndexType N, PairwiseCallback callback)
 {
 	tapkee::DenseMatrix result(N,N);
 	tapkee::IndexType i,j;
