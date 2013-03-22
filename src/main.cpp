@@ -346,13 +346,15 @@ int run(int argc, const char** argv)
 		{
 			tapkee::tapkee_internal::timed_context context("[+] Distance matrix computation");
 			distance_matrix = 
-				matrix_from_callback(data_indices.begin(),data_indices.end(),distance_callback(input_data));
+				matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
+				                     distance_callback(input_data));
 		} 
 		if (method_needs_kernel(method))
 		{
 			tapkee::tapkee_internal::timed_context context("[+] Kernel matrix computation");
 			kernel_matrix = 
-				matrix_from_callback(data_indices.begin(),data_indices.end(),kernel_callback(input_data));
+				matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
+				                     kernel_callback(input_data));
 		}
 	}
 	precomputed_distance_callback dcb(distance_matrix);

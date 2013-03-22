@@ -190,18 +190,17 @@ tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
 	return tapkee::UNKNOWN_EIGEN_METHOD;
 }
 
-template <class RandomAccessIterator, class PairwiseCallback>
-tapkee::DenseMatrix matrix_from_callback(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback)
+template <class PairwiseCallback>
+tapkee::DenseMatrix matrix_from_callback(tapkee::IndexType N, PairwiseCallback callback)
 {
-	tapkee::DenseMatrix result((end-begin),(end-begin));
-	const tapkee::IndexType N = end-begin;
+	tapkee::DenseMatrix result(N,N);
 	tapkee::IndexType i,j;
-#pragma omp parallel for shared(callback,result,begin) private(j) default(none)
+#pragma omp parallel for shared(callback,result) private(j) default(none)
 	for (i=0; i<N; ++i)
 	{
 		for (j=i; j<N; j++)
 		{
-			tapkee::ScalarType res = callback(begin[i],begin[j]);
+			tapkee::ScalarType res = callback(i,j);
 			result(i,j) = res;
 			result(j,i) = res;
 		}
