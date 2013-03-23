@@ -48,6 +48,8 @@ int run(int argc, const char** argv)
 
 #define INPUT_FILE_KEYWORD "--input-file"
 	opt.add("",0,1,0,"Input file","-i",INPUT_FILE_KEYWORD);
+#define TRANSPOSE_INPUT_KEYWORD "--transpose"
+	opt.add("",0,0,0,"Transpose input file if set","--transpose",TRANSPOSE_INPUT_KEYWORD);
 #define OUTPUT_FILE_KEYWORD "--output-file"
 	opt.add("",0,1,0,"Output file","-o",OUTPUT_FILE_KEYWORD);
 #define OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD "--output-projection-matrix-file"
@@ -329,6 +331,8 @@ int run(int argc, const char** argv)
 	ofstream ofs_mean(output_matrix_filename.c_str());
 
 	tapkee::DenseMatrix input_data = read_data(ifs);
+	if (opt.isSet(TRANSPOSE_INPUT_KEYWORD))
+		input_data.transposeInPlace();
 	parameters[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(input_data.rows());
 	
 	std::stringstream ss;
