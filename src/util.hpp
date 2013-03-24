@@ -156,10 +156,8 @@ tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
 		return tapkee::PASS_THRU;
 	if (!strcmp(str,"factor_analysis") || !strcmp(str,"fa"))
 		return tapkee::FACTOR_ANALYSIS;
-#ifdef TAPKEE_USE_GPL_TSNE
 	if (!strcmp(str,"t-stochastic_neighbor_embedding") || !strcmp(str,"t-sne"))
 		return tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING;
-#endif
 
 	return tapkee::UNKNOWN_METHOD;
 }
