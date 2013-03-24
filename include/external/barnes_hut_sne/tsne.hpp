@@ -32,16 +32,21 @@
 #ifndef TSNE_H
 #define TSNE_H
 
+/* Tapkee includes */
+#include <utils/logging.hpp>
+#include <utils/time.hpp>
+#include <external/barnes_hut_sne/quadtree.hpp>
+#include <external/barnes_hut_sne/vptree.hpp>
+/* End of Tapkee includes */
+
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
 #include <time.h>
-#include <utils/logging.hpp>
-#include <utils/time.hpp>
-#include <external/barnes_hut_sne/quadtree.hpp>
-#include <external/barnes_hut_sne/vptree.hpp>
+
+using std::vector;
 
 //! Namespace containing implementation of t-SNE algorithm
 namespace tsne

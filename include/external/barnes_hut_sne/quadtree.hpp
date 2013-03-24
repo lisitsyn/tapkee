@@ -38,7 +38,7 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 
-using namespace std;
+using std::max;
 
 namespace tsne
 {
@@ -116,7 +116,7 @@ public:
 		
 		// Construct quadtree
 		init(NULL, inp_data, mean_Y[0], mean_Y[1], max(max_Y[0] - mean_Y[0], mean_Y[0] - min_Y[0]) + 1e-5,
-												   max(max_Y[1] - mean_Y[1], mean_Y[1] - min_Y[1]) + 1e-5);
+		                                           max(max_Y[1] - mean_Y[1], mean_Y[1] - min_Y[1]) + 1e-5);
 		fill(N);
 		delete[] mean_Y; delete[] max_Y; delete[] min_Y;
 	}
