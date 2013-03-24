@@ -173,18 +173,18 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * [Local Tangent Space Alignment (LTSA)](http://lisitsyn.github.com/tapkee/methods/ltsa.html)
 * [Linear Local Tangent Space Alignment (LLTSA)](http://lisitsyn.github.com/tapkee/methods/lltsa.html)
 * [Hessian Locally Linear Embedding (HLLE)](http://lisitsyn.github.com/tapkee/methods/hlle.html)
-* [Laplacian eigenmaps](http://lisitsyn.github.com/tapkee/methods/laplacian_eigenmaps.html)
+* [Laplacian eigenmaps](http://lisitsyn.github.com/tapkee/methods/le.html)
 * [Locality Preserving Projections](http://lisitsyn.github.com/tapkee/methods/lpp.html)
-* [Diffusion map](http://lisitsyn.github.com/tapkee/methods/diffusion_map.html)
+* [Diffusion map](http://lisitsyn.github.com/tapkee/methods/dm.html)
 * [Isomap and landmark Isomap](http://lisitsyn.github.com/tapkee/methods/isomap.html)
 * [Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)](http://lisitsyn.github.com/tapkee/methods/mds.html)
 * [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
 * [PCA and randomized PCA](http://lisitsyn.github.com/tapkee/methods/pca.html)
 * [Kernel PCA (kPCA)](http://lisitsyn.github.com/tapkee/methods/kpca.html)
-* [Random projection](http://lisitsyn.github.com/tapkee/methods/ra.html)
+* [Random projection](http://lisitsyn.github.com/tapkee/methods/rp.html)
 * [Factor analysis](http://lisitsyn.github.com/tapkee/methods/fa.html)
 * [t-SNE](http://lisitsyn.github.com/tapkee/method/tsne.html)
-* [Barnes-Hut-SNE](htpp://lisitsyn.github.com/tapkee/method/barnes_hut_sne.html)
+* [Barnes-Hut-SNE](htpp://lisitsyn.github.com/tapkee/method/tsne.html)
 
 Licensing
 ---------
