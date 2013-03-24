@@ -500,8 +500,8 @@ IMPLEMENTATION_OF(STOCHASTIC_PROXIMITY_EMBEDDING)
 	PARAMETER(IndexType,               k,                  NUMBER_OF_NEIGHBORS, IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
 	PARAMETER(TAPKEE_NEIGHBORS_METHOD, neighbors_method,   NEIGHBORS_METHOD,    NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
 	PARAMETER(ScalarType,              tolerance,          SPE_TOLERANCE,       POSITIVE(tolerance));
-	PARAMETER(IndexType,               max_iteration,      MAX_ITERATION);
-	PARAMETER(IndexType,               nupdates,           SPE_NUM_UPDATES);
+	PARAMETER(IndexType,               max_iteration,      MAX_ITERATION,       NON_NEGATIVE(max_iteration));
+	PARAMETER(IndexType,               nupdates,           SPE_NUM_UPDATES,     NON_NEGATIVE(nupdates));
 	PARAMETER(bool,                    global_strategy,    SPE_GLOBAL_STRATEGY);
 	PARAMETER(bool,                    check_connectivity, CHECK_CONNECTIVITY);
 
@@ -539,8 +539,8 @@ IMPLEMENTATION_OF(FACTOR_ANALYSIS)
 {
 	PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION, POSITIVE(current_dimension));
 	PARAMETER(IndexType,  target_dimension,  TARGET_DIMENSION,  IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(ScalarType, epsilon,           FA_EPSILON, POSITIVE(epsilon));
-	PARAMETER(IndexType,  max_iteration,     MAX_ITERATION);
+	PARAMETER(ScalarType, epsilon,           FA_EPSILON,        POSITIVE(epsilon));
+	PARAMETER(IndexType,  max_iteration,     MAX_ITERATION,     NON_NEGATIVE(max_iteration));
 
 	DO_MEASURE_RUN("FA");
 	STOP_IF_CANCELLED;

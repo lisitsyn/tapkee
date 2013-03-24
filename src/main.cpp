@@ -120,7 +120,7 @@ int run(int argc, const char** argv)
 #define SPE_NUM_UPDATES_KEYWORD "--spe-num-updates"
 	opt.add("100",0,1,0,"Number of SPE updates (default 100)",SPE_NUM_UPDATES_KEYWORD);
 #define MAX_ITERS_KEYWORD "--max-iters"
-	opt.add("200",0,1,0,"Maximum number of iterations (default 200)",MAX_ITERS_KEYWORD);
+	opt.add("1000",0,1,0,"Maximum number of iterations (default 1000)",MAX_ITERS_KEYWORD);
 #define FA_EPSILON_KEYWORD "--fa-epsilon"
 	opt.add("1e-5",0,1,0,"FA convergence criterion (default 1e-5)",FA_EPSILON_KEYWORD);
 
@@ -265,7 +265,7 @@ int run(int argc, const char** argv)
 		parameters[tapkee::SPE_NUM_UPDATES] = static_cast<tapkee::IndexType>(spe_num_updates);
 	}
 	{
-		int max_iters = 200;
+		int max_iters = 1000;
 		opt.get(MAX_ITERS_KEYWORD)->getInt(max_iters);
 		parameters[tapkee::MAX_ITERATION] = static_cast<tapkee::IndexType>(max_iters);
 	}
