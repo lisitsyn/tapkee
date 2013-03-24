@@ -53,7 +53,7 @@ Integration with other libraries
 --------------------------------
 
 The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee.hpp) 
-method (see the documentation for more details).
+method (see [the documentation](http://lisitsyn.github.com/tapkee/doxygen/html/index.html) for more details).
 
 If your library includes Eigen3 (and only if) at some point - 
 let the Tapkee know about that with the following define:
