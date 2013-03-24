@@ -195,9 +195,9 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 
 			// insert kth object to heap with zero distance and set f[k] true
 #ifdef TAPKEE_USE_PRIORITY_QUEUE
-			heap.push(HeapElement(k,0.0));
+			heap.push(HeapElement(landmarks[k],0.0));
 #else
-			heap.insert(k,0.0);
+			heap.insert(landmarks[k],0.0);
 #endif
 			f[k] = true;
 
