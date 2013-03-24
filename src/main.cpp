@@ -111,8 +111,6 @@ int run(int argc, const char** argv)
 	opt.add("1",0,1,0,"Number of timesteps for diffusion map (default 1)",TIMESTEPS_KEYWORD);
 #define SPE_LOCAL_KEYWORD "--spe-local"
 	opt.add("0",0,0,0,"Local strategy in SPE (default global)",SPE_LOCAL_KEYWORD);
-#define CHECK_CONNECTIVITY_KEYWORD "--check-connectivity"
-	opt.add("0",0,0,0,"Check if neighborhood graph is connected (default - do not check)",CHECK_CONNECTIVITY_KEYWORD);
 #define EIGENSHIFT_KEYWORD "--eigenshift"
 	opt.add("1e-9",0,1,0,"Regularization diagonal shift for weight matrix (default 1e-9)",EIGENSHIFT_KEYWORD);
 #define LANDMARK_RATIO_KEYWORD "--landmark-ratio"
@@ -255,12 +253,6 @@ int run(int argc, const char** argv)
 			parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(false);
 		else
 			parameters[tapkee::SPE_GLOBAL_STRATEGY] = static_cast<bool>(true);
-	}
-	{
-		if (opt.isSet(CHECK_CONNECTIVITY_KEYWORD))
-			parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(true);
-		else
-			parameters[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(false);
 	}
 	{
 		double spe_tolerance = 1e-5;
