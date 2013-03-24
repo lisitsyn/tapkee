@@ -63,6 +63,6 @@ References
 ----------
 
 * [Sam Roweis' page on LLE](http://www.cs.nyu.edu/~roweis/lle/)
-          <li><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.123.7319&rep=rep1&type=pdf">Saul, L. K., Ave, P., Park, F., & Roweis, S. T. (2001). An introduction to Locally Linear Embedding</a></li>
-          <li><a href="http://linkinghub.elsevier.com/retrieve/pii/S0031320306002160">Zhao, D. (2006) Formulating LLE using alignment technique</a></li>
-        </ol>
+* Saul, L. K., Ave, P., Park, F., & Roweis, S. T. (2001). 
+  [An introduction to Locally Linear Embedding](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.123.7319&rep=rep1&type=pdf)
+* Zhao, D. (2006) [Formulating LLE using alignment technique](http://linkinghub.elsevier.com/retrieve/pii/S0031320306002160)
