@@ -9,14 +9,14 @@ difference lies in the eigendecomposition based embedding.
 
 According to the NPE algorithm embedding can be found from the solution of 
 the following partial generalized eigenproblem:
-\[ R L R f = \lambda R R^T f \]
-where \( R \) is a matrix containing all feature 
-vectors \( x_1 , \dots , x_N \) row-wise. The problem is solved for 
-smallest eigenvalues \( \lambda_1, \dots, \lambda_t \) and 
-its corresponding eigenvectors \( f_1, \dots, f_t \). The final embedding 
-is obtained with a matrix such that \(i\)-th coordinate (\( i=1,\dots,N \)) 
-of \(j\)-th eigenvector (\( j=1,\dots,t\) ) corresponds to \(j\)-th 
-coordinate of projected \(i\)-th vector.
+$$ R L R f = \lambda R R^T f $$
+where $ R $ is a matrix containing all feature 
+vectors $ x\_1 , \dots , x\_N $ row-wise. The problem is solved for 
+smallest eigenvalues $ \lambda\_1, \dots, \lambda\_t $ and 
+its corresponding eigenvectors $ f\_1, \dots, f\_t $. The final embedding 
+is obtained with a matrix such that $i$-th coordinate ($ i=1,\dots,N $) 
+of $j$-th eigenvector ($ j=1,\dots,t$ ) corresponds to $j$-th 
+coordinate of projected $i$-th vector.
 
 References
 
