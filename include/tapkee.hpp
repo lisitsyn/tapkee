@@ -9,6 +9,7 @@
 /* Tapkee includes */
 #include <tapkee_defines.hpp>
 #include <tapkee_methods.hpp>
+#include <callback/eigen_callbacks.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee
@@ -260,6 +261,27 @@ ReturnResult embed(IndexType N, KernelCallback kernel_callback, DistanceCallback
 
 	return embed(indices.begin(),indices.end(),kernel_callback,distance_callback,
 	             feature_vector_callback,parameters);
+}
+
+/** Additional simplified entry-point of the library. Constructs 
+ * a dense embedding with specified dimensionality using provided data matrix.
+ * Returns ReturnType that is essentially a pair of a DenseMatrix 
+ * (embedding of provided data) and a ProjectingFunction with corresponding 
+ * ProjectionImplementation which can be used to project data out of the sample.
+ *
+ * This function uses euclidean distance and linear kernel as callbacks.
+ * 
+ * @param data data matrix (column-wise, i.e. each vector to be projected 
+ *        is a column of that matrix)
+ * @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
+ */
+ReturnResult embed(const DenseMatrix& data, ParametersMap parameters)
+{
+	distance_callback dcb(data);
+	kernel_callback kcb(data);
+	feature_vector_callback fcb(data);
+	ReturnResult result = embed(static_cast<IndexType>(data.cols()),kcb,dcb,fcb,parameters);
+	return result;
 }
 
 } // End of namespace tapkee
