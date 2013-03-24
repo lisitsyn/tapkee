@@ -338,7 +338,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 	// For clarity, all parameters match their ARPACK name
 	// Always 0 on the first call
 	int ido = 0;
-	int n = (int)A.cols();
+	int n = (int)A.rows();
 	// User parameters: "LA", "SA", "SM", "LM", "BE"
 	char whch[3] = "LM";
 

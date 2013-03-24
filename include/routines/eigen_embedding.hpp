@@ -20,12 +20,14 @@
 #include <tapkee_defines.hpp>
 /* End of Tapkee includes */
 
+using std::string;
+
 namespace tapkee
 {
 namespace tapkee_internal
 {
 
-std::string get_eigen_embedding_name(TAPKEE_EIGEN_EMBEDDING_METHOD m)
+string get_eigen_embedding_name(TAPKEE_EIGEN_EMBEDDING_METHOD m)
 {
 	switch (m)
 	{

@@ -141,9 +141,9 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 
 	tapkee_internal::Context context(progress_function,cancel_function);
 
-#define CALL_IMPLEMENTATION(X)                                                                                              \
-		tapkee_internal::Implementation<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback,X>()     \
-		(begin,end,tapkee_internal::Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>(kernel_callback,       \
+#define CALL_IMPLEMENTATION(X)                                                                                          \
+		tapkee_internal::X##_implementation<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback> \
+		(begin,end,tapkee_internal::Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>(kernel_callback,   \
 		distance_callback,feature_vector_callback),parameters,context)
 #define HANDLE_IMPLEMENTATION(X)                          \
 	case X: return_result = CALL_IMPLEMENTATION(X); break
