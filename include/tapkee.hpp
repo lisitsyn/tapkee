@@ -85,6 +85,15 @@ namespace tapkee
  * - @ref tapkee::PASS_THRU
  *
  * @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
+ *
+ * @throw @ref tapkee::wrong_parameter_error if wrong parameter value is passed into the parameters map
+ * @throw @ref tapkee::wrong_parameter_type_error if a value with wrong type is passed into the parameters map
+ * @throw @ref tapkee::missed_parameter_error if some required parameter is missed in the parameters map
+ * @throw @ref tapkee::unsupported_method_error if some method or combination of methods is unsupported 
+ * @throw @ref tapkee::not_enough_memory_error if there is not enough memory to perform the algorithm
+ * @throw @ref tapkee::cancelled_exception if computations were cancelled with provided @ref tapkee::CANCEL_FUNCTION
+ * @throw @ref tapkee::eigendecomposition_error if eigendecomposition is failed
+ *
  */
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
 ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
@@ -250,6 +259,15 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
  * - @ref tapkee::PASS_THRU
  *
  * @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
+ *
+ * @throw @ref tapkee::wrong_parameter_error if wrong parameter value is passed into the parameters map
+ * @throw @ref tapkee::wrong_parameter_type_error if a value with wrong type is passed into the parameters map
+ * @throw @ref tapkee::missed_parameter_error if some required parameter is missed in the parameters map
+ * @throw @ref tapkee::unsupported_method_error if some method or combination of methods is unsupported 
+ * @throw @ref tapkee::not_enough_memory_error if there is not enough memory to perform the algorithm
+ * @throw @ref tapkee::cancelled_exception if computations were cancelled with provided @ref tapkee::CANCEL_FUNCTION
+ * @throw @ref tapkee::eigendecomposition_error if eigendecomposition is failed
+ *
  */
 template <class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
 ReturnResult embed(IndexType N, KernelCallback kernel_callback, DistanceCallback distance_callback,
@@ -274,6 +292,15 @@ ReturnResult embed(IndexType N, KernelCallback kernel_callback, DistanceCallback
  * @param data data matrix (column-wise, i.e. each vector to be projected 
  *        is a column of that matrix)
  * @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
+ *
+ * @throw @ref tapkee::wrong_parameter_error if wrong parameter value is passed into the parameters map
+ * @throw @ref tapkee::wrong_parameter_type_error if a value with wrong type is passed into the parameters map
+ * @throw @ref tapkee::missed_parameter_error if some required parameter is missed in the parameters map
+ * @throw @ref tapkee::unsupported_method_error if some method or combination of methods is unsupported 
+ * @throw @ref tapkee::not_enough_memory_error if there is not enough memory to perform the algorithm
+ * @throw @ref tapkee::cancelled_exception if computations were cancelled with provided @ref tapkee::CANCEL_FUNCTION
+ * @throw @ref tapkee::eigendecomposition_error if eigendecomposition is failed
+ *
  */
 ReturnResult embed(const DenseMatrix& data, ParametersMap parameters)
 {
