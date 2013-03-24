@@ -94,6 +94,9 @@ If you use some non-standard STL-compatible realization of vector, map and pair 
 with `TAPKEE_INTERNAL_VECTOR`, `TAPKEE_INTERNAL_PAIR`, `TAPKEE_INTERNAL_MAP` 
 (they are set to std::vector, std::pair and std::map by default).
 
+You may define `TAPKEE_USE_FIBONACCI_HEAP` or `TAPKEE_USE_PRIORITY_QUEUE` to select which
+data structure should be used for shortest paths computing. By default a priority queue is used.
+
 Other properties can be loaded from some provided header file using `#define TAPKEE_CUSTOM_PROPERTIES`. Currently
 such file should define the variable `COVERTREE_BASE` which is base of the CoverTree to be used (default is 1.3).
 
