@@ -183,8 +183,8 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * [Kernel PCA (kPCA)](http://lisitsyn.github.com/tapkee/methods/kpca.html)
 * [Random projection](http://lisitsyn.github.com/tapkee/methods/rp.html)
 * [Factor analysis](http://lisitsyn.github.com/tapkee/methods/fa.html)
-* [t-SNE](http://lisitsyn.github.com/tapkee/method/tsne.html)
-* [Barnes-Hut-SNE](htpp://lisitsyn.github.com/tapkee/method/tsne.html)
+* [t-SNE](http://lisitsyn.github.com/tapkee/methods/tsne.html)
+* [Barnes-Hut-SNE](htpp://lisitsyn.github.com/tapkee/methods/tsne.html)
 
 Licensing
 ---------
