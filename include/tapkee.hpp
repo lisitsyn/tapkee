@@ -280,6 +280,7 @@ ReturnResult embed(const DenseMatrix& data, ParametersMap parameters)
 	distance_callback dcb(data);
 	kernel_callback kcb(data);
 	feature_vector_callback fcb(data);
+	parameters[CURRENT_DIMENSION] = static_cast<IndexType>(data.rows());
 	ReturnResult result = embed(static_cast<IndexType>(data.cols()),kcb,dcb,fcb,parameters);
 	return result;
 }
