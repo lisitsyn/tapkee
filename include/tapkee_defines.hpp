@@ -513,6 +513,13 @@ typedef TAPKEE_INTERNAL_MAP<TAPKEE_PARAMETERS, any> ParametersMap;
 
 namespace tapkee_internal 
 {
+#if defined(TAPKEE_USE_PRIORITY_QUEUE) && defined(TAPKEE_USE_FIBONACCI_HEAP)
+	#error "Can't use both priority queue and fibonacci heap at the same time"
+#endif
+#if !defined(TAPKEE_USE_PRIORITY_QUEUE) && !defined(TAPKEE_USE_FIBONACCI_HEAP)
+	#define TAPKEE_USE_PRIORITY_QUEUE
+#endif
+
 #ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 	template <typename T> struct Triplet
 	{

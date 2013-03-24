@@ -9,6 +9,7 @@
 /* Tapkee includes */
 #include <tapkee_defines.hpp>
 #include <utils/fibonacci_heap.hpp>
+#include <utils/reservable_priority_queue.hpp>
 #include <utils/time.hpp>
 /* End of Tapkee includes */
 
@@ -20,6 +21,18 @@ namespace tapkee
 {
 namespace tapkee_internal
 {
+
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+typedef std::pair<IndexType,ScalarType> HeapElement;
+
+struct HeapElementComparator
+{
+	inline bool operator()(const HeapElement& l, const HeapElement& r) const 
+	{
+		return l.second > r.second;
+	}
+};
+#endif
 
 //! Computes shortest distances (so-called geodesic distances)
 //! using Dijkstra algorithm.
@@ -44,7 +57,12 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 		bool* f = new bool[N];
 		bool* s = new bool[N];
 		IndexType k;
-		FibonacciHeap* heap = new FibonacciHeap(N);
+
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+		reservable_priority_queue<HeapElement,HeapElementComparator> heap(N);
+#else
+		fibonacci_heap heap(N);
+#endif
 
 #pragma omp for nowait
 		for (k=0; k<N; k++)
@@ -60,15 +78,28 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 			shortest_distances(k,k) = 0.0;
 
 			// insert kth object to heap with zero distance and set f[k] true
-			heap->insert(k,0.0);
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+			heap.push(HeapElement(k,0.0));
+#else
+			heap.insert(k,0.0);
+#endif
 			f[k] = true;
 
 			// while heap is not empty
-			while (heap->get_num_nodes()>0)
+			while (!heap.empty())
 			{
 				// extract min and set (s)olution state as true and (f)rontier as false
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+				int min_item = heap.top().first;
+				ScalarType min_item_d = heap.top().second;
+				heap.pop();
+				if (min_item_d > shortest_distances(k,min_item))
+					continue;
+#else
 				ScalarType tmp;
-				int min_item = heap->extract_min(tmp);
+				int min_item = heap.extract_min(tmp);
+#endif
+
 				s[min_item] = true;
 				f[min_item] = false;
 
@@ -87,26 +118,30 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 						{
 							// relax distance
 							shortest_distances(k,w) = dist;
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+							heap.push(HeapElement(w,dist));
+							f[w] = true;
+#else
 							// if w is in (f)rontier
 							if (f[w])
 							{
 								// decrease distance in heap
-								heap->decrease_key(w, dist);
+								heap.decrease_key(w, dist);
 							}
 							else
 							{
 								// insert w to heap and set (f)rontier as true
-								heap->insert(w, dist);
+								heap.insert(w, dist);
 								f[w] = true;
 							}
+#endif
 						}
 					}
 				}
 			}
-			heap->clear();
+			heap.clear();
 		}
 
-		delete heap;
 		delete[] s;
 		delete[] f;
 	}
@@ -138,7 +173,12 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 		bool* f = new bool[N];
 		bool* s = new bool[N];
 		IndexType k;
-		FibonacciHeap* heap = new FibonacciHeap(N);
+
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+		reservable_priority_queue<HeapElement,HeapElementComparator> heap(N);
+#else
+		fibonacci_heap heap(N);
+#endif
 
 #pragma omp for nowait
 		for (k=0; k<N_landmarks; k++)
@@ -154,15 +194,28 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 			shortest_distances(k,landmarks[k]) = 0.0;
 
 			// insert kth object to heap with zero distance and set f[k] true
-			heap->insert(landmarks[k],0.0);
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+			heap.push(HeapElement(k,0.0));
+#else
+			heap.insert(k,0.0);
+#endif
 			f[k] = true;
 
 			// while heap is not empty
-			while (heap->get_num_nodes()>0)
+			while (!heap.empty())
 			{
 				// extract min and set (s)olution state as true and (f)rontier as false
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+				int min_item = heap.top().first;
+				ScalarType min_item_d = heap.top().second;
+				heap.pop();
+				if (min_item_d > shortest_distances(k,min_item))
+					continue;
+#else
 				ScalarType tmp;
-				int min_item = heap->extract_min(tmp);
+				int min_item = heap.extract_min(tmp);
+#endif
+
 				s[min_item] = true;
 				f[min_item] = false;
 
@@ -181,26 +234,30 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 						{
 							// relax distance
 							shortest_distances(k,w) = dist;
+#ifdef TAPKEE_USE_PRIORITY_QUEUE
+							heap.push(HeapElement(w,dist));
+							f[w] = true;
+#else
 							// if w is in (f)rontier
 							if (f[w])
 							{
 								// decrease distance in heap
-								heap->decrease_key(w, dist);
+								heap.decrease_key(w, dist);
 							}
 							else
 							{
 								// insert w to heap and set (f)rontier as true
-								heap->insert(w, dist);
+								heap.insert(w, dist);
 								f[w] = true;
 							}
+#endif
 						}
 					}
 				}
 			}
-			heap->clear();
+			heap.clear();
 		}
-	
-		delete heap;
+
 		delete[] s;
 		delete[] f;
 	}
