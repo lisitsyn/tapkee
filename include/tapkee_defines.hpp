@@ -20,6 +20,9 @@
 #include <vector>
 #include <utility>
 
+#define TAPKEE_MAJOR_VERSION 1
+#define TAPKEE_MINOR_VERSION 0
+
 //// Eigen 3 library includes
 #ifdef TAPKEE_EIGEN_INCLUDE_FILE
 	#include TAPKEE_EIGEN_INCLUDE_FILE
