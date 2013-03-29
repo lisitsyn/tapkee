@@ -77,6 +77,8 @@ For an example of integration you may check
 To control the flow you may also provide callbacks that track progress
 and indicate if computations were cancelled (`tapkee::PROGRESS_FUNCTION` and `tapkee::CANCEL_FUNCTION` keys).
 
+You may check which version of the library do you have with `TAPKEE_MAJOR_VERSION` and `TAPKEE_MINOR_VERSION` defines.
+
 We welcome any integration so please contact authors if you have got any questions. If you have 
 successfully used the library please also let authors know about that - mentions of any
 applications are very appreciated.
