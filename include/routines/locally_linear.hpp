@@ -21,8 +21,8 @@ namespace tapkee_internal
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
                                          const Neighbors& neighbors, PairwiseCallback callback, 
-                                         IndexType target_dimension, ScalarType shift,
-                                         bool partial_eigendecomposer=false)
+                                         const IndexType target_dimension, const ScalarType shift,
+                                         const bool partial_eigendecomposer=false)
 {
 	timed_context context("KLTSA weight matrix computation");
 	const IndexType k = neighbors[0].size();
@@ -30,57 +30,70 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve((k*k+k+1)*(end-begin));
 
-	RandomAccessIterator iter;
-	RandomAccessIterator iter_begin = begin, iter_end = end;
-	DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
-	DenseVector rhs = DenseVector::Ones(k);
-	DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
-	G.col(0).setConstant(1/sqrt(ScalarType(k)));
-	DenseSelfAdjointEigenSolver solver;
-
-	//RESTRICT_ALLOC;
-//#pragma omp parallel for private(iter,gram_matrix,G)
-	for (iter=iter_begin; iter<iter_end; ++iter)
+#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets) default(none)
 	{
-		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
-	
-		for (IndexType i=0; i<k; ++i)
-		{
-			for (IndexType j=i; j<k; ++j)
-			{
-				ScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
-				gram_matrix(i,j) = kij;
-				gram_matrix(j,i) = kij;
-			}
-		}
-		
-		centerMatrix(gram_matrix);
+		IndexType index_iter;
+		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
+		DenseVector rhs = DenseVector::Ones(k);
+		DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
+		G.col(0).setConstant(1/sqrt(ScalarType(k)));
+		DenseSelfAdjointEigenSolver solver;
+		SparseTriplets local_triplets;
+		local_triplets.reserve(k*k+2*k+1);
 
-		//UNRESTRICT_ALLOC;
-#ifdef TAPKEE_WITH_ARPACK
-		if (partial_eigendecomposer)
+#pragma omp for nowait
+		for (index_iter=0; index_iter<static_cast<IndexType>(end-begin); index_iter++)
 		{
-			G.rightCols(target_dimension).noalias() = eigen_embedding<DenseMatrix,DenseMatrixOperation>(ARPACK,gram_matrix,target_dimension,0).first;
-		}
-		else
-#endif
-		{
-			solver.compute(gram_matrix);
-			G.rightCols(target_dimension).noalias() = solver.eigenvectors().rightCols(target_dimension);
-		}
-		//RESTRICT_ALLOC;
-		gram_matrix.noalias() = G * G.transpose();
+			const LocalNeighbors& current_neighbors = neighbors[index_iter];
 		
-		sparse_triplets.push_back(SparseTriplet(iter-begin,iter-begin,shift));
-		for (IndexType i=0; i<k; ++i)
-		{
-			sparse_triplets.push_back(SparseTriplet(current_neighbors[i],current_neighbors[i],1.0));
-			for (IndexType j=0; j<k; ++j)
-				sparse_triplets.push_back(SparseTriplet(current_neighbors[i],current_neighbors[j],
-				                                        -gram_matrix(i,j)));
+			for (IndexType i=0; i<k; ++i)
+			{
+				for (IndexType j=i; j<k; ++j)
+				{
+					ScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
+					gram_matrix(i,j) = kij;
+					gram_matrix(j,i) = kij;
+				}
+			}
+			
+			centerMatrix(gram_matrix);
+
+			//UNRESTRICT_ALLOC;
+#ifdef TAPKEE_WITH_ARPACK
+			if (partial_eigendecomposer)
+			{
+				G.rightCols(target_dimension).noalias() = eigen_embedding<DenseMatrix,DenseMatrixOperation>(ARPACK,gram_matrix,target_dimension,0).first;
+			}
+			else
+#endif
+			{
+				solver.compute(gram_matrix);
+				G.rightCols(target_dimension).noalias() = solver.eigenvectors().rightCols(target_dimension);
+			}
+			//RESTRICT_ALLOC;
+			gram_matrix.noalias() = G * G.transpose();
+			
+			SparseTriplet diagonal_triplet(index_iter,index_iter,shift);
+			local_triplets.push_back(diagonal_triplet);
+			for (IndexType i=0; i<k; ++i)
+			{
+				SparseTriplet neighborhood_diagonal_triplet(current_neighbors[i],current_neighbors[i],1.0);
+				local_triplets.push_back(neighborhood_diagonal_triplet);
+
+				for (IndexType j=0; j<k; ++j) 
+				{
+					SparseTriplet tangent_triplet(current_neighbors[i],current_neighbors[j],-gram_matrix(i,j));
+					local_triplets.push_back(tangent_triplet);
+				}
+			}
+#pragma omp critical
+			{
+				copy(local_triplets.begin(),local_triplets.end(),back_inserter(sparse_triplets));
+			}
+			
+			local_triplets.clear();
 		}
 	}
-	//UNRESTRICT_ALLOC;
 
 #ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 	Eigen::DynamicSparseMatrix<ScalarType> dynamic_weight_matrix(end-begin,end-begin);
