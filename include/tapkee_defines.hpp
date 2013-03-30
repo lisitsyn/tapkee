@@ -91,7 +91,8 @@ namespace tapkee
 		NUMBER_OF_NEIGHBORS,
 		/** The key of the parameter map to store target dimension.
 		 *
-		 * It should be set always as it is used by all methods. 
+		 * It should be set as it is used by all methods. By default it is 
+		 * set to 2 though.
 		 * 
 		 * The corresponding value should have type 
 		 * @ref tapkee::IndexType and be greater than 
@@ -119,7 +120,7 @@ namespace tapkee
 		/** The key of the parameter map to indicate eigendecomposition
 		 * method that is going to be used.
 		 * 
-		 * Should be set for the following 'eigen-based' methods:
+		 * Should be set for the following eigendecomposition-based methods:
 		 *
 		 * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
 		 * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
@@ -135,6 +136,8 @@ namespace tapkee
 		 * - @ref tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING
 		 * - @ref tapkee::KERNEL_PCA
 		 * - @ref tapkee::PCA
+		 *
+		 * By default it is set to @ref tapkee::ARPACK if available.
 		 *
 		 * The corresponding value should have type 
 		 * @ref tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD. 
@@ -156,6 +159,8 @@ namespace tapkee
 		 * - @ref tapkee::LANDMARK_ISOMAP
 		 * - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING (with local strategy, i.e. 
 		 *        when @ref tapkee::SPE_GLOBAL_STRATEGY is set to false)
+		 *
+		 * By default it is set to @ref tapkee::COVERTREE if available.
 		 *
 		 * The corresponding value should have 
 		 * type @ref tapkee::TAPKEE_NEIGHBORS_METHOD.
@@ -251,7 +256,7 @@ namespace tapkee
 		 * regularization shift of locally linear embedding
 		 * weights computation.
 		 *
-		 * Default is 1e-6.
+		 * Default is 1e-3.
 		 *
 		 * Should be set for @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING only.
 		 *
