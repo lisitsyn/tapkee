@@ -193,7 +193,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end, 
                                          const Neighbors& neighbors, PairwiseCallback callback, 
-                                         IndexType target_dimension)
+                                         const IndexType target_dimension)
 {
 	timed_context context("Hessian weight matrix computation");
 	const IndexType k = neighbors[0].size();
@@ -201,70 +201,85 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve(k*k*(end-begin));
 
-	RandomAccessIterator iter_begin = begin, iter_end = end;
-	DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
+	const IndexType dp = target_dimension*(target_dimension+1)/2;
 
-	IndexType dp = target_dimension*(target_dimension+1)/2;
-	DenseMatrix Yi(k,1+target_dimension+dp);
-
-	RandomAccessIterator iter;
-	for (iter=iter_begin; iter!=iter_end; ++iter)
+#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets) default(none)
 	{
-		const LocalNeighbors& current_neighbors = neighbors[iter-begin];
-	
-		for (IndexType i=0; i<k; ++i)
+		IndexType index_iter;
+		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
+		DenseMatrix Yi(k,1+target_dimension+dp);
+
+		SparseTriplets local_triplets;
+		local_triplets.reserve(k*k+2*k+1);
+
+#pragma omp for nowait
+		for (index_iter=0; index_iter<static_cast<IndexType>(end-begin); index_iter++)
 		{
-			for (IndexType j=i; j<k; ++j)
-			{
-				ScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
-				gram_matrix(i,j) = kij;
-				gram_matrix(j,i) = kij;
-			}
-		}
+			const LocalNeighbors& current_neighbors = neighbors[index_iter];
 		
-		centerMatrix(gram_matrix);
-		
-		DenseSelfAdjointEigenSolver sae_solver;
-		sae_solver.compute(gram_matrix);
-
-		Yi.col(0).setConstant(1.0);
-		Yi.block(0,1,k,target_dimension).noalias() = sae_solver.eigenvectors().rightCols(target_dimension);
-
-		IndexType ct = 0;
-		for (IndexType j=0; j<target_dimension; ++j)
-		{
-			for (IndexType p=0; p<target_dimension-j; ++p)
+			for (IndexType i=0; i<k; ++i)
 			{
-				Yi.col(ct+p+1+target_dimension).noalias() = Yi.col(j+1).cwiseProduct(Yi.col(j+p+1));
+				for (IndexType j=i; j<k; ++j)
+				{
+					ScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
+					gram_matrix(i,j) = kij;
+					gram_matrix(j,i) = kij;
+				}
 			}
-			ct += ct + target_dimension - j;
-		}
-		
-		for (IndexType i=0; i<static_cast<IndexType>(Yi.cols()); i++)
-		{
-			for (IndexType j=0; j<i; j++)
+			
+			centerMatrix(gram_matrix);
+			
+			DenseSelfAdjointEigenSolver sae_solver;
+			sae_solver.compute(gram_matrix);
+
+			Yi.col(0).setConstant(1.0);
+			Yi.block(0,1,k,target_dimension).noalias() = sae_solver.eigenvectors().rightCols(target_dimension);
+
+			IndexType ct = 0;
+			for (IndexType j=0; j<target_dimension; ++j)
 			{
-				ScalarType r = Yi.col(i).dot(Yi.col(j));
-				Yi.col(i) -= r*Yi.col(j);
+				for (IndexType p=0; p<target_dimension-j; ++p)
+				{
+					Yi.col(ct+p+1+target_dimension).noalias() = Yi.col(j+1).cwiseProduct(Yi.col(j+p+1));
+				}
+				ct += ct + target_dimension - j;
 			}
-			ScalarType norm = Yi.col(i).norm();
-			Yi.col(i) *= (1.f / norm);
-		}
-		for (IndexType i=0; i<dp; i++)
-		{
-			ScalarType colsum = Yi.col(1+target_dimension+i).sum();
-			if (colsum > 1e-4)
-				Yi.col(1+target_dimension+i).array() /= colsum;
-		}
+			
+			for (IndexType i=0; i<static_cast<IndexType>(Yi.cols()); i++)
+			{
+				for (IndexType j=0; j<i; j++)
+				{
+					ScalarType r = Yi.col(i).dot(Yi.col(j));
+					Yi.col(i) -= r*Yi.col(j);
+				}
+				ScalarType norm = Yi.col(i).norm();
+				Yi.col(i) *= (1.f / norm);
+			}
+			for (IndexType i=0; i<dp; i++)
+			{
+				ScalarType colsum = Yi.col(1+target_dimension+i).sum();
+				if (colsum > 1e-4)
+					Yi.col(1+target_dimension+i).array() /= colsum;
+			}
 
-		// reuse gram matrix storage m'kay?
-		gram_matrix.noalias() = Yi.rightCols(dp)*(Yi.rightCols(dp).transpose());
+			// reuse gram matrix storage m'kay?
+			gram_matrix.noalias() = Yi.rightCols(dp)*(Yi.rightCols(dp).transpose());
 
-		for (IndexType i=0; i<k; ++i)
-		{
-			for (IndexType j=0; j<k; ++j)
-				sparse_triplets.push_back(SparseTriplet(current_neighbors[i],current_neighbors[j],
-				                                        gram_matrix(i,j)));
+			for (IndexType i=0; i<k; ++i)
+			{
+				for (IndexType j=0; j<k; ++j)
+				{
+					SparseTriplet hessian_triplet(current_neighbors[i],current_neighbors[j],gram_matrix(i,j));
+					local_triplets.push_back(hessian_triplet);
+				}
+			}
+
+			#pragma omp critical
+			{
+				copy(local_triplets.begin(),local_triplets.end(),back_inserter(sparse_triplets));
+			}
+
+			local_triplets.clear();
 		}
 	}
 
