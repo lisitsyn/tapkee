@@ -1,8 +1,6 @@
 #ifndef RESERVABLE_PRIORITY_QUEUE_H_
 #define RESERVABLE_PRIORITY_QUEUE_H_
 
-#pragma GCC diagnostic ignored "-Weffc++"
-
 #include <queue>
 #include <vector>
 
@@ -33,8 +31,6 @@ public:
 		this->c.clear();
 	}
 };
-
-#pragma GCC diagnostic pop
 
 } /* End of namespace tapkee_internal */
 } /* End of namespace tapkee */
