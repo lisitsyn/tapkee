@@ -326,9 +326,9 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 ::compute(const LMatrixType& A, const RMatrixType& B, Index nbrEigenvalues,
           std::string eigs_sigma, int parameters, RealScalar tol)
 {
-	eigen_assert(A.cols() == A.rows());
-	eigen_assert(B.cols() == B.rows());
-	eigen_assert(B.rows() == 0 || A.cols() == B.rows());
+	//eigen_assert(A.cols() == A.rows());
+	//eigen_assert(B.cols() == B.rows());
+	//eigen_assert(B.rows() == 0 || A.cols() == B.rows());
 	eigen_assert((parameters &~ (Eigen::EigVecMask | Eigen::GenEigMask)) == 0
 	             && (parameters & Eigen::EigVecMask) != Eigen::EigVecMask
 	             && "invalid option parameter");
