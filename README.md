@@ -36,9 +36,9 @@ Full set of callbacks (all three callbacks) makes possible to use all implemente
 
 Callback interface enables user to reach great flexibility: ability to set up some caching strategy,
 lazy initialization of resources and various more. As an example we provide 
-[simple callback set](https://github.com/lisitsyn/tapkee/tree/master/tapkee/callback/eigen_callbacks.hpp)
+[simple callback set](https://github.com/lisitsyn/tapkee/tree/master/include/callback/eigen_callbacks.hpp)
 for dense feature matrices out-of-the-box. If you are able to precompute kernel and distance matrices you may find
-[precomputed callbacks](https://github.com/lisitsyn/tapkee/tree/master/tapkee/callback/precomputed_callbacks.hpp) 
+[precomputed callbacks](https://github.com/lisitsyn/tapkee/tree/master/include/callback/precomputed_callbacks.hpp) 
 useful.
 
 It is required to identify your callback functors using the following macroses:
@@ -53,7 +53,7 @@ Integration with other libraries
 --------------------------------
 
 The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee.hpp) 
-method (see [the documentation](http://lisitsyn.github.com/tapkee/doxygen/html/index.html) for more details).
+method (see [the documentation](http://www.tapkee-library.com/tapkee/doxygen/html/index.html) for more details).
 
 If your library includes Eigen3 (and only if) at some point - 
 let the Tapkee know about that with the following define:
@@ -90,7 +90,7 @@ Tapkee is supposed to be highly customizable with preprocessor definitions.
 
 If you want to use float as numeric type (default is double) you may do 
 that with definition of `#define TAPKEE_CUSTOM_NUMTYPE float` 
-before including [defines header](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee_defines.hpp).
+before including [defines header](https://github.com/lisitsyn/tapkee/tree/master/include/tapkee_defines.hpp).
 
 If you use some non-standard STL-compatible realization of vector, map and pair you may redefine them
 with `TAPKEE_INTERNAL_VECTOR`, `TAPKEE_INTERNAL_PAIR`, `TAPKEE_INTERNAL_MAP` 
@@ -170,23 +170,23 @@ Supported dimension reduction methods
 
 Tapkee provides implementations of the following dimension reduction methods (urls to descriptions provided):
 
-* [Locally Linear Embedding and Kernel Locally Linear Embedding (LLE/KLLE)](http://lisitsyn.github.com/tapkee/methods/lle.html)
-* [Neighborhood Preserving Embedding (NPE)](http://lisitsyn.github.com/tapkee/methods/npe.html)
-* [Local Tangent Space Alignment (LTSA)](http://lisitsyn.github.com/tapkee/methods/ltsa.html)
-* [Linear Local Tangent Space Alignment (LLTSA)](http://lisitsyn.github.com/tapkee/methods/lltsa.html)
-* [Hessian Locally Linear Embedding (HLLE)](http://lisitsyn.github.com/tapkee/methods/hlle.html)
-* [Laplacian eigenmaps](http://lisitsyn.github.com/tapkee/methods/le.html)
-* [Locality Preserving Projections](http://lisitsyn.github.com/tapkee/methods/lpp.html)
-* [Diffusion map](http://lisitsyn.github.com/tapkee/methods/dm.html)
+* [Locally Linear Embedding and Kernel Locally Linear Embedding (LLE/KLLE)](http://www.tapkee-library.info/methods/lle.html)
+* [Neighborhood Preserving Embedding (NPE)](http://www.tapkee-library.info/methods/npe.html)
+* [Local Tangent Space Alignment (LTSA)](http://www.tapkee-library.info/methods/ltsa.html)
+* [Linear Local Tangent Space Alignment (LLTSA)](http://www.tapkee-library.info/methods/lltsa.html)
+* [Hessian Locally Linear Embedding (HLLE)](http://www.tapkee-library.info/methods/hlle.html)
+* [Laplacian eigenmaps](http://www.tapkee-library.info/methods/le.html)
+* [Locality Preserving Projections](http://www.tapkee-library.info/methods/lpp.html)
+* [Diffusion map](http://www.tapkee-library.info/methods/dm.html)
 * [Isomap and landmark Isomap](http://lisitsyn.github.com/tapkee/methods/isomap.html)
-* [Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)](http://lisitsyn.github.com/tapkee/methods/mds.html)
-* [Stochastic Proximity Embedding (SPE)](http://lisitsyn.github.com/tapkee/methods/spe.html)
-* [PCA and randomized PCA](http://lisitsyn.github.com/tapkee/methods/pca.html)
-* [Kernel PCA (kPCA)](http://lisitsyn.github.com/tapkee/methods/kpca.html)
-* [Random projection](http://lisitsyn.github.com/tapkee/methods/rp.html)
-* [Factor analysis](http://lisitsyn.github.com/tapkee/methods/fa.html)
-* [t-SNE](http://lisitsyn.github.com/tapkee/methods/tsne.html)
-* [Barnes-Hut-SNE](htpp://lisitsyn.github.com/tapkee/methods/tsne.html)
+* [Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)](http://www.tapkee-library.info/methods/mds.html)
+* [Stochastic Proximity Embedding (SPE)](http://www.tapkee-library.info/methods/spe.html)
+* [PCA and randomized PCA](http://www.tapkee-library.info/methods/pca.html)
+* [Kernel PCA (kPCA)](http://www.tapkee-library.info/methods/kpca.html)
+* [Random projection](http://www.tapkee-library.info/methods/rp.html)
+* [Factor analysis](http://www.tapkee-library.info/methods/fa.html)
+* [t-SNE](http://www.tapkee-library.info/methods/tsne.html)
+* [Barnes-Hut-SNE](htpp://www.tapkee-library.info/methods/tsne.html)
 
 Licensing
 ---------
