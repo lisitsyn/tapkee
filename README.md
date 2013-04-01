@@ -53,7 +53,7 @@ Integration with other libraries
 --------------------------------
 
 The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee.hpp) 
-method (see [the documentation](http://www.tapkee-library.com/tapkee/doxygen/html/index.html) for more details).
+method (see [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) for more details).
 
 If your library includes Eigen3 (and only if) at some point - 
 let the Tapkee know about that with the following define:
@@ -195,14 +195,14 @@ The library is distributed under the [BSD 3-clause](LICENSE) license.
 
 Exceptions are:
 
-- [Barnes-Hut-SNE code](tapkee/external/barnes_hut_sne/) by Laurens van der Maaten which
+- [Barnes-Hut-SNE code](https://github.com/lisitsyn/tapkee/tree/master/include/external/barnes_hut_sne/) by Laurens van der Maaten which
   is distributed under the BSD 4-clause license.
 
-- [Covertree code](tapkee/neighbors/covertree.hpp) by John Langford and Dinoj Surendran 
+- [Covertree code](https://github.com/lisitsyn/tapkee/tree/master/include/neighbors/covertree.hpp) by John Langford and Dinoj Surendran 
   which is distributed under the [LGPLv3 license](LGPL-LICENSE).
 
-- [Any type](tapkee/utils/any.hpp) by Christopher Diggins which is distributed under 
+- [Any type](https://github.com/lisitsyn/tapkee/tree/master/include/utils/any.hpp) by Christopher Diggins which is distributed under 
   the [Boost v.1.0 license](http://www.boost.org/LICENSE_1_0.txt).
 
-- [EZOptionsParser](src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed 
+- [EZOptionsParser](https://github.com/lisitsyn/tapkee/tree/master/src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed 
   under the [MIT license](MIT-LICENSE).
