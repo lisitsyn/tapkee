@@ -52,7 +52,7 @@ Out-of-the-box callbacks are already 'identified' - no need to use any macroses 
 Integration with other libraries
 --------------------------------
 
-The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/tapkee/tapkee.hpp) 
+The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/include/tapkee.hpp) 
 method (see [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) for more details).
 
 If your library includes Eigen3 (and only if) at some point - 
@@ -186,7 +186,7 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * [Random projection](http://www.tapkee-library.info/methods/rp.html)
 * [Factor analysis](http://www.tapkee-library.info/methods/fa.html)
 * [t-SNE](http://www.tapkee-library.info/methods/tsne.html)
-* [Barnes-Hut-SNE](htpp://www.tapkee-library.info/methods/tsne.html)
+* [Barnes-Hut-SNE](http://www.tapkee-library.info/methods/tsne.html)
 
 Licensing
 ---------
