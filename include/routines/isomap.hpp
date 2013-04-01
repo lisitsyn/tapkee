@@ -79,7 +79,8 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 
 			// insert kth object to heap with zero distance and set f[k] true
 #ifdef TAPKEE_USE_PRIORITY_QUEUE
-			heap.push(HeapElement(k,0.0));
+			HeapElement heap_element_of_self(k,0.0);
+			heap.push(heap_element_of_self);
 #else
 			heap.insert(k,0.0);
 #endif
@@ -119,7 +120,8 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 							// relax distance
 							shortest_distances(k,w) = dist;
 #ifdef TAPKEE_USE_PRIORITY_QUEUE
-							heap.push(HeapElement(w,dist));
+							HeapElement relaxed_heap_element(w,dist);
+							heap.push(relaxed_heap_element);
 							f[w] = true;
 #else
 							// if w is in (f)rontier
@@ -195,7 +197,8 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 
 			// insert kth object to heap with zero distance and set f[k] true
 #ifdef TAPKEE_USE_PRIORITY_QUEUE
-			heap.push(HeapElement(landmarks[k],0.0));
+			HeapElement heap_element_of_self(landmarks[k],0.0);
+			heap.push(heap_element_of_self);
 #else
 			heap.insert(landmarks[k],0.0);
 #endif
@@ -235,7 +238,8 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 							// relax distance
 							shortest_distances(k,w) = dist;
 #ifdef TAPKEE_USE_PRIORITY_QUEUE
-							heap.push(HeapElement(w,dist));
+							HeapElement relaxed_heap_element(w,dist);
+							heap.push(relaxed_heap_element);
 							f[w] = true;
 #else
 							// if w is in (f)rontier

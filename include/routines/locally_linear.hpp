@@ -36,7 +36,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
 		DenseVector rhs = DenseVector::Ones(k);
 		DenseMatrix G = DenseMatrix::Zero(k,target_dimension+1);
-		G.col(0).setConstant(1/sqrt(ScalarType(k)));
+		G.col(0).setConstant(1/sqrt(static_cast<ScalarType>(k)));
 		DenseSelfAdjointEigenSolver solver;
 		SparseTriplets local_triplets;
 		local_triplets.reserve(k*k+2*k+1);

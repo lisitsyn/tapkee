@@ -14,7 +14,7 @@
 using namespace std;
 
 inline bool is_wrong_char(char c) {
-	if (!(isdigit(c) || isblank(c) || c == '.' || c == '-' || c == '+' || c == 'e'))
+	if (!(isdigit(c) || isspace(c) || c == '.' || c == '-' || c == '+' || c == 'e'))
 	{
 		return true;
 	}
