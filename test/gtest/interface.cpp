@@ -135,7 +135,7 @@ TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 		data.push_back(i);
 	
 	dummy_kernel_callback kcb;
-	dummy_distance_callback dcb;
+	float_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
 	params[tapkee::REDUCTION_METHOD] = tapkee::LAPLACIAN_EIGENMAPS;
@@ -144,8 +144,6 @@ TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 	params[tapkee::GAUSSIAN_KERNEL_WIDTH] = static_cast<tapkee::ScalarType>(1.0);
 	params[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(1); 
 	params[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(5);
-	params[tapkee::CHECK_CONNECTIVITY] = static_cast<bool>(true);
-
 
 	tapkee::ReturnResult result;
 	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::unsupported_method_error);
