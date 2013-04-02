@@ -1898,7 +1898,7 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, unsigned int widt
 		SplitDelim(groups[k]->help, '\n', desc);
 		// Split lines longer than allowable help width.
 		for(insertionIter=desc.begin(), cIter=insertionIter++; 
-				cIter != desc.end(); 
+				cIter != desc.end() && insertionIter!= desc.end(); 
 				cIter=insertionIter++) {
 			if ((*cIter)->size() > helpwidth) {
 				// Get pointer to next string to insert new strings before it.
@@ -2109,7 +2109,7 @@ void ezOptionParser::parse(int argc, const char * argv[]) {
 }
 /* ################################################################### */
 void ezOptionParser::prettyPrint(std::string & out) {
-	char tmp[256];
+	char tmp[512];
 	unsigned int i,j,k;
 
 	out += "First Args:\n";
