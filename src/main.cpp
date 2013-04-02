@@ -50,7 +50,8 @@ int run(int argc, const char** argv)
 	#define OPT_PREFIX "/"
 	#define OPT_LONG_PREFIX "/"
 #else
-	#define OPT_PREFIX "--"
+	#define OPT_PREFIX "-"
+	#define OPT_LONG_PREFIX "--"
 #endif
 
 #define INPUT_FILE_KEYWORD "input-file"
