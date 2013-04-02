@@ -74,7 +74,7 @@ namespace anyimpl
 	struct choose_policy 
 	{
 		// default policy is small_any_policy (was big_any_policy)
-		typedef small_any_policy<T> type;
+		typedef big_any_policy<T> type;
 	};
 
 	template<typename T> 
