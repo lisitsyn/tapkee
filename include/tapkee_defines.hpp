@@ -550,7 +550,6 @@ namespace tapkee_internal
 
 namespace tapkee_internal
 {
-	typedef TAPKEE_INTERNAL_VECTOR<IndexType> VectorIndices;
 	typedef TAPKEE_INTERNAL_VECTOR<SparseTriplet> SparseTriplets;
 	typedef TAPKEE_INTERNAL_VECTOR<IndexType> LocalNeighbors;
 	typedef TAPKEE_INTERNAL_VECTOR<LocalNeighbors> Neighbors;

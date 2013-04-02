@@ -372,7 +372,11 @@ int run(int argc, const char** argv)
 	tapkee::LoggingSingleton::instance().message_info(ss.str());
 	
 	tapkee::ReturnResult embedding;
-	
+
+	vector<tapkee::IndexType> indices(input_data.cols());
+	for (tapkee::IndexType i=0; i<input_data.cols(); ++i)
+		indices[i] = i;
+
 #ifdef USE_PRECOMPUTED
 	tapkee::DenseMatrix distance_matrix;
 	tapkee::DenseMatrix kernel_matrix;
@@ -397,13 +401,13 @@ int run(int argc, const char** argv)
 	precomputed_kernel_callback kcb(kernel_matrix);
 	feature_vector_callback fvcb(input_data);
 
-	embedding = tapkee::embed(static_cast<tapkee::IndexType>(input_data.cols()),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::embed(indices.begin(),indices.end(),kcb,dcb,fvcb,parameters);
 #else
 	distance_callback dcb(input_data);
 	kernel_callback kcb(input_data);
 	feature_vector_callback fvcb(input_data);
 
-	embedding = tapkee::embed(static_cast<tapkee::IndexType>(input_data.cols()),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::embed(indices.begin(),indices.end(),kcb,dcb,fvcb,parameters);
 #endif
 	// Save obtained data
 	ofs << embedding.first;
