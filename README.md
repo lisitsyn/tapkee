@@ -1,6 +1,3 @@
-Tapkee: an efficient dimension reduction library
-================================================
-
 Tapkee is a C++ template library for dimensionality reduction with some bias on 
 spectral methods. The Tapkee origins from the code developed during 
 [GSoC 2011](http://www.google-melange.com/gsoc/homepage/google/gsoc2011) as 
@@ -17,9 +14,9 @@ Contributions are very encouraged as we distribute our software under permissive
 open sources licenses, see Licensing section of this document).
 
 To achieve code quality we employ [googletest](https://code.google.com/p/googletest/) as a testing
-framework (tests can be found [here](test/gtest)), [valgrind](http://valgrind.org/) for dynamic 
-analysis and [clang static analyzer](http://clang-analyzer.llvm.org/) as a tool for static code 
-analysis. We are happy to use [Travis](https://travis-ci.org) as a continuous integration 
+framework (tests can be found [here](https://github.com/lisitsyn/tapkee/tree/master/test/gtest)), 
+[valgrind](http://valgrind.org/) for dynamic analysis and [clang static analyzer](http://clang-analyzer.llvm.org/) 
+as a tool for static code analysis. We are happy to use [Travis](https://travis-ci.org) as a continuous integration 
 platform. The build status is:
 
 [![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee)
