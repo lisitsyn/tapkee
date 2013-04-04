@@ -44,16 +44,28 @@ if (TAPKEE_CUSTOM_INSTALL_DIR)
 		"${TAPKEE_CUSTOM_INSTALL_DIR}")
 else()
 	set (TAPKEE_INSTALL_DIR
-		"${CMAKE_INSTALL_PREFIX}/include")
+		"${CMAKE_INSTALL_PREFIX}/include/tapkee")
 endif()
 
-install(DIRECTORY "${TAPKEE_INCLUDE_DIR}" DESTINATION "${TAPKEE_INSTALL_DIR}")
+
+file(GLOB headers "${TAPKEE_INCLUDE_DIR}/*.hpp")
+install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR})
+file(GLOB headers "${TAPKEE_INCLUDE_DIR}/utils/*.hpp")
+install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/utils)
+file(GLOB headers "${TAPKEE_INCLUDE_DIR}/routines/*.hpp")
+install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/routines)
+file(GLOB headers "${TAPKEE_INCLUDE_DIR}/callback/*.hpp")
+install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/callback)
+file(GLOB headers "${TAPKEE_INCLUDE_DIR}/neighbors/*.hpp")
+install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/neighbors)
+file(GLOB headers "${TAPKEE_INCLUDE_DIR}/external/*.hpp")
+install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/external)
 
 # G++ specific flags
 option(USE_GCOV "Use gcov to analyze test coverage" OFF)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra -pedantic -Wno-long-long")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra -pedantic -Wno-long-long --std=c++0x -funroll-loops -fno-rtti")
 	if (USE_GCOV)
 		set(CMAKE_BUILD_TYPE Debug)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
@@ -73,6 +85,10 @@ if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+	add_definitions(-DTAPKEE_DEBUG)
+endif()
+
 option(PRECOMPUTED "Precompute kernel/distance matrices before reducing dimensionality" OFF)
 
 if (PRECOMPUTED)
@@ -82,7 +98,6 @@ endif()
 option(GPL_FREE "Build without GPL-licensed components" OFF)
 
 if (NOT GPL_FREE)
-	#add_definitions(-DTAPKEE_USE_GPL_TSNE)
 	add_definitions(-DTAPKEE_USE_LGPL_COVERTREE)
 endif()
 
