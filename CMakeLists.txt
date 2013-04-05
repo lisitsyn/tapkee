@@ -58,8 +58,8 @@ file(GLOB headers "${TAPKEE_INCLUDE_DIR}/callback/*.hpp")
 install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/callback)
 file(GLOB headers "${TAPKEE_INCLUDE_DIR}/neighbors/*.hpp")
 install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/neighbors)
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/external/*.hpp")
-install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/external)
+file(GLOB headers "${TAPKEE_INCLUDE_DIR}/external/barnes_hut_sne/*.hpp")
+install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/external/barnes_hut_sne/)
 
 # G++ specific flags
 option(USE_GCOV "Use gcov to analyze test coverage" OFF)
