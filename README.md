@@ -7,7 +7,7 @@ dimensionality reduction which can be easily integrated to existing codebases.
 Tapkee leverages capabilities of effective [Eigen3 linear algebra library](http://eigen.tuxfamily.org) and 
 optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/). To achieve 
 greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
-the data representation and storage schemes (see Callback interface section).
+the data representation and storage schemes.
 
 The library is distributed under permissive [BSD 3-clause license](https://github.com/lisitsyn/tapkee/tree/master/include/LICENSE) 
 (except some parts that are distributed under other 
@@ -182,23 +182,23 @@ Supported dimension reduction methods
 
 Tapkee provides implementations of the following dimension reduction methods (urls to descriptions provided):
 
-* [Locally Linear Embedding and Kernel Locally Linear Embedding (LLE/KLLE)](http://www.tapkee-library.info/methods/lle.html)
-* [Neighborhood Preserving Embedding (NPE)](http://www.tapkee-library.info/methods/npe.html)
-* [Local Tangent Space Alignment (LTSA)](http://www.tapkee-library.info/methods/ltsa.html)
-* [Linear Local Tangent Space Alignment (LLTSA)](http://www.tapkee-library.info/methods/lltsa.html)
-* [Hessian Locally Linear Embedding (HLLE)](http://www.tapkee-library.info/methods/hlle.html)
-* [Laplacian eigenmaps](http://www.tapkee-library.info/methods/le.html)
-* [Locality Preserving Projections](http://www.tapkee-library.info/methods/lpp.html)
-* [Diffusion map](http://www.tapkee-library.info/methods/dm.html)
-* [Isomap and landmark Isomap](http://lisitsyn.github.com/tapkee/methods/isomap.html)
-* [Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)](http://www.tapkee-library.info/methods/mds.html)
-* [Stochastic Proximity Embedding (SPE)](http://www.tapkee-library.info/methods/spe.html)
-* [PCA and randomized PCA](http://www.tapkee-library.info/methods/pca.html)
-* [Kernel PCA (kPCA)](http://www.tapkee-library.info/methods/kpca.html)
-* [Random projection](http://www.tapkee-library.info/methods/rp.html)
-* [Factor analysis](http://www.tapkee-library.info/methods/fa.html)
-* [t-SNE](http://www.tapkee-library.info/methods/tsne.html)
-* [Barnes-Hut-SNE](http://www.tapkee-library.info/methods/tsne.html)
+* Locally Linear Embedding and Kernel Locally Linear Embedding (LLE/KLLE)
+* Neighborhood Preserving Embedding (NPE)
+* Local Tangent Space Alignment (LTSA)
+* Linear Local Tangent Space Alignment (LLTSA)
+* Hessian Locally Linear Embedding (HLLE)
+* Laplacian eigenmaps
+* Locality Preserving Projections
+* Diffusion map
+* Isomap and landmark Isomap
+* Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)
+* Stochastic Proximity Embedding (SPE)
+* PCA and randomized PCA
+* Kernel PCA (kPCA)
+* Random projection
+* Factor analysis
+* t-SNE
+* Barnes-Hut-SNE
 
 Licensing
 ---------
