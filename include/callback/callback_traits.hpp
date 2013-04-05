@@ -21,10 +21,10 @@ struct BasicCallbackTraits
 };
 
 #define TAPKEE_CALLBACK_TRAIT_HELPER(X,KERNEL,LINEAR_KERNEL,DISTANCE,EUCLIDEAN_DISTANCE) \
-template<> const bool BasicCallbackTraits<X>::is_kernel = KERNEL;                                   \
-template<> const bool BasicCallbackTraits<X>::is_linear_kernel = LINEAR_KERNEL;                     \
-template<> const bool BasicCallbackTraits<X>::is_distance = DISTANCE;                               \
-template<> const bool BasicCallbackTraits<X>::is_euclidean_distance = EUCLIDEAN_DISTANCE            \
+template<> const bool BasicCallbackTraits<X>::is_kernel = KERNEL;                        \
+template<> const bool BasicCallbackTraits<X>::is_linear_kernel = LINEAR_KERNEL;          \
+template<> const bool BasicCallbackTraits<X>::is_distance = DISTANCE;                    \
+template<> const bool BasicCallbackTraits<X>::is_euclidean_distance = EUCLIDEAN_DISTANCE \
 
 /** Macro used to indicate that callback X is a kernel function */
 #define TAPKEE_CALLBACK_IS_KERNEL(X) TAPKEE_CALLBACK_TRAIT_HELPER(X,true,false,false,false)
@@ -54,12 +54,9 @@ template<> const bool BasicCallbackTraits<X>::is_euclidean_distance = EUCLIDEAN_
 template <class Callback>
 struct BatchCallbackTraits
 {
-	static bool supports_batch();
+	static const bool supports_batch;
 };
-#define TAPKEE_CALLBACK_SUPPORTS_BATCH(X) template<> struct BatchCallbackTraits \
-{ \
-	static bool supports_batch() { return true; }; \
-};
-
+#define TAPKEE_CALLBACK_SUPPORTS_BATCH(X)                            \
+template<> const bool BatchCallbackTraits<X>::supports_batch = true; \
 
 #endif
