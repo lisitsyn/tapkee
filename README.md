@@ -6,7 +6,7 @@ The project aim is to provide efficient and flexible standalone library for
 dimensionality reduction which can be easily integrated to existing codebases.
 Tapkee leverages capabilities of effective [Eigen3 linear algebra library](http://eigen.tuxfamily.org) and 
 optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/). To achieve 
-great flexibility we provide a callback interface which decouples dimension reduction algorithms from
+greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
 the data representation and storage schemes (see Callback interface section).
 
 Contributions are very encouraged as we distribute our software under permissive 
@@ -21,44 +21,63 @@ platform. The build status is:
 
 [![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee)
 
-Callback interface
+API
+---
+
+The main entry point of Tapkee is the [embed](https://github.com/lisitsyn/tapkee/tree/master/include/tapkee.hpp) 
+function (see [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) for more details) that
+returns embedding for provided data and a function that can be used to project data out of the sample (if such
+function is implemented). This function takes two random access iterators (that denote begin and end of the data),
+three callbacks (kernel callback, distance callback and feature vector access callback) and parameters map.
+
+In the simplest case `begin` and `end` are set to the corresponding iterators of some `vector<tapkee::IndexType>` 
+filled with a range of values from 0 to N-1 where N is the number of vectors to embed. 
+
+Callbacks, such as kernel functor (that computes similarity), distance functor (that computes dissimilarity) and 
+dense feature vector access functor (that computes required feature vector), are used by the library to access the 
+data. Such interface is motivated by great flexibility it provides (custom caching, precomputing, maybe even network access). 
+As an example we provide [a simple callback set](https://github.com/lisitsyn/tapkee/tree/master/include/callback/eigen_callbacks.hpp)
+for dense feature matrices out-of-the-box. If you are working with precomputed kernel and distance matrices you may find
+[precomputed callbacks](https://github.com/lisitsyn/tapkee/tree/master/include/callback/precomputed_callbacks.hpp) 
+useful. It is worth to note that most of methods use either kernel or distance while all linear (projective) methods require 
+access to feature vector. For example, to use the Locally Linear Embedding algorithm it is enough to provide a kernel
+callback; the Multidimensional Scaling algorithm requires only a distance callback and PCA requires only a feature
+vector access callback. Full set of callbacks (all three callbacks) makes possible to use all the implemented methods.
+
+Parameters map should contain all the required parameters as values with keys as 
+[TAPKEE\_PARAMETERS](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp#L61). If 
+some parameter is missed in the map the library throws an exception with information about missed parameter.
+You may check which parameters do you have to set in the documentation of parameters and methods or in 
+[implementations](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_methods.hpp)
+where parameters are obtained using the `PARAMETER` macro. 
+
+For example to run the Locally Linear Embedding algorithm you might need to populate the parameters map with the following code:
+`
+tapkee::ParametersMap parameters;
+parameters[tapkee::REDUCTION_METHOD] = LOCALLY_LINEAR_EMBEDDING;
+parameters[tapkee::NEIGHBORS_METHOD] = COVER_TREE;
+parameters[tapkee::EIGEN_EMBEDDING_METHOD] = ARPACK;
+parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
+parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(20);
+`
+
+Integration issues
 ------------------
 
-To achieve greater flexibility, the library decouples algorithms from data representation.
-To let user choose how to handle his data we provide callback interface essentially based
-on three functions: kernel function (similarity), distance function (dissimilarity) and 
-dense feature vector access function. It is worth to notice that most of methods use either
-kernel or distance while all linear (projective) methods require access to feature vector. 
-Full set of callbacks (all three callbacks) makes possible to use all implemented methods.
-
-Callback interface enables user to reach great flexibility: ability to set up some caching strategy,
-lazy initialization of resources and various more. As an example we provide 
-[simple callback set](https://github.com/lisitsyn/tapkee/tree/master/include/callback/eigen_callbacks.hpp)
-for dense feature matrices out-of-the-box. If you are able to precompute kernel and distance matrices you may find
-[precomputed callbacks](https://github.com/lisitsyn/tapkee/tree/master/include/callback/precomputed_callbacks.hpp) 
-useful.
-
-It is required to identify your callback functors using the following macroses:
-
-`TAPKEE_CALLBACK_IS_KERNEL(your_kernel_callback)`
-
-`TAPKEE_CALLBACK_IS_DISTANCE(your_distance_callback)`
-
-Out-of-the-box callbacks are already 'identified' - no need to use any macroses for them.
-
-Integration with other libraries
---------------------------------
-
-The main entry point of Tapkee is [embed](https://github.com/lisitsyn/tapkee/tree/master/include/tapkee.hpp) 
-method (see [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) for more details).
-
-If your library includes Eigen3 (and only if) at some point - 
-let the Tapkee know about that with the following define:
+There are a few issues related to including the Tapkee library. First, if your library already includes 
+Eigen3 (and only if) - you might need to let Tapkee know about that with the following define:
 
 `#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
 Please note that if you don't include Eigen3 in your project there is no need to define that variable -
-Eigen3 will be included by Tapkee in this case.
+Eigen3 will be included by Tapkee in this case. This issue comes from the need of including the Eigen3 library
+only once when using some specific parameters (like debug and extensions).
+
+It is also required to identify your custom callback functors using the following macroses:
+
+`TAPKEE_CALLBACK_IS_KERNEL(your_kernel_callback)`
+
+`TAPKEE_CALLBACK_IS_DISTANCE(your_distance_callback)`
 
 If you are able to use less restrictive licenses (such as LGPLv3) you could define 
 the following variable:
@@ -71,10 +90,8 @@ is linked against ARPACK library (-larpack key for g++ and clang++).
 For an example of integration you may check 
 [Tapkee adapter in Shogun](https://github.com/shogun-toolbox/shogun/blob/master/src/shogun/lib/tapkee/tapkee_shogun.cpp). 
 
-To control the flow you may also provide callbacks that track progress
-and indicate if computations were cancelled (`tapkee::PROGRESS_FUNCTION` and `tapkee::CANCEL_FUNCTION` keys).
-
-You may check which version of the library do you have with `TAPKEE_MAJOR_VERSION` and `TAPKEE_MINOR_VERSION` defines.
+When working with installed headers you may check which version of the library 
+do you have with checking the values of `TAPKEE_MAJOR_VERSION` and `TAPKEE_MINOR_VERSION` defines.
 
 We welcome any integration so please contact authors if you have got any questions. If you have 
 successfully used the library please also let authors know about that - mentions of any
@@ -83,27 +100,29 @@ applications are very appreciated.
 Customization
 -------------
 
-Tapkee is supposed to be highly customizable with preprocessor definitions.
+Tapkee is being developed to be highly customizable with preprocessor definitions.
 
-If you want to use float as numeric type (default is double) you may do 
+If you want to use float as internal numeric type (default is double) you may do 
 that with definition of `#define TAPKEE_CUSTOM_NUMTYPE float` 
 before including [defines header](https://github.com/lisitsyn/tapkee/tree/master/include/tapkee_defines.hpp).
 
 If you use some non-standard STL-compatible realization of vector, map and pair you may redefine them
 with `TAPKEE_INTERNAL_VECTOR`, `TAPKEE_INTERNAL_PAIR`, `TAPKEE_INTERNAL_MAP` 
-(they are set to std::vector, std::pair and std::map by default).
+(they are set to std::vector, std::pair and std::map by default otherwise).
 
 You may define `TAPKEE_USE_FIBONACCI_HEAP` or `TAPKEE_USE_PRIORITY_QUEUE` to select which
-data structure should be used for shortest paths computing. By default a priority queue is used.
+data structure should be used in the shortest paths computing algorithm. By default 
+a priority queue is used.
 
 Other properties can be loaded from some provided header file using `#define TAPKEE_CUSTOM_PROPERTIES`. Currently
-such file should define the variable `COVERTREE_BASE` which is base of the CoverTree to be used (default is 1.3).
+such file should define only one variable - `COVERTREE_BASE` which defines the base of the CoverTree (default is 1.3).
 
 Application
 -----------
 
 Tapkee comes with a sample application which can be used to construct
-low-dimensional representations of feature matrices. For more information on its usage please run:
+low-dimensional representations of dense feature matrices. For more information on 
+its usage please run:
 
 `./tapkee -h`
 
@@ -123,7 +142,9 @@ There are a few cases when you'd want to put some definitions:
   building unit-tests require googletest. If you are running Ubuntu you may install `libgtest-dev` package for that. 
   Otherwise, if you have gtest sources around you may provide them as `-DGTEST_SOURCE_DIR` and `-DGTEST_INCLUDES_DIR`.
   If may also download gtest with the following command: 
-  `wget http://googletest.googlecode.com/files/gtest-1.6.0.zip && unzip -q gtest-1.6.0.zip && cd gtest-1.6.0 && cmake . && make && cd .. && rm gtest-1.6.0.zip`.
+  `wget http://googletest.googlecode.com/files/gtest-1.6.0.zip && 
+   unzip -q gtest-1.6.0.zip && cd gtest-1.6.0 && cmake . && 
+   make && cd .. && rm gtest-1.6.0.zip`
   Downloaded sources will be used by Tapkee on build.
   To run tests use `make test` command (or better 'ctest -VV').
 
@@ -133,10 +154,10 @@ There are a few cases when you'd want to put some definitions:
 - To enable precomputation of kernel/distance matrices which can speed-up algorithms (but requires much more memory) add
   `-DPRECOMPUTED=1` to `[definitions]` when building.
 
-- To build application without parts licensed by GPLv3 and LGPLv3 use `-DGPL_FREE=1` definition.
+- To build application without parts licensed by LGPLv3 use `-DGPL_FREE=1` definition.
 
-The compilation requires Eigen3 to be available in your path. The ARPACK library is also highly recommended. 
-On Ubuntu Linux these packages can be installed with 
+The library requires Eigen3 to be available in your path. The ARPACK library is also highly 
+recommended to achieve best performance. On Debian/Ubuntu these packages can be installed with 
 
 `sudo apt-get install libeigen3-dev libarpack2-dev`
 
@@ -145,22 +166,23 @@ If you are using Mac OS X and Macports you can install these packages with
 `sudo port install eigen3 && sudo port install arpack`
 
 In case you want to use some non-default 
-compiler use `CC=your-C-compiler CXX=your-C++-compiler cmake` when running cmake.
+compiler use `CC=your-C-compiler CXX=your-C++-compiler cmake [definitions] ..` when running cmake.
 
 Need help?
 ----------
 
-If you need any help or advice don't hesitate to send [an email](mailto://lisitsyn.s.o@gmail.com "Send mail
-to Sergey Lisitsyn") or fire [an issue at github](https://github.com/lisitsyn/tapkee/issues/new "New Tapkee Issue").
+If you need any help or advice don't hesitate to send [an email](mailto://lisitsyn.s.o@gmail.com) or 
+fire [an issue at github](https://github.com/lisitsyn/tapkee/issues/new).
 
 Supported platforms
 -------------------
 
 Tapkee is tested to be fully functional on Linux (ICC, GCC, Clang compilers) 
-and Mac OS X (GCC and Clang compilers). It also compiles under Windows (MSVS 2012 compiler)
-but wasn't properly tested yet. In general, Tapkee uses no platform specific code 
-and should work on other systems as well. Please [let us know](mailto://lisitsyn.s.o@gmail.com) 
-if you have successfully compiled or have got issues on any other system not listed above.
+and Mac OS X (GCC and Clang compilers). It also compiles under Windows natively
+(MSVS 2012 compiler) with a few known issues. In general, Tapkee uses no platform 
+specific code and should work on other systems as well. Please 
+[let us know](mailto://lisitsyn.s.o@gmail.com) if you have successfully compiled 
+or have got any issues on any other system not listed above.
 
 Supported dimension reduction methods
 -------------------------------------
@@ -188,7 +210,7 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 Licensing
 ---------
 
-The library is distributed under the [BSD 3-clause](LICENSE) license.
+The library is distributed under the [BSD 3-clause](https://github.com/lisitsyn/tapkee/tree/master/LICENSE) license.
 
 Exceptions are:
 
