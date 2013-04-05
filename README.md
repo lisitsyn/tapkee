@@ -9,17 +9,9 @@ optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/softwa
 greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
 the data representation and storage schemes (see Callback interface section).
 
-Contributions are very encouraged as we distribute our software under permissive 
-[BSD 3-clause license](LICENSE) (except some parts that are distributed under other 
+The library is distributed under permissive [BSD 3-clause license](LICENSE) 
+(except some parts that are distributed under other 
 open sources licenses, see Licensing section of this document).
-
-To achieve code quality we employ [googletest](https://code.google.com/p/googletest/) as a testing
-framework (tests can be found [here](https://github.com/lisitsyn/tapkee/tree/master/test/gtest)), 
-[valgrind](http://valgrind.org/) for dynamic analysis and [clang static analyzer](http://clang-analyzer.llvm.org/) 
-as a tool for static code analysis. We are happy to use [Travis](https://travis-ci.org) as a continuous integration 
-platform. The build status is:
-
-[![Build Status](https://travis-ci.org/lisitsyn/tapkee.png)](https://travis-ci.org/lisitsyn/tapkee)
 
 API
 ---
