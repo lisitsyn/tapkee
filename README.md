@@ -44,14 +44,14 @@ You may check which parameters do you have to set in the documentation of parame
 where parameters are obtained using the `PARAMETER` macro. 
 
 For example to run the Locally Linear Embedding algorithm you might need to populate the parameters map with the following code:
-`
+```
 tapkee::ParametersMap parameters;
 parameters[tapkee::REDUCTION_METHOD] = LOCALLY_LINEAR_EMBEDDING;
 parameters[tapkee::NEIGHBORS_METHOD] = COVER_TREE;
 parameters[tapkee::EIGEN_EMBEDDING_METHOD] = ARPACK;
 parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
 parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(20);
-`
+```
 
 Integration issues
 ------------------
