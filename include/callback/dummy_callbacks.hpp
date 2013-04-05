@@ -9,7 +9,7 @@
 template<class Data>
 struct dummy_feature_vector_callback
 {
-	inline void operator()(tapkee::IndexType i, tapkee::DenseVector& vector) const
+	inline void operator()(const Data& i, tapkee::DenseVector& vector) const
 	{
 		throw tapkee::unsupported_method_error("Dummy feature vector callback is set");
 	}
