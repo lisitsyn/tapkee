@@ -9,7 +9,7 @@ optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/softwa
 greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
 the data representation and storage schemes (see Callback interface section).
 
-The library is distributed under permissive [BSD 3-clause license](LICENSE) 
+The library is distributed under permissive [BSD 3-clause license](https://github.com/lisitsyn/tapkee/tree/master/include/LICENSE) 
 (except some parts that are distributed under other 
 open sources licenses, see Licensing section of this document).
 
@@ -44,14 +44,13 @@ You may check which parameters do you have to set in the documentation of parame
 where parameters are obtained using the `PARAMETER` macro. 
 
 For example to run the Locally Linear Embedding algorithm you might need to populate the parameters map with the following code:
-```
-tapkee::ParametersMap parameters;
-parameters[tapkee::REDUCTION_METHOD] = LOCALLY_LINEAR_EMBEDDING;
-parameters[tapkee::NEIGHBORS_METHOD] = COVER_TREE;
-parameters[tapkee::EIGEN_EMBEDDING_METHOD] = ARPACK;
-parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
-parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(20);
-```
+
+	tapkee::ParametersMap parameters;
+	parameters[tapkee::REDUCTION_METHOD] = LOCALLY_LINEAR_EMBEDDING;
+	parameters[tapkee::NEIGHBORS_METHOD] = COVER_TREE;
+	parameters[tapkee::EIGEN_EMBEDDING_METHOD] = ARPACK;
+	parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
+	parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(20);
 
 Integration issues
 ------------------
@@ -59,10 +58,10 @@ Integration issues
 There are a few issues related to including the Tapkee library. First, if your library already includes 
 Eigen3 (and only if) - you might need to let Tapkee know about that with the following define:
 
-`#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
+`#define TAPKEE\_EIGEN\_INCLUDE\_FILE <path/to/your/eigen/include/file.h>`
 
 Please note that if you don't include Eigen3 in your project there is no need to define that variable -
-Eigen3 will be included by Tapkee in this case. This issue comes from the need of including the Eigen3 library
+in this case Eigen3 will be included by Tapkee. This issue comes from the need of including the Eigen3 library
 only once when using some specific parameters (like debug and extensions).
 
 It is also required to identify your custom callback functors using the following macroses:
