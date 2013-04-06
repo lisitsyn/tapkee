@@ -13,7 +13,7 @@ TAPKEE_CALLBACK_IS_DISTANCE(my_distance_callback);
 int main(int argc, const char** argv)
 {
 	const int N = 100;
-	vector<tapkee::IndexType> indices(N);
+	vector<IndexType> indices(N);
 	for (int i=0; i<N; i++) indices[i] = i;
 
 	dummy_kernel_callback<IndexType> kcb;
