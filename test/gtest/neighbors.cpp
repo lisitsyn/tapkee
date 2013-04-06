@@ -13,17 +13,19 @@
 
 TEST(Neighbors,BruteDistanceNeighbors)
 {
+	typedef std::vector<float> Floats;
 	const int N = 100;
 	const int k = 10;
 	ASSERT_EQ(k%2,0);
 
-	std::vector<float> floats;
+	Floats floats;
 	for (int i=0;i<N;i++) 
 		floats.push_back(float(i));
 
 	float_distance_callback fdc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::BRUTE_FORCE, floats.begin(), floats.end(), fdc, k, true);
+		tapkee::tapkee_internal::find_neighbors(tapkee::BRUTE_FORCE, floats.begin(), floats.end(), 
+				tapkee::tapkee_internal::PlainDistance<Floats::iterator,float_distance_callback>(fdc), k, true);
 
 	for (int i=0;i<N;i++)
 	{
@@ -48,16 +50,18 @@ TEST(Neighbors,BruteDistanceNeighbors)
 
 TEST(Neighbors,CoverTreeDistanceNeighbors)
 {
+	typedef std::vector<float> Floats;
 	const int N = 100;
 	const int k = 10;
 
-	std::vector<float> floats;
+	Floats floats;
 	for (int i=0;i<N;i++) 
 		floats.push_back(float(i));
 
 	float_distance_callback fdc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::COVER_TREE, floats.begin(), floats.end(), fdc, k, true);
+		tapkee::tapkee_internal::find_neighbors(tapkee::COVER_TREE, floats.begin(), floats.end(),
+				tapkee::tapkee_internal::PlainDistance<Floats::iterator,float_distance_callback>(fdc), k, true);
 
 	for (int i=0;i<N;i++)
 	{
@@ -82,17 +86,19 @@ TEST(Neighbors,CoverTreeDistanceNeighbors)
 
 TEST(Neighbors,BruteKernelNeighbors)
 {
+	typedef std::vector<float> Floats;
 	const int N = 100;
 	const int k = 10;
 	ASSERT_EQ(k%2,0);
 
-	std::vector<float> floats;
+	Floats floats;
 	for (int i=0;i<N;i++) 
 		floats.push_back(float(i));
 
 	float_kernel_callback fkc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::BRUTE_FORCE, floats.begin(), floats.end(), fkc, k, true);
+		tapkee::tapkee_internal::find_neighbors(tapkee::BRUTE_FORCE, floats.begin(), floats.end(),
+				tapkee::tapkee_internal::KernelDistance<Floats::iterator,float_kernel_callback>(fkc), k, true);
 
 	for (int i=0;i<N;i++)
 	{
@@ -117,16 +123,18 @@ TEST(Neighbors,BruteKernelNeighbors)
 
 TEST(Neighbors,CoverTreeKernelNeighbors)
 {
+	typedef std::vector<float> Floats;
 	const int N = 100;
 	const int k = 10;
 
-	std::vector<float> floats;
+	Floats floats;
 	for (int i=0;i<N;i++) 
 		floats.push_back(float(i));
 
 	float_kernel_callback fkc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::COVER_TREE, floats.begin(), floats.end(), fkc, k, true);
+		tapkee::tapkee_internal::find_neighbors(tapkee::COVER_TREE, floats.begin(), floats.end(),
+				tapkee::tapkee_internal::KernelDistance<Floats::iterator,float_kernel_callback>(fkc), k, true);
 
 	for (int i=0;i<N;i++)
 	{
