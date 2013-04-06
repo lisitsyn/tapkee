@@ -47,17 +47,45 @@ struct distances_comparator
 	}
 };
 
+template <class RandomAccessIterator, class Callback>
+struct KernelDistance
+{
+	KernelDistance(Callback cb) : callback(cb) {  } 
+	inline ScalarType operator()(const RandomAccessIterator& l, const RandomAccessIterator& r)
+	{
+		return callback.kernel(*l,*r);
+	}
+	static const bool is_kernel;
+	Callback callback;
+};
+template <class RandomAccessIterator, class Callback>
+const bool KernelDistance<RandomAccessIterator, Callback>::is_kernel = true;
+
+template <class RandomAccessIterator, class Callback>
+struct PlainDistance
+{
+	PlainDistance(Callback cb) : callback(cb) {  }
+	inline ScalarType operator()(const RandomAccessIterator& l, const RandomAccessIterator& r)
+	{
+		return callback.distance(*l,*r);
+	}
+	static const bool is_kernel;
+	Callback callback;
+};
+template <class RandomAccessIterator, class Callback>
+const bool PlainDistance<RandomAccessIterator, Callback>::is_kernel = false;
+
 #ifdef TAPKEE_USE_LGPL_COVERTREE
-template <class RandomAccessIterator, class PairwiseCallback>
+template <class RandomAccessIterator, class Callback>
 Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccessIterator end, 
-                         PairwiseCallback callback, IndexType k)
+                         Callback callback, IndexType k)
 {
 	timed_context context("Covertree-based neighbors search");
 
 	typedef CoverTreePoint<RandomAccessIterator> TreePoint;
 	v_array<TreePoint> points;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-		push(points, TreePoint(iter, callback(*iter,*iter)));
+		push(points, TreePoint(iter, callback(iter,iter)));
 
 	node<TreePoint> ct = batch_create(callback, points);
 
@@ -90,9 +118,9 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
 }
 #endif
 
-template <class RandomAccessIterator, class PairwiseCallback>
+template <class RandomAccessIterator, class Callback>
 Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end, 
-                                         PairwiseCallback callback, IndexType k)
+                                         Callback callback, IndexType k)
 {
 	timed_context context("Distance sorting based neighbors search");
 	typedef std::pair<RandomAccessIterator, ScalarType> DistanceRecord;
@@ -103,15 +131,16 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		Distances distances;
-		if (BasicCallbackTraits<PairwiseCallback>::is_kernel)
+		if (Callback::is_kernel)
 		{
 			for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
-				distances.push_back(make_pair(around_iter, callback(*around_iter,*around_iter) + callback(*iter,*iter) - 2*callback(*iter,*around_iter)));
+				distances.push_back(make_pair(around_iter, 
+							callback(around_iter,around_iter) + callback(iter,iter) - 2*callback(iter,around_iter)));
 		}
 		else
 		{
 			for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
-				distances.push_back(make_pair(around_iter, callback(*iter,*around_iter)));
+				distances.push_back(make_pair(around_iter, callback(iter,around_iter)));
 		}
 
 		nth_element(distances.begin(),distances.begin()+k+1,distances.end(),
@@ -130,9 +159,9 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 	return neighbors;
 }
 
-template <class RandomAccessIterator, class PairwiseCallback>
+template <class RandomAccessIterator, class Callback>
 Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessIterator& begin, 
-                         const RandomAccessIterator& end, const PairwiseCallback& callback, 
+                         const RandomAccessIterator& end, const Callback& callback, 
                          IndexType k, bool check_connectivity)
 {
 	if (k > static_cast<IndexType>(end-begin-1))

@@ -138,7 +138,9 @@ IMPLEMENTATION_OF(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 	STOP_IF_CANCELLED;
 
 	Neighbors neighbors =
-		find_neighbors(neighbors_method,begin,end,callbacks.kernel,k,check_connectivity);
+		find_neighbors(neighbors_method,begin,end,
+		               KernelDistance<RandomAccessIterator,KernelCallback>(callbacks.kernel),
+		               k,check_connectivity);
 	SparseWeightMatrix weight_matrix =
 		linear_weight_matrix(begin,end,neighbors,callbacks.kernel,eigenshift,traceshift);
 	return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
@@ -157,8 +159,10 @@ IMPLEMENTATION_OF(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 	DO_MEASURE_RUN("KLTSA");
 	STOP_IF_CANCELLED;
 
-	Neighbors neighbors = 
-		find_neighbors(neighbors_method,begin,end,callbacks.kernel,k,check_connectivity);
+	Neighbors neighbors =
+		find_neighbors(neighbors_method,begin,end,
+		               KernelDistance<RandomAccessIterator,KernelCallback>(callbacks.kernel),
+		               k,check_connectivity);
 	SparseWeightMatrix weight_matrix = 
 		tangent_weight_matrix(begin,end,neighbors,callbacks.kernel,target_dimension,eigenshift);
 	return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
@@ -248,8 +252,10 @@ IMPLEMENTATION_OF(ISOMAP)
 	DO_MEASURE_RUN("Isomap");
 	STOP_IF_CANCELLED;
 
-	Neighbors neighbors = 
-		find_neighbors(neighbors_method,begin,end,callbacks.distance,k,check_connectivity);
+	Neighbors neighbors =
+		find_neighbors(neighbors_method,begin,end,
+		               PlainDistance<RandomAccessIterator,DistanceCallback>(callbacks.distance),
+		               k,check_connectivity);
 	DenseSymmetricMatrix shortest_distances_matrix = 
 		compute_shortest_distances_matrix(begin,end,neighbors,callbacks.distance);
 	shortest_distances_matrix = shortest_distances_matrix.array().square();
@@ -277,8 +283,10 @@ IMPLEMENTATION_OF(LANDMARK_ISOMAP)
 	DO_MEASURE_RUN("Landmark Isomap");
 	STOP_IF_CANCELLED;
 
-	Neighbors neighbors = 
-		find_neighbors(neighbors_method,begin,end,callbacks.distance,k,check_connectivity);
+	Neighbors neighbors =
+		find_neighbors(neighbors_method,begin,end,
+		               PlainDistance<RandomAccessIterator,DistanceCallback>(callbacks.distance),
+		               k,check_connectivity);
 	Landmarks landmarks = 
 		select_landmarks_random(begin,end,ratio);
 	DenseMatrix distance_matrix = 
@@ -328,8 +336,10 @@ IMPLEMENTATION_OF(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 	DO_MEASURE_RUN("NPE");
 	STOP_IF_CANCELLED;
 
-	Neighbors neighbors = 
-		find_neighbors(neighbors_method,begin,end,callbacks.kernel,k,check_connectivity);
+	Neighbors neighbors =
+		find_neighbors(neighbors_method,begin,end,
+		               KernelDistance<RandomAccessIterator,KernelCallback>(callbacks.kernel),
+		               k,check_connectivity);
 	SparseWeightMatrix weight_matrix = 
 		linear_weight_matrix(begin,end,neighbors,callbacks.kernel,eigenshift,traceshift);
 	DenseSymmetricMatrixPair eig_matrices =
@@ -356,7 +366,9 @@ IMPLEMENTATION_OF(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 	STOP_IF_CANCELLED;
 
 	Neighbors neighbors =
-		find_neighbors(neighbors_method,begin,end,callbacks.kernel,k,check_connectivity);
+		find_neighbors(neighbors_method,begin,end,
+		               KernelDistance<RandomAccessIterator,KernelCallback>(callbacks.kernel),
+		               k,check_connectivity);
 	SparseWeightMatrix weight_matrix =
 		hessian_weight_matrix(begin,end,neighbors,callbacks.kernel,target_dimension);
 	return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
@@ -375,8 +387,10 @@ IMPLEMENTATION_OF(LAPLACIAN_EIGENMAPS)
 	DO_MEASURE_RUN("Laplacian Eigenmaps");
 	STOP_IF_CANCELLED;
 
-	Neighbors neighbors = 
-		find_neighbors(neighbors_method,begin,end,callbacks.distance,k,check_connectivity);
+	Neighbors neighbors =
+		find_neighbors(neighbors_method,begin,end,
+		               PlainDistance<RandomAccessIterator,DistanceCallback>(callbacks.distance),
+		               k,check_connectivity);
 	Laplacian laplacian = 
 		compute_laplacian(begin,end,neighbors,callbacks.distance,width);
 	return ReturnResult(generalized_eigen_embedding<SparseWeightMatrix,DenseDiagonalMatrix,SparseInverseMatrixOperation>(
@@ -396,8 +410,10 @@ IMPLEMENTATION_OF(LOCALITY_PRESERVING_PROJECTIONS)
 	DO_MEASURE_RUN("LPP");
 	STOP_IF_CANCELLED;
 
-	Neighbors neighbors = 
-		find_neighbors(neighbors_method,begin,end,callbacks.distance,k,check_connectivity);
+	Neighbors neighbors =
+		find_neighbors(neighbors_method,begin,end,
+		               PlainDistance<RandomAccessIterator,DistanceCallback>(callbacks.distance),
+		               k,check_connectivity);
 	Laplacian laplacian = 
 		compute_laplacian(begin,end,neighbors,callbacks.distance,width);
 	DenseSymmetricMatrixPair eigenproblem_matrices =
@@ -477,8 +493,10 @@ IMPLEMENTATION_OF(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 	DO_MEASURE_RUN("LLTSA");
 	STOP_IF_CANCELLED;
 
-	Neighbors neighbors = 
-		find_neighbors(neighbors_method,begin,end,callbacks.kernel,k,check_connectivity);
+	Neighbors neighbors =
+		find_neighbors(neighbors_method,begin,end,
+		               KernelDistance<RandomAccessIterator,KernelCallback>(callbacks.kernel),
+		               k,check_connectivity);
 	SparseWeightMatrix weight_matrix = 
 		tangent_weight_matrix(begin,end,neighbors,callbacks.kernel,target_dimension,eigenshift);
 	DenseSymmetricMatrixPair eig_matrices =
@@ -508,7 +526,10 @@ IMPLEMENTATION_OF(STOCHASTIC_PROXIMITY_EMBEDDING)
 	Neighbors neighbors;
 	if (!global_strategy)
 	{
-		neighbors = find_neighbors(neighbors_method,begin,end,callbacks.distance,k,check_connectivity);
+		Neighbors neighbors =
+			find_neighbors(neighbors_method,begin,end,
+			               PlainDistance<RandomAccessIterator,DistanceCallback>(callbacks.distance),
+			               k,check_connectivity);
 	}
 
 	DO_MEASURE_RUN("SPE");
@@ -529,7 +550,7 @@ IMPLEMENTATION_OF(PASS_THRU)
 	FeatureVectorCallback feature_vector_callback = callbacks.feature;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
-		feature_vector_callback(*iter,feature_vector);
+		feature_vector_callback.vector(*iter,feature_vector);
 		feature_matrix.col(iter-begin).array() = feature_vector;
 	}
 	return ReturnResult(feature_matrix.transpose(),tapkee::ProjectingFunction());
@@ -567,7 +588,7 @@ IMPLEMENTATION_OF(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING)
 	FeatureVectorCallback feature_vector_callback = callbacks.feature;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
-		feature_vector_callback(*iter,feature_vector);
+		feature_vector_callback.vector(*iter,feature_vector);
 		data.col(iter-begin).array() = feature_vector;
 	}
 
@@ -584,6 +605,8 @@ IMPLEMENTATION_OF(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING)
 
 #undef MINIMAL_K
 #undef MINIMAL_TD
+#undef KERNEL_DISTANCE
+#undef PLAIN_DISTANCE
 #undef NUM_VECTORS
 #undef DO_MEASURE_RUN
 #undef STOP_IF_CANCELLED

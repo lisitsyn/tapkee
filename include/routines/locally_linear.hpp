@@ -50,7 +50,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 			{
 				for (IndexType j=i; j<k; ++j)
 				{
-					ScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
+					ScalarType kij = callback.kernel(begin[current_neighbors[i]],begin[current_neighbors[j]]);
 					gram_matrix(i,j) = kij;
 					gram_matrix(j,i) = kij;
 				}
@@ -134,16 +134,17 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
 #pragma omp for nowait
 		for (index_iter=0; index_iter<static_cast<IndexType>(end-begin); index_iter++)
 		{
-			ScalarType kernel_value = callback(begin[index_iter],begin[index_iter]);
+			ScalarType kernel_value = callback.kernel(begin[index_iter],begin[index_iter]);
 			const LocalNeighbors& current_neighbors = neighbors[index_iter];
 			
 			for (IndexType i=0; i<k; ++i)
-				dots[i] = callback(begin[index_iter], begin[current_neighbors[i]]);
+				dots[i] = callback.kernel(begin[index_iter], begin[current_neighbors[i]]);
 
 			for (IndexType i=0; i<k; ++i)
 			{
 				for (IndexType j=i; j<k; ++j)
-					gram_matrix(i,j) = kernel_value - dots(i) - dots(j) + callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
+					gram_matrix(i,j) = kernel_value - dots(i) - dots(j) + 
+					                   callback.kernel(begin[current_neighbors[i]],begin[current_neighbors[j]]);
 			}
 			
 			ScalarType trace = gram_matrix.trace();
@@ -221,7 +222,7 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 			{
 				for (IndexType j=i; j<k; ++j)
 				{
-					ScalarType kij = callback(begin[current_neighbors[i]],begin[current_neighbors[j]]);
+					ScalarType kij = callback.kernel(begin[current_neighbors[i]],begin[current_neighbors[j]]);
 					gram_matrix(i,j) = kij;
 					gram_matrix(j,i) = kij;
 				}
@@ -313,7 +314,7 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 	//RESTRICT_ALLOC;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
-		feature_vector_callback(*iter,rank_update_vector_i);
+		feature_vector_callback.vector(*iter,rank_update_vector_i);
 		rhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i);
 	}
 
@@ -321,8 +322,8 @@ DenseSymmetricMatrixPair construct_neighborhood_preserving_eigenproblem(SparseWe
 	{
 		for (SparseWeightMatrix::InnerIterator it(W,i); it; ++it)
 		{
-			feature_vector_callback(begin[it.row()],rank_update_vector_i);
-			feature_vector_callback(begin[it.col()],rank_update_vector_j);
+			feature_vector_callback.vector(begin[it.row()],rank_update_vector_i);
+			feature_vector_callback.vector(begin[it.col()],rank_update_vector_j);
 			lhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i, rank_update_vector_j, it.value());
 		}
 	}
@@ -352,7 +353,7 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 	//RESTRICT_ALLOC;
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
-		feature_vector_callback(*iter,rank_update_vector_i);
+		feature_vector_callback.vector(*iter,rank_update_vector_i);
 		sum += rank_update_vector_i;
 		rhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i);
 	}
@@ -362,8 +363,8 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W,
 	{
 		for (SparseWeightMatrix::InnerIterator it(W,i); it; ++it)
 		{
-			feature_vector_callback(begin[it.row()],rank_update_vector_i);
-			feature_vector_callback(begin[it.col()],rank_update_vector_j);
+			feature_vector_callback.vector(begin[it.row()],rank_update_vector_i);
+			feature_vector_callback.vector(begin[it.col()],rank_update_vector_j);
 			lhs.selfadjointView<Eigen::Upper>().rankUpdate(rank_update_vector_i, rank_update_vector_j, it.value());
 		}
 	}

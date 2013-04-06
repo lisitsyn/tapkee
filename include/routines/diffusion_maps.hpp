@@ -53,7 +53,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 		{
 			for (j_index_iter=i_index_iter; j_index_iter<n_vectors; ++j_index_iter)
 			{
-				ScalarType k = callback(begin[i_index_iter],begin[j_index_iter]);
+				ScalarType k = callback.distance(begin[i_index_iter],begin[j_index_iter]);
 				ScalarType gk = exp(-(k*k)/width);
 				diffusion_matrix(i_index_iter,j_index_iter) = gk;
 				diffusion_matrix(j_index_iter,i_index_iter) = gk;

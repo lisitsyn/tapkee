@@ -15,7 +15,7 @@
 struct feature_vector_callback
 {
 	feature_vector_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline void operator()(tapkee::IndexType i, tapkee::DenseVector& vector) const
+	inline void vector(tapkee::IndexType i, tapkee::DenseVector& vector) const
 	{
 		vector = feature_matrix.col(i);
 	}
@@ -29,15 +29,12 @@ struct feature_vector_callback
 struct kernel_callback
 {
 	kernel_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline tapkee::ScalarType operator()(tapkee::IndexType a, tapkee::IndexType b) const
+	inline tapkee::ScalarType kernel(tapkee::IndexType a, tapkee::IndexType b) const
 	{
 		return feature_matrix.col(a).dot(feature_matrix.col(b));
 	}
 	const tapkee::DenseMatrix& feature_matrix;
 };
-// That's mandatory to specify that kernel_callback
-// is a kernel (and it is good to know that it is linear).
-TAPKEE_CALLBACK_IS_LINEAR_KERNEL(kernel_callback);
 
 // Distance function callback that provides
 // dissimilarity function values on vectors
@@ -46,14 +43,11 @@ TAPKEE_CALLBACK_IS_LINEAR_KERNEL(kernel_callback);
 struct distance_callback
 {
 	distance_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix) {};
-	inline tapkee::ScalarType operator()(tapkee::IndexType a, tapkee::IndexType b) const
+	inline tapkee::ScalarType distance(tapkee::IndexType a, tapkee::IndexType b) const
 	{
 		return (feature_matrix.col(a)-feature_matrix.col(b)).norm();
 	}
 	const tapkee::DenseMatrix& feature_matrix;
 };
-// That's mandatory to specify that distance_callback
-// is a distance
-TAPKEE_CALLBACK_IS_EUCLIDEAN_DISTANCE(distance_callback);
 
 #endif

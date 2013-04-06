@@ -37,7 +37,7 @@ callback; the Multidimensional Scaling algorithm requires only a distance callba
 vector access callback. Full set of callbacks (all three callbacks) makes possible to use all the implemented methods.
 
 Parameters map should contain all the required parameters as values with keys as 
-[TAPKEE\_PARAMETERS](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp#L61). If 
+[TAPKEE_PARAMETERS](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp#L61). If 
 some parameter is missed in the map the library throws an exception with information about missed parameter.
 You may check which parameters do you have to set in the documentation of parameters and methods or in 
 [implementations](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_methods.hpp)
@@ -63,12 +63,6 @@ Eigen3 (and only if) - you might need to let Tapkee know about that with the fol
 Please note that if you don't include Eigen3 in your project there is no need to define that variable -
 in this case Eigen3 will be included by Tapkee. This issue comes from the need of including the Eigen3 library
 only once when using some specific parameters (like debug and extensions).
-
-It is also required to identify your custom callback functors using the following macroses:
-
-`TAPKEE_CALLBACK_IS_KERNEL(your_kernel_callback)`
-
-`TAPKEE_CALLBACK_IS_DISTANCE(your_distance_callback)`
 
 If you are able to use less restrictive licenses (such as LGPLv3) you could define 
 the following variable:

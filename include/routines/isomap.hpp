@@ -113,7 +113,7 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 					if (s[w] == false)
 					{
 						// get distance from k to i through min_item
-						ScalarType dist = shortest_distances(k,min_item) + callback(begin[min_item],begin[w]);
+						ScalarType dist = shortest_distances(k,min_item) + callback.distance(begin[min_item],begin[w]);
 						// if distance can be relaxed
 						if (dist < shortest_distances(k,w))
 						{
@@ -231,7 +231,7 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 					if (s[w] == false)
 					{
 						// get distance from k to i through min_item
-						ScalarType dist = shortest_distances(k,min_item) + callback(begin[min_item],begin[w]);
+						ScalarType dist = shortest_distances(k,min_item) + callback.distance(begin[min_item],begin[w]);
 						// if distance can be relaxed
 						if (dist < shortest_distances(k,w))
 						{

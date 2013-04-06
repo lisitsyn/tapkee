@@ -6,9 +6,8 @@ using namespace tapkee;
 
 struct my_distance_callback
 {
-	ScalarType operator()(IndexType l, IndexType r) { return abs(l-r); } 
+	ScalarType distance(IndexType l, IndexType r) { return abs(l-r); } 
 }; 
-TAPKEE_CALLBACK_IS_DISTANCE(my_distance_callback);
 
 int main(int argc, const char** argv)
 {
