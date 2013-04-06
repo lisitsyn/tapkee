@@ -26,18 +26,18 @@ namespace tapkee
  *         case is @code Data = int @endcode).
  *
  * @tparam KernelCallback that defines 
- * @code ScalarType operator()(const Data&, const Data&) @endcode 
+ * @code ScalarType kernel(const Data&, const Data&) @endcode 
  * function of two iterators. This method should return value of Mercer kernel function 
  * between vectors/objects iterators pointing to. The callback should be marked as a kernel function using
  * @ref tapkee::TAPKEE_CALLBACK_IS_KERNEL macro (fails on compilation in other case).
  *
  * @tparam DistanceCallback that defines 
- * @code ScalarType operator()(const Data&, const Data&) @endcode 
+ * @code ScalarType distance(const Data&, const Data&) @endcode 
  * function of two iterators. The callback should be marked as a distance function using 
  * @ref tapkee::TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
  *
  * @tparam FeatureVectorCallback that defines 
- * @code void operator()(const Data&, DenseVector&) @endcode function
+ * @code void vector(const Data&, DenseVector&) @endcode function
  * used to access feature vector pointed by iterator. The callback should put the feature vector 
  * pointed by iterator to the second argument vector.
  *
@@ -48,7 +48,7 @@ namespace tapkee
  * @param begin begin iterator of data
  * @param end end iterator of data
  * @param kernel_callback the kernel callback implementing
- * @code ScalarType operator()(const Data&, const Data&) @endcode 
+ * @code ScalarType kernel(const Data&, const Data&) @endcode 
  *
  * Used by the following methods: 
  * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
@@ -59,7 +59,7 @@ namespace tapkee
  * - @ref tapkee::KERNEL_PCA
  *
  * @param distance_callback the distance callback implementing
- * @code ScalarType operator()(const Data&, const Data&) @endcode 
+ * @code ScalarType distance(const Data&, const Data&) @endcode 
  *
  * Used by the following methods: 
  * - @ref tapkee::LAPLACIAN_EIGENMAPS
@@ -73,7 +73,7 @@ namespace tapkee
  * - @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING
  *
  * @param feature_vector_callback the feature vector callback implementing
- * @code void operator()(const Data&, DenseVector&) @endcode
+ * @code void vector(const Data&, DenseVector&) @endcode
  *
  * Used by the following methods:
  * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
