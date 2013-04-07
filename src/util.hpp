@@ -58,134 +58,135 @@ tapkee::DenseMatrix read_data(ifstream& ifs)
 	return fm;
 }
 
-bool method_needs_kernel(tapkee::TAPKEE_METHOD method) 
+bool method_needs_kernel(tapkee::MethodId method) 
 {
 	switch (method)
 	{
 #define IF_NEEDS_KERNEL(X) case X : return tapkee::MethodTraits<X>::needs_kernel(); break;
-		IF_NEEDS_KERNEL(tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT);
-		IF_NEEDS_KERNEL(tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING);
-		IF_NEEDS_KERNEL(tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING);
-		IF_NEEDS_KERNEL(tapkee::MULTIDIMENSIONAL_SCALING);
-		IF_NEEDS_KERNEL(tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING);
-		IF_NEEDS_KERNEL(tapkee::ISOMAP);
-		IF_NEEDS_KERNEL(tapkee::LANDMARK_ISOMAP);
-		IF_NEEDS_KERNEL(tapkee::DIFFUSION_MAP);
-		IF_NEEDS_KERNEL(tapkee::KERNEL_PCA);
+		IF_NEEDS_KERNEL(tapkee::KernelLocalTangentSpaceAlignment);
+		IF_NEEDS_KERNEL(tapkee::KernelLocallyLinearEmbedding);
+		IF_NEEDS_KERNEL(tapkee::HessianLocallyLinearEmbedding);
+		IF_NEEDS_KERNEL(tapkee::MultidimensionalScaling);
+		IF_NEEDS_KERNEL(tapkee::LandmarkMultidimensionalScaling);
+		IF_NEEDS_KERNEL(tapkee::Isomap);
+		IF_NEEDS_KERNEL(tapkee::LandmarkIsomap);
+		IF_NEEDS_KERNEL(tapkee::DiffusionMap);
+		IF_NEEDS_KERNEL(tapkee::KernelPCA);
 		IF_NEEDS_KERNEL(tapkee::PCA);
-		IF_NEEDS_KERNEL(tapkee::RANDOM_PROJECTION);
-		IF_NEEDS_KERNEL(tapkee::LAPLACIAN_EIGENMAPS);
-		IF_NEEDS_KERNEL(tapkee::LOCALITY_PRESERVING_PROJECTIONS);
-		IF_NEEDS_KERNEL(tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING);
-		IF_NEEDS_KERNEL(tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT);
-		IF_NEEDS_KERNEL(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
-		IF_NEEDS_KERNEL(tapkee::PASS_THRU);
-		IF_NEEDS_KERNEL(tapkee::FACTOR_ANALYSIS);
-		IF_NEEDS_KERNEL(tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING);
-		IF_NEEDS_KERNEL(tapkee::UNKNOWN_METHOD);
+		IF_NEEDS_KERNEL(tapkee::RandomProjection);
+		IF_NEEDS_KERNEL(tapkee::LaplacianEigenmaps);
+		IF_NEEDS_KERNEL(tapkee::LocalityPreservingProjections);
+		IF_NEEDS_KERNEL(tapkee::NeighborhoodPreservingEmbedding);
+		IF_NEEDS_KERNEL(tapkee::LinearLocalTangentSpaceAlignment);
+		IF_NEEDS_KERNEL(tapkee::StochasticProximityEmbedding);
+		IF_NEEDS_KERNEL(tapkee::PassThru);
+		IF_NEEDS_KERNEL(tapkee::FactorAnalysis);
+		IF_NEEDS_KERNEL(tapkee::tDistributedStochasticNeighborEmbedding);
 #undef IF_NEEDS_KERNEL
 	}
 	return false;
 }
 
-bool method_needs_distance(tapkee::TAPKEE_METHOD method)
+bool method_needs_distance(tapkee::MethodId method)
 {
 	switch (method)
 	{
 #define IF_NEEDS_DISTANCE(X) case X : return tapkee::MethodTraits<X>::needs_distance(); break;
-		IF_NEEDS_DISTANCE(tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT);
-		IF_NEEDS_DISTANCE(tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING);
-		IF_NEEDS_DISTANCE(tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING);
-		IF_NEEDS_DISTANCE(tapkee::MULTIDIMENSIONAL_SCALING);
-		IF_NEEDS_DISTANCE(tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING);
-		IF_NEEDS_DISTANCE(tapkee::ISOMAP);
-		IF_NEEDS_DISTANCE(tapkee::LANDMARK_ISOMAP);
-		IF_NEEDS_DISTANCE(tapkee::DIFFUSION_MAP);
-		IF_NEEDS_DISTANCE(tapkee::KERNEL_PCA);
+		IF_NEEDS_DISTANCE(tapkee::KernelLocalTangentSpaceAlignment);
+		IF_NEEDS_DISTANCE(tapkee::KernelLocallyLinearEmbedding);
+		IF_NEEDS_DISTANCE(tapkee::HessianLocallyLinearEmbedding);
+		IF_NEEDS_DISTANCE(tapkee::MultidimensionalScaling);
+		IF_NEEDS_DISTANCE(tapkee::LandmarkMultidimensionalScaling);
+		IF_NEEDS_DISTANCE(tapkee::Isomap);
+		IF_NEEDS_DISTANCE(tapkee::LandmarkIsomap);
+		IF_NEEDS_DISTANCE(tapkee::DiffusionMap);
+		IF_NEEDS_DISTANCE(tapkee::KernelPCA);
 		IF_NEEDS_DISTANCE(tapkee::PCA);
-		IF_NEEDS_DISTANCE(tapkee::RANDOM_PROJECTION);
-		IF_NEEDS_DISTANCE(tapkee::LAPLACIAN_EIGENMAPS);
-		IF_NEEDS_DISTANCE(tapkee::LOCALITY_PRESERVING_PROJECTIONS);
-		IF_NEEDS_DISTANCE(tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING);
-		IF_NEEDS_DISTANCE(tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT);
-		IF_NEEDS_DISTANCE(tapkee::STOCHASTIC_PROXIMITY_EMBEDDING);
-		IF_NEEDS_DISTANCE(tapkee::PASS_THRU);
-		IF_NEEDS_DISTANCE(tapkee::FACTOR_ANALYSIS);
-		IF_NEEDS_DISTANCE(tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING);
-		IF_NEEDS_DISTANCE(tapkee::UNKNOWN_METHOD);
+		IF_NEEDS_DISTANCE(tapkee::RandomProjection);
+		IF_NEEDS_DISTANCE(tapkee::LaplacianEigenmaps);
+		IF_NEEDS_DISTANCE(tapkee::LocalityPreservingProjections);
+		IF_NEEDS_DISTANCE(tapkee::NeighborhoodPreservingEmbedding);
+		IF_NEEDS_DISTANCE(tapkee::LinearLocalTangentSpaceAlignment);
+		IF_NEEDS_DISTANCE(tapkee::StochasticProximityEmbedding);
+		IF_NEEDS_DISTANCE(tapkee::PassThru);
+		IF_NEEDS_DISTANCE(tapkee::FactorAnalysis);
+		IF_NEEDS_DISTANCE(tapkee::tDistributedStochasticNeighborEmbedding);
 #undef IF_NEEDS_DISTANCE
 	}
 	return false;
 }
 
-tapkee::TAPKEE_METHOD parse_reduction_method(const char* str)
+tapkee::MethodId parse_reduction_method(const char* str)
 {
 	if (!strcmp(str,"local_tangent_space_alignment") || !strcmp(str,"ltsa"))
-		return tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
+		return tapkee::KernelLocalTangentSpaceAlignment;
 	if (!strcmp(str,"locally_linear_embedding") || !strcmp(str,"lle"))
-		return tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING;
+		return tapkee::KernelLocallyLinearEmbedding;
 	if (!strcmp(str,"hessian_locally_linear_embedding") || !strcmp(str,"hlle"))
-		return tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING;
+		return tapkee::HessianLocallyLinearEmbedding;
 	if (!strcmp(str,"multidimensional_scaling") || !strcmp(str,"mds"))
-		return tapkee::MULTIDIMENSIONAL_SCALING;
+		return tapkee::MultidimensionalScaling;
 	if (!strcmp(str,"landmark_multidimensional_scaling") || !strcmp(str,"l-mds"))
-		return tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING;
+		return tapkee::LandmarkMultidimensionalScaling;
 	if (!strcmp(str,"isomap"))
-		return tapkee::ISOMAP;
+		return tapkee::Isomap;
 	if (!strcmp(str,"landmark_isomap") || !strcmp(str,"l-isomap"))
-		return tapkee::LANDMARK_ISOMAP;
+		return tapkee::LandmarkIsomap;
 	if (!strcmp(str,"diffusion_map") || !strcmp(str,"dm"))
-		return tapkee::DIFFUSION_MAP;
+		return tapkee::DiffusionMap;
 	if (!strcmp(str,"kernel_pca") || !strcmp(str,"kpca"))
-		return tapkee::KERNEL_PCA;
+		return tapkee::KernelPCA;
 	if (!strcmp(str,"pca"))
 		return tapkee::PCA;
 	if (!strcmp(str,"random_projection") || !strcmp(str,"ra"))
-		return tapkee::RANDOM_PROJECTION;
+		return tapkee::RandomProjection;
 	if (!strcmp(str,"laplacian_eigenmaps") || !strcmp(str,"la"))
-		return tapkee::LAPLACIAN_EIGENMAPS;
+		return tapkee::LaplacianEigenmaps;
 	if (!strcmp(str,"locality_preserving_projections") || !strcmp(str,"lpp"))
-		return tapkee::LOCALITY_PRESERVING_PROJECTIONS;
+		return tapkee::LocalityPreservingProjections;
 	if (!strcmp(str,"neighborhood_preserving_embedding") || !strcmp(str,"npe"))
-		return tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING;
+		return tapkee::NeighborhoodPreservingEmbedding;
 	if (!strcmp(str,"linear_local_tangent_space_alignment") || !strcmp(str,"lltsa"))
-		return tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT;
+		return tapkee::LinearLocalTangentSpaceAlignment;
 	if (!strcmp(str,"stochastic_proximity_embedding") || !strcmp(str,"spe"))
-		return tapkee::STOCHASTIC_PROXIMITY_EMBEDDING;
+		return tapkee::StochasticProximityEmbedding;
 	if (!strcmp(str,"passthru"))
-		return tapkee::PASS_THRU;
+		return tapkee::PassThru;
 	if (!strcmp(str,"factor_analysis") || !strcmp(str,"fa"))
-		return tapkee::FACTOR_ANALYSIS;
+		return tapkee::FactorAnalysis;
 	if (!strcmp(str,"t-stochastic_neighbor_embedding") || !strcmp(str,"t-sne"))
-		return tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING;
-
-	return tapkee::UNKNOWN_METHOD;
+		return tapkee::tDistributedStochasticNeighborEmbedding;
+	
+	throw std::exception();
+	return tapkee::PassThru;
 }
 
-tapkee::TAPKEE_NEIGHBORS_METHOD parse_neighbors_method(const char* str)
+tapkee::NeighborsMethodId parse_neighbors_method(const char* str)
 {
 	if (!strcmp(str,"brute"))
-		return tapkee::BRUTE_FORCE;
+		return tapkee::Brute;
 #ifdef TAPKEE_USE_LGPL_COVERTREE
 	if (!strcmp(str,"covertree"))
-		return tapkee::COVER_TREE;
+		return tapkee::CoverTree;
 #endif
 
-	return tapkee::UNKNOWN_NEIGHBORS_METHOD;
+	throw std::exception();
+	return tapkee::Brute;
 }
 
-tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD parse_eigen_method(const char* str)
+tapkee::EigenEmbeddingMethodId parse_eigen_method(const char* str)
 {
 #ifdef TAPKEE_WITH_ARPACK
 	if (!strcmp(str,"arpack"))
-		return tapkee::ARPACK;
+		return tapkee::Arpack;
 #endif
 	if (!strcmp(str,"randomized"))
-		return tapkee::RANDOMIZED;
+		return tapkee::Randomized;
 	if (!strcmp(str,"dense"))
-		return tapkee::EIGEN_DENSE_SELFADJOINT_SOLVER;
-
-	return tapkee::UNKNOWN_EIGEN_METHOD;
+		return tapkee::Dense;
+	
+	throw std::exception();
+	return tapkee::Dense;
 }
 
 template <class PairwiseCallback>

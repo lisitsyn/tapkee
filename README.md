@@ -37,7 +37,7 @@ callback; the Multidimensional Scaling algorithm requires only a distance callba
 vector access callback. Full set of callbacks (all three callbacks) makes possible to use all the implemented methods.
 
 Parameters map should contain all the required parameters as values with keys as 
-[TAPKEE_PARAMETERS](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp#L61). If 
+[`TAPKEE_PARAMETERS`](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp#L61). If 
 some parameter is missed in the map the library throws an exception with information about missed parameter.
 You may check which parameters do you have to set in the documentation of parameters and methods or in 
 [implementations](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_methods.hpp)
@@ -46,11 +46,11 @@ where parameters are obtained using the `PARAMETER` macro.
 For example to run the Locally Linear Embedding algorithm you might need to populate the parameters map with the following code:
 
 	tapkee::ParametersMap parameters;
-	parameters[tapkee::REDUCTION_METHOD] = LOCALLY_LINEAR_EMBEDDING;
-	parameters[tapkee::NEIGHBORS_METHOD] = COVER_TREE;
-	parameters[tapkee::EIGEN_EMBEDDING_METHOD] = ARPACK;
-	parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(20);
+	parameters[tapkee::ReductionMethod] = LocallyLinearEmbedding;
+	parameters[tapkee::NeighborsMethod] = CoverTree;
+	parameters[tapkee::EigenEmbeddingMethod] = Arpack;
+	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
+	parameters[tapkee::NumberOfNeighobors] = static_cast<tapkee::IndexType>(20);
 
 Integration issues
 ------------------

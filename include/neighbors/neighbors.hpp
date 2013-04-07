@@ -26,18 +26,6 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-std::string get_neighbors_method_name(TAPKEE_NEIGHBORS_METHOD m)
-{
-	switch (m)
-	{
-		case BRUTE_FORCE: return "Brute force";
-#ifdef TAPKEE_USE_LGPL_COVERTREE
-		case COVER_TREE: return "Cover tree";
-#endif
-		default: return "Unknown neighbors finding method (yes it is a bug)";
-	}
-}
-
 template <class DistanceRecord>
 struct distances_comparator
 {
@@ -160,7 +148,7 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 }
 
 template <class RandomAccessIterator, class Callback>
-Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessIterator& begin, 
+Neighbors find_neighbors(NeighborsMethodId method, const RandomAccessIterator& begin, 
                          const RandomAccessIterator& end, const Callback& callback, 
                          IndexType k, bool check_connectivity)
 {
@@ -170,20 +158,19 @@ Neighbors find_neighbors(TAPKEE_NEIGHBORS_METHOD method, const RandomAccessItera
 		                                             "Using greatest possible number of neighbors.");
 		k = static_cast<IndexType>(end-begin-1);
 	}
-	LoggingSingleton::instance().message_info("Using " + get_neighbors_method_name(method) + " neighbors computation method.");
+	LoggingSingleton::instance().message_info("Using the " + get_neighbors_method_name(method) + " neighbors computation method.");
 	Neighbors neighbors;
 	switch (method)
 	{
-		case BRUTE_FORCE: neighbors = find_neighbors_bruteforce_impl(begin,end,callback,k); break;
+		case Brute: neighbors = find_neighbors_bruteforce_impl(begin,end,callback,k); break;
 #ifdef TAPKEE_USE_LGPL_COVERTREE
-		case COVER_TREE: neighbors = find_neighbors_covertree_impl(begin,end,callback,k); break;
+		case CoverTree: neighbors = find_neighbors_covertree_impl(begin,end,callback,k); break;
 #endif
 		default: break;
 	}
 
 	if (check_connectivity)
 	{
-		timed_context connectivity("Checking connectivity");
 		if (!is_connected(begin,end,neighbors))
 			LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
 	}

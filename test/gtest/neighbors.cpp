@@ -24,7 +24,7 @@ TEST(Neighbors,BruteDistanceNeighbors)
 
 	float_distance_callback fdc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::BRUTE_FORCE, floats.begin(), floats.end(), 
+		tapkee::tapkee_internal::find_neighbors(tapkee::Brute, floats.begin(), floats.end(), 
 				tapkee::tapkee_internal::PlainDistance<Floats::iterator,float_distance_callback>(fdc), k, true);
 
 	for (int i=0;i<N;i++)
@@ -60,7 +60,7 @@ TEST(Neighbors,CoverTreeDistanceNeighbors)
 
 	float_distance_callback fdc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::COVER_TREE, floats.begin(), floats.end(),
+		tapkee::tapkee_internal::find_neighbors(tapkee::CoverTree, floats.begin(), floats.end(),
 				tapkee::tapkee_internal::PlainDistance<Floats::iterator,float_distance_callback>(fdc), k, true);
 
 	for (int i=0;i<N;i++)
@@ -97,7 +97,7 @@ TEST(Neighbors,BruteKernelNeighbors)
 
 	float_kernel_callback fkc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::BRUTE_FORCE, floats.begin(), floats.end(),
+		tapkee::tapkee_internal::find_neighbors(tapkee::Brute, floats.begin(), floats.end(),
 				tapkee::tapkee_internal::KernelDistance<Floats::iterator,float_kernel_callback>(fkc), k, true);
 
 	for (int i=0;i<N;i++)
@@ -133,7 +133,7 @@ TEST(Neighbors,CoverTreeKernelNeighbors)
 
 	float_kernel_callback fkc;
 	tapkee::tapkee_internal::Neighbors neighbors = 
-		tapkee::tapkee_internal::find_neighbors(tapkee::COVER_TREE, floats.begin(), floats.end(),
+		tapkee::tapkee_internal::find_neighbors(tapkee::CoverTree, floats.begin(), floats.end(),
 				tapkee::tapkee_internal::KernelDistance<Floats::iterator,float_kernel_callback>(fkc), k, true);
 
 	for (int i=0;i<N;i++)

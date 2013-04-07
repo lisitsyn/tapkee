@@ -211,6 +211,11 @@ public:
         return *r;
     }
 
+    template<typename T>
+    inline operator T() {
+        return cast<T>();
+    }
+
     /// Returns true if the any contains no value. 
     bool empty() const {
         return policy == anyimpl::get_policy<anyimpl::empty_any>();

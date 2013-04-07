@@ -3,8 +3,8 @@
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
 
-#ifndef TAPKEE_ISOMAP_H_
-#define TAPKEE_ISOMAP_H_
+#ifndef TAPKEE_Isomap_H_
+#define TAPKEE_Isomap_H_
 
 /* Tapkee includes */
 #include <tapkee_defines.hpp>

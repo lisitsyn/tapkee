@@ -13,8 +13,8 @@ TEST(Interface, NoDataPassThru)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
-	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(1);
+	params[tapkee::ReductionMethod] = tapkee::PassThru;
+	params[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(1);
 
 	tapkee::ReturnResult result;
 	// should produce no error
@@ -35,9 +35,9 @@ TEST(Interface, WrongParameterTypePassThru)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
+	params[tapkee::ReductionMethod] = tapkee::PassThru;
 	// here is the error (should be static_cast<tapkee::IndexType>(1))
-	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::ScalarType>(1.0);
+	params[tapkee::CurrentDimension] = static_cast<tapkee::ScalarType>(1.0);
 
 	tapkee::ReturnResult result;
 	// fails with wrong parameter type as '1.0' is not of tapkee::IndexType
@@ -52,9 +52,9 @@ TEST(Interface, WrongParameterValuePassThru)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
+	params[tapkee::ReductionMethod] = tapkee::PassThru;
 	// here is the error (should be positive)
-	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(-1);
+	params[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(-1);
 
 	tapkee::ReturnResult result;
 	// fails with wrong parameter type as '-1' is not a valid value.
@@ -74,9 +74,9 @@ TEST(Interface, CancellationPassThru)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
-	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(1);
-	params[tapkee::CANCEL_FUNCTION] = static_cast<bool (*)()>(always_cancel);
+	params[tapkee::ReductionMethod] = tapkee::PassThru;
+	params[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(1);
+	params[tapkee::CancelFunction] = static_cast<bool (*)()>(always_cancel);
 
 	tapkee::ReturnResult result;
 	// fails with wrong parameter type as '-1' is not a valid value.
@@ -105,7 +105,7 @@ TEST(Interface, NoCurrentDimensionSetFailPassThru)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::PASS_THRU;
+	params[tapkee::ReductionMethod] = tapkee::PassThru;
 	// no current dimension set which is required
 
 	tapkee::ReturnResult result;
@@ -120,8 +120,8 @@ TEST(Interface, WrongMethodParameterType)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = "diamonds are forever";
-	params[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(1);
+	params[tapkee::ReductionMethod] = "diamonds are forever";
+	params[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(1);
 
 	tapkee::ReturnResult result;
 	// fails with wrong parameter type as '1.0' is not of tapkee::IndexType
@@ -138,12 +138,12 @@ TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 	float_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::LAPLACIAN_EIGENMAPS;
-	params[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee::RANDOMIZED;
-	params[tapkee::NEIGHBORS_METHOD] = tapkee::BRUTE_FORCE;
-	params[tapkee::GAUSSIAN_KERNEL_WIDTH] = static_cast<tapkee::ScalarType>(1.0);
-	params[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(1); 
-	params[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(5);
+	params[tapkee::ReductionMethod] = tapkee::LaplacianEigenmaps;
+	params[tapkee::EigenEmbeddingMethod] = tapkee::Randomized;
+	params[tapkee::NeighborsMethod] = tapkee::Brute;
+	params[tapkee::GaussianKernelWidth] = static_cast<tapkee::ScalarType>(1.0);
+	params[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(1); 
+	params[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(5);
 
 	tapkee::ReturnResult result;
 	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::unsupported_method_error);
@@ -159,9 +159,9 @@ TEST(Interface, EigenDecompositionFailMDS)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::MULTIDIMENSIONAL_SCALING;
-	params[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee::RANDOMIZED;
-	params[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(3); 
+	params[tapkee::ReductionMethod] = tapkee::MultidimensionalScaling;
+	params[tapkee::EigenEmbeddingMethod] = tapkee::Randomized;
+	params[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(3); 
 
 	tapkee::ReturnResult result;
 	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,params), tapkee::eigendecomposition_error);
@@ -177,9 +177,9 @@ TEST(Interface, NotEnoughMemoryMDS)
 	dummy_distance_callback dcb;
 	dummy_feature_callback fcb;
 	tapkee::ParametersMap params;
-	params[tapkee::REDUCTION_METHOD] = tapkee::MULTIDIMENSIONAL_SCALING;
-	params[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee::EIGEN_DENSE_SELFADJOINT_SOLVER;
-	params[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(1); 
+	params[tapkee::ReductionMethod] = tapkee::MultidimensionalScaling;
+	params[tapkee::EigenEmbeddingMethod] = tapkee::Dense;
+	params[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(1); 
 
 	tapkee::ReturnResult result;
 	// tries to form 10000000 x 10000000 matrix (won't work on any machine in 2013)

@@ -62,7 +62,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 #ifdef TAPKEE_WITH_ARPACK
 			if (partial_eigendecomposer)
 			{
-				G.rightCols(target_dimension).noalias() = eigen_embedding<DenseMatrix,DenseMatrixOperation>(ARPACK,gram_matrix,target_dimension,0).first;
+				G.rightCols(target_dimension).noalias() = eigen_embedding<DenseMatrix,DenseMatrixOperation>(Arpack,gram_matrix,target_dimension,0).first;
 			}
 			else
 #endif

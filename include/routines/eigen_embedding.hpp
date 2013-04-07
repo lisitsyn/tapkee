@@ -27,19 +27,6 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-string get_eigen_embedding_name(TAPKEE_EIGEN_EMBEDDING_METHOD m)
-{
-	switch (m)
-	{
-#ifdef TAPKEE_WITH_ARPACK
-		case ARPACK: return "ARPACK library";
-#endif
-		case RANDOMIZED: return "randomized (redsvd)";
-		case EIGEN_DENSE_SELFADJOINT_SOLVER: return "dense (Eigen3)";
-		default: return "Unknown eigendecomposition method (yes it is a bug)";
-	}
-}
-
 //! Templated implementation of eigendecomposition-based embedding. 
 template <class MatrixType, class MatrixOperationType, int IMPLEMENTATION> 
 struct eigen_embedding_impl
@@ -55,7 +42,7 @@ struct eigen_embedding_impl
 #ifdef TAPKEE_WITH_ARPACK
 //! ARPACK implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixOperationType> 
-struct eigen_embedding_impl<MatrixType, MatrixOperationType, ARPACK>
+struct eigen_embedding_impl<MatrixType, MatrixOperationType, Arpack>
 {
 	EmbeddingResult embed(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 	{
@@ -83,7 +70,7 @@ struct eigen_embedding_impl<MatrixType, MatrixOperationType, ARPACK>
 
 //! Eigen library dense implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixOperationType> 
-struct eigen_embedding_impl<MatrixType, MatrixOperationType, EIGEN_DENSE_SELFADJOINT_SOLVER>
+struct eigen_embedding_impl<MatrixType, MatrixOperationType, Dense>
 {
 	EmbeddingResult embed(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 	{
@@ -116,7 +103,7 @@ struct eigen_embedding_impl<MatrixType, MatrixOperationType, EIGEN_DENSE_SELFADJ
 
 //! Randomized redsvd-like implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixOperationType> 
-struct eigen_embedding_impl<MatrixType, MatrixOperationType, RANDOMIZED>
+struct eigen_embedding_impl<MatrixType, MatrixOperationType, Randomized>
 {
 	EmbeddingResult embed(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 	{
@@ -216,24 +203,23 @@ struct eigen_embedding_impl<MatrixType, MatrixOperationType, RANDOMIZED>
 //! @param skip number of eigenvectors to skip (from either smallest or largest side)
 //!
 template <class MatrixType, class MatrixOperationType>
-EmbeddingResult eigen_embedding(TAPKEE_EIGEN_EMBEDDING_METHOD method, const MatrixType& m, 
+EmbeddingResult eigen_embedding(EigenEmbeddingMethodId method, const MatrixType& m, 
                                 IndexType target_dimension, unsigned int skip)
 {
-	LoggingSingleton::instance().message_info("Using " + get_eigen_embedding_name(method) +
-			" eigendecomposition.");
+	LoggingSingleton::instance().message_info("Using the " + get_eigenembedding_method_name(method) + " eigendecomposition method.");
 	switch (method)
 	{
 #ifdef TAPKEE_WITH_ARPACK
-		case ARPACK: 
+		case Arpack: 
 			return eigen_embedding_impl<MatrixType, MatrixOperationType, 
-				ARPACK>().embed(m, target_dimension, skip);
+				Arpack>().embed(m, target_dimension, skip);
 #endif
-		case RANDOMIZED: 
+		case Randomized: 
 			return eigen_embedding_impl<MatrixType, MatrixOperationType,
-				RANDOMIZED>().embed(m, target_dimension, skip);
-		case EIGEN_DENSE_SELFADJOINT_SOLVER:
+				Randomized>().embed(m, target_dimension, skip);
+		case Dense:
 			return eigen_embedding_impl<MatrixType, MatrixOperationType, 
-				EIGEN_DENSE_SELFADJOINT_SOLVER>().embed(m, target_dimension, skip);
+				Dense>().embed(m, target_dimension, skip);
 		default: break;
 	}
 	return EmbeddingResult();

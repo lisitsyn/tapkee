@@ -17,7 +17,7 @@ TEST(EigenEmbedding, EigenDenseLargestEigenvector)
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
 		tapkee::tapkee_internal::eigen_embedding<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
-		(tapkee::EIGEN_DENSE_SELFADJOINT_SOLVER, mat, 1, 0);
+		(tapkee::Dense, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
 	// eigenvalue is 2
@@ -48,7 +48,7 @@ TEST(EigenEmbedding, EigenSparseSmallestEigenvector)
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
 		tapkee::tapkee_internal::eigen_embedding<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
-		(tapkee::EIGEN_DENSE_SELFADJOINT_SOLVER, mat, 1, 0);
+		(tapkee::Dense, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
 	// smallest eigenvalue is 1
@@ -66,7 +66,7 @@ TEST(EigenEmbedding, ArpackDenseLargestEigenvector)
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
 		tapkee::tapkee_internal::eigen_embedding<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
-		(tapkee::ARPACK, mat, 1, 0);
+		(tapkee::Arpack, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
 	// eigenvalue is 2
@@ -97,7 +97,7 @@ TEST(EigenEmbedding, ArpackSparseSmallestEigenvector)
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
 		tapkee::tapkee_internal::eigen_embedding<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
-		(tapkee::ARPACK, mat, 1, 0);
+		(tapkee::Arpack, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
 	// smallest eigenvalue is 1
@@ -115,7 +115,7 @@ TEST(EigenEmbedding, RandomizedDenseLargestEigenvector)
 
 	tapkee::tapkee_internal::EmbeddingResult result = 
 		tapkee::tapkee_internal::eigen_embedding<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
-		(tapkee::RANDOMIZED, mat, 1, 0);
+		(tapkee::Randomized, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
 	// eigenvalue is 2

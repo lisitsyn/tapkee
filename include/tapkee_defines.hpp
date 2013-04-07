@@ -58,7 +58,7 @@ namespace tapkee
 {
 
 	//! Parameters that are used by the library
-	enum TAPKEE_PARAMETERS
+	enum ParameterKey
 	{
 		/** The key of the parameter map to indicate dimension reduction method that
 		 * is going to be used.
@@ -67,28 +67,28 @@ namespace tapkee
 		 * 
 		 * The corresponding value should be of type @ref tapkee::TAPKEE_METHOD. 
 		 */
-		REDUCTION_METHOD,
+		ReductionMethod,
 		/** The key of the parameter map to store number of neighbors.
 		 *
 		 * Should be set for all local methods such as:
 		 * 
-		 * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-		 * - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::LAPLACIAN_EIGENMAPS
-		 * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
-		 * - @ref tapkee::ISOMAP
-		 * - @ref tapkee::LANDMARK_ISOMAP
-		 * - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING (with local strategy, i.e. 
-		 *        when @ref tapkee::SPE_GLOBAL_STRATEGY is set to false)
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
+		 *        when @ref tapkee::SpeGlobalStrategy is set to false)
 		 *
 		 * The corresponding value should be of type @ref tapkee::IndexType, 
 		 * greater than @ref MINIMAL_K (3) and less than 
 		 * total number of vectors. 
 		 */
-		NUMBER_OF_NEIGHBORS,
+		NumberOfNeighbors,
 		/** The key of the parameter map to store target dimension.
 		 *
 		 * It should be set as it is used by all methods. By default it is 
@@ -100,125 +100,125 @@ namespace tapkee
 		 * minimum of total number of vectors and 
 		 * current dimension. 
 		 */
-		TARGET_DIMENSION,
+		TargetDimension,
 		/** The key of the parameter map to store current dimension.
 		 *
 		 * Should be set for the following methods:
 		 *
-		 *  - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-		 *  - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 *  - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
+		 *  - @ref tapkee::NeighborhoodPreservingEmbedding
+		 *  - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 *  - @ref tapkee::LocalityPreservingProjections
 		 *  - @ref tapkee::PCA
-		 *  - @ref tapkee::RANDOM_PROJECTION
-		 *  - @ref tapkee::PASS_THRU
-		 *  - @ref tapkee::FACTOR_ANALYSIS
+		 *  - @ref tapkee::RandomProjection
+		 *  - @ref tapkee::PassThru
+		 *  - @ref tapkee::FactorAnalysis
 		 * 
 		 * The corresponding value should have type @ref tapkee::IndexType and
 		 * be greater than 1. 
 		 */
-		CURRENT_DIMENSION,
+		CurrentDimension,
 		/** The key of the parameter map to indicate eigendecomposition
 		 * method that is going to be used.
 		 * 
 		 * Should be set for the following eigendecomposition-based methods:
 		 *
-		 * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-		 * - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::LAPLACIAN_EIGENMAPS
-		 * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
-		 * - @ref tapkee::DIFFUSION_MAP
-		 * - @ref tapkee::ISOMAP
-		 * - @ref tapkee::LANDMARK_ISOMAP
-		 * - @ref tapkee::MULTIDIMENSIONAL_SCALING
-		 * - @ref tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING
-		 * - @ref tapkee::KERNEL_PCA
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::DiffusionMap
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::MultidimensionalScaling
+		 * - @ref tapkee::LandmarkMultidimensionalScaling
+		 * - @ref tapkee::KernelPCA
 		 * - @ref tapkee::PCA
 		 *
 		 * By default it is set to @ref tapkee::ARPACK if available.
 		 *
 		 * The corresponding value should have type 
-		 * @ref tapkee::TAPKEE_EIGEN_EMBEDDING_METHOD. 
+		 * @ref tapkee::EigenEmbeddingMethodId. 
 		 */
-		EIGEN_EMBEDDING_METHOD,
+		EigenEmbeddingMethod,
 		/** The key of the parameter map to indicate neighbors
 		 * finding method that is going to be used.
 		 * 
 		 * Should be set for the following local methods:
 		 * 
-		 * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-		 * - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::LAPLACIAN_EIGENMAPS
-		 * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
-		 * - @ref tapkee::ISOMAP
-		 * - @ref tapkee::LANDMARK_ISOMAP
-		 * - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING (with local strategy, i.e. 
-		 *        when @ref tapkee::SPE_GLOBAL_STRATEGY is set to false)
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
+		 *        when @ref tapkee::SpeGlobalStrategy is set to false)
 		 *
 		 * By default it is set to @ref tapkee::COVERTREE if available.
 		 *
 		 * The corresponding value should have 
-		 * type @ref tapkee::TAPKEE_NEIGHBORS_METHOD.
+		 * type @ref tapkee::NeighborsMethodId.
 		 */
-		NEIGHBORS_METHOD,
+		NeighborsMethod,
 		/** The key of the parameter map to store number of
 		 * 'timesteps' that should be made by diffusion map model.
 		 * 
-		 * Should be set for @ref tapkee::DIFFUSION_MAP only.
+		 * Should be set for @ref tapkee::DiffusionMap only.
 		 * 
 		 * The corresponding value should have type @ref tapkee::IndexType.
 		 */
-		DIFFUSION_MAP_TIMESTEPS,
+		DiffusionMapTimesteps,
 		/** The key of the parameter map to store width of
 		 * the gaussian kernel, that is used by the 
 		 * following methods:
 		 *
-		 * - @ref tapkee::LAPLACIAN_EIGENMAPS
-		 * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
-		 * - @ref tapkee::DIFFUSION_MAP
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::DiffusionMap
 		 *
 		 * The corresponding value should have type @ref tapkee::ScalarType.
 		 */
-		GAUSSIAN_KERNEL_WIDTH,
+		GaussianKernelWidth,
 		/** The key of the parameter map to store maximal 
 		 * iteration that could be reached.
 		 *
 		 * Should be set for the following iterative methods:
-		 * - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING
-		 * - @ref tapkee::FACTOR_ANALYSIS
+		 * - @ref tapkee::StochasticProximityEmbedding
+		 * - @ref tapkee::FactorAnalysis
 		 * 
 		 * The corresponding value should have type @ref tapkee::IndexType.
 		 */
-		MAX_ITERATION,
+		MaxIteration,
 		/** The key of the parameter map to indicate
 		 * whether global strategy of SPE should be used.
 		 *
-		 * Should be set for @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING only.
+		 * Should be set for @ref tapkee::StochasticProximityEmbedding only.
 		 *
 		 * The corresponding value should have type bool.
 		 */
-		SPE_GLOBAL_STRATEGY,
+		SpeGlobalStrategy,
 		/** The key of the parameter map to store number of
 		 * updates to be done in SPE.
 		 *
-		 * Should be set for @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING only.
+		 * Should be set for @ref tapkee::StochasticProximityEmbedding only.
 		 *
 		 * The corresponding value should have type @ref tapkee::IndexType.
 		 */
-		SPE_NUM_UPDATES,
+		SpeNumberOfUpdates,
 		/** The key of the parameter map to store tolerance of
 		 * SPE. 
 		 * 
-		 * Should be set for @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING only.
+		 * Should be set for @ref tapkee::StochasticProximityEmbedding only.
 		 *
 		 * The corresponding value should have type @ref tapkee::ScalarType.
 		 */
-		SPE_TOLERANCE,
+		SpeTolerance,
 		/** The key of the parameter map to store ratio
 		 * of landmark points to be used (1.0 means all
 		 * points are landmarks and the reciprocal of number
@@ -226,13 +226,13 @@ namespace tapkee
 		 *
 		 * Should be set for landmark methods:
 		 *
-		 * - @ref tapkee::LANDMARK_ISOMAP
-		 * - @ref tapkee::LANDMARK_MULTIDIMENSIONAL_SCALING
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::LandmarkMultidimensionalScaling
 		 *  
 		 * The corresponding value should have type @ref tapkee::ScalarType
 		 * and be in [0,1] range.
 		 */
-		LANDMARK_RATIO,
+		LandmarkRatio,
 		/** The key of the parameter map to store 
 		 * diagonal shift regularizer coefficient
 		 * of nullspace eigenproblems.
@@ -241,29 +241,29 @@ namespace tapkee
 		 *
 		 * Should be set for the following methods:
 		 *
-		 * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-		 * - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LocalityPreservingProjections
 		 *
 		 * The corresponding value should have type @ref tapkee::ScalarType and
 		 * be quite close to zero.
 		 */
-		EIGENSHIFT,
+		NullspaceShift,
 		/** The key of the parameter map to store
 		 * regularization shift of locally linear embedding
 		 * weights computation.
 		 *
 		 * Default is 1e-3.
 		 *
-		 * Should be set for @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING only.
+		 * Should be set for @ref tapkee::KernelLocallyLinearEmbedding only.
 		 *
 		 * The corresponding value should have type @ref tapkee::ScalarType and
 		 * be quite close to zero.
 		 */
-		KLLE_TRACE_SHIFT,
+		KlleShift,
 		/** The key of the parameter map to indicate
 		 * whether graph connectivity check should be done.
 		 *
@@ -271,42 +271,29 @@ namespace tapkee
 		 *
 		 * Should be set for the following local methods:
 		 * 
-		 * - @ref tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::NEIGHBORHOOD_PRESERVING_EMBEDDING
-		 * - @ref tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT
-		 * - @ref tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING
-		 * - @ref tapkee::LAPLACIAN_EIGENMAPS
-		 * - @ref tapkee::LOCALITY_PRESERVING_PROJECTIONS
-		 * - @ref tapkee::ISOMAP
-		 * - @ref tapkee::LANDMARK_ISOMAP
-		 * - @ref tapkee::STOCHASTIC_PROXIMITY_EMBEDDING (with local strategy, i.e. 
-		 *        when @ref tapkee::SPE_GLOBAL_STRATEGY is set to false)
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
+		 *        when @ref tapkee::SpeGlobalStrategy is set to false)
 		 *
 		 * The corresponding value should have type bool.
 		 */
-		CHECK_CONNECTIVITY,
+		CheckConnectivity,
 		/** The key of the parameter map to store epsilon
 		 * parameter of t
 		 * 
-		 * Should be set for @ref tapkee::FACTOR_ANALYSIS only.
+		 * Should be set for @ref tapkee::FactorAnalysis only.
 		 *
 		 * The corresponding value should have type @ref tapkee::ScalarType.
 		 */
-		FA_EPSILON,
-		/** The key of the parameter map to indicate which 
-		 * output matrix order should be used. True means
-		 * each column corresponds to some feature vector,
-		 * false means each column contains values of specific
-		 * feature.
-		 *
-		 * Default is false.
-		 *
-		 * Should be set only if some specific order is required.
-		 *
-		 * The corresponding value should have bool type.
-		 */
-		OUTPUT_FEATURE_VECTORS_ARE_COLUMNS,
+		FaEpsilon,
 		/** The key of the parameter map to store a pointer
 		 * to the function which could be called to indicate progress
 		 * that was made (it is called with an argument in range [0,1],
@@ -319,7 +306,7 @@ namespace tapkee
 		 * (i.e. a pointer to some function that takes
 		 *  double argument and returns nothing).
 		 */
-		PROGRESS_FUNCTION,
+		ProgressFunction,
 		/** The key of the parameter map to store a pointer 
 		 * to the function which could be called to check if 
 		 * computations were cancelled (the function should return 
@@ -335,131 +322,124 @@ namespace tapkee
 		 * (i.e. a pointer to some function that takes
 		 *  nothing and returns boolean).
 		 */
-		CANCEL_FUNCTION,
+		CancelFunction,
 		/** The key of the parameter map to store perplelixity
 		 * parameter of t-SNE.
 		 *
-		 * Should be set for @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING only.
+		 * Should be set for @ref tapkee::tDistributedStochasticNeighborEmbedding only.
 		 *
 		 * The corresponding value should have type @ref tapkee::ScalarType.
 		 */
-		SNE_PERPLEXITY,
+		SnePerplexity,
 		/** The key of the parameter map to store theta 
 		 * parameter of t-SNE.
 		 *
-		 * Should be set for @ref tapkee::T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING only.
+		 * Should be set for @ref tapkee::tDistributedStochasticNeighborEmbedding only.
 		 * 
 		 * The corresponding value should have type @ref tapkee::ScalarType.
 		 */
-		SNE_THETA
+		SneTheta
 	};
 
 
 	//! Dimension reduction methods
-	enum TAPKEE_METHOD
+	enum MethodId
 	{
 		/** Kernel Locally Linear Embedding as described in @cite Decoste2001 */
-		KERNEL_LOCALLY_LINEAR_EMBEDDING,
+		KernelLocallyLinearEmbedding,
 		/** Neighborhood Preserving Embedding as described in @cite He2005 */
-		NEIGHBORHOOD_PRESERVING_EMBEDDING,
+		NeighborhoodPreservingEmbedding,
 		/** Local Tangent Space Alignment as described in @cite Zhang2002 */
-		KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT,
+		KernelLocalTangentSpaceAlignment,
 		/** Linear Local Tangent Space Alignment as described in @cite Zhang2007 */
-		LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT,
+		LinearLocalTangentSpaceAlignment,
 		/** Hessian Locally Linear Embedding as described in @cite Donoho2003 */
-		HESSIAN_LOCALLY_LINEAR_EMBEDDING,
+		HessianLocallyLinearEmbedding,
 		/** Laplacian Eigenmaps as described in @cite Belkin2002 */
-		LAPLACIAN_EIGENMAPS,
+		LaplacianEigenmaps,
 		/** Locality Preserving Projections as described in @cite He2003 */
-		LOCALITY_PRESERVING_PROJECTIONS,
+		LocalityPreservingProjections,
 		/** Diffusion map as described in @cite Coifman2006 */
-		DIFFUSION_MAP,
+		DiffusionMap,
 		/** Isomap as described in @cite Tenenbaum2000 */
-		ISOMAP,
+		Isomap,
 		/** Landmark Isomap as described in @cite deSilva2002 */
-		LANDMARK_ISOMAP,
+		LandmarkIsomap,
 		/** Multidimensional scaling as described in @cite Cox2000 */
-		MULTIDIMENSIONAL_SCALING,
+		MultidimensionalScaling,
 		/** Landmark multidimensional scaling as described in @cite deSilva2004 */
-		LANDMARK_MULTIDIMENSIONAL_SCALING,
+		LandmarkMultidimensionalScaling,
 		/** Stochastic Proximity Embedding as described in @cite Agrafiotis2003 */
-		STOCHASTIC_PROXIMITY_EMBEDDING,
+		StochasticProximityEmbedding,
 		/** Kernel PCA as described in @cite Scholkopf1997 */
-		KERNEL_PCA,
+		KernelPCA,
 		/** Principal Component Analysis */
 		PCA,
 		/** Random Projection @cite Kaski1998*/
-		RANDOM_PROJECTION,
+		RandomProjection,
 		/** Factor Analysis */
-		FACTOR_ANALYSIS,
+		FactorAnalysis,
 		/** t-SNE and Barnes-Hut-SNE as described in \cite tSNE and \cite Barnes-Hut-SNE */
-		T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING,
+		tDistributedStochasticNeighborEmbedding,
 		/** Passing through (doing nothing just passes data through) */
-		PASS_THRU,
-		/** unknown method */
-		UNKNOWN_METHOD
+		PassThru
 	};
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 	// Methods identification
-	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KERNEL_LOCALLY_LINEAR_EMBEDDING);
-	METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(NEIGHBORHOOD_PRESERVING_EMBEDDING);
-	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT);
-	METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT);
-	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(HESSIAN_LOCALLY_LINEAR_EMBEDDING);
-	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LAPLACIAN_EIGENMAPS);
-	METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(LOCALITY_PRESERVING_PROJECTIONS);
-	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(DIFFUSION_MAP);
-	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(ISOMAP);
-	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LANDMARK_ISOMAP);
-	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(MULTIDIMENSIONAL_SCALING);
-	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LANDMARK_MULTIDIMENSIONAL_SCALING);
-	METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(STOCHASTIC_PROXIMITY_EMBEDDING);
-	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KERNEL_PCA);
+	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KernelLocallyLinearEmbedding);
+	METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(NeighborhoodPreservingEmbedding);
+	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KernelLocalTangentSpaceAlignment);
+	METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(LinearLocalTangentSpaceAlignment);
+	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(HessianLocallyLinearEmbedding);
+	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LaplacianEigenmaps);
+	METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(LocalityPreservingProjections);
+	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(DiffusionMap);
+	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(Isomap);
+	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LandmarkIsomap);
+	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(MultidimensionalScaling);
+	METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LandmarkMultidimensionalScaling);
+	METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(StochasticProximityEmbedding);
+	METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KernelPCA);
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(PCA);
-	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(RANDOM_PROJECTION);
-	METHOD_THAT_NEEDS_NOTHING_IS(PASS_THRU);
-	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(FACTOR_ANALYSIS);
-	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING);
-	METHOD_THAT_NEEDS_NOTHING_IS(UNKNOWN_METHOD);
+	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(RandomProjection);
+	METHOD_THAT_NEEDS_NOTHING_IS(PassThru);
+	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(FactorAnalysis);
+	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(tDistributedStochasticNeighborEmbedding);
 #endif // DOXYGEN_SHOULD_SKIP_THS
 
 
 	//! Neighbors computation methods
-	enum TAPKEE_NEIGHBORS_METHOD
+	enum NeighborsMethodId
 	{
 		//! Brute force method with not least than 
 		//! \f$ O(N N \log k) \f$ time complexity.
 		//! Recommended to be used only in debug purposes.
-		BRUTE_FORCE,
+		Brute,
 #ifdef TAPKEE_USE_LGPL_COVERTREE
 		//! Covertree-based method with approximate \f$ O(\log N) \f$ time complexity.
 		//! Recommended to be used as a default method.
-		COVER_TREE,
+		CoverTree
 #endif
-		//! Unknown method
-		UNKNOWN_NEIGHBORS_METHOD
 	};
 
 
 	//! Eigendecomposition methods
-	enum TAPKEE_EIGEN_EMBEDDING_METHOD
+	enum EigenEmbeddingMethodId
 	{
 #ifdef TAPKEE_WITH_ARPACK
 		//! ARPACK-based method (requires the ARPACK library
 		//! binaries to be available around). Recommended to be used as a 
 		//! default method. Supports both generalized and standard eigenproblems.
-		ARPACK,
+		Arpack,
 #endif
 		//! Randomized method (implementation taken from the redsvd lib). 
 		//! Supports only standard but not generalized eigenproblems.
-		RANDOMIZED,
+		Randomized,
 		//! Eigen library dense method (could be useful for debugging). Computes
 		//! all eigenvectors thus can be very slow doing large-scale.
-		EIGEN_DENSE_SELFADJOINT_SOLVER,
-		//! Unknown method
-		UNKNOWN_EIGEN_METHOD
+		Dense
 	};
 
 
@@ -517,7 +497,7 @@ namespace tapkee
 	
 //! Parameters map with keys being values of @ref TAPKEE_PARAMETERS and 
 //! values set to corresponding values wrapped to @ref any type
-typedef TAPKEE_INTERNAL_MAP<TAPKEE_PARAMETERS, any> ParametersMap;
+typedef TAPKEE_INTERNAL_MAP<ParameterKey, any> ParametersMap;
 
 namespace tapkee_internal 
 {
@@ -564,6 +544,7 @@ namespace tapkee_internal
 
 /* Tapkee includes */
 #include <tapkee_projection.hpp>
+#include <utils/naming.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee 

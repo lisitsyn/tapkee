@@ -22,12 +22,12 @@ TEST(Methods,KernelLocallyLinearEmbeddingSmokeTest)
 	feature_vector_callback fcb(X);
 
 	tapkee::ParametersMap parameters;
-	parameters[tapkee::REDUCTION_METHOD] = tapkee::KERNEL_LOCALLY_LINEAR_EMBEDDING;
-	parameters[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(3);
-	parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(15);
-	parameters[tapkee::NEIGHBORS_METHOD] = tapkee::COVER_TREE;
-	parameters[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee::ARPACK;
+	parameters[tapkee::ReductionMethod] = tapkee::KernelLocallyLinearEmbedding;
+	parameters[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(3);
+	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
+	parameters[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(15);
+	parameters[tapkee::NeighborsMethod] = tapkee::CoverTree;
+	parameters[tapkee::EigenEmbeddingMethod] = tapkee::Arpack;
 	//tapkee::LoggingSingleton::instance().enable_info();
 
 	vector<int> data;
@@ -54,12 +54,12 @@ TEST(Methods,KernelLocalTangentSpaceAlignmentSmokeTest)
 	feature_vector_callback fcb(X);
 
 	tapkee::ParametersMap parameters;
-	parameters[tapkee::REDUCTION_METHOD] = tapkee::KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT;
-	parameters[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(3);
-	parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(15);
-	parameters[tapkee::NEIGHBORS_METHOD] = tapkee::COVER_TREE;
-	parameters[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee::ARPACK;
+	parameters[tapkee::ReductionMethod] = tapkee::KernelLocalTangentSpaceAlignment;
+	parameters[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(3);
+	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
+	parameters[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(15);
+	parameters[tapkee::NeighborsMethod] = tapkee::CoverTree;
+	parameters[tapkee::EigenEmbeddingMethod] = tapkee::Arpack;
 	//tapkee::LoggingSingleton::instance().enable_info();
 
 	vector<int> data;
@@ -86,12 +86,12 @@ TEST(Methods,HessianLocallyLinearEmbeddingSmokeTest)
 	feature_vector_callback fcb(X);
 
 	tapkee::ParametersMap parameters;
-	parameters[tapkee::REDUCTION_METHOD] = tapkee::HESSIAN_LOCALLY_LINEAR_EMBEDDING;
-	parameters[tapkee::CURRENT_DIMENSION] = static_cast<tapkee::IndexType>(3);
-	parameters[tapkee::TARGET_DIMENSION] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NUMBER_OF_NEIGHBORS] = static_cast<tapkee::IndexType>(15);
-	parameters[tapkee::NEIGHBORS_METHOD] = tapkee::COVER_TREE;
-	parameters[tapkee::EIGEN_EMBEDDING_METHOD] = tapkee::ARPACK;
+	parameters[tapkee::ReductionMethod] = tapkee::HessianLocallyLinearEmbedding;
+	parameters[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(3);
+	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
+	parameters[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(15);
+	parameters[tapkee::NeighborsMethod] = tapkee::CoverTree;
+	parameters[tapkee::EigenEmbeddingMethod] = tapkee::Arpack;
 	//tapkee::LoggingSingleton::instance().enable_info();
 
 	vector<int> data;

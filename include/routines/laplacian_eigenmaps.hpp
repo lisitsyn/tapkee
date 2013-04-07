@@ -3,8 +3,8 @@
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
 
-#ifndef TAPKEE_LAPLACIAN_EIGENMAPS_H_
-#define TAPKEE_LAPLACIAN_EIGENMAPS_H_
+#ifndef TAPKEE_LaplacianEigenmaps_H_
+#define TAPKEE_LaplacianEigenmaps_H_
 
 /* Tapkee includes */
 #include <tapkee_defines.hpp>

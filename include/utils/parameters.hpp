@@ -58,4 +58,5 @@
 #define NON_NEGATIVE(VARIABLE) \
 	(VARIABLE>=0)
 
+
 #endif

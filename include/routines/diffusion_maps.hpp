@@ -3,8 +3,8 @@
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
 
-#ifndef TAPKEE_DIFFUSION_MAPS_H_
-#define TAPKEE_DIFFUSION_MAPS_H_
+#ifndef TAPKEE_DiffusionMapS_H_
+#define TAPKEE_DiffusionMapS_H_
 
 /* Tapkee includes */
 #include <tapkee_defines.hpp>

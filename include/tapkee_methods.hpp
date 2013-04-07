@@ -34,34 +34,6 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-string get_method_name(TAPKEE_METHOD m)
-{
-	switch (m)
-	{
-		case KERNEL_LOCALLY_LINEAR_EMBEDDING: return "Kernel Locally Linear Embedding";
-		case KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT: return "Local Tangent Space Alignment";
-		case DIFFUSION_MAP: return "Diffusion Map";
-		case MULTIDIMENSIONAL_SCALING: return "Classic Multidimensional Scaling";
-		case LANDMARK_MULTIDIMENSIONAL_SCALING: return "Landmark Multidimensional Scaling";
-		case ISOMAP: return "Isomap";
-		case LANDMARK_ISOMAP: return "Landmark Isomap";
-		case NEIGHBORHOOD_PRESERVING_EMBEDDING: return "Neighborhood Preserving Embedding";
-		case LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT: return "Linear Local Tangent Space Alignment";
-		case HESSIAN_LOCALLY_LINEAR_EMBEDDING: return "Hessian Locally Linear Embedding";
-		case LAPLACIAN_EIGENMAPS: return "Laplacian Eigenmaps";
-		case LOCALITY_PRESERVING_PROJECTIONS: return "Locality Preserving Embedding";
-		case PCA: return "Principal Component Analysis";
-		case KERNEL_PCA: return "Kernel Principal Component Analysis";
-		case STOCHASTIC_PROXIMITY_EMBEDDING: return "Stochastic Proximity Embedding";
-		case PASS_THRU: return "passing through";
-		case RANDOM_PROJECTION: return "Random Projection";
-		case FACTOR_ANALYSIS: return "Factor Analysis";
-		case T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING: return "t-distributed Stochastic Neighbor Embedding";
-		case UNKNOWN_METHOD: return "this should not happen, call the police";
-	}
-	return "hello";
-}
-
 class Context
 {
 public:
@@ -106,7 +78,7 @@ public:
 #define IMPLEMENTATION_OF(METHOD)                                                     \
 template <class RandomAccessIterator, class KernelCallback,                           \
           class DistanceCallback, class FeatureVectorCallback>                        \
-ReturnResult METHOD##_implementation(                                                 \
+ReturnResult METHOD##Implementation(                                                  \
    RandomAccessIterator begin, RandomAccessIterator end,                              \
    const Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>& callbacks, \
    ParametersMap& parameters, const Context& context)
@@ -124,15 +96,15 @@ ReturnResult METHOD##_implementation(                                           
 #define DO_MEASURE_RUN(X) timed_context timing_context__("[+] Embedding with " X)
 #define STOP_IF_CANCELLED if (context.is_cancelled()) throw cancelled_exception()
 
-IMPLEMENTATION_OF(KERNEL_LOCALLY_LINEAR_EMBEDDING)
+IMPLEMENTATION_OF(KernelLocallyLinearEmbedding)
 {
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
-	PARAMETER(ScalarType,                    traceshift,         KLLE_TRACE_SHIFT);
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,      IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(ScalarType,             eigenshift,         NullspaceShift);
+	PARAMETER(ScalarType,             traceshift,         KlleShift);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("KLLE");
 	STOP_IF_CANCELLED;
@@ -147,14 +119,14 @@ IMPLEMENTATION_OF(KERNEL_LOCALLY_LINEAR_EMBEDDING)
 		weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
+IMPLEMENTATION_OF(KernelLocalTangentSpaceAlignment)
 {
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,      IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(ScalarType,             eigenshift,         NullspaceShift);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("KLTSA");
 	STOP_IF_CANCELLED;
@@ -169,12 +141,12 @@ IMPLEMENTATION_OF(KERNEL_LOCAL_TANGENT_SPACE_ALIGNMENT)
 		weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(DIFFUSION_MAP)
+IMPLEMENTATION_OF(DiffusionMap)
 {
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD,  NOT(eigen_method, UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,        IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(ScalarType,                    width,            GAUSSIAN_KERNEL_WIDTH,   POSITIVE(width));
-	PARAMETER(IndexType,                     timesteps,        DIFFUSION_MAP_TIMESTEPS);
+	PARAMETER(IndexType,              target_dimension, TargetDimension,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(ScalarType,             width,            GaussianKernelWidth,   POSITIVE(width));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,     EigenEmbeddingMethod);
+	PARAMETER(IndexType,              timesteps,        DiffusionMapTimesteps);
 	
 	DO_MEASURE_RUN("diffusion map");
 	STOP_IF_CANCELLED;
@@ -191,10 +163,10 @@ IMPLEMENTATION_OF(DIFFUSION_MAP)
 		diffusion_matrix,target_dimension,SKIP_NO_EIGENVALUES).first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(MULTIDIMENSIONAL_SCALING)
+IMPLEMENTATION_OF(MultidimensionalScaling)
 {
-	PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+	PARAMETER(IndexType,              target_dimension, TargetDimension,   IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,     EigenEmbeddingMethod);
 
 	DO_MEASURE_RUN("MDS");
 	STOP_IF_CANCELLED;
@@ -216,11 +188,11 @@ IMPLEMENTATION_OF(MULTIDIMENSIONAL_SCALING)
 	return ReturnResult(result.first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(LANDMARK_MULTIDIMENSIONAL_SCALING)
+IMPLEMENTATION_OF(LandmarkMultidimensionalScaling)
 {
-	PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(ScalarType,                    ratio,            LANDMARK_RATIO,         IN_RANGE(ratio,1/(NUM_VECTORS),1.0));
+	PARAMETER(IndexType,              target_dimension, TargetDimension,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(ScalarType,             ratio,            LandmarkRatio,         IN_RANGE(ratio,1/(NUM_VECTORS),1.0));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,     EigenEmbeddingMethod);
 
 	DO_MEASURE_RUN("Landmark MDS");
 	STOP_IF_CANCELLED;
@@ -241,13 +213,13 @@ IMPLEMENTATION_OF(LANDMARK_MULTIDIMENSIONAL_SCALING)
 		landmark_distances_squared,landmarks_embedding,target_dimension).first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(ISOMAP)
+IMPLEMENTATION_OF(Isomap)
 {
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,   IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors, IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("Isomap");
 	STOP_IF_CANCELLED;
@@ -271,14 +243,14 @@ IMPLEMENTATION_OF(ISOMAP)
 	return ReturnResult(embedding.first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(LANDMARK_ISOMAP)
+IMPLEMENTATION_OF(LandmarkIsomap)
 {
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(ScalarType,                    ratio,              LANDMARK_RATIO,         IN_RANGE(ratio,1/(NUM_VECTORS),1.0));
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,      IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(ScalarType,             ratio,              LandmarkRatio,        IN_RANGE(ratio,1/(NUM_VECTORS),1.0));
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("Landmark Isomap");
 	STOP_IF_CANCELLED;
@@ -303,7 +275,7 @@ IMPLEMENTATION_OF(LANDMARK_ISOMAP)
 
 	EmbeddingResult landmarks_embedding;
 	
-	if (eigen_method==EIGEN_DENSE_SELFADJOINT_SOLVER)
+	if (eigen_method==Dense)
 	{
 		DenseMatrix distance_matrix_sym = distance_matrix*distance_matrix.transpose();
 		landmarks_embedding = eigen_embedding<DenseSymmetricMatrix,DenseImplicitSquareMatrixOperation>
@@ -322,16 +294,16 @@ IMPLEMENTATION_OF(LANDMARK_ISOMAP)
 	return ReturnResult(embedding,tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(NEIGHBORHOOD_PRESERVING_EMBEDDING)
+IMPLEMENTATION_OF(NeighborhoodPreservingEmbedding)
 {
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
-	PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
-	PARAMETER(ScalarType,                    traceshift,         KLLE_TRACE_SHIFT);
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,      IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(IndexType,              dimension,          CurrentDimension,     POSITIVE(dimension));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(ScalarType,             eigenshift,         NullspaceShift);
+	PARAMETER(ScalarType,             traceshift,         KlleShift);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("NPE");
 	STOP_IF_CANCELLED;
@@ -354,13 +326,13 @@ IMPLEMENTATION_OF(NEIGHBORHOOD_PRESERVING_EMBEDDING)
 	return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.feature,dimension),projecting_function);
 }
 
-IMPLEMENTATION_OF(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
+IMPLEMENTATION_OF(HessianLocallyLinearEmbedding)
 {
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,     IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,   IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("HLLE");
 	STOP_IF_CANCELLED;
@@ -375,14 +347,14 @@ IMPLEMENTATION_OF(HESSIAN_LOCALLY_LINEAR_EMBEDDING)
 		weight_matrix,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(LAPLACIAN_EIGENMAPS)
+IMPLEMENTATION_OF(LaplacianEigenmaps)
 {
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(ScalarType,                    width,              GAUSSIAN_KERNEL_WIDTH,  POSITIVE(width));
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,      IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(ScalarType,             width,              GaussianKernelWidth,  POSITIVE(width));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("Laplacian Eigenmaps");
 	STOP_IF_CANCELLED;
@@ -397,15 +369,15 @@ IMPLEMENTATION_OF(LAPLACIAN_EIGENMAPS)
 		eigen_method,laplacian.first,laplacian.second,target_dimension,SKIP_ONE_EIGENVALUE).first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(LOCALITY_PRESERVING_PROJECTIONS)
+IMPLEMENTATION_OF(LocalityPreservingProjections)
 {
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(ScalarType,                    width,              GAUSSIAN_KERNEL_WIDTH,  POSITIVE(width));
-	PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,      IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(ScalarType,             width,              GaussianKernelWidth,  POSITIVE(width));
+	PARAMETER(IndexType,              dimension,          CurrentDimension,     POSITIVE(dimension));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("LPP");
 	STOP_IF_CANCELLED;
@@ -430,9 +402,9 @@ IMPLEMENTATION_OF(LOCALITY_PRESERVING_PROJECTIONS)
 
 IMPLEMENTATION_OF(PCA)
 {
-	PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     dimension,        CURRENT_DIMENSION,      POSITIVE(dimension));
+	PARAMETER(IndexType,              target_dimension, TargetDimension,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,              dimension,        CurrentDimension,      POSITIVE(dimension));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,     EigenEmbeddingMethod);
 
 	DO_MEASURE_RUN("PCA");
 	STOP_IF_CANCELLED;
@@ -447,10 +419,10 @@ IMPLEMENTATION_OF(PCA)
 	return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.feature,dimension), projecting_function);
 }
 
-IMPLEMENTATION_OF(RANDOM_PROJECTION)
+IMPLEMENTATION_OF(RandomProjection)
 {
-	PARAMETER(IndexType, target_dimension, TARGET_DIMENSION,  IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(IndexType, dimension,        CURRENT_DIMENSION, POSITIVE(dimension));
+	PARAMETER(IndexType, target_dimension, TargetDimension,  IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType, dimension,        CurrentDimension, POSITIVE(dimension));
 
 	DO_MEASURE_RUN("Random Projection");
 	STOP_IF_CANCELLED;
@@ -466,10 +438,10 @@ IMPLEMENTATION_OF(RANDOM_PROJECTION)
 	return ReturnResult(project(projection_matrix,mean_vector,begin,end,callbacks.feature,dimension), projecting_function);
 }
 
-IMPLEMENTATION_OF(KERNEL_PCA)
+IMPLEMENTATION_OF(KernelPCA)
 {
-	PARAMETER(IndexType,                     target_dimension, TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,     EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
+	PARAMETER(IndexType,              target_dimension, TargetDimension,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,     EigenEmbeddingMethod);
 
 	DO_MEASURE_RUN("kPCA");
 	STOP_IF_CANCELLED;
@@ -480,15 +452,15 @@ IMPLEMENTATION_OF(KERNEL_PCA)
 		centered_kernel_matrix,target_dimension,SKIP_NO_EIGENVALUES).first, tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
+IMPLEMENTATION_OF(LinearLocalTangentSpaceAlignment)
 {
-	PARAMETER(IndexType,                     target_dimension,   TARGET_DIMENSION,       IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(TAPKEE_EIGEN_EMBEDDING_METHOD, eigen_method,       EIGEN_EMBEDDING_METHOD, NOT(eigen_method,UNKNOWN_EIGEN_METHOD));
-	PARAMETER(IndexType,                     k,                  NUMBER_OF_NEIGHBORS,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD,       neighbors_method,   NEIGHBORS_METHOD,       NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(IndexType,                     dimension,          CURRENT_DIMENSION,      POSITIVE(dimension));
-	PARAMETER(ScalarType,                    eigenshift,         EIGENSHIFT);
-	PARAMETER(bool,                          check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,              target_dimension,   TargetDimension,      IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,              k,                  NumberOfNeighbors,    IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(IndexType,              dimension,          CurrentDimension,     POSITIVE(dimension));
+	PARAMETER(EigenEmbeddingMethodId, eigen_method,       EigenEmbeddingMethod);
+	PARAMETER(NeighborsMethodId,      neighbors_method,   NeighborsMethod);
+	PARAMETER(ScalarType,             eigenshift,         NullspaceShift);
+	PARAMETER(bool,                   check_connectivity, CheckConnectivity);
 
 	DO_MEASURE_RUN("LLTSA");
 	STOP_IF_CANCELLED;
@@ -512,16 +484,16 @@ IMPLEMENTATION_OF(LINEAR_LOCAL_TANGENT_SPACE_ALIGNMENT)
 			projecting_function);
 }
 
-IMPLEMENTATION_OF(STOCHASTIC_PROXIMITY_EMBEDDING)
+IMPLEMENTATION_OF(StochasticProximityEmbedding)
 {
-	PARAMETER(IndexType,               target_dimension,   TARGET_DIMENSION,    IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(IndexType,               k,                  NUMBER_OF_NEIGHBORS, IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
-	PARAMETER(TAPKEE_NEIGHBORS_METHOD, neighbors_method,   NEIGHBORS_METHOD,    NOT(neighbors_method,UNKNOWN_NEIGHBORS_METHOD));
-	PARAMETER(ScalarType,              tolerance,          SPE_TOLERANCE,       POSITIVE(tolerance));
-	PARAMETER(IndexType,               max_iteration,      MAX_ITERATION,       NON_NEGATIVE(max_iteration));
-	PARAMETER(IndexType,               nupdates,           SPE_NUM_UPDATES,     NON_NEGATIVE(nupdates));
-	PARAMETER(bool,                    global_strategy,    SPE_GLOBAL_STRATEGY);
-	PARAMETER(bool,                    check_connectivity, CHECK_CONNECTIVITY);
+	PARAMETER(IndexType,         target_dimension,   TargetDimension,    IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(IndexType,         k,                  NumberOfNeighbors,  IN_RANGE(k,MINIMAL_K,NUM_VECTORS));
+	PARAMETER(ScalarType,        tolerance,          SpeTolerance,       POSITIVE(tolerance));
+	PARAMETER(IndexType,         max_iteration,      MaxIteration,       NON_NEGATIVE(max_iteration));
+	PARAMETER(IndexType,         nupdates,           SpeNumberOfUpdates, NON_NEGATIVE(nupdates));
+	PARAMETER(NeighborsMethodId, neighbors_method,   NeighborsMethod);
+	PARAMETER(bool,              global_strategy,    SpeGlobalStrategy);
+	PARAMETER(bool,              check_connectivity, CheckConnectivity);
 
 	Neighbors neighbors;
 	if (!global_strategy)
@@ -539,9 +511,9 @@ IMPLEMENTATION_OF(STOCHASTIC_PROXIMITY_EMBEDDING)
 			target_dimension,global_strategy,tolerance,nupdates,max_iteration), tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(PASS_THRU)
+IMPLEMENTATION_OF(PassThru)
 {
-	PARAMETER(IndexType, dimension, CURRENT_DIMENSION, POSITIVE(dimension));
+	PARAMETER(IndexType, dimension, CurrentDimension, POSITIVE(dimension));
 
 	STOP_IF_CANCELLED;
 
@@ -556,12 +528,12 @@ IMPLEMENTATION_OF(PASS_THRU)
 	return ReturnResult(feature_matrix.transpose(),tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(FACTOR_ANALYSIS)
+IMPLEMENTATION_OF(FactorAnalysis)
 {
-	PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION, POSITIVE(current_dimension));
-	PARAMETER(IndexType,  target_dimension,  TARGET_DIMENSION,  IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
-	PARAMETER(ScalarType, epsilon,           FA_EPSILON,        POSITIVE(epsilon));
-	PARAMETER(IndexType,  max_iteration,     MAX_ITERATION,     NON_NEGATIVE(max_iteration));
+	PARAMETER(IndexType,  current_dimension, CurrentDimension, POSITIVE(current_dimension));
+	PARAMETER(IndexType,  target_dimension,  TargetDimension,  IN_RANGE(target_dimension,MINIMAL_TD,NUM_VECTORS));
+	PARAMETER(ScalarType, epsilon,           FaEpsilon,        POSITIVE(epsilon));
+	PARAMETER(IndexType,  max_iteration,     MaxIteration,     NON_NEGATIVE(max_iteration));
 
 	DO_MEASURE_RUN("FA");
 	STOP_IF_CANCELLED;
@@ -571,14 +543,14 @@ IMPLEMENTATION_OF(FACTOR_ANALYSIS)
                                 target_dimension, mean_vector), tapkee::ProjectingFunction());
 }
 
-IMPLEMENTATION_OF(T_DISTRIBUTED_STOCHASTIC_NEIGHBOR_EMBEDDING)
+IMPLEMENTATION_OF(tDistributedStochasticNeighborEmbedding)
 {
 	const IndexType N = NUM_VECTORS;
 	
-	PARAMETER(IndexType,  current_dimension, CURRENT_DIMENSION, POSITIVE(current_dimension));
-	PARAMETER(IndexType,  target_dimension,  TARGET_DIMENSION,  EXACTLY(target_dimension,2));
-	PARAMETER(ScalarType, perplexity,        SNE_PERPLEXITY,    IN_RANGE(perplexity,0,(N-1)/3));
-	PARAMETER(ScalarType, theta,             SNE_THETA,         NON_NEGATIVE(theta));
+	PARAMETER(IndexType,  current_dimension, CurrentDimension, POSITIVE(current_dimension));
+	PARAMETER(IndexType,  target_dimension,  TargetDimension,  EXACTLY(target_dimension,2));
+	PARAMETER(ScalarType, perplexity,        SnePerplexity,    IN_RANGE(perplexity,0,(N-1)/3));
+	PARAMETER(ScalarType, theta,             SneTheta,         NON_NEGATIVE(theta));
 
 	DO_MEASURE_RUN("t-SNE");
 	STOP_IF_CANCELLED;
