@@ -127,6 +127,7 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 	PUT_DEFAULT(NullspaceShift,ScalarType,1e-9);
 	PUT_DEFAULT(KlleShift,ScalarType,1e-3);
 	PUT_DEFAULT(CheckConnectivity,bool,true);
+	PUT_DEFAULT(LandmarkRatio,ScalarType,0.5);
 
 #ifdef TAPKEE_WITH_ARPACK
 	PUT_DEFAULT(EigenEmbeddingMethod,EigenEmbeddingMethodId,Arpack);
@@ -162,28 +163,9 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 	try 
 	{
 		LoggingSingleton::instance().message_info("Using the " + get_method_name(method) + " method.");
-		switch (method)
-		{
-			HANDLE_IMPLEMENTATION(KernelLocallyLinearEmbedding);
-			HANDLE_IMPLEMENTATION(KernelLocalTangentSpaceAlignment);
-			HANDLE_IMPLEMENTATION(DiffusionMap);
-			HANDLE_IMPLEMENTATION(MultidimensionalScaling);
-			HANDLE_IMPLEMENTATION(LandmarkMultidimensionalScaling);
-			HANDLE_IMPLEMENTATION(Isomap);
-			HANDLE_IMPLEMENTATION(LandmarkIsomap);
-			HANDLE_IMPLEMENTATION(NeighborhoodPreservingEmbedding);
-			HANDLE_IMPLEMENTATION(LinearLocalTangentSpaceAlignment);
-			HANDLE_IMPLEMENTATION(HessianLocallyLinearEmbedding);
-			HANDLE_IMPLEMENTATION(LaplacianEigenmaps);
-			HANDLE_IMPLEMENTATION(LocalityPreservingProjections);
-			HANDLE_IMPLEMENTATION(PCA);
-			HANDLE_IMPLEMENTATION(KernelPCA);
-			HANDLE_IMPLEMENTATION(RandomProjection);
-			HANDLE_IMPLEMENTATION(StochasticProximityEmbedding);
-			HANDLE_IMPLEMENTATION(PassThru);
-			HANDLE_IMPLEMENTATION(FactorAnalysis);
-			HANDLE_IMPLEMENTATION(tDistributedStochasticNeighborEmbedding);
-		}
+		
+		return_result = 
+			tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,feature_vector_callback,parameters,context).embed(method);
 	}
 	catch (const std::bad_alloc&)
 	{

@@ -544,7 +544,6 @@ namespace tapkee_internal
 
 /* Tapkee includes */
 #include <tapkee_projection.hpp>
-#include <utils/naming.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee 

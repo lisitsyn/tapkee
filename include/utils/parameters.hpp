@@ -6,57 +6,214 @@
 #ifndef TAPKEE_PARAMETERS_H_
 #define TAPKEE_PARAMETERS_H_
 
-// pure magic, for the brave souls 
-#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL_((__VA_ARGS__, 5,4,3,2,1))
-#define VA_NUM_ARGS_IMPL_(tuple) VA_NUM_ARGS_IMPL tuple
-#define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,N,...) N
-#define MACRO_DISPATCHER(macro, ...) MACRO_DISPATCHER_(macro, VA_NUM_ARGS(__VA_ARGS__))
-#define MACRO_DISPATCHER_(macro, nargs) MACRO_DISPATCHER__(macro, nargs)
-#define MACRO_DISPATCHER__(macro, nargs) MACRO_DISPATCHER___(macro, nargs)
-#define MACRO_DISPATCHER___(macro, nargs) macro ## nargs
+#include <utils/value_keeper.hpp>
 
-// parameter macro definition
-#define PARAMETER(...) MACRO_DISPATCHER(PARAMETER, __VA_ARGS__)(__VA_ARGS__)
-#define PARAMETER3(TYPE,NAME,CODE) PARAMETER_IMPL(TYPE,NAME,CODE,NO_CHECK)
-#define PARAMETER4(TYPE,NAME,CODE,CHECKER) PARAMETER_IMPL(TYPE,NAME,CODE,CHECKER)
+namespace tapkee
+{
+namespace tapkee_internal
+{
 
-// implementation of parameter macro
-#define PARAMETER_IMPL(TYPE,NAME,CODE,CHECKER)                                                         \
-	if (!parameters.count(CODE))                                                                          \
-		throw missed_parameter_error("No "#NAME" ("#TYPE") parameter set. Should be in map as "#CODE); \
-	TYPE NAME;                                                                                         \
-	try                                                                                                \
-	{                                                                                                  \
-		NAME = parameters[CODE].cast<TYPE>();                                                             \
-	}                                                                                                  \
-	catch (tapkee::anyimpl::bad_any_cast&)                                                             \
-	{                                                                                                  \
-		throw wrong_parameter_type_error("Wrong type for parameter "#NAME". Should be "#TYPE);         \
-	}                                                                                                  \
-	if (!CHECKER)                                                                                      \
-		throw wrong_parameter_error("Check failed "#CHECKER);                                          \
-	else                                                                                               \
-	{                                                                                                  \
-		if (LoggingSingleton::instance().is_debug_enabled())                                           \
-		{                                                                                              \
-			std::stringstream ss;                                                                      \
-			ss << "parameter "#TYPE" "#NAME" is set to " << NAME;                                      \
-			LoggingSingleton::instance().message_debug(ss.str());                                      \
-		}                                                                                              \
+struct Message
+{
+	std::stringstream ss;
+	template <typename T>
+	Message& operator<<(const T& data)
+	{
+		ss << data;
+		return *this;
+	}
+	operator std::string() 
+	{
+		return ss.str();
+	}
+};
+
+class CheckedParameter;
+
+class Parameter
+{
+
+	friend class CheckedParameter;
+
+private:
+
+	template <typename T>
+	Parameter(const T& value) : keeper(ValueKeeper(value))
+	{
 	}
 
-// checkers
-#define NO_CHECK true
-#define IN_RANGE(VARIABLE,LOWER,UPPER) \
-	((VARIABLE>=LOWER) && (VARIABLE<UPPER))
-#define NOT(VARIABLE,VALUE) \
-	(VARIABLE!=VALUE)
-#define POSITIVE(VARIABLE) \
-	(VARIABLE>0)
-#define EXACTLY(VARIABLE,VALUE) \
-	(VARIABLE==VALUE)
-#define NON_NEGATIVE(VARIABLE) \
-	(VARIABLE>=0)
+public:
 
+	template <typename T>
+	static Parameter of(const T& value) 
+	{
+		return Parameter(value);
+	}
 
+	Parameter() : keeper(ValueKeeper())
+	{
+	}
+
+	Parameter(const Parameter& p) : keeper(p.keeper)
+	{
+	}
+
+	~Parameter()
+	{
+	}
+
+	template <typename T>
+	inline operator T()
+	{
+		return value<T>();
+	}
+
+	template <typename T>
+	bool is(T v)
+	{
+		if (!is_type_correct<T>())
+			return false;
+		T kv = keeper.value<T>();
+		if (v == kv)
+			return true;
+		return false;
+	}
+
+	template <typename T>
+	bool operator==(T v) const
+	{
+		return is<T>(v);
+	}
+
+	CheckedParameter checked();
+
+	template <typename T>
+	bool in_range(T lower, T upper) const
+	{
+		return keeper.in_range<T>(lower, upper);
+	}
+
+	template <typename T>
+	bool equal(T value) const
+	{
+		return keeper.equal<T>(value);
+	}
+
+	template <typename T>
+	bool not_equal(T value) const
+	{
+		return keeper.not_equal<T>(value);
+	}
+
+	bool positive() const 
+	{
+		return keeper.positive();
+	}
+
+	bool negative() const
+	{
+		return keeper.negative();
+	}
+
+	template <typename T>
+	bool greater(T lower) const
+	{
+		return keeper.greater<T>(lower);
+	}
+
+	template <typename T>
+	bool is_lesser(T upper) const
+	{
+		return keeper.lesser<T>(upper);
+	}
+
+private:
+
+	template <typename T>
+	inline T value() const
+	{
+		return keeper.value<T>();
+	}
+	
+	template <typename T>
+	inline bool is_type_correct() const
+	{
+		return keeper.is_type_correct<T>();
+	}
+
+private:
+
+	ValueKeeper keeper; 
+
+};
+
+class CheckedParameter
+{
+
+public:
+
+	explicit CheckedParameter(const Parameter& p) : parameter(p)
+	{
+	}
+
+	template <typename T>
+	inline operator T()
+	{
+		return parameter.value<T>();
+	}
+	
+	inline operator const Parameter&()
+	{
+		return parameter;
+	}
+
+	template <typename T>
+	bool is(T v)
+	{
+		return parameter.is<T>(v);
+	}
+
+	template <typename T>
+	bool operator==(T v)
+	{
+		return is<T>(v);
+	}
+
+	template <typename T>
+	CheckedParameter& in_range(T lower, T upper)
+	{
+		if (!parameter.in_range(lower, upper))
+		{
+			std::string error_message = 
+				(Message() << "Value " << parameter.value<T>() << " doesn't fit the range [" << 
+				 lower << ", " << upper << ")");
+			throw tapkee::wrong_parameter_error(error_message);
+		}
+		return *this;
+	}
+	
+	CheckedParameter& positive()
+	{
+		if (!parameter.positive())
+		{
+			std::string error_message = 
+				(Message() << "Value is not positive");
+			throw tapkee::wrong_parameter_error(error_message);
+		}
+		return *this;
+	}
+
+private:
+
+	Parameter parameter;
+
+};
+
+CheckedParameter Parameter::checked() 
+{
+	return CheckedParameter(*this);
+}
+
+}
+}
 #endif

@@ -38,7 +38,7 @@ struct distances_comparator
 template <class RandomAccessIterator, class Callback>
 struct KernelDistance
 {
-	KernelDistance(Callback cb) : callback(cb) {  } 
+	KernelDistance(const Callback& cb) : callback(cb) {  } 
 	inline ScalarType operator()(const RandomAccessIterator& l, const RandomAccessIterator& r)
 	{
 		return callback.kernel(*l,*r);
@@ -52,7 +52,7 @@ const bool KernelDistance<RandomAccessIterator, Callback>::is_kernel = true;
 template <class RandomAccessIterator, class Callback>
 struct PlainDistance
 {
-	PlainDistance(Callback cb) : callback(cb) {  }
+	PlainDistance(const Callback& cb) : callback(cb) {  }
 	inline ScalarType operator()(const RandomAccessIterator& l, const RandomAccessIterator& r)
 	{
 		return callback.distance(*l,*r);
