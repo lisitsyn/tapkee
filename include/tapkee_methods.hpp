@@ -154,15 +154,14 @@ public:
 		}
 	}
 
-	ImplementationBase(RandomAccessIterator begin, RandomAccessIterator end,
+	ImplementationBase(RandomAccessIterator b, RandomAccessIterator e,
 	                   const Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>& cbks,
 	                   ParametersMap& pmap, const Context& ctx) : 
 		parameters(pmap), context(ctx), callbacks(cbks),
 		plain_distance(PlainDistance<RandomAccessIterator,DistanceCallback>(cbks.distance)),
-		kernel_distance(KernelDistance<RandomAccessIterator,KernelCallback>(cbks.kernel))
+		kernel_distance(KernelDistance<RandomAccessIterator,KernelCallback>(cbks.kernel)),
+		begin(b), end(e)
 	{
-		this->begin = begin;
-		this->end = end;
 		n_vectors = (end-begin);
 
 		if (n_vectors == 0)

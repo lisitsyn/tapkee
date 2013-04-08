@@ -15,7 +15,9 @@ namespace tapkee_internal
 
 struct Message
 {
-	std::stringstream ss;
+	Message() : ss()
+	{
+	}
 	template <typename T>
 	Message& operator<<(const T& data)
 	{
@@ -26,6 +28,7 @@ struct Message
 	{
 		return ss.str();
 	}
+	std::stringstream ss;
 };
 
 class CheckedParameter;

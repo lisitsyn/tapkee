@@ -8,6 +8,7 @@ namespace tapkee_internal
 
 struct TypePolicyBase
 {
+	virtual ~TypePolicyBase() {}
 	virtual void copy_from_value(void const*, void**) const = 0;
 	virtual void* get_value(void**) const = 0;
 	virtual void free(void**) const = 0;
@@ -54,6 +55,7 @@ TypePolicyBase* get_policy()
 
 struct CheckerPolicyBase
 {
+	virtual ~CheckerPolicyBase() {}
 	virtual bool is_in_range(void* const*, void*, void*) const = 0;
 	virtual bool is_equal(void* const*, void*) const = 0;
 	virtual bool is_not_equal(void* const*, void*) const = 0;
