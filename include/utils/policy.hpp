@@ -113,7 +113,7 @@ struct PointerCheckerPolicyImpl : public CheckerPolicyBase
 	}
 };
 
-class EmptyType;
+struct EmptyType;
 
 template <>
 struct PointerCheckerPolicyImpl<EmptyType> : public CheckerPolicyBase

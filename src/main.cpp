@@ -204,7 +204,7 @@ int run(int argc, const char** argv)
 			tapkee::MethodId tapkee_method = parse_reduction_method(method.c_str());
 			parameters[tapkee::ReductionMethod] = tapkee_method;
 		} 
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown method ") + method);
 			return 0;
@@ -218,7 +218,7 @@ int run(int argc, const char** argv)
 			tapkee::NeighborsMethodId tapkee_neighbors_method = parse_neighbors_method(method.c_str());
 			parameters[tapkee::NeighborsMethod] = tapkee_neighbors_method;
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
 			return 0;
@@ -232,7 +232,7 @@ int run(int argc, const char** argv)
 			tapkee::EigenEmbeddingMethodId tapkee_eigen_method = parse_eigen_method(method.c_str());
 			parameters[tapkee::EigenEmbeddingMethod] = tapkee_eigen_method;
 		}
-		catch (const std::exception& e)
+		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
 			return 0;

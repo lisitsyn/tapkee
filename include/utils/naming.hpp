@@ -81,7 +81,9 @@ string get_eigenembedding_method_name(EigenEmbeddingMethodId m)
 {
 	switch (m)
 	{
+#ifdef TAPKEE_WITH_ARPACK
 		case Arpack: return "Arpack";
+#endif
 		case Dense: return "Dense";
 		case Randomized: return "Randomized";
 	}
