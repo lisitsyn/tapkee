@@ -225,6 +225,7 @@ public:
 			tapkee_method_handle(tDistributedStochasticNeighborEmbedding);
 		}
 #undef tapkee_method_handle
+		return ReturnResult();
 	}
 
 	ReturnResult embedKernelLocallyLinearEmbedding()
