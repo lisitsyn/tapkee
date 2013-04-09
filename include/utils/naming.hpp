@@ -72,7 +72,9 @@ string get_neighbors_method_name(NeighborsMethodId m)
 	switch (m)
 	{
 		case Brute: return "Brute-force";
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 		case CoverTree: return "Cover Tree";
+#endif
 	}
 	return "hello";
 }
