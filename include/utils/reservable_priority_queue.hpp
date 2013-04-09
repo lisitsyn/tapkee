@@ -9,6 +9,7 @@ namespace tapkee
 namespace tapkee_internal
 {
 
+#pragma GCC diagnostic ignored "-Weffc++"
 template <class T, class Comparator>
 class reservable_priority_queue: public std::priority_queue<T,std::vector<T>,Comparator>
 {
@@ -31,6 +32,7 @@ public:
 		this->c.clear();
 	}
 };
+#pragma GCC diagnostic pop
 
 } /* End of namespace tapkee_internal */
 } /* End of namespace tapkee */
