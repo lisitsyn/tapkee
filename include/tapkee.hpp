@@ -119,30 +119,6 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 		throw wrong_parameter_type_error("Wrong method type specified.");
 	}
 
-#define PUT_DEFAULT(KEY,TYPE,VALUE)                 \
-	if (!parameters.count(KEY))                     \
-		parameters[KEY] = static_cast<TYPE>(VALUE); 
-
-	//// defaults
-	PUT_DEFAULT(NullspaceShift,ScalarType,1e-9);
-	PUT_DEFAULT(KlleShift,ScalarType,1e-3);
-	PUT_DEFAULT(CheckConnectivity,bool,true);
-	PUT_DEFAULT(LandmarkRatio,ScalarType,0.5);
-
-#ifdef TAPKEE_WITH_ARPACK
-	PUT_DEFAULT(EigenEmbeddingMethod,EigenEmbeddingMethodId,Arpack);
-#else
-	PUT_DEFAULT(EigenEmbeddingMethod,EigenEmbeddingMethodId,Dense);
-#endif
-
-	PUT_DEFAULT(TargetDimension,IndexType,2);
-#ifdef TAPKEE_USE_LGPL_COVERTREE
-	PUT_DEFAULT(NeighborsMethod,NeighborsMethodId,CoverTree);
-#endif
-	//// end of defaults
-
-#undef PUT_DEFAULT
-
 	void (*progress_function)(double) = NULL;
 	bool (*cancel_function)() = NULL;
 
@@ -152,13 +128,6 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 		cancel_function = parameters[CancelFunction].cast<bool (*)()>();
 
 	tapkee_internal::Context context(progress_function,cancel_function);
-
-#define CALL_IMPLEMENTATION(X)                                                                                          \
-		tapkee_internal::X##Implementation<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback> \
-		(begin,end,tapkee_internal::Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>(kernel_callback,   \
-		distance_callback,feature_vector_callback),parameters,context)
-#define HANDLE_IMPLEMENTATION(X)                          \
-	case X: return_result = CALL_IMPLEMENTATION(X); break
 
 	try 
 	{
@@ -171,9 +140,6 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 	{
 		throw not_enough_memory_error("Not enough memory");
 	}
-
-#undef CALL_IMPLEMENTATION 
-#undef HANDLE_IMPLEMENTATION
 
 	return return_result;
 }

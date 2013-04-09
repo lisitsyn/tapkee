@@ -66,6 +66,16 @@ public:
 	}
 
 	template <typename T>
+	inline Parameter withDefault(T value)
+	{
+		if (!is_initialized())
+		{
+			keeper = ValueKeeper(value);
+		}
+		return *this;
+	}
+
+	template <typename T>
 	inline operator T()
 	{
 		return value<T>();
@@ -128,6 +138,11 @@ public:
 	bool is_lesser(T upper) const
 	{
 		return keeper.lesser<T>(upper);
+	}
+
+	bool is_initialized() const
+	{
+		return keeper.is_initialized();
 	}
 
 private:
