@@ -101,15 +101,15 @@ public:
 
 		perplexity = parameter<ScalarType>(SnePerplexity).withDefault(scalar(min(30.0,(n_vectors-1)/3.0)));
 		target_dimension = parameter<IndexType>(TargetDimension).withDefault(index(2));
-		ratio = parameter<ScalarType>(LandmarkRatio).withDefault(0.5);
+		ratio = parameter<ScalarType>(LandmarkRatio).withDefault(scalar(0.5));
 		n_neighbors = parameter<IndexType>(NumberOfNeighbors);
 		
 		if (n_vectors > 0)
 		{
-			perplexity = perplexity.checked().in_range(0.0,(n_vectors-1)/3.0 + 1e-6);
-			target_dimension = target_dimension.checked().in_range(1,n_vectors);
-			n_neighbors = n_neighbors.checked().in_range(3,n_vectors);
-			ratio = parameter<ScalarType>(LandmarkRatio).checked().in_range(1.0/n_vectors,1.0 + 1e-6);
+			perplexity = perplexity.checked().in_range(scalar(0.0),scalar((n_vectors-1)/3.0 + 1e-6));
+			target_dimension = target_dimension.checked().in_range(index(1),index(n_vectors));
+			n_neighbors = n_neighbors.checked().in_range(index(3),index(n_vectors));
+			ratio = parameter<ScalarType>(LandmarkRatio).checked().in_range(scalar(1.0/n_vectors),scalar(1.0 + 1e-6));
 		}
 
 #ifdef TAPKEE_WITH_ARPACK
@@ -128,7 +128,7 @@ public:
 
 		check_connectivity = parameter<bool>(CheckConnectivity).withDefault(true);
 
-		width = parameter<ScalarType>(GaussianKernelWidth).withDefault(1.0).checked().positive();
+		width = parameter<ScalarType>(GaussianKernelWidth).withDefault(scalar(1.0)).checked().positive();
 		timesteps = parameter<IndexType>(DiffusionMapTimesteps).withDefault(index(1)).checked().positive();
 		eigenshift = parameter<ScalarType>(NullspaceShift).withDefault(scalar(1e-9));
 		traceshift = parameter<ScalarType>(KlleShift).withDefault(scalar(1e-3));
