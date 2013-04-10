@@ -1,3 +1,4 @@
+#define TAPKEE_WITH_ARPACK
 #include <tapkee.hpp>
 #include <callback/dummy_callbacks.hpp>
 
@@ -36,11 +37,10 @@ int main(int argc, const char** argv)
 	dummy_feature_vector_callback<string> fvcb;
 
 	ParametersMap parameters;
-	parameters[REDUCTION_METHOD] = LAPLACIAN_EIGENMAPS;
-	parameters[NEIGHBORS_METHOD] = BRUTE_FORCE;
-	parameters[TARGET_DIMENSION] = static_cast<IndexType>(2);
-	parameters[NUMBER_OF_NEIGHBORS] = static_cast<IndexType>(20);
-	parameters[GAUSSIAN_KERNEL_WIDTH] = static_cast<ScalarType>(100.0);
+	parameters[ReductionMethod] = MultidimensionalScaling;
+	parameters[TargetDimension] = static_cast<IndexType>(2);
+	parameters[DiffusionMapTimesteps] = static_cast<IndexType>(1);
+	parameters[GaussianKernelWidth] = static_cast<ScalarType>(10.0);
 
 	ReturnResult result = embed(rnas.begin(),rnas.end(),
 	                            kcb,dcb,fvcb,parameters);
