@@ -205,10 +205,10 @@ Exceptions are:
   is distributed under the BSD 4-clause license.
 
 - [Covertree code](https://github.com/lisitsyn/tapkee/tree/master/include/neighbors/covertree.hpp) by John Langford and Dinoj Surendran 
-  which is distributed under the [LGPLv3 license](LGPL-LICENSE).
+  which is distributed under the [LGPLv3 license](https://github.com/lisitsyn/tapkee/tree/master/LGPL-LICENSE).
 
 - [Any type](https://github.com/lisitsyn/tapkee/tree/master/include/utils/any.hpp) by Christopher Diggins which is distributed under 
   the [Boost v.1.0 license](http://www.boost.org/LICENSE_1_0.txt).
 
 - [EZOptionsParser](https://github.com/lisitsyn/tapkee/tree/master/src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed 
-  under the [MIT license](MIT-LICENSE).
+  under the [MIT license](https://github.com/lisitsyn/tapkee/tree/master/MIT-LICENSE).
