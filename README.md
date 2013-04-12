@@ -58,7 +58,7 @@ Integration issues
 There are a few issues related to including the Tapkee library. First, if your library already includes 
 Eigen3 (and only if) - you might need to let Tapkee know about that with the following define:
 
-`#define TAPKEE\_EIGEN\_INCLUDE\_FILE <path/to/your/eigen/include/file.h>`
+`#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
 Please note that if you don't include Eigen3 in your project there is no need to define that variable -
 in this case Eigen3 will be included by Tapkee. This issue comes from the need of including the Eigen3 library
