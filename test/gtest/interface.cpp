@@ -35,19 +35,19 @@ TEST(Interface, ParameterTargetDimension)
 	ASSERT_EQ(td,static_cast<int>(target_dimension));
 }
 
-TEST(Interface, ParameterGroup)
+TEST(Interface, ParametersSet)
 {
 	int td = 3;
 	int k = 5;
-	ParameterGroup pg = (target_dimension=td, num_neighbors=k);
+	ParametersSet pg = (target_dimension=td, num_neighbors=k);
 	ASSERT_EQ(static_cast<int>(pg(target_dimension)),td);
 	ASSERT_EQ(static_cast<int>(pg(num_neighbors)),k);
 }
 
-TEST(Interface, OneParameterParameterGroup)
+TEST(Interface, OneParameterParametersSet)
 {
 	int td = 3;
-	ParameterGroup pg = (target_dimension=td);
+	ParametersSet pg = (target_dimension=td);
 	ASSERT_EQ(static_cast<int>(pg(target_dimension)),td);
 }
 
