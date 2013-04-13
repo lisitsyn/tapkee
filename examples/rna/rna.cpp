@@ -10,10 +10,11 @@
 
 using namespace std;
 using namespace tapkee;
+using namespace tapkee::keywords;
 
-struct hamming_distance_callback
+struct match_kernel_callback
 {
-	ScalarType distance(const string& l, const string& r) 
+	ScalarType kernel(const string& l, const string& r) const
 	{
 		return inner_product(l.begin(),l.end(),r.begin(),
 		                     0,plus<int>(),not2(equal_to<string::value_type>()));
@@ -32,18 +33,14 @@ int main(int argc, const char** argv)
 		rnas.push_back(line);
 	}
 	
-	dummy_kernel_callback<string> kcb;
-	hamming_distance_callback dcb;
+	match_kernel_callback kcb;
+	dummy_distance_callback<string> dcb;
 	dummy_feature_vector_callback<string> fvcb;
 
-	ParametersMap parameters;
-	parameters[ReductionMethod] = MultidimensionalScaling;
-	parameters[TargetDimension] = static_cast<IndexType>(2);
-	parameters[DiffusionMapTimesteps] = static_cast<IndexType>(1);
-	parameters[GaussianKernelWidth] = static_cast<ScalarType>(10.0);
-
-	ReturnResult result = embed(rnas.begin(),rnas.end(),
-	                            kcb,dcb,fvcb,parameters);
+	ReturnResult result = embed(rnas.begin(),rnas.end(),kcb,dcb,fvcb,
+	                            (method=KernelLocallyLinearEmbedding,
+	                             num_neighbors=30,
+	                             target_dimension=2));
 	cout << result.first.transpose() << endl;
 
 	return 0;
