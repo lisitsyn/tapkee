@@ -95,10 +95,11 @@ struct generalized_eigen_embedding_impl<LMatrixType, RMatrixType, MatrixOperatio
 };
 
 template <class LMatrixType, class RMatrixType, class MatrixOperationType>
-EmbeddingResult generalized_eigen_embedding(EigenEmbeddingMethodId method, const LMatrixType& lhs,
+EmbeddingResult generalized_eigen_embedding(EigenMethod method, const LMatrixType& lhs,
                                             const RMatrixType& rhs,
                                             IndexType target_dimension, unsigned int skip)
 {
+	LoggingSingleton::instance().message_info("Using the " + get_eigen_method_name(method) + " eigendecomposition method.");
 	switch (method)
 	{
 #ifdef TAPKEE_WITH_ARPACK

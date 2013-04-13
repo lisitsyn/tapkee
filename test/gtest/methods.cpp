@@ -11,32 +11,28 @@
 #include <algorithm>
 #include <set>
 
+using namespace tapkee;
+using namespace tapkee::keywords;
+using std::vector;
+
 TEST(Methods,KernelLocallyLinearEmbeddingSmokeTest)
 {
 	const int N = 100;
 
-	tapkee::DenseMatrix X = swissroll(N);
+	DenseMatrix X = swissroll(N);
 
 	kernel_callback kcb(X);
 	distance_callback dcb(X);
 	feature_vector_callback fcb(X);
 
-	tapkee::ParametersMap parameters;
-	parameters[tapkee::ReductionMethod] = tapkee::KernelLocallyLinearEmbedding;
-	parameters[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(3);
-	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(15);
-	parameters[tapkee::NeighborsMethod] = tapkee::CoverTree;
-	parameters[tapkee::EigenEmbeddingMethod] = tapkee::Arpack;
-	//tapkee::LoggingSingleton::instance().enable_info();
-
 	vector<int> data;
 	for (int i=0; i<N; i++)
 		data.push_back(i);
 
-	tapkee::ReturnResult result;
+	ReturnResult result;
 	// should produce no error
-	ASSERT_NO_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,parameters));
+	ASSERT_NO_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,
+	                               (method=KernelLocallyLinearEmbedding,num_neighbors=15)));
 	// that's normal
 	ASSERT_EQ(2,result.first.cols());
 	// that's normal
@@ -47,20 +43,11 @@ TEST(Methods,KernelLocalTangentSpaceAlignmentSmokeTest)
 {
 	const int N = 100;
 
-	tapkee::DenseMatrix X = swissroll(N);
+	DenseMatrix X = swissroll(N);
 
 	kernel_callback kcb(X);
 	distance_callback dcb(X);
 	feature_vector_callback fcb(X);
-
-	tapkee::ParametersMap parameters;
-	parameters[tapkee::ReductionMethod] = tapkee::KernelLocalTangentSpaceAlignment;
-	parameters[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(3);
-	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(15);
-	parameters[tapkee::NeighborsMethod] = tapkee::CoverTree;
-	parameters[tapkee::EigenEmbeddingMethod] = tapkee::Arpack;
-	//tapkee::LoggingSingleton::instance().enable_info();
 
 	vector<int> data;
 	for (int i=0; i<N; i++)
@@ -68,7 +55,8 @@ TEST(Methods,KernelLocalTangentSpaceAlignmentSmokeTest)
 
 	tapkee::ReturnResult result;
 	// should produce no error
-	ASSERT_NO_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,parameters));
+	ASSERT_NO_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,
+	                               (method=KernelLocalTangentSpaceAlignment,num_neighbors=15)));
 	// that's normal
 	ASSERT_EQ(2,result.first.cols());
 	// that's normal
@@ -79,20 +67,11 @@ TEST(Methods,HessianLocallyLinearEmbeddingSmokeTest)
 {
 	const int N = 100;
 
-	tapkee::DenseMatrix X = swissroll(N);
+	DenseMatrix X = swissroll(N);
 
 	kernel_callback kcb(X);
 	distance_callback dcb(X);
 	feature_vector_callback fcb(X);
-
-	tapkee::ParametersMap parameters;
-	parameters[tapkee::ReductionMethod] = tapkee::HessianLocallyLinearEmbedding;
-	parameters[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(3);
-	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(15);
-	parameters[tapkee::NeighborsMethod] = tapkee::CoverTree;
-	parameters[tapkee::EigenEmbeddingMethod] = tapkee::Arpack;
-	//tapkee::LoggingSingleton::instance().enable_info();
 
 	vector<int> data;
 	for (int i=0; i<N; i++)
@@ -100,7 +79,8 @@ TEST(Methods,HessianLocallyLinearEmbeddingSmokeTest)
 
 	tapkee::ReturnResult result;
 	// should produce no error
-	ASSERT_NO_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,parameters));
+	ASSERT_NO_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,
+	                               (method=HessianLocallyLinearEmbedding,num_neighbors=15)));
 	// that's normal
 	ASSERT_EQ(2,result.first.cols());
 	// that's normal

@@ -20,7 +20,7 @@ The main entry point of Tapkee is the [embed](https://github.com/lisitsyn/tapkee
 function (see [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) for more details) that
 returns embedding for provided data and a function that can be used to project data out of the sample (if such
 function is implemented). This function takes two random access iterators (that denote begin and end of the data),
-three callbacks (kernel callback, distance callback and feature vector access callback) and parameters map.
+three callbacks (kernel callback, distance callback and feature vector access callback) and a set of parameters.
 
 In the simplest case `begin` and `end` are set to the corresponding iterators of some `vector<tapkee::IndexType>` 
 filled with a range of values from 0 to N-1 where N is the number of vectors to embed. 
@@ -36,27 +36,55 @@ access to feature vector. For example, to use the Locally Linear Embedding algor
 callback; the Multidimensional Scaling algorithm requires only a distance callback and PCA requires only a feature
 vector access callback. Full set of callbacks (all three callbacks) makes possible to use all the implemented methods.
 
-Parameters map should contain all the required parameters as values with keys as 
-[`TAPKEE_PARAMETERS`](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp#L61). If 
-some parameter is missed in the map the library throws an exception with information about missed parameter.
-You may check which parameters do you have to set in the documentation of parameters and methods or in 
-[implementations](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_methods.hpp)
-where parameters are obtained using the `PARAMETER` macro. 
+To specify options a parameter set is used. We define a convenient syntax for that - for example to let 
+the library to embed with the kernel Locally Linear Embedding algorithm and number of neighbors set to 30 you
+use the following code (parentheses around the expression are required):
 
-For example to run the Locally Linear Embedding algorithm you might need to populate the parameters map with the following code:
+	(method=KernelLocallyLinearEmbedding, num_neighbors=30)
 
-	tapkee::ParametersMap parameters;
-	parameters[tapkee::ReductionMethod] = LocallyLinearEmbedding;
-	parameters[tapkee::NeighborsMethod] = CoverTree;
-	parameters[tapkee::EigenEmbeddingMethod] = Arpack;
-	parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(2);
-	parameters[tapkee::NumberOfNeighobors] = static_cast<tapkee::IndexType>(20);
+Here `method` and `num_neighbors` are the keywords. See [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) 
+for more details on keywords.
 
-Integration issues
-------------------
+Minimal example
+---------------
 
-There are a few issues related to including the Tapkee library. First, if your library already includes 
-Eigen3 (and only if) - you might need to let Tapkee know about that with the following define:
+A minimal working example of using the library:
+
+	#include <tapkee.hpp>
+	#include <callback/dummy_callbacks.hpp>
+
+	using namespace std;
+	using namespace tapkee;
+	using namespace tapkee::keywords;
+
+	struct my_distance_callback
+	{
+		ScalarType distance(IndexType l, IndexType r) { return abs(l-r); } 
+	}; 
+
+	int main(int argc, const char** argv)
+	{
+		const int N = 100;
+		vector<IndexType> indices(N);
+		for (int i=0; i<N; i++) indices[i] = i;
+
+		dummy_kernel_callback<IndexType> kcb;
+		my_distance_callback dcb;
+		dummy_feature_vector_callback<IndexType> fvcb;
+
+		ReturnResult result = embed(indices.begin(),indices.end(),
+		                            kcb,dcb,fvcb,(method=MultidimensionalScaling,target_dimension=1));
+		cout << result.first.transpose() << endl;
+
+		return 0;
+	}
+
+Integration
+-----------
+
+There are a few issues related to including the Tapkee library to your code. First, if your library 
+already includes Eigen3 (and only if) - you might need to let Tapkee 
+know about that with the following define:
 
 `#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
@@ -64,7 +92,7 @@ Please note that if you don't include Eigen3 in your project there is no need to
 in this case Eigen3 will be included by Tapkee. This issue comes from the need of including the Eigen3 library
 only once when using some specific parameters (like debug and extensions).
 
-If you are able to use less restrictive licenses (such as LGPLv3) you could define 
+If you are able to use less restrictive licenses (such as LGPLv3) you may define 
 the following variable:
 
 - `TAPKEE_USE_LGPL_COVERTREE` to use Covertree code by John Langford.
@@ -76,7 +104,8 @@ For an example of integration you may check
 [Tapkee adapter in Shogun](https://github.com/shogun-toolbox/shogun/blob/master/src/shogun/lib/tapkee/tapkee_shogun.cpp). 
 
 When working with installed headers you may check which version of the library 
-do you have with checking the values of `TAPKEE_MAJOR_VERSION` and `TAPKEE_MINOR_VERSION` defines.
+do you have with checking the values of `TAPKEE_WORLD_VERSION`, `TAPKEE_MAJOR_VERSION` 
+and `TAPKEE_MINOR_VERSION` defines.
 
 We welcome any integration so please contact authors if you have got any questions. If you have 
 successfully used the library please also let authors know about that - mentions of any
@@ -85,7 +114,7 @@ applications are very appreciated.
 Customization
 -------------
 
-Tapkee is being developed to be highly customizable with preprocessor definitions.
+Tapkee is designed to be highly customizable with preprocessor definitions.
 
 If you want to use float as internal numeric type (default is double) you may do 
 that with definition of `#define TAPKEE_CUSTOM_NUMTYPE float` 
@@ -127,11 +156,11 @@ There are a few cases when you'd want to put some definitions:
   building unit-tests require googletest. If you are running Ubuntu you may install `libgtest-dev` package for that. 
   Otherwise, if you have gtest sources around you may provide them as `-DGTEST_SOURCE_DIR` and `-DGTEST_INCLUDES_DIR`.
   If may also download gtest with the following command: 
-  ```
-   wget http://googletest.googlecode.com/files/gtest-1.6.0.zip && 
-   unzip -q gtest-1.6.0.zip && cd gtest-1.6.0 && cmake . && 
-   make && cd .. && rm gtest-1.6.0.zip
-  ```
+
+	wget http://googletest.googlecode.com/files/gtest-1.6.0.zip && 
+	unzip -q gtest-1.6.0.zip && cd gtest-1.6.0 && cmake . && 
+	make && cd .. && rm gtest-1.6.0.zip
+  
   Downloaded sources will be used by Tapkee on build.
   To run tests use `make test` command (or better 'ctest -VV').
 
@@ -146,11 +175,11 @@ There are a few cases when you'd want to put some definitions:
 The library requires Eigen3 to be available in your path. The ARPACK library is also highly 
 recommended to achieve best performance. On Debian/Ubuntu these packages can be installed with 
 
-`sudo apt-get install libeigen3-dev libarpack2-dev`
+	sudo apt-get install libeigen3-dev libarpack2-dev
 
 If you are using Mac OS X and Macports you can install these packages with 
 
-`sudo port install eigen3 && sudo port install arpack`
+	sudo port install eigen3 && sudo port install arpack`
 
 In case you want to use some non-default 
 compiler use `CC=your-C-compiler CXX=your-C++-compiler cmake [definitions] ..` when running cmake.
@@ -206,9 +235,6 @@ Exceptions are:
 
 - [Covertree code](https://github.com/lisitsyn/tapkee/tree/master/include/neighbors/covertree.hpp) by John Langford and Dinoj Surendran 
   which is distributed under the [LGPLv3 license](https://github.com/lisitsyn/tapkee/tree/master/LGPL-LICENSE).
-
-- [Any type](https://github.com/lisitsyn/tapkee/tree/master/include/utils/any.hpp) by Christopher Diggins which is distributed under 
-  the [Boost v.1.0 license](http://www.boost.org/LICENSE_1_0.txt).
 
 - [EZOptionsParser](https://github.com/lisitsyn/tapkee/tree/master/src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed 
   under the [MIT license](https://github.com/lisitsyn/tapkee/tree/master/MIT-LICENSE).

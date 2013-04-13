@@ -148,7 +148,7 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 }
 
 template <class RandomAccessIterator, class Callback>
-Neighbors find_neighbors(NeighborsMethodId method, const RandomAccessIterator& begin, 
+Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& begin, 
                          const RandomAccessIterator& end, const Callback& callback, 
                          IndexType k, bool check_connectivity)
 {

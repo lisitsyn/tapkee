@@ -9,7 +9,8 @@
 namespace tapkee
 {
 
-string get_method_name(MethodId m)
+/** Returns the name of the provided method */
+string get_method_name(DimensionReductionMethod m)
 {
 	switch (m)
 	{
@@ -36,38 +37,8 @@ string get_method_name(MethodId m)
 	return "hello";
 }
 
-string get_parameter_name(ParameterKey pk)
-{
-	switch (pk)
-	{
-#define __parameter_case(X) case X: return ""#X; break
-		__parameter_case(ReductionMethod);
-		__parameter_case(NumberOfNeighbors);
-		__parameter_case(TargetDimension);
-		__parameter_case(CurrentDimension);
-		__parameter_case(EigenEmbeddingMethod);
-		__parameter_case(NeighborsMethod);
-		__parameter_case(DiffusionMapTimesteps);
-		__parameter_case(GaussianKernelWidth);
-		__parameter_case(MaxIteration);
-		__parameter_case(SpeGlobalStrategy);
-		__parameter_case(SpeNumberOfUpdates);
-		__parameter_case(SpeTolerance);
-		__parameter_case(LandmarkRatio);
-		__parameter_case(NullspaceShift);
-		__parameter_case(KlleShift);
-		__parameter_case(CheckConnectivity);
-		__parameter_case(FaEpsilon);
-		__parameter_case(ProgressFunction);
-		__parameter_case(CancelFunction);
-		__parameter_case(SnePerplexity);
-		__parameter_case(SneTheta);
-#undef parameter_case
-	}
-	return "hello";
-}
-
-string get_neighbors_method_name(NeighborsMethodId m)
+/** Returns the name of the provided neighbors method */
+string get_neighbors_method_name(NeighborsMethod m)
 {
 	switch (m)
 	{
@@ -79,7 +50,8 @@ string get_neighbors_method_name(NeighborsMethodId m)
 	return "hello";
 }
 
-string get_eigenembedding_method_name(EigenEmbeddingMethodId m)
+/** Returns the name of the provided eigen method */
+string get_eigen_method_name(EigenMethod m)
 {
 	switch (m)
 	{

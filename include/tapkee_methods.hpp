@@ -11,7 +11,6 @@
 #include <utils/naming.hpp>
 #include <utils/time.hpp>
 #include <utils/logging.hpp>
-#include <utils/parameters.hpp>
 #include <routines/locally_linear.hpp>
 #include <routines/eigen_embedding.hpp>
 #include <routines/generalized_eigen_embedding.hpp>
@@ -34,6 +33,27 @@ namespace tapkee
 //! Main namespace for all internal routines, should not be exposed as public API
 namespace tapkee_internal
 {
+
+static const ParametersSet defaults = (
+	tapkee::keywords::eigen_method = tapkee::keywords::by_default,
+	tapkee::keywords::neighbors_method = tapkee::keywords::by_default,
+	tapkee::keywords::num_neighbors = tapkee::keywords::by_default,
+	tapkee::keywords::target_dimension = tapkee::keywords::by_default,
+	tapkee::keywords::diffusion_map_timesteps = tapkee::keywords::by_default,
+	tapkee::keywords::gaussian_kernel_width = tapkee::keywords::by_default,
+	tapkee::keywords::max_iteration = tapkee::keywords::by_default,
+	tapkee::keywords::spe_global_strategy = tapkee::keywords::by_default,
+	tapkee::keywords::spe_num_updates = tapkee::keywords::by_default,
+	tapkee::keywords::spe_tolerance = tapkee::keywords::by_default,
+	tapkee::keywords::landmark_ratio = tapkee::keywords::by_default,
+	tapkee::keywords::nullspace_shift = tapkee::keywords::by_default,
+	tapkee::keywords::klle_shift = tapkee::keywords::by_default,
+	tapkee::keywords::check_connectivity = tapkee::keywords::by_default,
+	tapkee::keywords::fa_epsilon = tapkee::keywords::by_default,
+	tapkee::keywords::progress_function = tapkee::keywords::by_default,
+	tapkee::keywords::cancel_function = tapkee::keywords::by_default,
+	tapkee::keywords::sne_perplexity = tapkee::keywords::by_default,
+	tapkee::keywords::sne_theta = tapkee::keywords::by_default);
 
 class Context
 {
@@ -86,67 +106,61 @@ public:
 
 	ImplementationBase(RandomAccessIterator b, RandomAccessIterator e,
 	                   const Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>& cbks,
-	                   ParametersMap& pmap, const Context& ctx) : 
+	                   ParametersSet& pmap, const Context& ctx) : 
 		parameters(pmap), context(ctx), callbacks(cbks),
 		plain_distance(PlainDistance<RandomAccessIterator,DistanceCallback>(cbks.distance)),
 		kernel_distance(KernelDistance<RandomAccessIterator,KernelCallback>(cbks.kernel)),
 		begin(b), end(e), 
 		eigen_method(), neighbors_method(), eigenshift(), traceshift(),
 		check_connectivity(), n_neighbors(), width(), timesteps(),
-		ratio(), max_iteration(), tolerance(), n_updates(), current_dimension(),
-		perplexity(), theta(), global_strategy(), epsilon(), target_dimension(),
-		n_vectors(0)
+		ratio(), max_iteration(), tolerance(), n_updates(), perplexity(), 
+		theta(), global_strategy(), epsilon(), target_dimension(),
+		n_vectors(0), current_dimension(0)
 	{
 		n_vectors = (end-begin);
 
-		perplexity = parameter<ScalarType>(SnePerplexity).withDefault(scalar(min(30.0,(n_vectors-1)/3.0)));
-		target_dimension = parameter<IndexType>(TargetDimension).withDefault(index(2));
-		ratio = parameter<ScalarType>(LandmarkRatio).withDefault(scalar(0.5));
-		n_neighbors = parameter<IndexType>(NumberOfNeighbors);
+		perplexity = parameters(keywords::sne_perplexity);
+		target_dimension = parameters(keywords::target_dimension);
+		ratio = parameters(keywords::landmark_ratio);
+		n_neighbors = parameters(keywords::num_neighbors).checked().positive();
 		
 		if (n_vectors > 0)
 		{
-			perplexity = perplexity.checked().in_range(scalar(0.0),scalar((n_vectors-1)/3.0 + 1e-6));
 			target_dimension = target_dimension.checked().in_range(index(1),index(n_vectors));
 			n_neighbors = n_neighbors.checked().in_range(index(3),index(n_vectors));
-			ratio = parameter<ScalarType>(LandmarkRatio).checked().in_range(scalar(1.0/n_vectors),scalar(1.0 + 1e-6));
 		}
 
-#ifdef TAPKEE_WITH_ARPACK
-		EigenEmbeddingMethodId default_eigen_method = Arpack;
-#else
-		EigenEmbeddingMethodId default_eigen_method = Dense;
-#endif
-		eigen_method = parameter<EigenEmbeddingMethodId>(EigenEmbeddingMethod).withDefault(default_eigen_method);
+		eigen_method = parameters(keywords::eigen_method);
+		neighbors_method = parameters(keywords::neighbors_method);
+		check_connectivity = parameters(keywords::check_connectivity);
+		width = parameters(keywords::gaussian_kernel_width).checked().positive();
+		timesteps = parameters(keywords::diffusion_map_timesteps).checked().positive();
+		eigenshift = parameters(keywords::nullspace_shift);
+		traceshift = parameters(keywords::klle_shift);
+		max_iteration = parameters(keywords::max_iteration).checked().positive();
+		tolerance = parameters(keywords::spe_tolerance).checked().positive();
+		n_updates = parameters(keywords::spe_num_updates).checked().positive();
+		theta = parameters(keywords::sne_theta).checked().positive();
 
-#ifdef TAPKEE_USE_LGPL_COVERTREE
-		NeighborsMethodId default_neighbors_method = CoverTree;
-#else
-		NeighborsMethodId default_neighbors_method = Brute;
-#endif
-		neighbors_method = parameter<NeighborsMethodId>(NeighborsMethod).withDefault(default_neighbors_method);
-
-		check_connectivity = parameter<bool>(CheckConnectivity).withDefault(true);
-
-		width = parameter<ScalarType>(GaussianKernelWidth).withDefault(scalar(1.0)).checked().positive();
-		timesteps = parameter<IndexType>(DiffusionMapTimesteps).withDefault(index(1)).checked().positive();
-		eigenshift = parameter<ScalarType>(NullspaceShift).withDefault(scalar(1e-9));
-		traceshift = parameter<ScalarType>(KlleShift).withDefault(scalar(1e-3));
-
-		max_iteration = parameter<IndexType>(MaxIteration).checked().positive();
-		tolerance = parameter<ScalarType>(SpeTolerance).checked().positive();
-		n_updates = parameter<IndexType>(SpeNumberOfUpdates).checked().positive();
-		
-		current_dimension = parameter<IndexType>(CurrentDimension).checked().positive();
-		
-		theta = parameter<ScalarType>(SneTheta).checked().positive();
-		
+		if (n_vectors > 0)
+		{
+			DenseVector dv = DenseVector::Zero(0);
+			try 
+			{
+				callbacks.feature.vector(*begin,dv);
+			}
+			catch (const unsupported_method_error&)
+			{
+				current_dimension = 0;
+			}
+			current_dimension = dv.size();
+		}
 	}
 
 	static const IndexType SkipOneEigenvalue = 1;
 	static const IndexType SkipNoEigenvalues = 0;
 
-	ParametersMap parameters;
+	ParametersSet parameters;
 	Context context;
 	Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback> callbacks;
 	PlainDistance<RandomAccessIterator,DistanceCallback> plain_distance;
@@ -167,7 +181,6 @@ public:
 	Parameter max_iteration;
 	Parameter tolerance;
 	Parameter n_updates;
-	Parameter current_dimension;
 	Parameter perplexity;
 	Parameter theta;
 	Parameter global_strategy;
@@ -175,26 +188,7 @@ public:
 	Parameter target_dimension;
 
 	IndexType n_vectors;
-
-	template <typename T>
-	Parameter parameter(ParameterKey key)
-	{
-		if (parameters.count(key))
-		{
-			try
-			{
-				return Parameter::of(parameters[key].template cast<T>());
-			}
-			catch (const anyimpl::bad_any_cast&)
-			{
-				throw wrong_parameter_type_error("Wrong type of " + get_parameter_name(key));
-			}
-		}
-		else
-		{
-			return Parameter();
-		}
-	}
+	IndexType current_dimension;
 
 	inline static ScalarType scalar(ScalarType v)
 	{
@@ -206,7 +200,7 @@ public:
 		return v;
 	}
 
-	ReturnResult embed(MethodId method)
+	ReturnResult embedUsing(DimensionReductionMethod method)
 	{
 		if (context.is_cancelled()) 
 			throw cancelled_exception();
@@ -303,6 +297,8 @@ public:
 
 	ReturnResult embedLandmarkMultidimensionalScaling()
 	{
+		ratio = ratio.checked().in_range(scalar(1.0/n_vectors),scalar(1.0 + 1e-6));
+
 		Landmarks landmarks = 
 			select_landmarks_random(begin,end,ratio);
 		DenseSymmetricMatrix distance_matrix = 
@@ -340,6 +336,8 @@ public:
 
 	ReturnResult embedLandmarkIsomap()
 	{
+		ratio = ratio.checked().in_range(scalar(1.0/n_vectors),scalar(1.0 + 1e-6));
+
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,plain_distance,
 		                                     n_neighbors,check_connectivity);
 		Landmarks landmarks = 
@@ -518,6 +516,8 @@ public:
 
 	ReturnResult embedtDistributedStochasticNeighborEmbedding()
 	{
+		perplexity = perplexity.checked().in_range(scalar(0.0),scalar((n_vectors-1)/3.0 + 1e-6));
+
 		DenseMatrix data(static_cast<IndexType>(current_dimension),n_vectors);
 		DenseVector feature_vector(static_cast<IndexType>(current_dimension));
 		FeatureVectorCallback feature_vector_callback = callbacks.feature;
@@ -542,7 +542,7 @@ template <class RandomAccessIterator, class KernelCallback,
 ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback>
 	initialize(RandomAccessIterator begin, RandomAccessIterator end,
 	           KernelCallback kernel, DistanceCallback distance, FeatureVectorCallback feature_vector,
-	           ParametersMap& pmap, const Context& ctx)
+	           ParametersSet& pmap, const Context& ctx)
 {
 	return ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback>(
 			begin,end,Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>(kernel,distance,feature_vector),

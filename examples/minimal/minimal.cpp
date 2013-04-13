@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace tapkee;
+using namespace tapkee::keywords;
 
 struct my_distance_callback
 {
@@ -19,12 +20,8 @@ int main(int argc, const char** argv)
 	my_distance_callback dcb;
 	dummy_feature_vector_callback<IndexType> fvcb;
 
-	ParametersMap parameters;
-	parameters[REDUCTION_METHOD] = MULTIDIMENSIONAL_SCALING;
-	parameters[TARGET_DIMENSION] = static_cast<IndexType>(1);
-
 	ReturnResult result = embed(indices.begin(),indices.end(),
-	                            kcb,dcb,fvcb,parameters);
+	                            kcb,dcb,fvcb,(method=MultidimensionalScaling,target_dimension=1));
 	cout << result.first.transpose() << endl;
 
 	return 0;

@@ -58,7 +58,7 @@ tapkee::DenseMatrix read_data(ifstream& ifs)
 	return fm;
 }
 
-bool method_needs_kernel(tapkee::MethodId method) 
+bool method_needs_kernel(tapkee::DimensionReductionMethod method) 
 {
 	switch (method)
 	{
@@ -87,7 +87,7 @@ bool method_needs_kernel(tapkee::MethodId method)
 	return false;
 }
 
-bool method_needs_distance(tapkee::MethodId method)
+bool method_needs_distance(tapkee::DimensionReductionMethod method)
 {
 	switch (method)
 	{
@@ -116,7 +116,7 @@ bool method_needs_distance(tapkee::MethodId method)
 	return false;
 }
 
-tapkee::MethodId parse_reduction_method(const char* str)
+tapkee::DimensionReductionMethod parse_reduction_method(const char* str)
 {
 	if (!strcmp(str,"local_tangent_space_alignment") || !strcmp(str,"ltsa"))
 		return tapkee::KernelLocalTangentSpaceAlignment;
@@ -161,7 +161,7 @@ tapkee::MethodId parse_reduction_method(const char* str)
 	return tapkee::PassThru;
 }
 
-tapkee::NeighborsMethodId parse_neighbors_method(const char* str)
+tapkee::NeighborsMethod parse_neighbors_method(const char* str)
 {
 	if (!strcmp(str,"brute"))
 		return tapkee::Brute;
@@ -174,7 +174,7 @@ tapkee::NeighborsMethodId parse_neighbors_method(const char* str)
 	return tapkee::Brute;
 }
 
-tapkee::EigenEmbeddingMethodId parse_eigen_method(const char* str)
+tapkee::EigenMethod parse_eigen_method(const char* str)
 {
 #ifdef TAPKEE_WITH_ARPACK
 	if (!strcmp(str,"arpack"))

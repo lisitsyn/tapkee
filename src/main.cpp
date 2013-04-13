@@ -194,15 +194,14 @@ int run(int argc, const char** argv)
 		tapkee::LoggingSingleton::instance().enable_benchmark();
 		tapkee::LoggingSingleton::instance().message_info("Benchmarking enabled");
 	}
-		
-	tapkee::ParametersMap parameters;
+	
+	tapkee::DimensionReductionMethod tapkee_method;
 	{
 		string method;
 		opt.get(OPT_LONG_PREFIX METHOD_KEYWORD)->getString(method);
 		try
 		{
-			tapkee::MethodId tapkee_method = parse_reduction_method(method.c_str());
-			parameters[tapkee::ReductionMethod] = tapkee_method;
+			tapkee_method = parse_reduction_method(method.c_str());
 		} 
 		catch (const std::exception&)
 		{
@@ -210,13 +209,14 @@ int run(int argc, const char** argv)
 			return 0;
 		}
 	}
+	
+	tapkee::NeighborsMethod tapkee_neighbors_method;
 	{
 		string method;
 		opt.get(OPT_LONG_PREFIX NEIGHBORS_METHOD_KEYWORD)->getString(method);
 		try
 		{
-			tapkee::NeighborsMethodId tapkee_neighbors_method = parse_neighbors_method(method.c_str());
-			parameters[tapkee::NeighborsMethod] = tapkee_neighbors_method;
+			tapkee_neighbors_method = parse_neighbors_method(method.c_str());
 		}
 		catch (const std::exception&)
 		{
@@ -224,13 +224,13 @@ int run(int argc, const char** argv)
 			return 0;
 		}
 	}
+	tapkee::EigenMethod tapkee_eigen_method;
 	{
 		string method;
 		opt.get(OPT_LONG_PREFIX EIGEN_METHOD_KEYWORD)->getString(method);
 		try
 		{
-			tapkee::EigenEmbeddingMethodId tapkee_eigen_method = parse_eigen_method(method.c_str());
-			parameters[tapkee::EigenEmbeddingMethod] = tapkee_eigen_method;
+			tapkee_eigen_method = parse_eigen_method(method.c_str());
 		}
 		catch (const std::exception&)
 		{
@@ -238,100 +238,83 @@ int run(int argc, const char** argv)
 			return 0;
 		}
 	}
+	int target_dim = 1;
 	{
-		int target_dimension = 1;
-		opt.get(OPT_LONG_PREFIX TARGET_DIMENSION_KEYWORD)->getInt(target_dimension);
-		if (target_dimension < 0)
+		opt.get(OPT_LONG_PREFIX TARGET_DIMENSION_KEYWORD)->getInt(target_dim);
+		if (target_dim < 0)
 		{
 			tapkee::LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
 			                                                   "Please visit other universe");
 			return 0;
 		}
-		else
-			parameters[tapkee::TargetDimension] = static_cast<tapkee::IndexType>(target_dimension);
 	}
+	int k = 1;
 	{
-		int k = 1;
 		opt.get(OPT_LONG_PREFIX NUM_NEIGHBORS_KEYWORD)->getInt(k);
 		if (k < 3)
 		{
 			tapkee::LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
 			return 0;
 		}
-		else
-			parameters[tapkee::NumberOfNeighbors] = static_cast<tapkee::IndexType>(k);
 	}
+	double width = 1.0;
 	{
-		double width = 1.0;
 		opt.get(OPT_LONG_PREFIX GAUSSIAN_WIDTH_KEYWORD)->getDouble(width);
 		if (width < 0.0) 
 		{
 			tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
 			return 0;
 		}
-		else 
-			parameters[tapkee::GaussianKernelWidth] = static_cast<tapkee::ScalarType>(width);
 	}
+	int timesteps = 1;
 	{
-		int timesteps = 1;
 		opt.get(OPT_LONG_PREFIX TIMESTEPS_KEYWORD)->getInt(timesteps);
 		if (timesteps < 0)
 		{
 			tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
 			return 0;
 		}
-		else
-			parameters[tapkee::DiffusionMapTimesteps] = static_cast<tapkee::IndexType>(timesteps);
 	}
+	double eigenshift = 1e-9;
 	{
-		double eigenshift = 1e-9;
 		opt.get(OPT_LONG_PREFIX EIGENSHIFT_KEYWORD)->getDouble(eigenshift);
-		parameters[tapkee::NullspaceShift] = static_cast<tapkee::ScalarType>(eigenshift);
 	}
+	double landmark_rt = 0.0;
 	{
-		double landmark_ratio = 0.0;
-		opt.get(OPT_LONG_PREFIX LANDMARK_RATIO_KEYWORD)->getDouble(landmark_ratio);
-		parameters[tapkee::LandmarkRatio] = static_cast<tapkee::ScalarType>(landmark_ratio);
+		opt.get(OPT_LONG_PREFIX LANDMARK_RATIO_KEYWORD)->getDouble(landmark_rt);
 	}
+	bool spe_global = false;
 	{
 		if (opt.isSet(OPT_LONG_PREFIX SPE_LOCAL_KEYWORD))
-			parameters[tapkee::SpeGlobalStrategy] = static_cast<bool>(false);
+			spe_global = false;
 		else
-			parameters[tapkee::SpeGlobalStrategy] = static_cast<bool>(true);
+			spe_global = true;
 	}
+	double spe_tol = 1e-5;
 	{
-		double spe_tolerance = 1e-5;
-		opt.get(OPT_LONG_PREFIX SPE_TOLERANCE_KEYWORD)->getDouble(spe_tolerance);
-		parameters[tapkee::SpeTolerance] = static_cast<tapkee::ScalarType>(spe_tolerance);
+		opt.get(OPT_LONG_PREFIX SPE_TOLERANCE_KEYWORD)->getDouble(spe_tol);
 	}
+	int spe_num_upd = 100;
 	{
-		int spe_num_updates = 100;
-		opt.get(OPT_LONG_PREFIX SPE_NUM_UPDATES_KEYWORD)->getInt(spe_num_updates);
-		parameters[tapkee::SpeNumberOfUpdates] = static_cast<tapkee::IndexType>(spe_num_updates);
+		opt.get(OPT_LONG_PREFIX SPE_NUM_UPDATES_KEYWORD)->getInt(spe_num_upd);
 	}
+	int max_iters = 1000;
 	{
-		int max_iters = 1000;
 		opt.get(OPT_LONG_PREFIX MAX_ITERS_KEYWORD)->getInt(max_iters);
-		parameters[tapkee::MaxIteration] = static_cast<tapkee::IndexType>(max_iters);
 	}
+	double fa_eps = 1e-5;
 	{
-		double fa_epsilon = 1e-5;
-		opt.get(OPT_LONG_PREFIX FA_EPSILON_KEYWORD)->getDouble(fa_epsilon);
-		parameters[tapkee::FaEpsilon] = static_cast<tapkee::ScalarType>(fa_epsilon);
+		opt.get(OPT_LONG_PREFIX FA_EPSILON_KEYWORD)->getDouble(fa_eps);
 	}
-	
+	double perplexity = 30.0;
 	{
-		double perplexity = 30.0;
 		opt.get(OPT_LONG_PREFIX SNE_PERPLEXITY_KEYWORD)->getDouble(perplexity);
-		parameters[tapkee::SnePerplexity] = static_cast<tapkee::ScalarType>(perplexity);
 	}
+	double theta = 0.5;
 	{
-		double theta = 0.5;
 		opt.get(OPT_LONG_PREFIX SNE_THETA_KEYWORD)->getDouble(theta);
-		parameters[tapkee::SneTheta] = static_cast<tapkee::ScalarType>(theta);
 	}
 
-	parameters[tapkee::CancelFunction] = static_cast<bool (*)()>(cancel);
 	// Load data
 	string input_filename;
 	string output_filename;
@@ -370,7 +353,6 @@ int run(int argc, const char** argv)
 	tapkee::DenseMatrix input_data = read_data(ifs);
 	if (opt.isSet(OPT_LONG_PREFIX TRANSPOSE_INPUT_KEYWORD))
 		input_data.transposeInPlace();
-	parameters[tapkee::CurrentDimension] = static_cast<tapkee::IndexType>(input_data.rows());
 	
 	std::stringstream ss;
 	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
@@ -382,19 +364,38 @@ int run(int argc, const char** argv)
 	for (tapkee::IndexType i=0; i<input_data.cols(); ++i)
 		indices[i] = i;
 
+	using namespace tapkee::keywords;
+	tapkee::ParametersSet parameters = 
+			(method = tapkee_method,
+			 eigen_method = tapkee_eigen_method,
+			 neighbors_method = tapkee_neighbors_method,
+			 num_neighbors = k,
+			 target_dimension = target_dim,
+			 diffusion_map_timesteps = timesteps,
+			 gaussian_kernel_width = width,
+			 max_iteration = max_iters,
+			 spe_global_strategy = spe_global,
+			 spe_num_updates = spe_num_upd,
+			 spe_tolerance = spe_tol,
+			 landmark_ratio = landmark_rt,
+			 nullspace_shift = eigenshift,
+			 check_connectivity = true,
+			 fa_epsilon = fa_eps,
+			 sne_perplexity = perplexity,
+			 sne_theta = theta);
+
 #ifdef USE_PRECOMPUTED
 	tapkee::DenseMatrix distance_matrix;
 	tapkee::DenseMatrix kernel_matrix;
 	{
-		tapkee::TAPKEE_METHOD method = parameters[tapkee::REDUCTION_METHOD].cast<tapkee::TAPKEE_METHOD>();
-		if (method_needs_distance(method))
+		if (method_needs_distance(tapkee_method))
 		{
 			tapkee::tapkee_internal::timed_context context("[+] Distance matrix computation");
 			distance_matrix = 
 				matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
 				                     distance_callback(input_data));
 		} 
-		if (method_needs_kernel(method))
+		if (method_needs_kernel(tapkee_method))
 		{
 			tapkee::tapkee_internal::timed_context context("[+] Kernel matrix computation");
 			kernel_matrix = 
@@ -418,7 +419,8 @@ int run(int argc, const char** argv)
 	ofs << embedding.first.transpose();
 	ofs.close();
 
-	if (output_projection && embedding.second.implementation) {
+	if (output_projection && embedding.second.implementation) 
+	{
 		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->proj_mat;
 		ofs_mean << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mean_vec;
 	}

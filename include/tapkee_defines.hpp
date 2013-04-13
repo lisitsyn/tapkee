@@ -1,8 +1,5 @@
 /* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * This code also uses Any type developed by C. Diggins under Boost license, version 1.0.
- * http://www.boost.org/LICENSE_1_0.txt
- *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
 
@@ -11,7 +8,7 @@
 
 /* Tapkee includes */
 #include <tapkee_exceptions.hpp>
-#include <utils/any.hpp>
+#include <utils/parameters.hpp>
 #include <callback/callback_traits.hpp>
 #include <routines/methods_traits.hpp>
 /* End of Tapkee includes */
@@ -19,8 +16,10 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <string>
 
-#define TAPKEE_MAJOR_VERSION 1
+#define TAPKEE_WORLD_VERSION 1
+#define TAPKEE_MAJOR_VERSION 0
 #define TAPKEE_MINOR_VERSION 0
 
 //// Eigen 3 library includes
@@ -56,335 +55,65 @@
 //! Main namespace of the library, contains all public API definitions
 namespace tapkee 
 {
-
-	//! Parameters that are used by the library
-	enum ParameterKey
-	{
-		/** The key of the parameter map to indicate dimension reduction method that
-		 * is going to be used.
-		 *
-		 * Should always be set in the parameter map.
-		 * 
-		 * The corresponding value should be of type @ref tapkee::TAPKEE_METHOD. 
-		 */
-		ReductionMethod,
-		/** The key of the parameter map to store number of neighbors.
-		 *
-		 * Should be set for all local methods such as:
-		 * 
-		 * - @ref tapkee::KernelLocallyLinearEmbedding
-		 * - @ref tapkee::NeighborhoodPreservingEmbedding
-		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
-		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
-		 * - @ref tapkee::HessianLocallyLinearEmbedding
-		 * - @ref tapkee::LaplacianEigenmaps
-		 * - @ref tapkee::LocalityPreservingProjections
-		 * - @ref tapkee::Isomap
-		 * - @ref tapkee::LandmarkIsomap
-		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
-		 *        when @ref tapkee::SpeGlobalStrategy is set to false)
-		 *
-		 * The corresponding value should be of type @ref tapkee::IndexType, 
-		 * greater than @ref MINIMAL_K (3) and less than 
-		 * total number of vectors. 
-		 */
-		NumberOfNeighbors,
-		/** The key of the parameter map to store target dimension.
-		 *
-		 * It should be set as it is used by all methods. By default it is 
-		 * set to 2 though.
-		 * 
-		 * The corresponding value should have type 
-		 * @ref tapkee::IndexType and be greater than 
-		 * @ref MINIMAL_TD (1) and less than
-		 * minimum of total number of vectors and 
-		 * current dimension. 
-		 */
-		TargetDimension,
-		/** The key of the parameter map to store current dimension.
-		 *
-		 * Should be set for the following methods:
-		 *
-		 *  - @ref tapkee::NeighborhoodPreservingEmbedding
-		 *  - @ref tapkee::LinearLocalTangentSpaceAlignment
-		 *  - @ref tapkee::LocalityPreservingProjections
-		 *  - @ref tapkee::PCA
-		 *  - @ref tapkee::RandomProjection
-		 *  - @ref tapkee::PassThru
-		 *  - @ref tapkee::FactorAnalysis
-		 * 
-		 * The corresponding value should have type @ref tapkee::IndexType and
-		 * be greater than 1. 
-		 */
-		CurrentDimension,
-		/** The key of the parameter map to indicate eigendecomposition
-		 * method that is going to be used.
-		 * 
-		 * Should be set for the following eigendecomposition-based methods:
-		 *
-		 * - @ref tapkee::KernelLocallyLinearEmbedding
-		 * - @ref tapkee::NeighborhoodPreservingEmbedding
-		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
-		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
-		 * - @ref tapkee::HessianLocallyLinearEmbedding
-		 * - @ref tapkee::LaplacianEigenmaps
-		 * - @ref tapkee::LocalityPreservingProjections
-		 * - @ref tapkee::DiffusionMap
-		 * - @ref tapkee::Isomap
-		 * - @ref tapkee::LandmarkIsomap
-		 * - @ref tapkee::MultidimensionalScaling
-		 * - @ref tapkee::LandmarkMultidimensionalScaling
-		 * - @ref tapkee::KernelPCA
-		 * - @ref tapkee::PCA
-		 *
-		 * By default it is set to @ref tapkee::ARPACK if available.
-		 *
-		 * The corresponding value should have type 
-		 * @ref tapkee::EigenEmbeddingMethodId. 
-		 */
-		EigenEmbeddingMethod,
-		/** The key of the parameter map to indicate neighbors
-		 * finding method that is going to be used.
-		 * 
-		 * Should be set for the following local methods:
-		 * 
-		 * - @ref tapkee::KernelLocallyLinearEmbedding
-		 * - @ref tapkee::NeighborhoodPreservingEmbedding
-		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
-		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
-		 * - @ref tapkee::HessianLocallyLinearEmbedding
-		 * - @ref tapkee::LaplacianEigenmaps
-		 * - @ref tapkee::LocalityPreservingProjections
-		 * - @ref tapkee::Isomap
-		 * - @ref tapkee::LandmarkIsomap
-		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
-		 *        when @ref tapkee::SpeGlobalStrategy is set to false)
-		 *
-		 * By default it is set to @ref tapkee::COVERTREE if available.
-		 *
-		 * The corresponding value should have 
-		 * type @ref tapkee::NeighborsMethodId.
-		 */
-		NeighborsMethod,
-		/** The key of the parameter map to store number of
-		 * 'timesteps' that should be made by diffusion map model.
-		 * 
-		 * Should be set for @ref tapkee::DiffusionMap only.
-		 * 
-		 * The corresponding value should have type @ref tapkee::IndexType.
-		 */
-		DiffusionMapTimesteps,
-		/** The key of the parameter map to store width of
-		 * the gaussian kernel, that is used by the 
-		 * following methods:
-		 *
-		 * - @ref tapkee::LaplacianEigenmaps
-		 * - @ref tapkee::LocalityPreservingProjections
-		 * - @ref tapkee::DiffusionMap
-		 *
-		 * The corresponding value should have type @ref tapkee::ScalarType.
-		 */
-		GaussianKernelWidth,
-		/** The key of the parameter map to store maximal 
-		 * iteration that could be reached.
-		 *
-		 * Should be set for the following iterative methods:
-		 * - @ref tapkee::StochasticProximityEmbedding
-		 * - @ref tapkee::FactorAnalysis
-		 * 
-		 * The corresponding value should have type @ref tapkee::IndexType.
-		 */
-		MaxIteration,
-		/** The key of the parameter map to indicate
-		 * whether global strategy of SPE should be used.
-		 *
-		 * Should be set for @ref tapkee::StochasticProximityEmbedding only.
-		 *
-		 * The corresponding value should have type bool.
-		 */
-		SpeGlobalStrategy,
-		/** The key of the parameter map to store number of
-		 * updates to be done in SPE.
-		 *
-		 * Should be set for @ref tapkee::StochasticProximityEmbedding only.
-		 *
-		 * The corresponding value should have type @ref tapkee::IndexType.
-		 */
-		SpeNumberOfUpdates,
-		/** The key of the parameter map to store tolerance of
-		 * SPE. 
-		 * 
-		 * Should be set for @ref tapkee::StochasticProximityEmbedding only.
-		 *
-		 * The corresponding value should have type @ref tapkee::ScalarType.
-		 */
-		SpeTolerance,
-		/** The key of the parameter map to store ratio
-		 * of landmark points to be used (1.0 means all
-		 * points are landmarks and the reciprocal of number
-		 * of vectors means only one landmark).
-		 *
-		 * Should be set for landmark methods:
-		 *
-		 * - @ref tapkee::LandmarkIsomap
-		 * - @ref tapkee::LandmarkMultidimensionalScaling
-		 *  
-		 * The corresponding value should have type @ref tapkee::ScalarType
-		 * and be in [0,1] range.
-		 */
-		LandmarkRatio,
-		/** The key of the parameter map to store 
-		 * diagonal shift regularizer coefficient
-		 * of nullspace eigenproblems.
-		 *
-		 * Default is 1e-9.
-		 *
-		 * Should be set for the following methods:
-		 *
-		 * - @ref tapkee::KernelLocallyLinearEmbedding
-		 * - @ref tapkee::NeighborhoodPreservingEmbedding
-		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
-		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
-		 * - @ref tapkee::HessianLocallyLinearEmbedding
-		 * - @ref tapkee::LocalityPreservingProjections
-		 *
-		 * The corresponding value should have type @ref tapkee::ScalarType and
-		 * be quite close to zero.
-		 */
-		NullspaceShift,
-		/** The key of the parameter map to store
-		 * regularization shift of locally linear embedding
-		 * weights computation.
-		 *
-		 * Default is 1e-3.
-		 *
-		 * Should be set for @ref tapkee::KernelLocallyLinearEmbedding only.
-		 *
-		 * The corresponding value should have type @ref tapkee::ScalarType and
-		 * be quite close to zero.
-		 */
-		KlleShift,
-		/** The key of the parameter map to indicate
-		 * whether graph connectivity check should be done.
-		 *
-		 * Default is true. 
-		 *
-		 * Should be set for the following local methods:
-		 * 
-		 * - @ref tapkee::KernelLocallyLinearEmbedding
-		 * - @ref tapkee::NeighborhoodPreservingEmbedding
-		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
-		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
-		 * - @ref tapkee::HessianLocallyLinearEmbedding
-		 * - @ref tapkee::LaplacianEigenmaps
-		 * - @ref tapkee::LocalityPreservingProjections
-		 * - @ref tapkee::Isomap
-		 * - @ref tapkee::LandmarkIsomap
-		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
-		 *        when @ref tapkee::SpeGlobalStrategy is set to false)
-		 *
-		 * The corresponding value should have type bool.
-		 */
-		CheckConnectivity,
-		/** The key of the parameter map to store epsilon
-		 * parameter of t
-		 * 
-		 * Should be set for @ref tapkee::FactorAnalysis only.
-		 *
-		 * The corresponding value should have type @ref tapkee::ScalarType.
-		 */
-		FaEpsilon,
-		/** The key of the parameter map to store a pointer
-		 * to the function which could be called to indicate progress
-		 * that was made (it is called with an argument in range [0,1],
-		 * where 0 means 0% progress and 1 means 100% progress).
-		 *
-		 * Is not supported yet thus won't be used.
-		 *
-		 * The corresponding value should have type 
-		 * @code void (*)(double) @endcode 
-		 * (i.e. a pointer to some function that takes
-		 *  double argument and returns nothing).
-		 */
-		ProgressFunction,
-		/** The key of the parameter map to store a pointer 
-		 * to the function which could be called to check if 
-		 * computations were cancelled (the function should return 
-		 * true if computations were cancelled).
-		 *
-		 * It is called only once when method is starting to work.
-		 * 
-		 * If function returns true the library immediately 
-		 * throws @ref tapkee::cancelled_exception.
-		 *
-		 * The corresponding value should have type
-		 * @code bool (*)() @endcode 
-		 * (i.e. a pointer to some function that takes
-		 *  nothing and returns boolean).
-		 */
-		CancelFunction,
-		/** The key of the parameter map to store perplelixity
-		 * parameter of t-SNE.
-		 *
-		 * Should be set for @ref tapkee::tDistributedStochasticNeighborEmbedding only.
-		 *
-		 * The corresponding value should have type @ref tapkee::ScalarType.
-		 */
-		SnePerplexity,
-		/** The key of the parameter map to store theta 
-		 * parameter of t-SNE.
-		 *
-		 * Should be set for @ref tapkee::tDistributedStochasticNeighborEmbedding only.
-		 * 
-		 * The corresponding value should have type @ref tapkee::ScalarType.
-		 */
-		SneTheta
-	};
-
-
 	//! Dimension reduction methods
-	enum MethodId
+	enum DimensionReductionMethod
 	{
-		/** Kernel Locally Linear Embedding as described in @cite Decoste2001 */
+		/** Kernel Locally Linear Embedding as described 
+		 * in @cite Decoste2001 */
 		KernelLocallyLinearEmbedding,
-		/** Neighborhood Preserving Embedding as described in @cite He2005 */
+		/** Neighborhood Preserving Embedding as described 
+		 * in @cite He2005 */
 		NeighborhoodPreservingEmbedding,
-		/** Local Tangent Space Alignment as described in @cite Zhang2002 */
+		/** Local Tangent Space Alignment as described 
+		 * in @cite Zhang2002 */
 		KernelLocalTangentSpaceAlignment,
-		/** Linear Local Tangent Space Alignment as described in @cite Zhang2007 */
+		/** Linear Local Tangent Space Alignment as described 
+		 * in @cite Zhang2007 */
 		LinearLocalTangentSpaceAlignment,
-		/** Hessian Locally Linear Embedding as described in @cite Donoho2003 */
+		/** Hessian Locally Linear Embedding as described in 
+		 * @cite Donoho2003 */
 		HessianLocallyLinearEmbedding,
-		/** Laplacian Eigenmaps as described in @cite Belkin2002 */
+		/** Laplacian Eigenmaps as described in 
+		 * @cite Belkin2002 */
 		LaplacianEigenmaps,
-		/** Locality Preserving Projections as described in @cite He2003 */
+		/** Locality Preserving Projections as described in 
+		 * @cite He2003 */
 		LocalityPreservingProjections,
-		/** Diffusion map as described in @cite Coifman2006 */
+		/** Diffusion map as described in 
+		 * @cite Coifman2006 */
 		DiffusionMap,
-		/** Isomap as described in @cite Tenenbaum2000 */
+		/** Isomap as described in 
+		 * @cite Tenenbaum2000 */
 		Isomap,
-		/** Landmark Isomap as described in @cite deSilva2002 */
+		/** Landmark Isomap as described in 
+		 * @cite deSilva2002 */
 		LandmarkIsomap,
-		/** Multidimensional scaling as described in @cite Cox2000 */
+		/** Multidimensional scaling as described in 
+		 * @cite Cox2000 */
 		MultidimensionalScaling,
-		/** Landmark multidimensional scaling as described in @cite deSilva2004 */
+		/** Landmark multidimensional scaling as described in 
+		 * @cite deSilva2004 */
 		LandmarkMultidimensionalScaling,
-		/** Stochastic Proximity Embedding as described in @cite Agrafiotis2003 */
+		/** Stochastic Proximity Embedding as described in 
+		 * @cite Agrafiotis2003 */
 		StochasticProximityEmbedding,
-		/** Kernel PCA as described in @cite Scholkopf1997 */
+		/** Kernel PCA as described in 
+		 * @cite Scholkopf1997 */
 		KernelPCA,
 		/** Principal Component Analysis */
 		PCA,
-		/** Random Projection @cite Kaski1998*/
+		/** Random Projection as described in
+		 * @cite Kaski1998*/
 		RandomProjection,
 		/** Factor Analysis */
 		FactorAnalysis,
-		/** t-SNE and Barnes-Hut-SNE as described in \cite tSNE and \cite Barnes-Hut-SNE */
+		/** t-SNE and Barnes-Hut-SNE as described in 
+		 * @cite vanDerMaaten2008 and @cite vanDerMaaten2013 */
 		tDistributedStochasticNeighborEmbedding,
-		/** Passing through (doing nothing just passes data through) */
+		/** Passing through (doing nothing just passes the 
+		 * data through) */
 		PassThru
 	};
-
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 	// Methods identification
@@ -409,9 +138,8 @@ namespace tapkee
 	METHOD_THAT_NEEDS_ONLY_FEATURES_IS(tDistributedStochasticNeighborEmbedding);
 #endif // DOXYGEN_SHOULD_SKIP_THS
 
-
 	//! Neighbors computation methods
-	enum NeighborsMethodId
+	enum NeighborsMethod
 	{
 		//! Brute force method with not least than 
 		//! \f$ O(N N \log k) \f$ time complexity.
@@ -424,9 +152,8 @@ namespace tapkee
 #endif
 	};
 
-
 	//! Eigendecomposition methods
-	enum EigenEmbeddingMethodId
+	enum EigenMethod
 	{
 #ifdef TAPKEE_WITH_ARPACK
 		//! ARPACK-based method (requires the ARPACK library
@@ -441,7 +168,6 @@ namespace tapkee
 		//! all eigenvectors thus can be very slow doing large-scale.
 		Dense
 	};
-
 
 #ifdef TAPKEE_CUSTOM_INTERNAL_NUMTYPE
 	typedef TAPKEE_CUSTOM_INTERNAL_NUMTYPE ScalarType;
@@ -477,6 +203,386 @@ namespace tapkee
 	#endif
 #endif
 
+	//! The namespace that contains keywords for all parameters
+	namespace keywords
+	{
+		//! The namespace that contains implementations for the keywords
+		namespace keywords_internal
+		{
+			struct DefaultValue
+			{
+				DefaultValue() { }
+			};
+
+			/**
+			 * Usage is 
+			 * @code
+			 * 	ParameterKeyword<int> keyword;
+			 * 	Parameter p = (keyword = 5);
+			 * 	int p_value = p;
+			 * @endcode
+			 */
+			template <typename T> 
+			struct ParameterKeyword
+			{
+				typedef std::string Name;
+
+				ParameterKeyword(const Name& n, const T& dv) : name(n), default_value(dv) { }
+				ParameterKeyword(const ParameterKeyword& pk);
+				ParameterKeyword operator=(const ParameterKeyword& pk); 
+
+				Parameter operator=(const T& value) const
+				{
+					return Parameter::create(name,value);
+				}
+				Parameter operator=(const DefaultValue&) const
+				{
+					return Parameter::create(name,default_value);
+				}
+				operator string() const
+				{
+					return name;
+				}
+
+				Name name;
+				T default_value;
+			};
+		}
+		using namespace keywords_internal;
+
+		/** The keyword for the value that stands for the dimension reduction 
+		 * method to be used.
+		 *
+		 * Should always be set with a value (no default value is provided).
+		 *
+		 * The corresponding value should be of type @ref tapkee::MethodId. 
+		 */
+		static const ParameterKeyword<DimensionReductionMethod>
+			method("dimension reduction method", PassThru);
+
+		/** The keyword for the value that stands for the eigendecomposition
+		 * method to be used.
+		 * 
+		 * Used by the following eigendecomposition-based methods:
+		 *
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::DiffusionMap
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::MultidimensionalScaling
+		 * - @ref tapkee::LandmarkMultidimensionalScaling
+		 * - @ref tapkee::KernelPCA
+		 * - @ref tapkee::PCA
+		 *
+		 * Default value is @ref tapkee::Arpack if available, @ref tapkee::Dense otherwise.
+		 *
+		 * The corresponding value should have type 
+		 * @ref tapkee::EigenMethod. 
+		 */
+		static const ParameterKeyword<EigenMethod>
+			eigen_method("eigendecomposition method", Dense);
+
+		/** The keyword for the value that stands for the neighbors
+		 * finding method to be used.
+		 * 
+		 * Used by the following local methods:
+		 * 
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
+		 *        when @ref tapkee::keywords::spe_global_strategy is set to false)
+		 *
+		 * Default value is @ref tapkee::CoverTree if available, @ref tapkee::Brute otherwise.
+		 *
+		 * The corresponding value should have type
+		 * @ref tapkee::NeighborsMethodId.
+		 */
+		static const ParameterKeyword<NeighborsMethod> 
+			neighbors_method("nearest neighbors method", Brute);
+
+		/** The keyword for the value that stores the number of neighbors.
+		 *
+		 * Used by all local methods such as:
+		 * 
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
+		 *        when @ref tapkee::keywords::spe_global_strategy is set to false)
+		 *
+		 * Default value is 5.
+		 *
+		 * The corresponding value should be of type @ref tapkee::IndexType, 
+		 * greater than 3 and less than the total number of vectors. 
+		 */
+		static const ParameterKeyword<IndexType>
+			num_neighbors("number of neighbors", 5);
+
+		/** The keyword for the value that stores the target dimension.
+		 *
+		 * It is used by all the implemented methods. 
+		 *
+		 * Default value is 2.
+		 * 
+		 * The corresponding value should have type 
+		 * @ref tapkee::IndexType and be greater than 
+		 * 1 and less than the minimum of the total number 
+		 * of vectors and the current dimension. 
+		 */
+		static const ParameterKeyword<IndexType> 
+			target_dimension("target dimension", 2);
+
+		/** The keyword for the value that stores the number of
+		 * timesteps in the diffusion map model.
+		 * 
+		 * Used by @ref tapkee::DiffusionMap.
+		 *
+		 * Default value is 3.
+		 * 
+		 * The corresponding value should have type @ref tapkee::IndexType.
+		 */
+		static const ParameterKeyword<IndexType>
+			diffusion_map_timesteps("diffusion map timesteps", 3);
+
+		/** The keyword for the value that stores the width of
+		 * the gaussian kernel.
+		 *
+		 * Used by the following methods:
+		 *
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::DiffusionMap
+		 *
+		 * Default value is 1.0.
+		 *
+		 * The corresponding value should have type @ref tapkee::ScalarType.
+		 */
+		static const ParameterKeyword<ScalarType>
+			gaussian_kernel_width("the width of the gaussian kernel", 1.0);
+
+		/** The keyword for the value that stores the maximal 
+		 * iteration that could be reached.
+		 *
+		 * Used by the following iterative methods:
+		 * - @ref tapkee::StochasticProximityEmbedding
+		 * - @ref tapkee::FactorAnalysis
+		 * 
+		 * Default value is 100.
+		 *
+		 * The corresponding value should have type @ref tapkee::IndexType.
+		 */
+		static const ParameterKeyword<IndexType>
+			max_iteration("maximal iteration", 100);
+
+		/** The keyword for the value that indicates
+		 * whether global strategy of SPE should be used.
+		 *
+		 * Used by @ref tapkee::StochasticProximityEmbedding.
+		 *
+		 * Default value is true.
+		 *
+		 * The corresponding value should have type bool.
+		 */
+		static const ParameterKeyword<bool>
+			spe_global_strategy("SPE global strategy", true);
+
+		/** The keyword for the value that stores the number of
+		 * updates to be done in SPE.
+		 *
+		 * Used by @ref tapkee::StochasticProximityEmbedding.
+		 *
+		 * Default value is 100.
+		 *
+		 * The corresponding value should have type @ref tapkee::IndexType.
+		 */
+		static const ParameterKeyword<IndexType>
+			spe_num_updates("SPE number of updates", 100);
+
+		/** The keyword for the value that stores the tolerance of
+		 * the SPE algorithm. 
+		 * 
+		 * Used by @ref tapkee::StochasticProximityEmbedding.
+		 *
+		 * Default value is 1e-9.
+		 *
+		 * The corresponding value should have type @ref tapkee::ScalarType.
+		 */
+		static const ParameterKeyword<ScalarType>
+			spe_tolerance("SPE tolerance", 1e-9);
+
+		/** The keyword for the value that stores the ratio
+		 * of landmark points to be used (1.0 means all
+		 * points are landmarks and the reciprocal of the
+		 * number of vectors means only one landmark).
+		 *
+		 * Used by the following landmark methods:
+		 *
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::LandmarkMultidimensionalScaling
+		 *
+		 * Default is 0.5.
+		 *  
+		 * The corresponding value should have type @ref tapkee::ScalarType
+		 * and be in [0,1] range.
+		 */
+		static const ParameterKeyword<ScalarType>
+			landmark_ratio("ratio of landmark points", 0.5);
+
+		/** The keyword for the value that stores 
+		 * the diagonal shift regularizer for
+		 * eigenproblems.
+		 *
+		 * Default is 1e-9.
+		 *
+		 * Used by the following methods:
+		 *
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LocalityPreservingProjections
+		 *
+		 * The corresponding value should have type @ref tapkee::ScalarType and
+		 * be quite close to zero.
+		 */
+		static const ParameterKeyword<ScalarType>
+			nullspace_shift("diagonal shift of nullspace", 1e-9);
+
+		/** The keyword for the value that stores
+		 * the regularization shift of the locally linear embedding
+		 * algorithm weights computation problem.
+		 *
+		 * Used by @ref tapkee::KernelLocallyLinearEmbedding.
+		 *
+		 * Default is 1e-3.
+		 *
+		 * The corresponding value should have type @ref tapkee::ScalarType and
+		 * be quite close to zero.
+		 */
+		static const ParameterKeyword<ScalarType>
+			klle_shift("KLLE regularizer", 1e-3);
+
+		/** The keyword for the value that indicates
+		 * whether graph connectivity check should be done.
+		 *
+		 * Used by the following local methods:
+		 * 
+		 * - @ref tapkee::KernelLocallyLinearEmbedding
+		 * - @ref tapkee::NeighborhoodPreservingEmbedding
+		 * - @ref tapkee::KernelLocalTangentSpaceAlignment
+		 * - @ref tapkee::LinearLocalTangentSpaceAlignment
+		 * - @ref tapkee::HessianLocallyLinearEmbedding
+		 * - @ref tapkee::LaplacianEigenmaps
+		 * - @ref tapkee::LocalityPreservingProjections
+		 * - @ref tapkee::Isomap
+		 * - @ref tapkee::LandmarkIsomap
+		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
+		 *        when @ref tapkee::keywords::spe_global_strategy is set to false)
+		 *
+		 * Default is true. 
+		 *
+		 * The corresponding value should have type bool.
+		 */
+		static const ParameterKeyword<bool>
+			check_connectivity("check connectivity", true);
+
+		/** The keyword for the value that stores the epsilon
+		 * parameter of the Factor Analysis algorithm.
+		 * 
+		 * Used by @ref tapkee::FactorAnalysis.
+		 *
+		 * Default is 1e-9.
+		 *
+		 * The corresponding value should have type @ref tapkee::ScalarType.
+		 */
+		static const ParameterKeyword<ScalarType>
+			fa_epsilon("epsilon of FA", 1e-9);
+
+		/** The keyword for the value that stores a pointer
+		 * to the function which could be called to indicate progress
+		 * that has been made (it is called with an argument in range [0,1],
+		 * where 0 means 0% progress and 1 means 100% progress).
+		 *
+		 * Is not supported yet thus won't be used.
+		 *
+		 * The corresponding value should have type 
+		 * @code void (*)(double) @endcode 
+		 * (i.e. a pointer to some function that takes
+		 *  double argument and returns nothing).
+		 */
+		static const ParameterKeyword<void (*)(double)>  
+			progress_function("progress function", NULL);
+
+		/** The keyword for the value that stores a pointer 
+		 * to the function which could be called to check whether
+		 * computations were cancelled (the function should return 
+		 * true if computations were cancelled).
+		 *
+		 * Currently, it is called only once when 
+		 * method is starting to work.
+		 * 
+		 * If function returns true the library immediately 
+		 * throws @ref tapkee::cancelled_exception.
+		 *
+		 * The corresponding value should have type
+		 * @code bool (*)() @endcode 
+		 * (i.e. a pointer to some function that takes
+		 *  nothing and returns boolean).
+		 */
+		static const ParameterKeyword<bool (*)()>
+			cancel_function("cancel function", NULL);
+
+		/** The keyword for the value that stores perplelixity
+		 * parameter of t-SNE.
+		 *
+		 * Used by @ref tapkee::tDistributedStochasticNeighborEmbedding.
+		 *
+		 * Default value is 30.0;
+		 *
+		 * The corresponding value should have type @ref tapkee::ScalarType.
+		 */
+		static const ParameterKeyword<ScalarType>
+			sne_perplexity("SNE perplexity", 30.0);
+
+		/** The keyword for the value that stores the theta 
+		 * parameter of the t-SNE algorithm.
+		 *
+		 * Used by @ref tapkee::tDistributedStochasticNeighborEmbedding.
+		 *
+		 * Default value is 0.5.
+		 * 
+		 * The corresponding value should have type @ref tapkee::ScalarType.
+		 */
+		static const ParameterKeyword<ScalarType>
+			sne_theta("SNE theta", 0.5);
+		
+		/** The default value - assigning any keyword to this
+		 * static struct produces a parameter with its default value.
+		 */
+		static const DefaultValue by_default;
+
+	}
+
 #ifdef TAPKEE_CUSTOM_PROPERTIES
 	#include TAPKEE_CUSTOM_PROPERTIES
 #else
@@ -494,10 +600,6 @@ namespace tapkee
 #ifndef TAPKEE_INTERNAL_MAP
 	#define TAPKEE_INTERNAL_MAP std::map
 #endif
-	
-//! Parameters map with keys being values of @ref TAPKEE_PARAMETERS and 
-//! values set to corresponding values wrapped to @ref any type
-typedef TAPKEE_INTERNAL_MAP<ParameterKey, any> ParametersMap;
 
 namespace tapkee_internal 
 {

@@ -65,7 +65,7 @@ install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/external/barnes_hut_s
 option(USE_GCOV "Use gcov to analyze test coverage" OFF)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ -Wall -Wextra -pedantic -Wno-long-long")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-long-long")
 	if (USE_GCOV)
 		set(CMAKE_BUILD_TYPE Debug)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")

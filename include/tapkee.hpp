@@ -14,32 +14,30 @@
 namespace tapkee
 {
 
-/** Main entry-point of the library. Constructs a dense embedding with specified 
+/** Constructs a dense embedding with specified 
  * dimensionality using provided data represented by random access iterators 
  * and provided callbacks. Returns ReturnType that is essentially a pair of 
- * DenseMatrix (embedding of provided data) and a ProjectingFunction with 
+ * @ref DenseMatrix (embedding of provided data) and a ProjectingFunction with 
  * corresponding ProjectionImplementation used to project 
  * data out of the sample.
  *
- * @tparam @code RandomAccessIterator @endcode basic random access iterator with no 
- *         specific capabilities that points to some @code Data @endcode (the simplest
- *         case is @code Data = int @endcode).
+ * @tparam RandomAccessIterator random access iterator with no 
+ *         specific capabilities that points to some RandomAccessIterator::value_type 
+ *         (the simplest case is RandomAccessIterator::value_type being int).
  *
- * @tparam KernelCallback that defines 
- * @code ScalarType kernel(const Data&, const Data&) @endcode 
+ * @tparam KernelCallback a callback that defines 
+ * @code ScalarType kernel(const RandomAccessIterator::value_type&, const RandomAccessIterator::value_type&) @endcode 
  * function of two iterators. This method should return value of Mercer kernel function 
- * between vectors/objects iterators pointing to. The callback should be marked as a kernel function using
- * @ref tapkee::TAPKEE_CALLBACK_IS_KERNEL macro (fails on compilation in other case).
+ * between vectors/objects iterators pointing to. 
  *
- * @tparam DistanceCallback that defines 
- * @code ScalarType distance(const Data&, const Data&) @endcode 
- * function of two iterators. The callback should be marked as a distance function using 
- * @ref tapkee::TAPKEE_CALLBACK_IS_DISTANCE macro (fails during compilation in other case).
+ * @tparam DistanceCallback a callback that defines 
+ * @code ScalarType distance(const RandomAccessIterator::value_type&, const RandomAccessIterator::value_type&) @endcode 
+ * function of two iterators. 
  *
- * @tparam FeatureVectorCallback that defines 
- * @code void vector(const Data&, DenseVector&) @endcode function
+ * @tparam FeatureVectorCallback a callback that defines 
+ * @code void vector(const RandomAccessIterator::value_type&, DenseVector&) @endcode function
  * used to access feature vector pointed by iterator. The callback should put the feature vector 
- * pointed by iterator to the second argument vector.
+ * pointed by the iterator to the provided vector.
  *
  * Parameters required by the chosen algorithm are obtained from the parameter map. It gracefully 
  * fails during runtime and throws an exception if some of required 
@@ -48,8 +46,7 @@ namespace tapkee
  * @param begin begin iterator of data
  * @param end end iterator of data
  * @param kernel_callback the kernel callback implementing
- * @code ScalarType kernel(const Data&, const Data&) @endcode 
- *
+ * @code ScalarType kernel(const RandomAccessIterator::value_type&, const RandomAccessIterator::value_type&) @endcode 
  * Used by the following methods: 
  * - @ref tapkee::KernelLocallyLinearEmbedding
  * - @ref tapkee::NeighborhoodPreservingEmbedding
@@ -59,8 +56,7 @@ namespace tapkee
  * - @ref tapkee::KernelPCA
  *
  * @param distance_callback the distance callback implementing
- * @code ScalarType distance(const Data&, const Data&) @endcode 
- *
+ * @code ScalarType distance(const RandomAccessIterator::value_type&, const RandomAccessIterator::value_type&) @endcode 
  * Used by the following methods: 
  * - @ref tapkee::LaplacianEigenmaps
  * - @ref tapkee::LocalityPreservingProjections
@@ -73,8 +69,7 @@ namespace tapkee
  * - @ref tapkee::tDistributedStochasticNeighborEmbedding
  *
  * @param feature_vector_callback the feature vector callback implementing
- * @code void vector(const Data&, DenseVector&) @endcode
- *
+ * @code void vector(const RandomAccessIterator::value_type&, DenseVector&) @endcode
  * Used by the following methods:
  * - @ref tapkee::NeighborhoodPreservingEmbedding
  * - @ref tapkee::LinearLocalTangentSpaceAlignment
@@ -85,56 +80,43 @@ namespace tapkee
  * - @ref tapkee::tDistributedStochasticNeighborEmbedding
  * - @ref tapkee::PassThru
  *
- * @param parameters parameter map containing values with keys from @ref tapkee::TAPKEE_PARAMETERS
+ * @param parameters a set of parameters formed with 
+ *        keywords expression.
  *
- * @throw @ref tapkee::wrong_parameter_error if wrong parameter value is passed into the parameters map
- * @throw @ref tapkee::wrong_parameter_type_error if a value with wrong type is passed into the parameters map
- * @throw @ref tapkee::missed_parameter_error if some required parameter is missed in the parameters map
- * @throw @ref tapkee::unsupported_method_error if some method or combination of methods is unsupported 
- * @throw @ref tapkee::not_enough_memory_error if there is not enough memory to perform the algorithm
- * @throw @ref tapkee::cancelled_exception if computations were cancelled with provided @ref tapkee::CANCEL_FUNCTION
- * @throw @ref tapkee::eigendecomposition_error if eigendecomposition has failed
+ * @throw tapkee::wrong_parameter_error if wrong parameter value is passed
+ * @throw tapkee::missed_parameter_error if some required parameter is missed
+ * @throw tapkee::multiple_parameter_error if some parameter is provided more than once
+ * @throw tapkee::unsupported_method_error if some method or combination of methods is unsupported 
+ * @throw tapkee::not_enough_memory_error if there is not enough memory to perform the computations
+ * @throw tapkee::cancelled_exception if computations were cancelled due to cancel_function returned true
+ * @throw tapkee::eigendecomposition_error if eigendecomposition has failed
  *
  */
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
 ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
                    KernelCallback kernel_callback, DistanceCallback distance_callback,
-                   FeatureVectorCallback feature_vector_callback, ParametersMap parameters)
+                   FeatureVectorCallback feature_vector_callback, ParametersSet parameters)
 {
 #if EIGEN_VERSION_AT_LEAST(3,1,0)
 	Eigen::initParallel();
 #endif
 	ReturnResult return_result;
 
-	MethodId method;
-	if (!parameters.count(ReductionMethod))
-		throw missed_parameter_error("Dimension reduction method wasn't specified");
+	parameters.merge(tapkee_internal::defaults);
 
-	try 
-	{
-		method = parameters[ReductionMethod];
-	}
-	catch (const anyimpl::bad_any_cast&)
-	{
-		throw wrong_parameter_type_error("Wrong method type specified.");
-	}
-
-	void (*progress_function)(double) = NULL;
-	bool (*cancel_function)() = NULL;
-
-	if (parameters.count(ProgressFunction))
-		progress_function = parameters[ProgressFunction].cast<void (*)(double)>();
-	if (parameters.count(CancelFunction))
-		cancel_function = parameters[CancelFunction].cast<bool (*)()>();
+	DimensionReductionMethod selected_method = parameters(keywords::method);
+	
+	void (*progress_function)(double) = parameters(keywords::progress_function);
+	bool (*cancel_function)() = parameters(keywords::cancel_function);
 
 	tapkee_internal::Context context(progress_function,cancel_function);
 
 	try 
 	{
-		LoggingSingleton::instance().message_info("Using the " + get_method_name(method) + " method.");
+		LoggingSingleton::instance().message_info("Using the " + get_method_name(selected_method) + " method.");
 		
 		return_result = 
-			tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,feature_vector_callback,parameters,context).embed(method);
+			tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,feature_vector_callback,parameters,context).embedUsing(selected_method);
 	}
 	catch (const std::bad_alloc&)
 	{

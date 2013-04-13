@@ -32,7 +32,7 @@ public:
 		this->c.clear();
 	}
 };
-#pragma GCC diagnostic pop
+//#pragma GCC diagnostic pop
 
 } /* End of namespace tapkee_internal */
 } /* End of namespace tapkee */

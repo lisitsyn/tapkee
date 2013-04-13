@@ -203,10 +203,10 @@ struct eigen_embedding_impl<MatrixType, MatrixOperationType, Randomized>
 //! @param skip number of eigenvectors to skip (from either smallest or largest side)
 //!
 template <class MatrixType, class MatrixOperationType>
-EmbeddingResult eigen_embedding(EigenEmbeddingMethodId method, const MatrixType& m, 
+EmbeddingResult eigen_embedding(EigenMethod method, const MatrixType& m, 
                                 IndexType target_dimension, unsigned int skip)
 {
-	LoggingSingleton::instance().message_info("Using the " + get_eigenembedding_method_name(method) + " eigendecomposition method.");
+	LoggingSingleton::instance().message_info("Using the " + get_eigen_method_name(method) + " eigendecomposition method.");
 	switch (method)
 	{
 #ifdef TAPKEE_WITH_ARPACK
