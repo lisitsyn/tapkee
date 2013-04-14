@@ -141,6 +141,8 @@ public:
 		tolerance = parameters(keywords::spe_tolerance).checked().positive();
 		n_updates = parameters(keywords::spe_num_updates).checked().positive();
 		theta = parameters(keywords::sne_theta).checked().positive();
+		global_strategy = parameters(keywords::spe_global_strategy);
+		epsilon = parameters(keywords::fa_epsilon);
 
 		if (n_vectors > 0)
 		{

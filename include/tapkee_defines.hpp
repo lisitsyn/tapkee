@@ -266,7 +266,7 @@ namespace tapkee
 			 *
 			 * Should always be set with a value (no default value is provided).
 			 *
-			 * The corresponding value should be of type @ref tapkee::MethodId. 
+			 * The corresponding value should be of type @ref tapkee::DimensionReductionMethod. 
 			 */
 			const ParameterKeyword<DimensionReductionMethod>
 				method("dimension reduction method", PassThru);
@@ -319,7 +319,7 @@ namespace tapkee
 			 * Default value is @ref tapkee::CoverTree if available, @ref tapkee::Brute otherwise.
 			 *
 			 * The corresponding value should have type
-			 * @ref tapkee::NeighborsMethodId.
+			 * @ref tapkee::NeighborsMethod.
 			 */
 			const ParameterKeyword<NeighborsMethod> 
 				neighbors_method("nearest neighbors method", default_neighbors_method);

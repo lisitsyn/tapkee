@@ -15,76 +15,109 @@ using namespace tapkee;
 using namespace tapkee::keywords;
 using std::vector;
 
-TEST(Methods,KernelLocallyLinearEmbeddingSmokeTest)
+void smoketest(DimensionReductionMethod m)
 {
-	const int N = 100;
-
+	const int N = 50;
 	DenseMatrix X = swissroll(N);
-
 	kernel_callback kcb(X);
 	distance_callback dcb(X);
 	feature_vector_callback fcb(X);
-
-	vector<int> data;
-	for (int i=0; i<N; i++)
-		data.push_back(i);
-
+	vector<int> data(N);
+	for (int i=0; i<N; ++i) data[i] = i;
 	ReturnResult result;
-	// should produce no error
-	ASSERT_NO_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,
-	                               (method=KernelLocallyLinearEmbedding,num_neighbors=15)));
-	// that's normal
+	ASSERT_NO_THROW(result = embed(data.begin(), data.end(),
+		kcb, dcb, fcb, (method=m,target_dimension=2,num_neighbors=N/5,
+	                    gaussian_kernel_width=10.0,sne_perplexity=10.0)));
 	ASSERT_EQ(2,result.first.cols());
-	// that's normal
 	ASSERT_EQ(N,result.first.rows());
+}
+
+TEST(Method,KernelLocallyLinearEmbeddingSmokeTest)
+{
+	smoketest(KernelLocallyLinearEmbedding);
+}
+
+TEST(Method,NeighborhoodPreservingEmbedding)
+{
+	smoketest(NeighborhoodPreservingEmbedding);
 }
 
 TEST(Methods,KernelLocalTangentSpaceAlignmentSmokeTest)
 {
-	const int N = 100;
+	smoketest(KernelLocallyLinearEmbedding);
+}
 
-	DenseMatrix X = swissroll(N);
-
-	kernel_callback kcb(X);
-	distance_callback dcb(X);
-	feature_vector_callback fcb(X);
-
-	vector<int> data;
-	for (int i=0; i<N; i++)
-		data.push_back(i);
-
-	tapkee::ReturnResult result;
-	// should produce no error
-	ASSERT_NO_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,
-	                               (method=KernelLocalTangentSpaceAlignment,num_neighbors=15)));
-	// that's normal
-	ASSERT_EQ(2,result.first.cols());
-	// that's normal
-	ASSERT_EQ(N,result.first.rows());
+TEST(Methods,LinearLocalTangentSpaceAlignment)
+{
+	smoketest(LinearLocalTangentSpaceAlignment);
 }
 
 TEST(Methods,HessianLocallyLinearEmbeddingSmokeTest)
 {
-	const int N = 100;
-
-	DenseMatrix X = swissroll(N);
-
-	kernel_callback kcb(X);
-	distance_callback dcb(X);
-	feature_vector_callback fcb(X);
-
-	vector<int> data;
-	for (int i=0; i<N; i++)
-		data.push_back(i);
-
-	tapkee::ReturnResult result;
-	// should produce no error
-	ASSERT_NO_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,
-	                               (method=HessianLocallyLinearEmbedding,num_neighbors=15)));
-	// that's normal
-	ASSERT_EQ(2,result.first.cols());
-	// that's normal
-	ASSERT_EQ(N,result.first.rows());
+	smoketest(HessianLocallyLinearEmbedding);
 }
 
+TEST(Methods,LaplacianEigenmapsSmokeTest)
+{
+	smoketest(LaplacianEigenmaps);
+}
 
+TEST(Methods,LocalityPreservingProjectionsSmokeTest)
+{
+	smoketest(LocalityPreservingProjections);
+}
+
+TEST(Methods,DiffusionMapSmokeTest)
+{
+	smoketest(DiffusionMap);
+}
+
+TEST(Methods,IsomapSmokeTest)
+{
+	smoketest(Isomap);
+}
+
+TEST(Methods,LandmarkIsomapSmokeTest)
+{
+	smoketest(LandmarkIsomap);
+}
+
+TEST(Methods,MultidimensionalScalingSmokeTest)
+{
+	smoketest(MultidimensionalScaling);
+}
+
+TEST(Methods,LandmarkMultidimensionalScalingSmokeTest)
+{
+	smoketest(LandmarkMultidimensionalScaling);
+}
+		
+TEST(Methods,StochasticProximityEmbeddingSmokeTest)
+{
+	smoketest(StochasticProximityEmbedding);
+}
+
+TEST(Methods,KernelPCASmokeTest)
+{
+	smoketest(KernelPCA);
+}
+
+TEST(Methods,PCASmokeTest)
+{
+	smoketest(PCA);
+}
+
+TEST(Methods,RandomProjectionSmokeTest)
+{
+	smoketest(RandomProjection);
+}
+
+TEST(Methods,FactorAnalysisSmokeTest)
+{
+	smoketest(FactorAnalysis);
+}
+
+TEST(Methods,tDistributedStochasticNeighborEmbeddingSmokeTest)
+{
+	smoketest(tDistributedStochasticNeighborEmbedding);
+}
