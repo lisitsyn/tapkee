@@ -151,6 +151,11 @@ namespace tapkee
 		CoverTree
 #endif
 	};
+#ifdef TAPKEE_USE_LGPL_COVERTREE
+	static NeighborsMethod default_neighbors_method = CoverTree;
+#else
+	static NeighborsMethod default_neighbors_method = Brute;
+#endif
 
 	//! Eigendecomposition methods
 	enum EigenMethod
@@ -168,6 +173,11 @@ namespace tapkee
 		//! all eigenvectors thus can be very slow doing large-scale.
 		Dense
 	};
+#ifdef TAPKEE_WITH_ARPACK
+	static EigenMethod default_eigen_method = Arpack;
+#else
+	static EigenMethod default_eigen_method = Dense;
+#endif
 
 #ifdef TAPKEE_CUSTOM_INTERNAL_NUMTYPE
 	typedef TAPKEE_CUSTOM_INTERNAL_NUMTYPE ScalarType;
@@ -286,7 +296,7 @@ namespace tapkee
 		 * @ref tapkee::EigenMethod. 
 		 */
 		static const ParameterKeyword<EigenMethod>
-			eigen_method("eigendecomposition method", Dense);
+			eigen_method("eigendecomposition method", default_eigen_method);
 
 		/** The keyword for the value that stands for the neighbors
 		 * finding method to be used.
@@ -311,7 +321,7 @@ namespace tapkee
 		 * @ref tapkee::NeighborsMethodId.
 		 */
 		static const ParameterKeyword<NeighborsMethod> 
-			neighbors_method("nearest neighbors method", Brute);
+			neighbors_method("nearest neighbors method", default_neighbors_method);
 
 		/** The keyword for the value that stores the number of neighbors.
 		 *
