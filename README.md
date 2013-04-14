@@ -9,9 +9,20 @@ optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/softwa
 greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
 the data representation and storage schemes.
 
-The library is distributed under permissive [BSD 3-clause license](https://github.com/lisitsyn/tapkee/tree/master/include/LICENSE) 
-(except some parts that are distributed under other 
+The library is distributed under permissive 
+[BSD 3-clause license](https://github.com/lisitsyn/tapkee/tree/master/include/LICENSE) 
+(except a few rather optional parts that are distributed under other 
 open sources licenses, see Licensing section of this document).
+
+To get started with dimension reduction you may try the 
+[borsch script](https://github.com/lisitsyn/tapkee/tree/master/examples/borsch/borsch.py)
+that embeds common datasets (swissroll, helix, scurve) using
+the Tapkee library and outputs it with the help of 
+Matplotlib library. To use the script build the 
+sample application (see the Application section for more details) 
+and call borsch with command line:
+
+	./examples/borsch [swissroll|helix|scurve|...] [lle|isomap|...]
 
 API
 ---
