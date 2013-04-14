@@ -34,7 +34,8 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-static const ParametersSet defaults = (
+namespace {
+const ParametersSet defaults = (
 	tapkee::keywords::eigen_method = tapkee::keywords::by_default,
 	tapkee::keywords::neighbors_method = tapkee::keywords::by_default,
 	tapkee::keywords::num_neighbors = tapkee::keywords::by_default,
@@ -54,6 +55,7 @@ static const ParametersSet defaults = (
 	tapkee::keywords::cancel_function = tapkee::keywords::by_default,
 	tapkee::keywords::sne_perplexity = tapkee::keywords::by_default,
 	tapkee::keywords::sne_theta = tapkee::keywords::by_default);
+}
 
 class Context
 {
@@ -119,9 +121,7 @@ public:
 	{
 		n_vectors = (end-begin);
 
-		perplexity = parameters(keywords::sne_perplexity);
 		target_dimension = parameters(keywords::target_dimension);
-		ratio = parameters(keywords::landmark_ratio);
 		n_neighbors = parameters(keywords::num_neighbors).checked().positive();
 		
 		if (n_vectors > 0)
@@ -143,6 +143,8 @@ public:
 		theta = parameters(keywords::sne_theta).checked().positive();
 		global_strategy = parameters(keywords::spe_global_strategy);
 		epsilon = parameters(keywords::fa_epsilon);
+		perplexity = parameters(keywords::sne_perplexity);
+		ratio = parameters(keywords::landmark_ratio);
 
 		if (n_vectors > 0)
 		{
