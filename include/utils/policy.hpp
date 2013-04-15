@@ -1,3 +1,8 @@
+/* This software is distributed under BSD 3-clause license (see LICENSE file).
+ *
+ * Copyright (c) 2012-2013 Sergey Lisitsyn
+ */
+
 #ifndef TAPKEE_POLICY_H_
 #define TAPKEE_POLICY_H_
 
@@ -120,31 +125,72 @@ struct PointerCheckerPolicyImpl<EmptyType> : public CheckerPolicyBase
 {
 	virtual bool is_in_range(void* const*, void*, void*) const
 	{
-		return true;
+		return false;
 	}
 	virtual bool is_equal(void* const*, void*) const
 	{
-		return true;
+		return false;
 	}
 	virtual bool is_not_equal(void* const*, void*) const
 	{
-		return true;
+		return false;
 	}
 	virtual bool is_positive(void* const*) const
 	{
-		return true;
+		return false;
 	}
 	virtual bool is_negative(void* const*) const
 	{
-		return true;
+		return false;
 	}
 	virtual bool is_greater(void* const*, void*) const
 	{
-		return true;
+		return false;
 	}
 	virtual bool is_lesser(void* const*, void*) const
 	{
-		return true;
+		return false;
+	}
+};
+
+template <>
+struct PointerCheckerPolicyImpl<bool> : public CheckerPolicyBase
+{
+	inline bool value(void* v) const
+	{
+		return *reinterpret_cast<bool*>(v);
+	}
+	virtual bool is_in_range(void* const*, void*, void*) const
+	{
+		return false;
+	}
+	virtual bool is_equal(void* const* src, void* other_src) const
+	{
+		bool v = value(*src);
+		bool ov = value(other_src);
+		return (v==ov);
+	}
+	virtual bool is_not_equal(void* const* src, void* other_src) const
+	{
+		bool v = value(*src);
+		bool ov = value(other_src);
+		return (v!=ov);
+	}
+	virtual bool is_positive(void* const*) const
+	{
+		return false;
+	}
+	virtual bool is_negative(void* const*) const
+	{
+		return false;
+	}
+	virtual bool is_greater(void* const*, void*) const
+	{
+		return false;
+	}
+	virtual bool is_lesser(void* const*, void*) const
+	{
+		return false;
 	}
 };
 
