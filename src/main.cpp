@@ -6,8 +6,8 @@
 #include <tapkee.hpp>
 #include <tapkee_defines.hpp>
 #include <tapkee_projection.hpp>
-#include <callback/eigen_callbacks.hpp>
-#include <callback/precomputed_callbacks.hpp>
+#include <callbacks/eigen_callbacks.hpp>
+#include <callbacks/precomputed_callbacks.hpp>
 #include <utils/logging.hpp>
 #include <algorithm>
 #include <string>
@@ -360,10 +360,6 @@ int run(int argc, const char** argv)
 	
 	tapkee::ReturnResult embedding;
 
-	vector<tapkee::IndexType> indices(input_data.cols());
-	for (tapkee::IndexType i=0; i<input_data.cols(); ++i)
-		indices[i] = i;
-
 	using namespace tapkee::keywords;
 	tapkee::ParametersSet parameters = 
 			(method = tapkee_method,
@@ -385,6 +381,10 @@ int run(int argc, const char** argv)
 			 sne_theta = theta);
 
 #ifdef USE_PRECOMPUTED
+	vector<tapkee::IndexType> indices(input_data.cols());
+	for (tapkee::IndexType i=0; i<input_data.cols(); ++i)
+		indices[i] = i;
+
 	tapkee::DenseMatrix distance_matrix;
 	tapkee::DenseMatrix kernel_matrix;
 	{
@@ -393,27 +393,25 @@ int run(int argc, const char** argv)
 			tapkee::tapkee_internal::timed_context context("[+] Distance matrix computation");
 			distance_matrix = 
 				matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
-				                     distance_callback(input_data));
+				                     tapkee::eigen_distance_callback(input_data));
 		} 
 		if (method_needs_kernel(tapkee_method))
 		{
 			tapkee::tapkee_internal::timed_context context("[+] Kernel matrix computation");
 			kernel_matrix = 
 				matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
-				                     kernel_callback(input_data));
+				                     tapkee::eigen_kernel_callback(input_data));
 		}
 	}
-	precomputed_distance_callback dcb(distance_matrix);
-	precomputed_kernel_callback kcb(kernel_matrix);
-	feature_vector_callback fvcb(input_data);
+	tapkee::precomputed_distance_callback dcb(distance_matrix);
+	tapkee::precomputed_kernel_callback kcb(kernel_matrix);
+	tapkee::eigen_features_callback fcb(input_data);
 
-	embedding = tapkee::embed(indices.begin(),indices.end(),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::withParameters(parameters)
+	                   .withKernel(kcb).withDistance(dcb).withFeatures(fcb)
+	                   .embed(indices.begin(),indices.end());
 #else
-	distance_callback dcb(input_data);
-	kernel_callback kcb(input_data);
-	feature_vector_callback fvcb(input_data);
-
-	embedding = tapkee::embed(indices.begin(),indices.end(),kcb,dcb,fvcb,parameters);
+	embedding = tapkee::withParameters(parameters).embed(input_data);
 #endif
 	// Save obtained data
 	ofs << embedding.first.transpose();

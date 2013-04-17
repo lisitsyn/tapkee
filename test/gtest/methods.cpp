@@ -2,7 +2,7 @@
 
 #include <tapkee.hpp>
 #include <tapkee_exceptions.hpp>
-#include <callback/eigen_callbacks.hpp>
+#include <callbacks/eigen_callbacks.hpp>
 
 #include "callbacks.hpp"
 #include "data.hpp"
@@ -19,9 +19,9 @@ void smoketest(DimensionReductionMethod m)
 {
 	const int N = 50;
 	DenseMatrix X = swissroll(N);
-	kernel_callback kcb(X);
-	distance_callback dcb(X);
-	feature_vector_callback fcb(X);
+	tapkee::eigen_kernel_callback kcb(X);
+	tapkee::eigen_distance_callback dcb(X);
+	tapkee::eigen_features_callback fcb(X);
 	vector<int> data(N);
 	for (int i=0; i<N; ++i) data[i] = i;
 	ReturnResult result;

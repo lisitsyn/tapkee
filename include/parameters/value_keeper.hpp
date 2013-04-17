@@ -6,7 +6,7 @@
 #ifndef TAPKEE_VALUE_KEEPER_H_
 #define TAPKEE_VALUE_KEEPER_H_
 
-#include <utils/policy.hpp>
+#include <parameters/policy.hpp>
 
 namespace tapkee
 {

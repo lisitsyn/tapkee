@@ -8,9 +8,9 @@
 
 /* Tapkee includes */
 #include <tapkee_exceptions.hpp>
-#include <utils/parameters.hpp>
-#include <callback/callback_traits.hpp>
-#include <routines/methods_traits.hpp>
+#include <parameters/parameters.hpp>
+#include <traits/callbacks_traits.hpp>
+#include <traits/methods_traits.hpp>
 /* End of Tapkee includes */
 
 #include <map>

@@ -62,7 +62,7 @@ bool method_needs_kernel(tapkee::DimensionReductionMethod method)
 {
 	switch (method)
 	{
-#define IF_NEEDS_KERNEL(X) case X : return tapkee::MethodTraits<X>::needs_kernel(); break;
+#define IF_NEEDS_KERNEL(X) case X : return tapkee::MethodTraits<X>::needs_kernel; break;
 		IF_NEEDS_KERNEL(tapkee::KernelLocalTangentSpaceAlignment);
 		IF_NEEDS_KERNEL(tapkee::KernelLocallyLinearEmbedding);
 		IF_NEEDS_KERNEL(tapkee::HessianLocallyLinearEmbedding);
@@ -91,7 +91,7 @@ bool method_needs_distance(tapkee::DimensionReductionMethod method)
 {
 	switch (method)
 	{
-#define IF_NEEDS_DISTANCE(X) case X : return tapkee::MethodTraits<X>::needs_distance(); break;
+#define IF_NEEDS_DISTANCE(X) case X : return tapkee::MethodTraits<X>::needs_distance; break;
 		IF_NEEDS_DISTANCE(tapkee::KernelLocalTangentSpaceAlignment);
 		IF_NEEDS_DISTANCE(tapkee::KernelLocallyLinearEmbedding);
 		IF_NEEDS_DISTANCE(tapkee::HessianLocallyLinearEmbedding);

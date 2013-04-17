@@ -11,6 +11,8 @@
 #include <utils/naming.hpp>
 #include <utils/time.hpp>
 #include <utils/logging.hpp>
+#include <utils/conditional_select.hpp>
+#include <parameters/defaults.hpp>
 #include <routines/locally_linear.hpp>
 #include <routines/eigen_embedding.hpp>
 #include <routines/generalized_eigen_embedding.hpp>
@@ -26,36 +28,14 @@
 #include <external/barnes_hut_sne/tsne.hpp>
 /* End of Tapkee includes */
 
-using std::string;
-
 namespace tapkee
 {
 //! Main namespace for all internal routines, should not be exposed as public API
 namespace tapkee_internal
 {
 
-namespace {
-const ParametersSet defaults = (
-	tapkee::keywords::eigen_method = tapkee::keywords::by_default,
-	tapkee::keywords::neighbors_method = tapkee::keywords::by_default,
-	tapkee::keywords::num_neighbors = tapkee::keywords::by_default,
-	tapkee::keywords::target_dimension = tapkee::keywords::by_default,
-	tapkee::keywords::diffusion_map_timesteps = tapkee::keywords::by_default,
-	tapkee::keywords::gaussian_kernel_width = tapkee::keywords::by_default,
-	tapkee::keywords::max_iteration = tapkee::keywords::by_default,
-	tapkee::keywords::spe_global_strategy = tapkee::keywords::by_default,
-	tapkee::keywords::spe_num_updates = tapkee::keywords::by_default,
-	tapkee::keywords::spe_tolerance = tapkee::keywords::by_default,
-	tapkee::keywords::landmark_ratio = tapkee::keywords::by_default,
-	tapkee::keywords::nullspace_shift = tapkee::keywords::by_default,
-	tapkee::keywords::klle_shift = tapkee::keywords::by_default,
-	tapkee::keywords::check_connectivity = tapkee::keywords::by_default,
-	tapkee::keywords::fa_epsilon = tapkee::keywords::by_default,
-	tapkee::keywords::progress_function = tapkee::keywords::by_default,
-	tapkee::keywords::cancel_function = tapkee::keywords::by_default,
-	tapkee::keywords::sne_perplexity = tapkee::keywords::by_default,
-	tapkee::keywords::sne_theta = tapkee::keywords::by_default);
-}
+template <bool>
+struct wowwow;
 
 class Context
 {
@@ -84,30 +64,30 @@ private:
 	bool (*cancel_function)();
 };
 
-template <class KernelCallback, class DistanceCallback, class FeatureVectorCallback>
+template <class KernelCallback, class DistanceCallback, class FeaturesCallback>
 class Callbacks
 {
 public:
 
 	Callbacks(KernelCallback kernel_callback, DistanceCallback distance_callback, 
-	          FeatureVectorCallback feature_callback) : 
-		kernel(kernel_callback), distance(distance_callback), feature(feature_callback) 
+	          FeaturesCallback features_callbacks) : 
+		kernel(kernel_callback), distance(distance_callback), features(features_callbacks) 
 	{
 	}
 
 	KernelCallback kernel;
 	DistanceCallback distance;
-	FeatureVectorCallback feature;
+	FeaturesCallback features;
 };
 
 template <class RandomAccessIterator, class KernelCallback,
-          class DistanceCallback, class FeatureVectorCallback>
+          class DistanceCallback, class FeaturesCallback>
 class ImplementationBase
 {
 public:
 
 	ImplementationBase(RandomAccessIterator b, RandomAccessIterator e,
-	                   const Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>& cbks,
+	                   const Callbacks<KernelCallback,DistanceCallback,FeaturesCallback>& cbks,
 	                   ParametersSet& pmap, const Context& ctx) : 
 		parameters(pmap), context(ctx), callbacks(cbks),
 		plain_distance(PlainDistance<RandomAccessIterator,DistanceCallback>(cbks.distance)),
@@ -151,7 +131,7 @@ public:
 			DenseVector dv = DenseVector::Zero(0);
 			try 
 			{
-				callbacks.feature.vector(*begin,dv);
+				callbacks.features.vector(*begin,dv);
 			}
 			catch (const unsupported_method_error&)
 			{
@@ -166,7 +146,7 @@ public:
 
 	ParametersSet parameters;
 	Context context;
-	Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback> callbacks;
+	Callbacks<KernelCallback,DistanceCallback,FeaturesCallback> callbacks;
 	PlainDistance<RandomAccessIterator,DistanceCallback> plain_distance;
 	KernelDistance<RandomAccessIterator,KernelCallback> kernel_distance;
 
@@ -209,13 +189,23 @@ public:
 		if (context.is_cancelled()) 
 			throw cancelled_exception();
 
-#define tapkee_method_handle(X)										\
-		case X:														\
-		{															\
-				timed_context tctx__("[+] embedding with " # X);	\
-				return embed##X();									\
-		}															\
-		break														\
+		using std::mem_fun_ref_t;
+		using std::mem_fun_ref;
+		typedef std::mem_fun_ref_t<ReturnResult,ImplementationBase> ImplRef;
+
+#define tapkee_method_handle(X)																	\
+		case X:																					\
+		{																						\
+			timed_context tctx__("[+] embedding with " # X);									\
+			ImplRef ref = conditional_select<													\
+				((!MethodTraits<X>::needs_kernel)   || (!is_dummy<KernelCallback>::value))       &&	\
+				((!MethodTraits<X>::needs_distance) || (!is_dummy<DistanceCallback>::value))     &&	\
+				((!MethodTraits<X>::needs_features) || (!is_dummy<FeaturesCallback>::value)),	\
+					ImplRef>()(mem_fun_ref(&ImplementationBase::embed##X),						\
+					           mem_fun_ref(&ImplementationBase::embedEmpty));					\
+			return ref(*this);																	\
+		}																						\
+		break																					\
 
 		switch (method)
 		{
@@ -240,6 +230,12 @@ public:
 			tapkee_method_handle(tDistributedStochasticNeighborEmbedding);
 		}
 #undef tapkee_method_handle
+		return ReturnResult();
+	}
+
+	ReturnResult embedEmpty()
+	{
+		throw unsupported_method_error("Some callback is missed");
 		return ReturnResult();
 	}
 
@@ -387,14 +383,14 @@ public:
 			linear_weight_matrix(begin,end,neighbors,callbacks.kernel,eigenshift,traceshift);
 		DenseSymmetricMatrixPair eig_matrices =
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
-				callbacks.feature,current_dimension);
+				callbacks.features,current_dimension);
 		EmbeddingResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SkipNoEigenvalues);
 		DenseVector mean_vector = 
-			compute_mean(begin,end,callbacks.feature,current_dimension);
+			compute_mean(begin,end,callbacks.features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.feature,current_dimension),projecting_function);
+		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.features,current_dimension),projecting_function);
 	}
 
 	ReturnResult embedHessianLocallyLinearEmbedding()
@@ -425,26 +421,26 @@ public:
 			compute_laplacian(begin,end,neighbors,callbacks.distance,width);
 		DenseSymmetricMatrixPair eigenproblem_matrices =
 			construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
-					callbacks.feature,current_dimension);
+					callbacks.features,current_dimension);
 		EmbeddingResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
 				eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SkipNoEigenvalues);
 		DenseVector mean_vector = 
-			compute_mean(begin,end,callbacks.feature,current_dimension);
+			compute_mean(begin,end,callbacks.features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.feature,current_dimension),projecting_function);
+		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.features,current_dimension),projecting_function);
 	}
 
 	ReturnResult embedPCA()
 	{
 		DenseVector mean_vector = 
-			compute_mean(begin,end,callbacks.feature,current_dimension);
+			compute_mean(begin,end,callbacks.features,current_dimension);
 		DenseSymmetricMatrix centered_covariance_matrix = 
-			compute_covariance_matrix(begin,end,mean_vector,callbacks.feature,current_dimension);
+			compute_covariance_matrix(begin,end,mean_vector,callbacks.features,current_dimension);
 		EmbeddingResult projection_result = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,SkipNoEigenvalues);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.feature,current_dimension), projecting_function);
+		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.features,current_dimension), projecting_function);
 	}
 
 	ReturnResult embedRandomProjection()
@@ -452,10 +448,10 @@ public:
 		DenseMatrix projection_matrix = 
 			gaussian_projection_matrix(current_dimension, target_dimension);
 		DenseVector mean_vector = 
-			compute_mean(begin,end,callbacks.feature,current_dimension);
+			compute_mean(begin,end,callbacks.features,current_dimension);
 
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_matrix,mean_vector));
-		return ReturnResult(project(projection_matrix,mean_vector,begin,end,callbacks.feature,current_dimension), projecting_function);
+		return ReturnResult(project(projection_matrix,mean_vector,begin,end,callbacks.features,current_dimension), projecting_function);
 	}
 
 	ReturnResult embedKernelPCA()
@@ -474,14 +470,14 @@ public:
 			tangent_weight_matrix(begin,end,neighbors,callbacks.kernel,target_dimension,eigenshift);
 		DenseSymmetricMatrixPair eig_matrices =
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,
-				callbacks.feature,current_dimension);
+				callbacks.features,current_dimension);
 		EmbeddingResult projection_result = 
 			generalized_eigen_embedding<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
 				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SkipNoEigenvalues);
 		DenseVector mean_vector = 
-			compute_mean(begin,end,callbacks.feature,current_dimension);
+			compute_mean(begin,end,callbacks.features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.feature,current_dimension),
+		return ReturnResult(project(projection_result.first,mean_vector,begin,end,callbacks.features,current_dimension),
 				projecting_function);
 	}
 
@@ -502,7 +498,7 @@ public:
 	{
 		DenseMatrix feature_matrix(static_cast<IndexType>(current_dimension),n_vectors);
 		DenseVector feature_vector(static_cast<IndexType>(current_dimension));
-		FeatureVectorCallback feature_vector_callback = callbacks.feature;
+		FeaturesCallback feature_vector_callback = callbacks.features;
 		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 		{
 			feature_vector_callback.vector(*iter,feature_vector);
@@ -513,8 +509,8 @@ public:
 
 	ReturnResult embedFactorAnalysis()
 	{
-		DenseVector mean_vector = compute_mean(begin,end,callbacks.feature,current_dimension);
-		return ReturnResult(project(begin,end,callbacks.feature,current_dimension,max_iteration,epsilon,
+		DenseVector mean_vector = compute_mean(begin,end,callbacks.features,current_dimension);
+		return ReturnResult(project(begin,end,callbacks.features,current_dimension,max_iteration,epsilon,
 									target_dimension, mean_vector), tapkee::ProjectingFunction());
 	}
 
@@ -524,7 +520,7 @@ public:
 
 		DenseMatrix data(static_cast<IndexType>(current_dimension),n_vectors);
 		DenseVector feature_vector(static_cast<IndexType>(current_dimension));
-		FeatureVectorCallback feature_vector_callback = callbacks.feature;
+		FeaturesCallback feature_vector_callback = callbacks.features;
 		for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 		{
 			feature_vector_callback.vector(*iter,feature_vector);
@@ -542,14 +538,14 @@ public:
 };
 
 template <class RandomAccessIterator, class KernelCallback,
-          class DistanceCallback, class FeatureVectorCallback>
-ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback>
+          class DistanceCallback, class FeaturesCallback>
+ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeaturesCallback>
 	initialize(RandomAccessIterator begin, RandomAccessIterator end,
-	           KernelCallback kernel, DistanceCallback distance, FeatureVectorCallback feature_vector,
+	           KernelCallback kernel, DistanceCallback distance, FeaturesCallback feature_vector,
 	           ParametersSet& pmap, const Context& ctx)
 {
-	return ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeatureVectorCallback>(
-			begin,end,Callbacks<KernelCallback,DistanceCallback,FeatureVectorCallback>(kernel,distance,feature_vector),
+	return ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeaturesCallback>(
+			begin,end,Callbacks<KernelCallback,DistanceCallback,FeaturesCallback>(kernel,distance,feature_vector),
 			pmap,ctx);
 }
 

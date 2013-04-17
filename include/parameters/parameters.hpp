@@ -6,7 +6,7 @@
 #ifndef TAPKEE_PARAMETERS_H_
 #define TAPKEE_PARAMETERS_H_
 
-#include <utils/value_keeper.hpp>
+#include <parameters/value_keeper.hpp>
 #include <sstream>
 #include <vector>
 #include <map>
