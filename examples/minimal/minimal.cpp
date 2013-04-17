@@ -16,12 +16,12 @@ int main(int argc, const char** argv)
 	vector<IndexType> indices(N);
 	for (int i=0; i<N; i++) indices[i] = i;
 
-	dummy_kernel_callback<IndexType> kcb;
-	my_distance_callback dcb;
-	dummy_feature_vector_callback<IndexType> fvcb;
+	my_distance_callback d;
 
-	ReturnResult result = embed(indices.begin(),indices.end(),
-	                            kcb,dcb,fvcb,(method=MultidimensionalScaling,target_dimension=1));
+	ReturnResult result = withParameters((method=MultidimensionalScaling,target_dimension=1))
+	                     .withDistance(d)
+	                     .embed(indices.begin(),indices.end());
+	
 	cout << result.first.transpose() << endl;
 
 	return 0;
