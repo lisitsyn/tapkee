@@ -33,14 +33,13 @@ int main(int argc, const char** argv)
 		rnas.push_back(line);
 	}
 	
-	match_kernel_callback kcb;
-	dummy_distance_callback<string> dcb;
-	dummy_feature_vector_callback<string> fvcb;
+	match_kernel_callback k;
 
-	ReturnResult result = embed(rnas.begin(),rnas.end(),kcb,dcb,fvcb,
-	                            (method=KernelLocallyLinearEmbedding,
-	                             num_neighbors=30,
-	                             target_dimension=2));
+	ReturnResult result = withParameters((method=KernelLocallyLinearEmbedding,
+	                                      num_neighbors=30,
+	                                      target_dimension=2))
+	                     .withKernel(k)
+	                     .embed(rnas.begin(),rnas.end());
 	cout << result.first.transpose() << endl;
 
 	return 0;
