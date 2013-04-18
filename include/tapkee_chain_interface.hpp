@@ -24,9 +24,14 @@ namespace tapkee_internal
 			parameters(params), kernel(k), distance(d), features(f) { }
 		
 		template<class RandomAccessIterator>
-		ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end) const
+		TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
 		{
 			return tapkee::embed(begin,end,kernel,distance,features,parameters);
+		}
+		template<class Container>
+		TapkeeOutput embedUsing(const Container& container) const
+		{
+			return embedRange(container.begin(),container.end());
 		}
 	private:
 		ParametersSet parameters;
@@ -48,10 +53,15 @@ namespace tapkee_internal
 		{ return CallbacksInitializedState<KernelCallback,DistanceCallback,FeaturesCallback>(parameters,kernel,distance,features); }
 		
 		template<class RandomAccessIterator>
-		ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end) const
+		TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
 		{
 			return (*this).withFeatures(dummy_features_callback<typename RandomAccessIterator::value_type>())
-						  .embed(begin,end);
+						  .embedRange(begin,end);
+		}
+		template<class Container>
+		TapkeeOutput embedUsing(const Container& container) const
+		{
+			return embedRange(container.begin(),container.end());
 		}
 	private:
 		ParametersSet parameters;
@@ -72,10 +82,15 @@ namespace tapkee_internal
 		{ return CallbacksInitializedState<KernelCallback,DistanceCallback,FeaturesCallback>(parameters,kernel,distance,features); }
 
 		template<class RandomAccessIterator>
-		ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end) const
+		TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
 		{
 			return (*this).withDistance(dummy_distance_callback<typename RandomAccessIterator::value_type>())
-						  .embed(begin,end);
+						  .embedRange(begin,end);
+		}
+		template<class Container>
+		TapkeeOutput embedUsing(const Container& container) const
+		{
+			return embedRange(container.begin(),container.end());
 		}
 	private:
 		ParametersSet parameters;
@@ -96,10 +111,15 @@ namespace tapkee_internal
 		{ return CallbacksInitializedState<KernelCallback,DistanceCallback,FeaturesCallback>(parameters,kernel,distance,features); }
 
 		template<class RandomAccessIterator>
-		ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end) const
+		TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
 		{
 			return (*this).withKernel(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
-						  .embed(begin,end);
+						  .embedRange(begin,end);
+		}
+		template<class Container>
+		TapkeeOutput embedUsing(const Container& container) const
+		{
+			return embedRange(container.begin(),container.end());
 		}
 	private:
 		ParametersSet parameters;
@@ -122,11 +142,16 @@ namespace tapkee_internal
 		{ return KernelAndFeaturesInitializedState<KernelCallback,FeaturesCallback>(parameters,kernel,features); }
 
 		template<class RandomAccessIterator>
-		ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end) const
+		TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
 		{
 			return (*this).withDistance(dummy_distance_callback<typename RandomAccessIterator::value_type>())
 						  .withFeatures(dummy_features_callback<typename RandomAccessIterator::value_type>())
-						  .embed(begin,end);
+						  .embedRange(begin,end);
+		}
+		template<class Container>
+		TapkeeOutput embedUsing(const Container& container) const
+		{
+			return embedRange(container.begin(),container.end());
 		}
 	private:
 		ParametersSet parameters;
@@ -148,11 +173,16 @@ namespace tapkee_internal
 		{ return DistanceAndFeaturesInitializedState<DistanceCallback,FeaturesCallback>(parameters,distance,features); }
 
 		template<class RandomAccessIterator>
-		ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end) const
+		TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
 		{
 			return (*this).withKernel(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
 						  .withFeatures(dummy_features_callback<typename RandomAccessIterator::value_type>())
-						  .embed(begin,end);
+						  .embedRange(begin,end);
+		}
+		template<class Container>
+		TapkeeOutput embedUsing(const Container& container) const
+		{
+			return embedRange(container.begin(),container.end());
 		}
 	private:
 		ParametersSet parameters;
@@ -174,11 +204,16 @@ namespace tapkee_internal
 		{ return DistanceAndFeaturesInitializedState<DistanceCallback,FeaturesCallback>(parameters,distance,features); }
 
 		template<class RandomAccessIterator>
-		ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end) const
+		TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
 		{
 			return (*this).withKernel(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
 						  .withDistance(dummy_distance_callback<typename RandomAccessIterator::value_type>())
-						  .embed(begin,end);
+						  .embedRange(begin,end);
+		}
+		template<class Container>
+		TapkeeOutput embedUsing(const Container& container) const
+		{
+			return embedRange(container.begin(),container.end());
 		}
 	private:
 		ParametersSet parameters;
@@ -201,7 +236,7 @@ namespace tapkee_internal
 		FeaturesFirstInitializedState<FeaturesCallback> withFeatures(const FeaturesCallback& features) const
 		{ return FeaturesFirstInitializedState<FeaturesCallback>(parameters,features); }
 
-		ReturnResult embed(const DenseMatrix& matrix) const
+		TapkeeOutput embedUsing(const DenseMatrix& matrix) const
 		{
 			vector<int> indices(matrix.cols());
 			for (int i=0; i<matrix.cols(); i++) indices[i] = i;
@@ -215,13 +250,20 @@ namespace tapkee_internal
 	};
 }
 
-namespace 
+struct initialize
 {
-	tapkee_internal::ParametersInitializedState withParameters(const ParametersSet& parameters)
+	initialize() 
+	{
+	}
+	tapkee_internal::ParametersInitializedState operator[](const ParametersSet& parameters) const
+	{
+		return withParameters(parameters);
+	}
+	tapkee_internal::ParametersInitializedState withParameters(const ParametersSet& parameters) const
 	{
 		return tapkee_internal::ParametersInitializedState(parameters);
 	}
-}
+};
 
 }
 

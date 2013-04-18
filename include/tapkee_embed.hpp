@@ -90,14 +90,14 @@ namespace tapkee
  *
  */
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>
-ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
+TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end,
                    KernelCallback kernel_callback, DistanceCallback distance_callback,
-                   FeaturesCallback feature_vector_callback, ParametersSet parameters)
+                   FeaturesCallback features_callback, ParametersSet parameters)
 {
 #if EIGEN_VERSION_AT_LEAST(3,1,0)
 	Eigen::initParallel();
 #endif
-	ReturnResult return_result;
+	TapkeeOutput output;
 
 	parameters.merge(tapkee_internal::defaults);
 
@@ -112,15 +112,15 @@ ReturnResult embed(RandomAccessIterator begin, RandomAccessIterator end,
 	{
 		LoggingSingleton::instance().message_info("Using the " + get_method_name(selected_method) + " method.");
 		
-		return_result = 
-			tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,feature_vector_callback,parameters,context).embedUsing(selected_method);
+		output = tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,features_callback,parameters,context)
+		                         .embedUsing(selected_method);
 	}
 	catch (const std::bad_alloc&)
 	{
 		throw not_enough_memory_error("Not enough memory");
 	}
 
-	return return_result;
+	return output;
 }
 }
 #endif

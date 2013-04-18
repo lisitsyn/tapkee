@@ -20,64 +20,82 @@ TEST(Interface,ChainInterfaceOrder)
 	float_distance_callback dcb;
 	float_features_callback fcb;
 
-	ReturnResult embedding;
+	TapkeeOutput output;
 
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=MultidimensionalScaling))
-	                                 .withKernel(kcb).withFeatures(fcb).withDistance(dcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=MultidimensionalScaling))
+			.withKernel(kcb).withFeatures(fcb).withDistance(dcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=MultidimensionalScaling))
-	                                 .withKernel(kcb).withDistance(dcb).withFeatures(fcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=MultidimensionalScaling))
+			.withKernel(kcb).withDistance(dcb).withFeatures(fcb)
+			.embedRange(indices.begin(),indices.end()));
 
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=KernelPCA))
-	                                 .withDistance(dcb).withKernel(kcb).withFeatures(fcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=KernelPCA))
+			.withDistance(dcb).withKernel(kcb).withFeatures(fcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=PassThru))
-	                                 .withDistance(dcb).withFeatures(fcb).withKernel(kcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=PassThru))
+			.withDistance(dcb).withFeatures(fcb).withKernel(kcb)
+			.embedRange(indices.begin(),indices.end()));
 
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=MultidimensionalScaling))
-	                                 .withFeatures(fcb).withDistance(dcb).withKernel(kcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=MultidimensionalScaling))
+			.withFeatures(fcb).withDistance(dcb).withKernel(kcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=MultidimensionalScaling))
-	                                 .withFeatures(fcb).withKernel(kcb).withDistance(dcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=MultidimensionalScaling))
+			.withFeatures(fcb).withKernel(kcb).withDistance(dcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=PassThru))
-	                                 .withFeatures(fcb).withKernel(kcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=PassThru))
+			.withFeatures(fcb).withKernel(kcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=PassThru))
-	                                 .withFeatures(fcb).withDistance(dcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=PassThru))
+			.withFeatures(fcb).withDistance(dcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=KernelPCA))
-	                                 .withKernel(kcb).withDistance(dcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=KernelPCA))
+			.withKernel(kcb).withDistance(dcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=KernelPCA))
-	                                 .withKernel(kcb).withFeatures(fcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=KernelPCA))
+			.withKernel(kcb).withFeatures(fcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=MultidimensionalScaling))
-	                                 .withDistance(dcb).withFeatures(fcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=MultidimensionalScaling))
+			.withDistance(dcb).withFeatures(fcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=MultidimensionalScaling))
-	                                 .withDistance(dcb).withKernel(kcb)
-	                                 .embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=MultidimensionalScaling))
+			.withDistance(dcb).withKernel(kcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=KernelPCA))
-	                                 .withKernel(kcb).embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=KernelPCA))
+			.withKernel(kcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=MultidimensionalScaling))
-	                                 .withDistance(dcb).embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=MultidimensionalScaling))
+			.withDistance(dcb)
+			.embedRange(indices.begin(),indices.end()));
 	
-	ASSERT_NO_THROW(embedding=tapkee::withParameters((method=PassThru))
-	                                 .withFeatures(fcb).embed(indices.begin(),indices.end()));
+	ASSERT_NO_THROW(output=tapkee::initialize()
+			.withParameters((method=PassThru))
+			.withFeatures(fcb)
+			.embedRange(indices.begin(),indices.end()));
 }
 
 TEST(Interface, NoDataPassThru) 
@@ -88,15 +106,15 @@ TEST(Interface, NoDataPassThru)
 	tapkee::dummy_distance_callback<int> dcb;
 	tapkee::dummy_features_callback<int> fcb;
 
-	ReturnResult result;
+	TapkeeOutput output;
 	// should produce no error
-	ASSERT_NO_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,(method = PassThru)));
+	ASSERT_NO_THROW(output = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,(method = PassThru)));
 	// that's normal
-	ASSERT_EQ(0,result.first.cols());
+	ASSERT_EQ(0,output.embedding.cols());
 	// that's normal
-	ASSERT_EQ(0,result.first.rows());
+	ASSERT_EQ(0,output.embedding.rows());
 	// that's normal
-	ASSERT_EQ(NULL,result.second.implementation);
+	ASSERT_EQ(NULL,output.projection.implementation);
 }
 
 TEST(Interface, ParameterTargetDimension)
@@ -130,9 +148,9 @@ TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding)
 	tapkee::dummy_distance_callback<int> dcb;
 	tapkee::dummy_features_callback<int> fcb;
 
-	ReturnResult result;
+	TapkeeOutput output;
 	// fails with wrong parameter type as '-1' is not a valid value.
-	ASSERT_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=KernelLocallyLinearEmbedding,num_neighbors=-3)), 
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=KernelLocallyLinearEmbedding,num_neighbors=-3)), 
 	             wrong_parameter_error);
 }
 
@@ -144,9 +162,9 @@ TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding)
 	tapkee::dummy_distance_callback<int> dcb;
 	tapkee::dummy_features_callback<int> fcb;
 
-	ReturnResult result;
+	TapkeeOutput output;
 	// fails with wrong parameter type as '-1' is not a valid value.
-	ASSERT_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,
 	                            (method=KernelLocallyLinearEmbedding,num_neighbors=6,num_neighbors=5)), 
 	             multiple_parameter_error);
 }
@@ -165,9 +183,9 @@ TEST(Interface, CancellationPassThru)
 	tapkee::dummy_distance_callback<int> dcb;
 	tapkee::dummy_features_callback<int> fcb;
 
-	ReturnResult result;
+	TapkeeOutput output;
 	// should cancel
-	ASSERT_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=PassThru,cancel_function=always_cancel)),
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=PassThru,cancel_function=always_cancel)),
 	             cancelled_exception);
 }
 
@@ -179,9 +197,9 @@ TEST(Interface, NoReductionMethodSetFailPassThru)
 	tapkee::dummy_distance_callback<int> dcb;
 	tapkee::dummy_features_callback<int> fcb;
 
-	ReturnResult result;
+	TapkeeOutput output;
 	// should fail with missed parameter
-	ASSERT_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,(eigen_method=Dense)),
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(eigen_method=Dense)),
 	             missed_parameter_error);
 }
 
@@ -195,8 +213,8 @@ TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 	float_distance_callback dcb;
 	tapkee::dummy_features_callback<int> fcb;
 
-	ReturnResult result;
-	ASSERT_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=LaplacianEigenmaps,eigen_method=Randomized)),
+	TapkeeOutput output;
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=LaplacianEigenmaps,eigen_method=Randomized)),
 	             unsupported_method_error);
 }
 
@@ -211,8 +229,8 @@ TEST(Interface, EigenDecompositionFailMDS)
 	float_distance_callback dcb;
 	tapkee::dummy_features_callback<float> fcb;
 
-	ReturnResult result;
-	ASSERT_THROW(result = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,(method=MultidimensionalScaling,eigen_method=Randomized)),
+	TapkeeOutput output;
+	ASSERT_THROW(output = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,(method=MultidimensionalScaling,eigen_method=Randomized)),
 	             eigendecomposition_error);
 }
 
@@ -227,8 +245,8 @@ TEST(Interface, NotEnoughMemoryMDS)
 	float_distance_callback dcb;
 	tapkee::dummy_features_callback<float> fcb;
 
-	tapkee::ReturnResult result;
+	tapkee::TapkeeOutput output;
 	// tries to form 10000000 x 10000000 matrix (won't work on any machine in 2013)
-	ASSERT_THROW(result = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=MultidimensionalScaling,eigen_method=Dense)),
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=MultidimensionalScaling,eigen_method=Dense)),
 	             not_enough_memory_error);
 }

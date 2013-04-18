@@ -12,12 +12,12 @@ using namespace std;
 using namespace tapkee;
 using namespace tapkee::keywords;
 
-struct match_kernel_callback
+struct MatchKernelCallback
 {
 	ScalarType kernel(const string& l, const string& r) const
 	{
 		return inner_product(l.begin(),l.end(),r.begin(),
-		                     0,plus<int>(),not2(equal_to<string::value_type>()));
+		                     0,plus<int>(),equal_to<string::value_type>());
 	} 
 }; 
 
@@ -33,14 +33,15 @@ int main(int argc, const char** argv)
 		rnas.push_back(line);
 	}
 	
-	match_kernel_callback k;
+	MatchKernelCallback k;
 
-	ReturnResult result = withParameters((method=KernelLocallyLinearEmbedding,
-	                                      num_neighbors=30,
-	                                      target_dimension=2))
-	                     .withKernel(k)
-	                     .embed(rnas.begin(),rnas.end());
-	cout << result.first.transpose() << endl;
+	TapkeeOutput result = initialize()
+		.withParameters((method=KernelLocallyLinearEmbedding,
+		                 num_neighbors=30, target_dimension=2))
+		.withKernel(k)
+		.embedUsing(rnas);
+
+	cout << result.embedding.transpose() << endl;
 
 	return 0;
 }

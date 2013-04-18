@@ -161,14 +161,14 @@ public:
 	IndexType n_vectors;
 	IndexType current_dimension;
 
-	ReturnResult embedUsing(DimensionReductionMethod method)
+	TapkeeOutput embedUsing(DimensionReductionMethod method)
 	{
 		if (context.is_cancelled()) 
 			throw cancelled_exception();
 
 		using std::mem_fun_ref_t;
 		using std::mem_fun_ref;
-		typedef std::mem_fun_ref_t<ReturnResult,ImplementationBase> ImplRef;
+		typedef std::mem_fun_ref_t<TapkeeOutput,ImplementationBase> ImplRef;
 
 #define tapkee_method_handle(X)																	\
 		case X:																					\
@@ -207,36 +207,36 @@ public:
 			tapkee_method_handle(tDistributedStochasticNeighborEmbedding);
 		}
 #undef tapkee_method_handle
-		return ReturnResult();
+		return TapkeeOutput();
 	}
 
-	ReturnResult embedEmpty()
+	TapkeeOutput embedEmpty()
 	{
 		throw unsupported_method_error("Some callback is missed");
-		return ReturnResult();
+		return TapkeeOutput();
 	}
 
-	ReturnResult embedKernelLocallyLinearEmbedding()
+	TapkeeOutput embedKernelLocallyLinearEmbedding()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_distance,
 		                                     n_neighbors,check_connectivity);
 		SparseWeightMatrix weight_matrix =
 			linear_weight_matrix(begin,end,neighbors,kernel,eigenshift,traceshift);
-		return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
+		return TapkeeOutput(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SkipOneEigenvalue).first, tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedKernelLocalTangentSpaceAlignment()
+	TapkeeOutput embedKernelLocalTangentSpaceAlignment()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_distance,
 		                                     n_neighbors,check_connectivity);
 		SparseWeightMatrix weight_matrix = 
 			tangent_weight_matrix(begin,end,neighbors,kernel,target_dimension,eigenshift);
-		return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
+		return TapkeeOutput(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SkipOneEigenvalue).first, tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedDiffusionMap()
+	TapkeeOutput embedDiffusionMap()
 	{
 		#ifdef TAPKEE_GPU
 			#define DM_MATRIX_OP GPUDenseImplicitSquareMatrixOperation
@@ -246,13 +246,13 @@ public:
 
 		DenseSymmetricMatrix diffusion_matrix =
 			compute_diffusion_matrix(begin,end,distance,timesteps,width);
-		return ReturnResult(eigen_embedding<DenseSymmetricMatrix,DM_MATRIX_OP>(eigen_method,diffusion_matrix,
+		return TapkeeOutput(eigen_embedding<DenseSymmetricMatrix,DM_MATRIX_OP>(eigen_method,diffusion_matrix,
 			target_dimension,SkipNoEigenvalues).first, tapkee::ProjectingFunction());
 
 		#undef DM_MATRIX_OP
 	}
 
-	ReturnResult embedMultidimensionalScaling()
+	TapkeeOutput embedMultidimensionalScaling()
 	{
 		#ifdef TAPKEE_GPU
 			#define MDS_MATRIX_OP GPUDenseImplicitSquareMatrixOperation
@@ -268,11 +268,11 @@ public:
 
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			result.first.col(i).array() *= sqrt(result.second(i));
-		return ReturnResult(result.first, tapkee::ProjectingFunction());
+		return TapkeeOutput(result.first, tapkee::ProjectingFunction());
 		#undef MDS_MATRIX_OP
 	}
 
-	ReturnResult embedLandmarkMultidimensionalScaling()
+	TapkeeOutput embedLandmarkMultidimensionalScaling()
 	{
 		ratio.checked()
 		     .in_range(static_cast<ScalarType>(1.0/n_vectors),
@@ -290,11 +290,11 @@ public:
 					distance_matrix,target_dimension,SkipNoEigenvalues);
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			landmarks_embedding.first.col(i).array() *= sqrt(landmarks_embedding.second(i));
-		return ReturnResult(triangulate(begin,end,distance,landmarks,
+		return TapkeeOutput(triangulate(begin,end,distance,landmarks,
 			landmark_distances_squared,landmarks_embedding,target_dimension).first, tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedIsomap()
+	TapkeeOutput embedIsomap()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,plain_distance,
 		                                     n_neighbors,check_connectivity);
@@ -310,10 +310,10 @@ public:
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			embedding.first.col(i).array() *= sqrt(embedding.second(i));
 
-		return ReturnResult(embedding.first, tapkee::ProjectingFunction());
+		return TapkeeOutput(embedding.first, tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedLandmarkIsomap()
+	TapkeeOutput embedLandmarkIsomap()
 	{
 		ratio.checked()
 		     .in_range(static_cast<ScalarType>(1.0/n_vectors),
@@ -353,10 +353,10 @@ public:
 
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			embedding.col(i).array() /= sqrt(sqrt(landmarks_embedding.second(i)));
-		return ReturnResult(embedding,tapkee::ProjectingFunction());
+		return TapkeeOutput(embedding,tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedNeighborhoodPreservingEmbedding()
+	TapkeeOutput embedNeighborhoodPreservingEmbedding()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_distance,
 		                                     n_neighbors,check_connectivity);
@@ -371,30 +371,30 @@ public:
 		DenseVector mean_vector = 
 			compute_mean(begin,end,features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,features,current_dimension),projecting_function);
+		return TapkeeOutput(project(projection_result.first,mean_vector,begin,end,features,current_dimension),projecting_function);
 	}
 
-	ReturnResult embedHessianLocallyLinearEmbedding()
+	TapkeeOutput embedHessianLocallyLinearEmbedding()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_distance,
 		                                     n_neighbors,check_connectivity);
 		SparseWeightMatrix weight_matrix =
 			hessian_weight_matrix(begin,end,neighbors,kernel,target_dimension);
-		return ReturnResult(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
+		return TapkeeOutput(eigen_embedding<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
 			weight_matrix,target_dimension,SkipOneEigenvalue).first, tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedLaplacianEigenmaps()
+	TapkeeOutput embedLaplacianEigenmaps()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,plain_distance,
 		                                     n_neighbors,check_connectivity);
 		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance,width);
-		return ReturnResult(generalized_eigen_embedding<SparseWeightMatrix,DenseDiagonalMatrix,SparseInverseMatrixOperation>(
+		return TapkeeOutput(generalized_eigen_embedding<SparseWeightMatrix,DenseDiagonalMatrix,SparseInverseMatrixOperation>(
 			eigen_method,laplacian.first,laplacian.second,target_dimension,SkipOneEigenvalue).first, tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedLocalityPreservingProjections()
+	TapkeeOutput embedLocalityPreservingProjections()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,plain_distance,
 		                                     n_neighbors,check_connectivity);
@@ -409,10 +409,10 @@ public:
 		DenseVector mean_vector = 
 			compute_mean(begin,end,features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,features,current_dimension),projecting_function);
+		return TapkeeOutput(project(projection_result.first,mean_vector,begin,end,features,current_dimension),projecting_function);
 	}
 
-	ReturnResult embedPCA()
+	TapkeeOutput embedPCA()
 	{
 		DenseVector mean_vector = 
 			compute_mean(begin,end,features,current_dimension);
@@ -421,10 +421,10 @@ public:
 		EmbeddingResult projection_result = 
 			eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,SkipNoEigenvalues);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,features,current_dimension), projecting_function);
+		return TapkeeOutput(project(projection_result.first,mean_vector,begin,end,features,current_dimension), projecting_function);
 	}
 
-	ReturnResult embedRandomProjection()
+	TapkeeOutput embedRandomProjection()
 	{
 		DenseMatrix projection_matrix = 
 			gaussian_projection_matrix(current_dimension, target_dimension);
@@ -432,10 +432,10 @@ public:
 			compute_mean(begin,end,features,current_dimension);
 
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_matrix,mean_vector));
-		return ReturnResult(project(projection_matrix,mean_vector,begin,end,features,current_dimension), projecting_function);
+		return TapkeeOutput(project(projection_matrix,mean_vector,begin,end,features,current_dimension), projecting_function);
 	}
 
-	ReturnResult embedKernelPCA()
+	TapkeeOutput embedKernelPCA()
 	{
 		DenseSymmetricMatrix centered_kernel_matrix = 
 			compute_centered_kernel_matrix(begin,end,kernel);
@@ -443,10 +443,10 @@ public:
 			centered_kernel_matrix,target_dimension,SkipNoEigenvalues);
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			embedding.first.col(i).array() *= sqrt(embedding.second(i));
-		return ReturnResult(embedding.first, tapkee::ProjectingFunction());
+		return TapkeeOutput(embedding.first, tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedLinearLocalTangentSpaceAlignment()
+	TapkeeOutput embedLinearLocalTangentSpaceAlignment()
 	{
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,kernel_distance,
 		                                     n_neighbors,check_connectivity);
@@ -461,11 +461,11 @@ public:
 		DenseVector mean_vector = 
 			compute_mean(begin,end,features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
-		return ReturnResult(project(projection_result.first,mean_vector,begin,end,features,current_dimension),
+		return TapkeeOutput(project(projection_result.first,mean_vector,begin,end,features,current_dimension),
 				projecting_function);
 	}
 
-	ReturnResult embedStochasticProximityEmbedding()
+	TapkeeOutput embedStochasticProximityEmbedding()
 	{
 		Neighbors neighbors;
 		if (global_strategy.is(false))
@@ -474,11 +474,11 @@ public:
 			                                     n_neighbors,check_connectivity);
 		}
 
-		return ReturnResult(spe_embedding(begin,end,distance,neighbors,
+		return TapkeeOutput(spe_embedding(begin,end,distance,neighbors,
 				target_dimension,global_strategy,tolerance,n_updates,max_iteration), tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedPassThru()
+	TapkeeOutput embedPassThru()
 	{
 		DenseMatrix feature_matrix(static_cast<IndexType>(current_dimension),n_vectors);
 		DenseVector feature_vector(static_cast<IndexType>(current_dimension));
@@ -487,17 +487,17 @@ public:
 			features.vector(*iter,feature_vector);
 			feature_matrix.col(iter-begin).array() = feature_vector;
 		}
-		return ReturnResult(feature_matrix.transpose(),tapkee::ProjectingFunction());
+		return TapkeeOutput(feature_matrix.transpose(),tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedFactorAnalysis()
+	TapkeeOutput embedFactorAnalysis()
 	{
 		DenseVector mean_vector = compute_mean(begin,end,features,current_dimension);
-		return ReturnResult(project(begin,end,features,current_dimension,max_iteration,epsilon,
+		return TapkeeOutput(project(begin,end,features,current_dimension,max_iteration,epsilon,
 									target_dimension, mean_vector), tapkee::ProjectingFunction());
 	}
 
-	ReturnResult embedtDistributedStochasticNeighborEmbedding()
+	TapkeeOutput embedtDistributedStochasticNeighborEmbedding()
 	{
 		perplexity.checked()
 		          .in_range(static_cast<ScalarType>(0.0),
@@ -516,7 +516,7 @@ public:
 		tsne->run(data.data(),n_vectors,current_dimension,embedding.data(),target_dimension,perplexity,theta);
 		delete tsne;
 
-		return ReturnResult(embedding.transpose(),tapkee::ProjectingFunction());
+		return TapkeeOutput(embedding.transpose(),tapkee::ProjectingFunction());
 	}
 
 };

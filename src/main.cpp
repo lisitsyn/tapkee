@@ -358,7 +358,7 @@ int run(int argc, const char** argv)
 	ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
 	tapkee::LoggingSingleton::instance().message_info(ss.str());
 	
-	tapkee::ReturnResult embedding;
+	tapkee::TapkeeOutput output;
 
 	using namespace tapkee::keywords;
 	tapkee::ParametersSet parameters = 
@@ -407,22 +407,25 @@ int run(int argc, const char** argv)
 	tapkee::precomputed_kernel_callback kcb(kernel_matrix);
 	tapkee::eigen_features_callback fcb(input_data);
 
-	embedding = tapkee::withParameters(parameters)
-	                   .withKernel(kcb).withDistance(dcb).withFeatures(fcb)
-	                   .embed(indices.begin(),indices.end());
+	output = tapkee::initialize()
+		.withParameters(parameters)
+		.withKernel(kcb).withDistance(dcb).withFeatures(fcb)
+	 	.embedRange(indices.begin(),indices.end());
 #else
-	embedding = tapkee::withParameters(parameters).embed(input_data);
+	output = tapkee::initialize()
+		.withParameters(parameters)
+		.embedUsing(input_data);
 #endif
 	// Save obtained data
-	ofs << embedding.first.transpose();
+	ofs << output.embedding.transpose();
 	ofs.close();
 
-	if (output_projection && embedding.second.implementation) 
+	if (output_projection && output.projection.implementation) 
 	{
-		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->proj_mat;
-		ofs_mean << ((tapkee::MatrixProjectionImplementation*)embedding.second.implementation)->mean_vec;
+		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)output.projection.implementation)->proj_mat;
+		ofs_mean << ((tapkee::MatrixProjectionImplementation*)output.projection.implementation)->mean_vec;
 	}
-	embedding.second.clear();
+	output.projection.clear();
 	ofs_matrix.close();
 	ofs_mean.close();
 	return 0;

@@ -24,12 +24,12 @@ void smoketest(DimensionReductionMethod m)
 	tapkee::eigen_features_callback fcb(X);
 	vector<int> data(N);
 	for (int i=0; i<N; ++i) data[i] = i;
-	ReturnResult result;
+	TapkeeOutput result;
 	ASSERT_NO_THROW(result = embed(data.begin(), data.end(),
 		kcb, dcb, fcb, (method=m,target_dimension=2,num_neighbors=N/5,
 	                    gaussian_kernel_width=10.0,sne_perplexity=10.0)));
-	ASSERT_EQ(2,result.first.cols());
-	ASSERT_EQ(N,result.first.rows());
+	ASSERT_EQ(2,result.embedding.cols());
+	ASSERT_EQ(N,result.embedding.rows());
 }
 
 TEST(Methods,KernelLocallyLinearEmbeddingSmokeTest)

@@ -662,7 +662,25 @@ namespace tapkee
 {
 
 	//! Return result of the library - a pair of @ref DenseMatrix (embedding) and @ref ProjectingFunction
-	typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,tapkee::ProjectingFunction> ReturnResult;
+	struct TapkeeOutput
+	{
+		TapkeeOutput() :
+			embedding(), projection()
+		{
+		}
+		TapkeeOutput(const DenseMatrix& e, const ProjectingFunction& p) :
+			embedding(), projection(p)
+		{
+			embedding.swap(e);
+		}
+		TapkeeOutput(const TapkeeOutput& that) :
+			embedding(), projection(that.projection)
+		{
+			this->embedding.swap(that.embedding);
+		}
+		DenseMatrix embedding;
+		ProjectingFunction projection;
+	};
 
 } // End of namespace tapkee
 
