@@ -32,12 +32,12 @@ void smoketest(DimensionReductionMethod m)
 	ASSERT_EQ(N,result.first.rows());
 }
 
-TEST(Method,KernelLocallyLinearEmbeddingSmokeTest)
+TEST(Methods,KernelLocallyLinearEmbeddingSmokeTest)
 {
 	smoketest(KernelLocallyLinearEmbedding);
 }
 
-TEST(Method,NeighborhoodPreservingEmbedding)
+TEST(Methods,NeighborhoodPreservingEmbedding)
 {
 	smoketest(NeighborhoodPreservingEmbedding);
 }
