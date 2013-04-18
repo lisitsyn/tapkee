@@ -458,8 +458,11 @@ public:
 	{
 		DenseSymmetricMatrix centered_kernel_matrix = 
 			compute_centered_kernel_matrix(begin,end,callbacks.kernel);
-		return ReturnResult(eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
-			centered_kernel_matrix,target_dimension,SkipNoEigenvalues).first, tapkee::ProjectingFunction());
+		EmbeddingResult embedding = eigen_embedding<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
+			centered_kernel_matrix,target_dimension,SkipNoEigenvalues);
+		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
+			embedding.first.col(i).array() *= sqrt(embedding.second(i));
+		return ReturnResult(embedding.first, tapkee::ProjectingFunction());
 	}
 
 	ReturnResult embedLinearLocalTangentSpaceAlignment()
