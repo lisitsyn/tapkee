@@ -20,46 +20,77 @@ that embeds common datasets (swissroll, helix, scurve) using
 the Tapkee library and outputs it with the help of 
 Matplotlib library. To use the script build the 
 sample application (see the Application section for more details) 
-and call borsch with command line:
+and call borsch with the following command:
 
 	./examples/borsch [swissroll|helix|scurve|...] [lle|isomap|...]
 
 API
 ---
 
-The main entry point of Tapkee is the [embed](https://github.com/lisitsyn/tapkee/tree/master/include/tapkee.hpp) 
-function (see [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) for more details) that
-returns embedding for provided data and a function that can be used to project data out of the sample (if such
-function is implemented). This function takes two random access iterators (that denote begin and end of the data),
-three callbacks (kernel callback, distance callback and feature vector access callback) and a set of parameters.
+We provide an interface based on the method chaining technique. The chain starts from the call 
+of the `initialize()` method and followed with the `withParameters(const ParametersSet&)` call 
+which is used to provide parameters like the method to use and its settings. The provided 
+argument is formed with the following syntax:
 
-In the simplest case `begin` and `end` are set to the corresponding iterators of some `vector<tapkee::IndexType>` 
-filled with a range of values from 0 to N-1 where N is the number of vectors to embed. 
+	(keyword1=value1, keyword2=value2)
 
-Callbacks, such as kernel functor (that computes similarity), distance functor (that computes dissimilarity) and 
-dense feature vector access functor (that computes required feature vector), are used by the library to access the 
-data. Such interface is motivated by great flexibility it provides (custom caching, precomputing, maybe even network access). 
-As an example we provide [a simple callback set](https://github.com/lisitsyn/tapkee/tree/master/include/callback/eigen_callbacks.hpp)
-for dense feature matrices out-of-the-box. If you are working with precomputed kernel and distance matrices you may find
-[precomputed callbacks](https://github.com/lisitsyn/tapkee/tree/master/include/callback/precomputed_callbacks.hpp) 
-useful. It is worth to note that most of methods use either kernel or distance while all linear (projective) methods require 
-access to feature vector. For example, to use the Locally Linear Embedding algorithm it is enough to provide a kernel
-callback; the Multidimensional Scaling algorithm requires only a distance callback and PCA requires only a feature
-vector access callback. Full set of callbacks (all three callbacks) makes possible to use all the implemented methods.
+Keywords are defined in the `tapkee::keywords` namespace. Currently, the following keywords
+are defined: `method`, `eigen_method`, `neighbors_method`, `num_neighbors`, `target_dimension`,
+`diffusion_map_timesteps`, `gaussian_kernel_width`, `max_iteration`, `spe_global_strategy`, 
+`spe_num_updates`, `spe_tolerance`, `landmark_ratio`, `nullspace_shift`, `klle_shift`, 
+`check_connectivity`, `fa_epsilon`, `progress_function`, `cancel_function`, `sne_perplexity`,
+`sne_theta`. See the documentation for their detailed meaning.
 
-To specify options a parameter set is used. We define a convenient syntax for that - for example to let 
-the library to embed with the kernel Locally Linear Embedding algorithm and number of neighbors set to 30 you
-use the following code (parentheses around the expression are required):
+As an example, if you want to use the Isomap algorithm with the 
+number of neighbors set to 15:
 
-	(method=KernelLocallyLinearEmbedding, num_neighbors=30)
+	initialize().withParameters((method=Isomap,num_neighbors=15))
 
-Here `method` and `num_neighbors` are the keywords. See [the documentation](http://www.tapkee-library.info/doxygen/html/index.html) 
-for more details on keywords.
+Please note that the inner parentheses are necessary as it uses the 
+overloaded comma operator which appears to be ambiguous in this case.
+
+Next, with initialized parameters you may either embed the provided matrix with:
+
+	initialize().withParameters((method=Isomap,num_neighbors=15)).
+	            .embedUsing(matrix);
+
+Or provide callbacks (kernel, distance and features) using any combination 
+of the `withKernel(KernelCallback)`, `withDistance(DistanceCallback)` and 
+`withFeatures(FeaturesCallback)` member functions:
+
+	initialize().withParameters((method=Isomap,num_neighbors=15))
+	            .withKernel(kernel_callback)
+	            .withDistance(distance_callback)
+	            .withFeatures(features_callback)
+
+Once callbacks are initialized you may either embed data using an 
+STL-compatible sequence of indices or objects (that supports the 
+`begin()` and `end()` methods to obtain the corresponding iterators)
+with the `embedUsing(Sequence)` member function 
+or embed the data using a sequence range with the 
+`embedRange(RandomAccessIterator, RandomAccessIterator)` 
+member function.
+
+As a summary - a few examples:
+
+	TapkeeOutput output = initialize()
+	    .withParameters((method=Isomap,num_neighbors=15))
+	    .embedUsing(matrix);
+
+	TapkeeOutput output = initialize()
+	    .withParameters((method=Isomap,num_neighbors=15))
+	    .withDistance(distance_callback)
+	    .embedUsing(indices);
+
+	TapkeeOutput output = initialize()
+	    .withParameters((method=Isomap,num_neighbors=15))
+	    .withDistance(distance_callback)
+	    .embedRange(indices.begin(),indices.end());
 
 Minimal example
 ---------------
 
-A minimal working example of using the library:
+A minimal working example of a program that uses the library is:
 
 	#include <tapkee.hpp>
 	#include <callback/dummy_callbacks.hpp>
@@ -68,7 +99,7 @@ A minimal working example of using the library:
 	using namespace tapkee;
 	using namespace tapkee::keywords;
 
-	struct my_distance_callback
+	struct MyDistanceCallback
 	{
 		ScalarType distance(IndexType l, IndexType r) { return abs(l-r); } 
 	}; 
@@ -79,14 +110,14 @@ A minimal working example of using the library:
 		vector<IndexType> indices(N);
 		for (int i=0; i<N; i++) indices[i] = i;
 
-		dummy_kernel_callback<IndexType> kcb;
-		my_distance_callback dcb;
-		dummy_feature_vector_callback<IndexType> fvcb;
+		MyDistanceCallback d;
 
-		ReturnResult result = embed(indices.begin(),indices.end(),
-		                            kcb,dcb,fvcb,(method=MultidimensionalScaling,target_dimension=1));
-		cout << result.first.transpose() << endl;
+		TapkeeOutput output = initialize() 
+		   .withParameters((method=MultidimensionalScaling,target_dimension=1))
+		   .withDistance(d)
+		   .embedUsing(indices);
 
+		cout << output.embedding.transpose() << endl;
 		return 0;
 	}
 
