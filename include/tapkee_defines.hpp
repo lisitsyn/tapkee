@@ -44,8 +44,8 @@
 #endif
 
 #ifdef EIGEN_RUNTIME_NO_MALLOC
-	#define RESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(false);
-	#define UNRESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(true);
+	#define RESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(false)
+	#define UNRESTRICT_ALLOC Eigen::internal::set_is_malloc_allowed(true)
 #else
 	#define RESTRICT_ALLOC
 	#define UNRESTRICT_ALLOC
@@ -219,12 +219,23 @@ namespace tapkee
 		//! The namespace that contains implementations for the keywords
 		namespace keywords_internal
 		{
+			/** DefaultValue instance is useful 
+			 * to set a parameter its default value.
+			 *
+			 * Once assigned to a keyword it produces a parameter
+			 * with the default value assigned to the keyword.
+			 */
 			struct DefaultValue
 			{
 				DefaultValue() { }
 			};
 
-			/**
+			/** ParameterKeyword instance is used to represent
+			 * a keyword that is assigned to some value. Such
+			 * an assignment results to instance of @ref Parameter
+			 * class which can be later checked and casted back 
+			 * to the value it represents.
+			 *
 			 * Usage is 
 			 * @code
 			 * 	ParameterKeyword<int> keyword;
@@ -249,7 +260,7 @@ namespace tapkee
 				{
 					return Parameter::create(name,default_value);
 				}
-				operator string() const
+				operator Name() const
 				{
 					return name;
 				}
