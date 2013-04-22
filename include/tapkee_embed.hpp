@@ -6,8 +6,10 @@
 #ifndef TAPKEE_EMBED_H_
 #define TAPKEE_EMBED_H_
 
+/* Tapkee includes */
 #include <tapkee_defines.hpp>
 #include <tapkee_methods.hpp>
+/* End of Tapkee includes */
 
 namespace tapkee
 {

@@ -6,7 +6,10 @@
 #ifndef TAPKEE_PARAMETERS_H_
 #define TAPKEE_PARAMETERS_H_
 
+/* Tapkee includes */
 #include <parameters/value_keeper.hpp>
+/* End of Tapkee includes */
+
 #include <sstream>
 #include <vector>
 #include <map>
@@ -49,8 +52,8 @@ class Parameter
 private:
 
 	template <typename T>
-	Parameter(const ParameterName& name, const T& value) : 
-		parameter_name(name), keeper(tapkee_internal::ValueKeeper(value))
+	Parameter(const ParameterName& pname, const T& value) : 
+		parameter_name(pname), keeper(tapkee_internal::ValueKeeper(value))
 	{
 	}
 
@@ -89,7 +92,7 @@ public:
 	{
 		try 
 		{
-			return value<T>();
+			return get_value<T>();
 		}
 		catch (const missed_parameter_error&)
 		{
@@ -104,7 +107,7 @@ public:
 	{
 		if (!is_type_correct<T>())
 			return false;
-		T kv = keeper.value<T>();
+		T kv = keeper.get_value<T>();
 		if (v == kv)
 			return true;
 		return false;
@@ -173,9 +176,9 @@ public:
 private:
 
 	template <typename T>
-	inline T value() const
+	inline T get_value() const
 	{
-		return keeper.value<T>();
+		return keeper.get_value<T>();
 	}
 	
 	template <typename T>
@@ -204,7 +207,7 @@ public:
 	template <typename T>
 	inline operator T() const
 	{
-		return parameter.value<T>();
+		return parameter.get_value<T>();
 	}
 	
 	inline operator const Parameter&()
@@ -230,7 +233,7 @@ public:
 		if (!parameter.in_range(lower, upper))
 		{
 			std::string error_message = 
-				(Message() << "Value " << parameter.value<T>() << " doesn't fit the range [" << 
+				(Message() << "Value " << parameter.get_value<T>() << " doesn't fit the range [" << 
 				 lower << ", " << upper << ")");
 			throw tapkee::wrong_parameter_error(error_message);
 		}

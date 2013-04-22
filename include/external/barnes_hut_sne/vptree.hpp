@@ -50,10 +50,10 @@ class DataPoint
 
 public:
 	DataPoint() : _D(1), _ind(-1), _x(NULL) { }
-	DataPoint(int D, int ind, double* x) : _D(D), _ind(ind), _x(NULL) 
+	DataPoint(int Dv, int indv, double* xv) : _D(Dv), _ind(indv), _x(NULL) 
 	{
 		_x = (double*) malloc(_D * sizeof(double));
-		for(int d = 0; d < _D; d++) _x[d] = x[d];
+		for(int d = 0; d < _D; d++) _x[d] = xv[d];
 	}
 	DataPoint(const DataPoint& other) : _D(), _ind(0), _x(NULL) // this makes a deep copy -- should not free anything
 	{
@@ -166,8 +166,8 @@ private:
 
 	// An item on the intermediate result queue
 	struct HeapItem {
-		HeapItem( int index, double dist) :
-			index(index), dist(dist) {}
+		HeapItem(int indexv, double distv) :
+			index(indexv), dist(distv) {}
 		int index;
 		double dist;
 		bool operator<(const HeapItem& o) const {
@@ -179,7 +179,7 @@ private:
 	struct DistanceComparator
 	{
 		const T& item;
-		DistanceComparator(const T& item) : item(item) {}
+		DistanceComparator(const T& itemv) : item(itemv) {}
 		bool operator()(const T& a, const T& b) {
 			return distance(item, a) < distance(item, b);
 		}

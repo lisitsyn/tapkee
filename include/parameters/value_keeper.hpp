@@ -6,7 +6,9 @@
 #ifndef TAPKEE_VALUE_KEEPER_H_
 #define TAPKEE_VALUE_KEEPER_H_
 
+/* Tapkee includes */
 #include <parameters/policy.hpp>
+/* End of Tapkee includes */
 
 namespace tapkee
 {
@@ -53,7 +55,7 @@ public:
 	}
 
 	template <typename T>
-	inline T value() const
+	inline T get_value() const
 	{
 		T* v;
 		if (!is_initialized())

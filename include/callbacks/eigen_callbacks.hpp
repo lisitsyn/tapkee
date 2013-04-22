@@ -14,9 +14,9 @@ namespace tapkee
 	struct eigen_features_callback
 	{
 		eigen_features_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix) {};
-		inline void vector(tapkee::IndexType i, tapkee::DenseVector& vector) const
+		inline void vector(tapkee::IndexType i, tapkee::DenseVector& v) const
 		{
-			vector = feature_matrix.col(i);
+			v = feature_matrix.col(i);
 		}
 		const tapkee::DenseMatrix& feature_matrix;
 	};

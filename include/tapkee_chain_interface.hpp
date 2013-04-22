@@ -6,9 +6,11 @@
 #ifndef TAPKEE_CHAIN_H_
 #define TAPKEE_CHAIN_H_
 
+/* Tapkee includes */
 #include <tapkee_embed.hpp>
 #include <callbacks/dummy_callbacks.hpp>
 #include <callbacks/eigen_callbacks.hpp>
+/* End of Tapkee includes */
 
 namespace tapkee
 {

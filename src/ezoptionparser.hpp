@@ -1608,8 +1608,8 @@ bool ezOptionParser::exportFile(const char * filename, bool all) {
 					out.append("\n");
 				}
 			} else {
-				unsigned int n = g->args.size();
-				for(unsigned int j=0; j < n; ++j) {
+				unsigned int nn = g->args.size();
+				for(unsigned int j=0; j < nn; ++j) {
 					out.append(*stringPtrs[i]);
 					out.append(" ");
 					m = g->args[j]->size();

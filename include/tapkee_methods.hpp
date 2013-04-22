@@ -470,8 +470,8 @@ public:
 		Neighbors neighbors;
 		if (global_strategy.is(false))
 		{
-			Neighbors neighbors = find_neighbors(neighbors_method,begin,end,plain_distance,
-			                                     n_neighbors,check_connectivity);
+			neighbors = find_neighbors(neighbors_method,begin,end,plain_distance,
+			                           n_neighbors,check_connectivity);
 		}
 
 		return TapkeeOutput(spe_embedding(begin,end,distance,neighbors,
