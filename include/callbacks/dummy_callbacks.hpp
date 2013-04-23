@@ -12,6 +12,10 @@ namespace tapkee
 	struct dummy_features_callback
 	{
 		typedef int dummy;
+		inline tapkee::IndexType dimension() const 
+		{
+			throw tapkee::unsupported_method_error("Dummy feature vector callback is set");
+		}
 		inline void vector(const Data&, tapkee::DenseVector&) const
 		{
 			throw tapkee::unsupported_method_error("Dummy feature vector callback is set");

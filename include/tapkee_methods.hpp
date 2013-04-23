@@ -102,7 +102,7 @@ public:
 		timesteps = parameters(keywords::diffusion_map_timesteps).checked().positive();
 		eigenshift = parameters(keywords::nullspace_shift);
 		traceshift = parameters(keywords::klle_shift);
-		max_iteration = parameters(keywords::max_iteration).checked().positive();
+		max_iteration = parameters(keywords::max_iteration);
 		tolerance = parameters(keywords::spe_tolerance).checked().positive();
 		n_updates = parameters(keywords::spe_num_updates).checked().positive();
 		theta = parameters(keywords::sne_theta).checked().positive();
@@ -113,16 +113,14 @@ public:
 
 		if (n_vectors > 0)
 		{
-			DenseVector dv = DenseVector::Zero(0);
 			try 
 			{
-				features.vector(*begin,dv);
+				current_dimension = features.dimension();
 			}
 			catch (const unsupported_method_error&)
 			{
 				current_dimension = 0;
 			}
-			current_dimension = dv.size();
 		}
 	}
 
