@@ -24,6 +24,11 @@ and call borsch with the following command:
 
 	./examples/borsch [swissroll|helix|scurve|...] [lle|isomap|...]
 
+You may also try out an minimal example using
+	make minimal
+and the RNA example using
+	make rna
+
 API
 ---
 
