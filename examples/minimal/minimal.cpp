@@ -1,5 +1,5 @@
 #include <tapkee.hpp>
-#include <callback/dummy_callbacks.hpp>
+#include <callbacks/dummy_callbacks.hpp>
 
 using namespace std;
 using namespace tapkee;
@@ -7,7 +7,10 @@ using namespace tapkee::keywords;
 
 struct MyDistanceCallback
 {
-	ScalarType distance(IndexType l, IndexType r) { return abs(l-r); } 
+	ScalarType distance(IndexType l, IndexType r) 
+	{ 
+		return abs(l-r);
+	} 
 }; 
 
 int main(int argc, const char** argv)
@@ -16,13 +19,13 @@ int main(int argc, const char** argv)
 	vector<IndexType> indices(N);
 	for (int i=0; i<N; i++) indices[i] = i;
 
-	MyDistanceCallback d;
+	MyDistanceCallback distance;
 
 	TapkeeOutput output = initialize() 
-		.withParameters((method=MultidimensionalScaling,
-		                 target_dimension=1))
-		.withDistance(d)
-		.embedUsing(indices);
+	  .withParameters((method=MultidimensionalScaling,
+	                   target_dimension=1))
+	  .withDistance(distance)
+	  .embedUsing(indices);
 	
 	cout << output.embedding.transpose() << endl;
 

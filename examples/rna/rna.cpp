@@ -1,6 +1,5 @@
-#define TAPKEE_WITH_ARPACK
 #include <tapkee.hpp>
-#include <callback/dummy_callbacks.hpp>
+#include <callbacks/dummy_callbacks.hpp>
 
 #include <numeric>
 #include <functional>
@@ -33,12 +32,12 @@ int main(int argc, const char** argv)
 		rnas.push_back(line);
 	}
 	
-	MatchKernelCallback k;
+	MatchKernelCallback kernel;
 
 	TapkeeOutput result = initialize()
 		.withParameters((method=KernelLocallyLinearEmbedding,
 		                 num_neighbors=30, target_dimension=2))
-		.withKernel(k)
+		.withKernel(kernel)
 		.embedUsing(rnas);
 
 	cout << result.embedding.transpose() << endl;

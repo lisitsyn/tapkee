@@ -37,8 +37,9 @@ def embed(data,method):
 	numpy.savetxt(input_file, data)
 	tapkee_binary = 'bin/tapkee'
 	runner_string = '%s -i %s -o %s -m %s -k 20 --verbose --benchmark' % (tapkee_binary,input_file,output_file,method)
+	print '-- To reproduce this use the following command', runner_string
 	output = subprocess.check_output(runner_string,shell=True)
-	print 'Library output is \n', output
+	print '-- Library output is \n', output
 	embedded_data = numpy.loadtxt(output_file)
 	os.remove(input_file)
 	os.remove(output_file)
@@ -64,9 +65,9 @@ if __name__ == "__main__":
 	
 	dataset = args.dataset[0]
 	method = args.method[0]
-	print 'Loading %s data' % dataset
+	print '-- Loading %s data' % dataset
 	data, colors = generate_data(dataset)
-	print 'Embedding %s data with %s' % (dataset,method) 
+	print '-- Embedding %s data with %s' % (dataset,method) 
 	embedded_data = embed(data,method)
-	print 'Plotting embedded data'
+	print '-- Plotting embedded data'
 	plot(data,embedded_data,colors)

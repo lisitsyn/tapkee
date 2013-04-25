@@ -34,6 +34,9 @@ endif()
 include_directories("${TAPKEE_INCLUDE_DIR}")
 set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
 add_executable(tapkee ${SRCS})
+# Examples
+add_subdirectory(examples)
+
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
@@ -69,7 +72,7 @@ install(FILES ${headers} DESTINATION ${TAPKEE_INSTALL_DIR}/external/barnes_hut_s
 option(USE_GCOV "Use gcov to analyze test coverage" OFF)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-long-long")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-long-long -Wshadow")
 	if (USE_GCOV)
 		set(CMAKE_BUILD_TYPE Debug)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
