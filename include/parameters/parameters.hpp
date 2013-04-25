@@ -278,9 +278,9 @@ public:
 
 		pmap[p.name()] = p;
 	}
-	bool contains(const string& name) 
+	bool contains(const string& name) const
 	{
-		return pmap.count(name);
+		return pmap.count(name) > 0;
 	}
 	void merge(const ParametersSet& pg) 
 	{
