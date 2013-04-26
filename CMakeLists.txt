@@ -30,15 +30,25 @@ if (OPENMP_FOUND)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-# Main executable
 include_directories("${TAPKEE_INCLUDE_DIR}")
-set (SRCS ${TAPKEE_SRC_DIR}/main.cpp)
-add_executable(tapkee ${SRCS})
+# CLI executable
+add_executable(tapkee_cli ${TAPKEE_SRC_DIR}/cli/main.cpp)
+# Python inteface
+#find_package(Boost 1.45.0)
+#if (Boost_FOUND)
+#	find_package(PythonLibs 2.7)
+#	include_directories(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+#	set(Boost_USE_STATIC_LIBS OFF)
+#	set(Boost_USE_STATIC_RUNTIME OFF)
+#	set(Boost_USE_MULTITHREADED ON)
+#	add_library(tapkee SHARED ${TAPKEE_SRC_DIR}/python/tapkee.cxx)
+#	target_link_libraries(tapkee boost_python ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+#endif()
 # Examples
 add_subdirectory(examples)
 
 if (ARPACK_FOUND)
-	target_link_libraries(tapkee arpack)
+	target_link_libraries(tapkee_cli arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
 
