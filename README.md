@@ -181,14 +181,14 @@ a priority queue is used.
 Other properties can be loaded from some provided header file using `#define TAPKEE_CUSTOM_PROPERTIES`. Currently
 such file should define only one variable - `COVERTREE_BASE` which defines the base of the CoverTree (default is 1.3).
 
-Application
+Command line application
 -----------
 
 Tapkee comes with a sample application which can be used to construct
 low-dimensional representations of dense feature matrices. For more information on 
 its usage please run:
 
-`./tapkee -h`
+`./bin/tapkee_cli -h`
 
 The application takes plain ASCII file containing dense matrix (each vector is a column and each
 line contains values of some feature). The output of the application is stored into the provided

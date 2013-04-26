@@ -21,4 +21,11 @@ rna: default
 	  ./bin/rna examples/rna/rna.dat | $(plotter) \
 	  );
 
+precomputed: default
+	@(echo '--- Description ---';                \
+	  cat ./examples/precomputed/precomputed.md; \
+	  echo '--- Running ---';                    \
+	  echo 'Result is: ';                        \
+	  ./bin/precomputed)
+
 .PHONY: test
