@@ -1,31 +1,23 @@
-import numpy, datetime, json
-from modshogun import Isomap, RealFeatures
+import numpy, datetime, json, subprocess
+from modshogun import MultidimensionalScaling, RealFeatures
 
 def embed(fname='mnist2000.dat'):
-	print '%s reading %s' % (datetime.datetime.now(), fname)
-	data = numpy.loadtxt(fname)
-	data = data.T
-	print '%s there are %d vectors with %d elements in %s' \
-			% (datetime.datetime.now(), data.shape[1], data.shape[0], fname)
-	features = RealFeatures(data.T)
-	converter = Isomap()
-	converter.set_k(100)
-	converter.set_target_dim(2)
-	return converter.apply(features).get_feature_matrix(), data
+	run_string = './../../bin/tapkee_cli -i %s -o tmp.dat -m t-sne --verbose --benchmark' % (fname)
+	output = subprocess.check_output(run_string, shell=True)
+	print output
+	return numpy.loadtxt('tmp.dat'), None
 
-def plot_embedding(embedding,gc_content=None):
+def plot_embedding(embedding):
 	import matplotlib.pyplot as plt
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 	ax.scatter(embedding[0],embedding[1])
-	if gc_content:
-		fig.colorbar(gc_content,orientation='horizontal')
 	plt.show()
 
 def export_json(embedding):
 	json_dict = {}
 	N = embedding.shape[1]
-	json_dict['data'] = [{'embedx':embedding[0,i], 'embedy':embedding[1,i]} for i in xrange(N)]
+	json_dict['data'] = [{'cx':embedding[0,i], 'cy':embedding[1,i]} for i in xrange(N)]
 	json.dump(json_dict, open('mnist.json', 'w'))
 
 if __name__ == "__main__":
