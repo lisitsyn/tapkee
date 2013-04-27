@@ -33,7 +33,7 @@ promoters:
 	  then                                         \
 	    echo '--- Description ---';                \
 	    cat ./examples/promoters/promoters.md;     \
-	    echo '--- Plotting ---';                   \
+	    echo '--- Embedding and plotting (please wait, a window will appear in a minute) ---';  \
 	    python examples/promoters/promoters.py;    \
 	  else                                         \
 	    echo 'Shogun machine learning toolbox is not installed' \
@@ -43,7 +43,19 @@ promoters:
 mnist: default
 	@(echo '--- Description ---';               \
 	  cat ./examples/mnist/mnist.md;            \
-	  echo '--- Plotting ---';                  \
+	  echo '--- Embedding and plotting (please wait, a window will appear in a minute) ---';    \
 	  python examples/mnist/mnist.py data/mnist2000.dat)
+
+cbcl: default
+	@(echo '--- Description ---';               \
+	  cat ./examples/cbcl/cbcl.md;              \
+	  echo '--- Embedding and plotting (please wait, a window will appear in a minute) ---';    \
+	  python examples/cbcl/cbcl.py)
+
+faces: default
+	@(echo '--- Description ---';               \
+	  cat ./examples/faces/faces.md;              \
+	  echo '--- Embedding and plotting (please wait, a window will appear in a few seconds) ---';    \
+	  python examples/faces/faces.py)
 
 .PHONY: test minimal rna precomputed promoters
