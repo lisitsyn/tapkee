@@ -8,21 +8,27 @@ test: default
 	@(cd build; ctest -VV)
 
 minimal: default
-	@(echo '--- Description ---';        \
+	@(echo '--- Code ---';               \
+	  cat ./examples/minimal/minimal.cpp;\
+	  echo '--- Description ---';        \
 	  cat ./examples/minimal/minimal.md; \
 	  echo '--- Running ---';            \
 	  echo 'Result is: ';                \
 	  ./bin/minimal)
 
 rna: default
-	@(echo '--- Description ---';                 \
+	@(echo '--- Code ---';                        \
+	  cat ./examples/rna/rna.cpp;                 \
+	  echo '--- Description ---';                 \
 	  cat ./examples/rna/rna.md;                  \
 	  echo '--- Plotting ---';                    \
 	  ./bin/rna examples/rna/rna.dat | $(plotter) \
 	  );
 
 precomputed: default
-	@(echo '--- Description ---';                \
+	@(echo '--- Code ---';                       \
+	  cat ./examples/precomputed/precomputed.cpp;\
+	  echo '--- Description ---';                \
 	  cat ./examples/precomputed/precomputed.md; \
 	  echo '--- Running ---';                    \
 	  echo 'Result is: ';                        \
