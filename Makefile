@@ -28,4 +28,16 @@ precomputed: default
 	  echo 'Result is: ';                        \
 	  ./bin/precomputed)
 
-.PHONY: test
+promoters:
+	@(if (python -c 'from modshogun import LocallyLinearEmbedding' > /dev/null 2>&1); \
+	  then                                         \
+	    echo '--- Description ---';                \
+	    cat ./examples/promoters/promoters.md;     \
+	    echo '--- Plotting ---';                   \
+	    python examples/promoters/promoters.py;    \
+	  else                                         \
+	    echo 'Shogun machine learning toolbox is not installed' \
+	         'https://github.com/shogun-toolbox/shogun)';     \
+	  fi;)
+
+.PHONY: test minimal rna precomputed promoters
