@@ -1,10 +1,12 @@
-import numpy, datetime, json, subprocess
+import numpy, datetime, json, subprocess, sys, os
 
-def embed(fname='mnist2000.dat'):
-	run_string = './../../bin/tapkee_cli -i %s -o tmp.dat -m t-sne --verbose --benchmark' % (fname)
+def embed(fname):
+	output_file = 'tmp_mnist_.dat'
+	run_string = './bin/tapkee_cli -i %s -o %s -m t-sne --transpose --verbose --benchmark' % (fname,output_file)
 	output = subprocess.check_output(run_string, shell=True)
-	print output
-	return numpy.loadtxt('tmp.dat'), numpy.loadtxt(fname)
+	embedding = numpy.loadtxt(output_file)
+	os.remove(output_file)
+	return embedding, numpy.loadtxt(fname)
 
 def plot_embedding(embedding,data):
 	import matplotlib.pyplot as plt
@@ -23,22 +25,23 @@ def plot_embedding(embedding,data):
 		ax.add_artist(ab)
 	plt.show()
 
-def export_json(embedding,data):
+def export_json(outfile,embedding,data):
 	json_dict = {}
 	N = embedding.shape[1]
-
+	print 'N', N
 	import scipy.misc
 	for i in xrange(N):
 		img = numpy.zeros((28,28,4))
-		img[:,:,0] = 255-255*data[i,:].reshape(28,28)
-		img[:,:,1] = 255-255*data[i,:].reshape(28,28)
-		img[:,:,2] = 255-255*data[i,:].reshape(28,28)
+		img[:,:,0] = 255*data[i,:].reshape(28,28)
+		img[:,:,1] = 255*data[i,:].reshape(28,28)
+		img[:,:,2] = 255*data[i,:].reshape(28,28)
 		img[:,:,3] = 255*data[i,:].reshape(28,28)
 		scipy.misc.imsave('mnist/%d.png' % i,img)
-	json_dict['data'] = [{'cx':embedding[0,i], 'cy':embedding[1,i], 'image':'%d.png' % i} for i in xrange(N)]
-	json.dump(json_dict, open('mnist.json', 'w'))
+	json_dict['data'] = [{'cx':embedding[0,i], 'cy':embedding[1,i], 'fname':'%d.png' % i} for i in xrange(N)]
+	json.dump(json_dict, open(outfile, 'w'))
 
 if __name__ == "__main__":
-	embedding, data = embed()
-	export_json(embedding,data)
+	embedding, data = embed(sys.argv[1])
+	if len(sys.argv)==3:
+		export_json(sys.argv[2],embedding,data)
 	plot_embedding(embedding,data)

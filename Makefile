@@ -37,7 +37,13 @@ promoters:
 	    python examples/promoters/promoters.py;    \
 	  else                                         \
 	    echo 'Shogun machine learning toolbox is not installed' \
-	         'https://github.com/shogun-toolbox/shogun)';     \
+	         ' (https://github.com/shogun-toolbox/shogun)';     \
 	  fi;)
+
+mnist: default
+	@(echo '--- Description ---';               \
+	  cat ./examples/mnist/mnist.md;            \
+	  echo '--- Plotting ---';                  \
+	  python examples/mnist/mnist.py data/mnist2000.dat)
 
 .PHONY: test minimal rna precomputed promoters
