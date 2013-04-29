@@ -40,7 +40,7 @@ promoters:
 	    echo '--- Description ---';                \
 	    cat ./examples/promoters/promoters.md;     \
 	    echo '--- Embedding and plotting (please wait, a window will appear in a minute) ---';  \
-	    python examples/promoters/promoters.py;    \
+	    python examples/promoters/promoters.py data/mml.pickle;    \
 	  else                                         \
 	    echo 'Shogun machine learning toolbox is not installed' \
 	         ' (https://github.com/shogun-toolbox/shogun)';     \
