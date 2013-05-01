@@ -89,10 +89,10 @@ public:
 		{
 			target_dimension = target_dimension
 				.checked()
-				.in_range(static_cast<IndexType>(1),static_cast<IndexType>(n_vectors));
+				.inRange(static_cast<IndexType>(1),static_cast<IndexType>(n_vectors));
 			n_neighbors = n_neighbors
 				.checked()
-				.in_range(static_cast<IndexType>(3),static_cast<IndexType>(n_vectors));
+				.inRange(static_cast<IndexType>(3),static_cast<IndexType>(n_vectors));
 		}
 
 		eigen_method = parameters(keywords::eigen_method);
@@ -107,8 +107,8 @@ public:
 		n_updates = parameters(keywords::spe_num_updates).checked().positive();
 		theta = parameters(keywords::sne_theta).checked().positive();
 		global_strategy = parameters(keywords::spe_global_strategy);
-		epsilon = parameters(keywords::fa_epsilon);
-		perplexity = parameters(keywords::sne_perplexity);
+		epsilon = parameters(keywords::fa_epsilon).checked().nonNegative();
+		perplexity = parameters(keywords::sne_perplexity).checked().nonNegative();
 		ratio = parameters(keywords::landmark_ratio);
 
 		if (n_vectors > 0)
@@ -273,8 +273,8 @@ public:
 	TapkeeOutput embedLandmarkMultidimensionalScaling()
 	{
 		ratio.checked()
-		     .in_range(static_cast<ScalarType>(1.0/n_vectors),
-		               static_cast<ScalarType>(1.0 + 1e-6));
+		     .inRange(static_cast<ScalarType>(1.0/n_vectors),
+		              static_cast<ScalarType>(1.0 + 1e-6));
 
 		Landmarks landmarks = 
 			select_landmarks_random(begin,end,ratio);
@@ -314,8 +314,8 @@ public:
 	TapkeeOutput embedLandmarkIsomap()
 	{
 		ratio.checked()
-		     .in_range(static_cast<ScalarType>(1.0/n_vectors),
-		               static_cast<ScalarType>(1.0 + 1e-6));
+		     .inRange(static_cast<ScalarType>(1.0/n_vectors),
+		              static_cast<ScalarType>(1.0 + 1e-6));
 
 		Neighbors neighbors = find_neighbors(neighbors_method,begin,end,plain_distance,
 		                                     n_neighbors,check_connectivity);
@@ -498,8 +498,8 @@ public:
 	TapkeeOutput embedtDistributedStochasticNeighborEmbedding()
 	{
 		perplexity.checked()
-		          .in_range(static_cast<ScalarType>(0.0),
-		                    static_cast<ScalarType>((n_vectors-1)/3.0 + 1e-6));
+		          .inRange(static_cast<ScalarType>(0.0),
+		                   static_cast<ScalarType>((n_vectors-1)/3.0 + 1e-6));
 
 		DenseMatrix data(static_cast<IndexType>(current_dimension),n_vectors);
 		DenseVector feature_vector(static_cast<IndexType>(current_dimension));

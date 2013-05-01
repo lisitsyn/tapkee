@@ -14,8 +14,8 @@ namespace tapkee_internal
 struct TypePolicyBase
 {
 	virtual ~TypePolicyBase() {}
-	virtual void copy_from_value(void const*, void**) const = 0;
-	virtual void* get_value(void**) const = 0;
+	virtual void copyFromValue(void const*, void**) const = 0;
+	virtual void* getValue(void**) const = 0;
 	virtual void free(void**) const = 0;
 	virtual void clone(void* const*, void**) const = 0;
 	virtual void move(void* const*, void**) const = 0;
@@ -24,11 +24,11 @@ struct TypePolicyBase
 template <typename T>
 struct PointerTypePolicyImpl : public TypePolicyBase
 {
-	inline virtual void copy_from_value(void const* src, void** dest) const
+	inline virtual void copyFromValue(void const* src, void** dest) const
 	{
 		*dest = new T(*reinterpret_cast<T const*>(src));
 	}
-	inline virtual void* get_value(void** src) const
+	inline virtual void* getValue(void** src) const
 	{
 		return *src;
 	}
@@ -52,7 +52,7 @@ struct PointerTypePolicyImpl : public TypePolicyBase
 };
 
 template <typename T>
-TypePolicyBase* get_policy()
+TypePolicyBase* getPolicy()
 {
 	static PointerTypePolicyImpl<T> policy;
 	return &policy;
@@ -61,13 +61,15 @@ TypePolicyBase* get_policy()
 struct CheckerPolicyBase
 {
 	virtual ~CheckerPolicyBase() {}
-	virtual bool is_in_range(void* const*, void*, void*) const = 0;
-	virtual bool is_equal(void* const*, void*) const = 0;
-	virtual bool is_not_equal(void* const*, void*) const = 0;
-	virtual bool is_positive(void* const*) const = 0;
-	virtual bool is_negative(void* const*) const = 0;
-	virtual bool is_greater(void* const*, void*) const = 0;
-	virtual bool is_lesser(void* const*, void*) const = 0;
+	virtual bool isInRange(void* const*, void*, void*) const = 0;
+	virtual bool isEqual(void* const*, void*) const = 0;
+	virtual bool isNotEqual(void* const*, void*) const = 0;
+	virtual bool isPositive(void* const*) const = 0;
+	virtual bool isNonNegative(void * const*) const = 0;
+	virtual bool isNegative(void* const*) const = 0;
+	virtual bool isNonPositive(void * const*) const = 0;
+	virtual bool isGreater(void* const*, void*) const = 0;
+	virtual bool isLesser(void* const*, void*) const = 0;
 };
 
 template <typename T>
@@ -77,41 +79,51 @@ struct PointerCheckerPolicyImpl : public CheckerPolicyBase
 	{
 		return *reinterpret_cast<T*>(v);
 	}
-	virtual bool is_in_range(void* const* src, void* lower, void* upper) const
+	virtual bool isInRange(void* const* src, void* lower, void* upper) const
 	{
 		T v = value(*src);
 		T l = value(lower);
 		T u = value(upper);
 		return (v>=l) && (v<u);
 	}
-	virtual bool is_equal(void* const* src, void* other_src) const
+	virtual bool isEqual(void* const* src, void* other_src) const
 	{
 		T v = value(*src);
 		T ov = value(other_src);
 		return (v==ov);
 	}
-	virtual bool is_not_equal(void* const* src, void* other_src) const
+	virtual bool isNotEqual(void* const* src, void* other_src) const
 	{
 		T v = value(*src);
 		T ov = value(other_src);
 		return (v!=ov);
 	}
-	virtual bool is_positive(void* const* src) const
+	virtual bool isPositive(void* const* src) const
 	{
 		T v = value(*src);
 		return (v>0);
 	}
-	virtual bool is_negative(void* const* src) const
+	virtual bool isNonNegative(void* const* src) const
+	{
+		T v = value(*src);
+		return (v>=0);
+	}
+	virtual bool isNegative(void* const* src) const
 	{
 		T v = value(*src);
 		return (v<0);
 	}
-	virtual bool is_greater(void* const* src, void* lower) const
+	virtual bool isNonPositive(void* const* src) const
+	{
+		T v = value(*src);
+		return (v<=0);
+	}
+	virtual bool isGreater(void* const* src, void* lower) const
 	{
 		T v = value(*src);
 		return (v>value(lower));
 	}
-	virtual bool is_lesser(void* const* src, void* upper) const
+	virtual bool isLesser(void* const* src, void* upper) const
 	{
 		T v = value(*src);
 		return (v<value(upper));
@@ -123,31 +135,39 @@ struct EmptyType;
 template <>
 struct PointerCheckerPolicyImpl<EmptyType> : public CheckerPolicyBase
 {
-	virtual bool is_in_range(void* const*, void*, void*) const
+	virtual bool isInRange(void* const*, void*, void*) const
 	{
 		return false;
 	}
-	virtual bool is_equal(void* const*, void*) const
+	virtual bool isEqual(void* const*, void*) const
 	{
 		return false;
 	}
-	virtual bool is_not_equal(void* const*, void*) const
+	virtual bool isNotEqual(void* const*, void*) const
 	{
 		return false;
 	}
-	virtual bool is_positive(void* const*) const
+	virtual bool isPositive(void* const*) const
 	{
 		return false;
 	}
-	virtual bool is_negative(void* const*) const
+	virtual bool isNonNegative(void* const*) const
 	{
 		return false;
 	}
-	virtual bool is_greater(void* const*, void*) const
+	virtual bool isNegative(void* const*) const
 	{
 		return false;
 	}
-	virtual bool is_lesser(void* const*, void*) const
+	virtual bool isNonPositive(void* const*) const
+	{
+		return false;
+	}
+	virtual bool isGreater(void* const*, void*) const
+	{
+		return false;
+	}
+	virtual bool isLesser(void* const*, void*) const
 	{
 		return false;
 	}
@@ -160,42 +180,50 @@ struct PointerCheckerPolicyImpl<bool> : public CheckerPolicyBase
 	{
 		return *reinterpret_cast<bool*>(v);
 	}
-	virtual bool is_in_range(void* const*, void*, void*) const
+	virtual bool isInRange(void* const*, void*, void*) const
 	{
 		return false;
 	}
-	virtual bool is_equal(void* const* src, void* other_src) const
+	virtual bool isEqual(void* const* src, void* other_src) const
 	{
 		bool v = value(*src);
 		bool ov = value(other_src);
 		return (v==ov);
 	}
-	virtual bool is_not_equal(void* const* src, void* other_src) const
+	virtual bool isNotEqual(void* const* src, void* other_src) const
 	{
 		bool v = value(*src);
 		bool ov = value(other_src);
 		return (v!=ov);
 	}
-	virtual bool is_positive(void* const*) const
+	virtual bool isPositive(void* const*) const
 	{
 		return false;
 	}
-	virtual bool is_negative(void* const*) const
+	virtual bool isNonNegative(void* const*) const
 	{
 		return false;
 	}
-	virtual bool is_greater(void* const*, void*) const
+	virtual bool isNegative(void* const*) const
 	{
 		return false;
 	}
-	virtual bool is_lesser(void* const*, void*) const
+	virtual bool isNonPositive(void* const*) const
+	{
+		return false;
+	}
+	virtual bool isGreater(void* const*, void*) const
+	{
+		return false;
+	}
+	virtual bool isLesser(void* const*, void*) const
 	{
 		return false;
 	}
 };
 
 template <typename T>
-CheckerPolicyBase* get_checker_policy()
+CheckerPolicyBase* getCheckerPolicy()
 {
 	static PointerCheckerPolicyImpl<T> policy;
 	return &policy;
