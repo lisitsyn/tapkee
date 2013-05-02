@@ -49,9 +49,9 @@ def plot_embedding(embedding,images):
 	plt.show()
 
 if __name__ == "__main__":
-	feature_matrix, images = load('data/faces')
+	feature_matrix, images = load(sys.argv[1])
 	embedding = embed(feature_matrix)
-	if len(sys.argv)==2:
-		export_json(sys.argv[1],embedding, images)
+	if len(sys.argv)==3:
+		export_json(sys.argv[2],embedding, images)
 	plot_embedding(embedding,images)
 

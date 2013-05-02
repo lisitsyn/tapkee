@@ -1,27 +1,10 @@
-import cPickle,gzip,bz2,numpy,os,re,sys,datetime,random,json
+import numpy,os,re,sys,datetime,random,json
 from modshogun import WeightedDegreeStringKernel, StringCharFeatures, DNA, MultidimensionalScaling, KernelDistance
 
-def load(filename):
-    try:
-        f = bz2.BZ2File(filename, 'rb')
-    except IOError, details:
-        sys.stderr.write('File ' + filename + ' cannot be read\n')
-        sys.stderr.write(details)
-        return
-    myobj = cPickle.load(f)
-    f.close()
-    return myobj
-
-def embed(file='mml.pickle',N=500):
+def embed(file='data/mml.txt'):
 	strings = []
-	print '%s reading %s' % (datetime.datetime.now(), file)
-	file_contents = load(file)
-	print '%s there are %d strings in %s' % (datetime.datetime.now(), len(file_contents['examples']), file)
-	
-	positives = numpy.where(numpy.array(file_contents['labels'])>0)[0]
-	selected_idxs = random.sample(positives,N)
-	for i in selected_idxs:
-		strings.append(file_contents['examples'][i])
+	with open(file) as f:
+		strings = [s.rstrip() for s in f.readlines()]
 	
 	features = StringCharFeatures(strings,DNA)
 	kernel = WeightedDegreeStringKernel(10)

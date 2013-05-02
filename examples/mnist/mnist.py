@@ -1,12 +1,21 @@
 import numpy, datetime, json, subprocess, sys, os
 
 def embed(fname):
-	output_file = 'tmp_mnist_.dat'
-	run_string = './bin/tapkee_cli -i %s -o %s -m t-sne --transpose --verbose --benchmark' % (fname,output_file)
+	input_file = 'tmp_mnist_input.dat'
+	with open(fname,'r') as file:
+		json_data = json.load(file)
+	N, d = json_data['N'], json_data['d']
+	X = numpy.zeros((N,d))
+	for i in xrange(N):
+		X[i,json_data['data'][str(i)]] = 1.0
+	numpy.savetxt(input_file,X.T,fmt='%.1f')
+	output_file = 'tmp_mnist_output.dat'
+	run_string = './bin/tapkee_cli -i %s -o %s -m t-sne --verbose --benchmark' % (input_file,output_file)
 	output = subprocess.check_output(run_string, shell=True)
 	embedding = numpy.loadtxt(output_file)
+	os.remove(input_file)
 	os.remove(output_file)
-	return embedding, numpy.loadtxt(fname)
+	return embedding, X
 
 def plot_embedding(embedding,data):
 	import matplotlib.pyplot as plt
