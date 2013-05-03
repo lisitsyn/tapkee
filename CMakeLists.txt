@@ -33,17 +33,6 @@ endif()
 include_directories("${TAPKEE_INCLUDE_DIR}")
 # CLI executable
 add_executable(tapkee_cli ${TAPKEE_SRC_DIR}/cli/main.cpp)
-# Python inteface
-#find_package(Boost 1.45.0)
-#if (Boost_FOUND)
-#	find_package(PythonLibs 2.7)
-#	include_directories(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-#	set(Boost_USE_STATIC_LIBS OFF)
-#	set(Boost_USE_STATIC_RUNTIME OFF)
-#	set(Boost_USE_MULTITHREADED ON)
-#	add_library(tapkee SHARED ${TAPKEE_SRC_DIR}/python/tapkee.cxx)
-#	target_link_libraries(tapkee boost_python ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
-#endif()
 # Examples
 add_subdirectory(examples)
 
