@@ -75,66 +75,6 @@ struct CheckerPolicyBase
 template <typename T>
 struct PointerCheckerPolicyImpl : public CheckerPolicyBase
 {
-	inline T value(void* v) const
-	{
-		return *reinterpret_cast<T*>(v);
-	}
-	virtual bool isInRange(void* const* src, void* lower, void* upper) const
-	{
-		T v = value(*src);
-		T l = value(lower);
-		T u = value(upper);
-		return (v>=l) && (v<u);
-	}
-	virtual bool isEqual(void* const* src, void* other_src) const
-	{
-		T v = value(*src);
-		T ov = value(other_src);
-		return (v==ov);
-	}
-	virtual bool isNotEqual(void* const* src, void* other_src) const
-	{
-		T v = value(*src);
-		T ov = value(other_src);
-		return (v!=ov);
-	}
-	virtual bool isPositive(void* const* src) const
-	{
-		T v = value(*src);
-		return (v>0);
-	}
-	virtual bool isNonNegative(void* const* src) const
-	{
-		T v = value(*src);
-		return (v>=0);
-	}
-	virtual bool isNegative(void* const* src) const
-	{
-		T v = value(*src);
-		return (v<0);
-	}
-	virtual bool isNonPositive(void* const* src) const
-	{
-		T v = value(*src);
-		return (v<=0);
-	}
-	virtual bool isGreater(void* const* src, void* lower) const
-	{
-		T v = value(*src);
-		return (v>value(lower));
-	}
-	virtual bool isLesser(void* const* src, void* upper) const
-	{
-		T v = value(*src);
-		return (v<value(upper));
-	}
-};
-
-struct EmptyType;
-
-template <>
-struct PointerCheckerPolicyImpl<EmptyType> : public CheckerPolicyBase
-{
 	virtual bool isInRange(void* const*, void*, void*) const
 	{
 		return false;
@@ -173,54 +113,68 @@ struct PointerCheckerPolicyImpl<EmptyType> : public CheckerPolicyBase
 	}
 };
 
-template <>
-struct PointerCheckerPolicyImpl<bool> : public CheckerPolicyBase
-{
-	inline bool value(void* v) const
-	{
-		return *reinterpret_cast<bool*>(v);
-	}
-	virtual bool isInRange(void* const*, void*, void*) const
-	{
-		return false;
-	}
-	virtual bool isEqual(void* const* src, void* other_src) const
-	{
-		bool v = value(*src);
-		bool ov = value(other_src);
-		return (v==ov);
-	}
-	virtual bool isNotEqual(void* const* src, void* other_src) const
-	{
-		bool v = value(*src);
-		bool ov = value(other_src);
-		return (v!=ov);
-	}
-	virtual bool isPositive(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isNonNegative(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isNegative(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isNonPositive(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isGreater(void* const*, void*) const
-	{
-		return false;
-	}
-	virtual bool isLesser(void* const*, void*) const
-	{
-		return false;
-	}
-};
+#define default_policy_for(Type) \
+template <>																		\
+struct PointerCheckerPolicyImpl<Type> : public CheckerPolicyBase				\
+{																				\
+	inline Type value(void* v) const											\
+	{																			\
+		return *reinterpret_cast<Type*>(v);										\
+	}																			\
+	virtual bool isInRange(void* const* src, void* lower, void* upper) const	\
+	{																			\
+		Type v = value(*src);													\
+		Type l = value(lower);													\
+		Type u = value(upper);													\
+		return (v>=l) && (v<u);													\
+	}																			\
+	virtual bool isEqual(void* const* src, void* other_src) const				\
+	{																			\
+		Type v = value(*src);													\
+		Type ov = value(other_src);												\
+		return (v==ov);															\
+	}																			\
+	virtual bool isNotEqual(void* const* src, void* other_src) const			\
+	{																			\
+		Type v = value(*src);													\
+		Type ov = value(other_src);												\
+		return (v!=ov);															\
+	}																			\
+	virtual bool isPositive(void* const* src) const								\
+	{																			\
+		Type v = value(*src);													\
+		return (v>0);															\
+	}																			\
+	virtual bool isNonNegative(void* const* src) const							\
+	{																			\
+		Type v = value(*src);													\
+		return (v>=0);															\
+	}																			\
+	virtual bool isNegative(void* const* src) const								\
+	{																			\
+		Type v = value(*src);													\
+		return (v<0);															\
+	}																			\
+	virtual bool isNonPositive(void* const* src) const							\
+	{																			\
+		Type v = value(*src);													\
+		return (v<=0);															\
+	}																			\
+	virtual bool isGreater(void* const* src, void* lower) const					\
+	{																			\
+		Type v = value(*src);													\
+		return (v>value(lower));												\
+	}																			\
+	virtual bool isLesser(void* const* src, void* upper) const					\
+	{																			\
+		Type v = value(*src);													\
+		return (v<value(upper));												\
+	}																			\
+}
+
+default_policy_for(double);
+default_policy_for(float);
+default_policy_for(int);
 
 template <typename T>
 CheckerPolicyBase* getCheckerPolicy()
