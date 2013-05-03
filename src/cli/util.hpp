@@ -165,6 +165,8 @@ tapkee::NeighborsMethod parse_neighbors_method(const char* str)
 {
 	if (!strcmp(str,"brute"))
 		return tapkee::Brute;
+	if (!strcmp(str,"vptree"))
+		return tapkee::VpTree;
 #ifdef TAPKEE_USE_LGPL_COVERTREE
 	if (!strcmp(str,"covertree"))
 		return tapkee::CoverTree;
