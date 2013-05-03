@@ -28,10 +28,10 @@ You may also try out an minimal example using `make minimal`
 and the RNA example using `make rna`. There are a few graphical
 examples. To run MNIST digits embedding example use `make mnist`,
 to run promoters embedding example use `make promoters` and 
-to run embedding for two images datasets use `make cbcl` and
-`make faces`. All graphical examples require Matplotlib which can 
-be usually installed with a package manager. The promoters example 
-also has non-trivial dependency on Shogun machine learning toolbox 
+to run embedding for faces dataset use `make faces`. All graphical 
+examples require Matplotlib which can be usually installed with 
+a package manager. The promoters example also has non-trivial 
+dependency on Shogun machine learning toolbox 
 (minimal version is 2.1.0).
 
 API
