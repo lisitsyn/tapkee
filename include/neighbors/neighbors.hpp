@@ -30,7 +30,7 @@ namespace tapkee_internal
 template <class DistanceRecord>
 struct distances_comparator
 {
-	bool operator()(const DistanceRecord& l, const DistanceRecord& r) 
+	inline bool operator()(const DistanceRecord& l, const DistanceRecord& r) const
 	{
 		return (l.second < r.second);
 	}
@@ -128,17 +128,8 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, cons
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 	{
 		Distances distances;
-		if (Callback::is_kernel)
-		{
-			for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
-				distances.push_back(make_pair(around_iter, 
-							callback(around_iter,around_iter) + callback(iter,iter) - 2*callback(iter,around_iter)));
-		}
-		else
-		{
-			for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
-				distances.push_back(make_pair(around_iter, callback(iter,around_iter)));
-		}
+		for (RandomAccessIterator around_iter=begin; around_iter!=end; ++around_iter)
+			distances.push_back(make_pair(around_iter, callback.distance(iter,around_iter)));
 
 		nth_element(distances.begin(),distances.begin()+k+1,distances.end(),
 		            distances_comparator<DistanceRecord>());

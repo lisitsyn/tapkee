@@ -30,32 +30,29 @@ struct DistanceComparator
 		callback(c), item(i) {}
 	inline bool operator()(const RandomAccessIterator& a, const RandomAccessIterator& b)
 	{
-		return compare_if_kernel<DistanceCallback::is_kernel,RandomAccessIterator,DistanceCallback>(item,callback)(a,b);
+		return compare_if_kernel<DistanceCallback::is_kernel,RandomAccessIterator,DistanceCallback>()
+			(callback,item,a,b);
 	}
 };
 
 template<class RandomAccessIterator, class DistanceCallback> 
 struct compare_if_kernel<true,RandomAccessIterator,DistanceCallback>
 {
-	compare_if_kernel(RandomAccessIterator i, DistanceCallback c) : item(i), callback(c) {}
-	bool operator()(const RandomAccessIterator& a, const RandomAccessIterator& b)
+	inline bool operator()(DistanceCallback& callback, const RandomAccessIterator& item,
+	                       const RandomAccessIterator& a, const RandomAccessIterator& b)
 	{
 		return (-2*callback(item,a) + callback(a,a)) < (-2*callback(item,b) + callback(b,b));
 	}
-	RandomAccessIterator item;
-	DistanceCallback callback;
 };
 
 template<class RandomAccessIterator, class DistanceCallback> 
 struct compare_if_kernel<false,RandomAccessIterator,DistanceCallback>
 {
-	compare_if_kernel(RandomAccessIterator i, DistanceCallback c) : item(i), callback(c) {}
-	bool operator()(const RandomAccessIterator& a, const RandomAccessIterator& b)
+	inline bool operator()(DistanceCallback& callback, const RandomAccessIterator& item,
+	                       const RandomAccessIterator& a, const RandomAccessIterator& b)
 	{
 		return callback(item,a) < callback(item,b);
 	}
-	RandomAccessIterator item;
-	DistanceCallback callback;
 };
 
 template<class RandomAccessIterator, class DistanceCallback>
@@ -106,20 +103,23 @@ private:
 	VantagePointTree(const VantagePointTree&);
 	VantagePointTree& operator=(const VantagePointTree&);
 
-	std::vector<RandomAccessIterator> items;
 	RandomAccessIterator begin;
+	std::vector<RandomAccessIterator> items;
 	DistanceCallback callback;
 	double tau;
 
-	// Single node of a VP tree (has a point and radius; left children are closer to point than the radius)
 	struct Node
 	{
-		int index;              // index of point in node
-		double threshold;       // radius(?)
-		Node* left;             // points closer by than threshold
-		Node* right;            // points farther away than threshold
+		int index;
+		double threshold;
+		Node* left;
+		Node* right;
 
-		Node() : index(0), threshold(0.), left(0), right(0) {}
+		Node() : 
+			index(0), threshold(0.), 
+			left(0), right(0) 
+		{
+		}
 
 		~Node() 
 		{
@@ -132,92 +132,83 @@ private:
 
 	}* root;
 
-	// An item on the intermediate result queue
 	struct HeapItem {
-		HeapItem(int indexv, double distv) :
-			index(indexv), dist(distv) {}
+		HeapItem(int i, double d) :
+			index(i), distance(d) {}
 		int index;
-		double dist;
+		double distance;
 		bool operator<(const HeapItem& o) const {
-			return dist < o.dist;
+			return distance < o.distance;
 		}
 	};
 
 
-	// Function that (recursively) fills the tree
 	Node* buildFromPoints(int lower, int upper)
 	{
-		if (upper == lower) {     // indicates that we're done here!
+		if (upper == lower)
+		{
 			return NULL;
 		}
 
-		// Lower index is center of current node
 		Node* node = new Node();
 		node->index = lower;
 
-		if (upper - lower > 1) {      // if we did not arrive at leaf yet
-
-			// Choose an arbitrary point and move it to the start
+		if (upper - lower > 1)
+		{
 			int i = (int) ((double)rand() / RAND_MAX * (upper - lower - 1)) + lower;
 			std::swap(items[lower], items[i]);
 
-			// Partition around the median distance
 			int median = (upper + lower) / 2;
-			std::nth_element(items.begin() + lower + 1, items.begin() + median, 
-					items.begin() + upper, DistanceComparator<RandomAccessIterator,DistanceCallback>(callback,items[lower]));
+			std::nth_element(items.begin() + lower + 1, items.begin() + median, items.begin() + upper, 
+				DistanceComparator<RandomAccessIterator,DistanceCallback>(callback,items[lower]));
 
-			// Threshold of the new node will be the distance to the median
 			node->threshold = callback.distance(items[lower], items[median]);
-
-			// Recursively build tree
 			node->index = lower;
 			node->left = buildFromPoints(lower + 1, median);
 			node->right = buildFromPoints(median, upper);
 		}
 
-		// Return result
 		return node;
 	}
 
-	// Helper function that searches the tree    
 	void search(Node* node, const RandomAccessIterator& target, int k, std::priority_queue<HeapItem>& heap)
 	{
-		if(node == NULL) return;     // indicates that we're done here
+		if (node == NULL) 
+			return;
 
-		// Compute distance between target and current node
-		double dist = callback.distance(items[node->index], target);
+		double distance = callback.distance(items[node->index], target);
 
-		// If current node within radius tau
-		if(dist < tau) {
-			if(heap.size() == static_cast<size_t>(k)) heap.pop(); // remove furthest node from result list (if we already have k results)
-			heap.push(HeapItem(node->index, dist));           // add current node to result list
-			if(heap.size() == static_cast<size_t>(k)) tau = heap.top().dist;     // update value of tau (farthest point in result list)
+		if (distance < tau) 
+		{
+			if (heap.size() == static_cast<size_t>(k)) 
+				heap.pop();
+
+			heap.push(HeapItem(node->index, distance));
+
+			if (heap.size() == static_cast<size_t>(k))
+				tau = heap.top().distance;
 		}
 
-		// Return if we arrived at a leaf
-		if(node->left == NULL && node->right == NULL) {
+		if (node->left == NULL && node->right == NULL) 
+		{
 			return;
 		}
 
-		// If the target lies within the radius of ball
-		if(dist < node->threshold) {
-			if(dist - tau <= node->threshold) {         // if there can still be neighbors inside the ball, recursively search left child first
+		if (distance < node->threshold)
+		{
+			if ((distance - tau) <= node->threshold) 
 				search(node->left, target, k, heap);
-			}
 
-			if(dist + tau >= node->threshold) {         // if there can still be neighbors outside the ball, recursively search right child
+			if ((distance + tau) >= node->threshold) 
 				search(node->right, target, k, heap);
-			}
-
-			// If the target lies outsize the radius of the ball
-		} else {
-			if(dist + tau >= node->threshold) {         // if there can still be neighbors outside the ball, recursively search right child first
+		} 
+		else
+		{
+			if ((distance + tau) >= node->threshold) 
 				search(node->right, target, k, heap);
-			}
 
-			if (dist - tau <= node->threshold) {         // if there can still be neighbors inside the ball, recursively search left child
+			if ((distance - tau) <= node->threshold) 
 				search(node->left, target, k, heap);
-			}
 		}
 	}
 };
