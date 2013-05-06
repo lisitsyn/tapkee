@@ -5,7 +5,8 @@ the part of the [Shogun machine learning toolbox](https://github.com/shogun-tool
 The project aim is to provide efficient and flexible standalone library for 
 dimensionality reduction which can be easily integrated to existing codebases.
 Tapkee leverages capabilities of effective [Eigen3 linear algebra library](http://eigen.tuxfamily.org) and 
-optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/). To achieve 
+optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/). 
+The library uses CoverTree and VP-tree data structures to compute nearest neighbors. To achieve 
 greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
 the data representation and storage schemes.
 
