@@ -132,6 +132,9 @@ A minimal working example of a program that uses the library is:
 		return 0;
 	}
 
+This example require Tapkee to be in the include path. With Linux compilers
+you may do that with the `-I/path/to/tapkee/headers/folder` key.
+
 Integration
 -----------
 
