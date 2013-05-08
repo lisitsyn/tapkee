@@ -45,6 +45,9 @@ argument is formed with the following syntax:
 
 	(keyword1=value1, keyword2=value2)
 
+Such syntax is possible due to comma operator overloading which groups all assigned keywords
+in the comma separated list.
+
 Keywords are defined in the `tapkee::keywords` namespace. Currently, the following keywords
 are defined: `method`, `eigen_method`, `neighbors_method`, `num_neighbors`, `target_dimension`,
 `diffusion_map_timesteps`, `gaussian_kernel_width`, `max_iteration`, `spe_global_strategy`, 
@@ -52,13 +55,13 @@ are defined: `method`, `eigen_method`, `neighbors_method`, `num_neighbors`, `tar
 `check_connectivity`, `fa_epsilon`, `progress_function`, `cancel_function`, `sne_perplexity`,
 `sne_theta`. See the documentation for their detailed meaning.
 
-As an example, if you want to use the Isomap algorithm with the 
-number of neighbors set to 15:
+As an example of parameters setting, if you want to use the Isomap 
+algorithm with the number of neighbors set to 15:
 
 	initialize().withParameters((method=Isomap,num_neighbors=15))
 
 Please note that the inner parentheses are necessary as it uses the 
-overloaded comma operator which appears to be ambiguous in this case.
+comma operator which appears to be ambiguous in this case.
 
 Next, with initialized parameters you may either embed the provided matrix with:
 
