@@ -1,6 +1,6 @@
 /* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * Copyright (c) 2012-2013 Sergey Lisitsyn
+ * Copyright (c) 2012-2013 Laurens van der Maaten, Sergey Lisitsyn
  */
 
 #ifndef TAPKEE_VPTREE_H_
