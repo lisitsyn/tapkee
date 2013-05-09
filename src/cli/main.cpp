@@ -253,7 +253,7 @@ int run(int argc, const char** argv)
 		opt.get(OPT_LONG_PREFIX NUM_NEIGHBORS_KEYWORD)->getInt(k);
 		if (k < 3)
 		{
-			tapkee::LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 10.");
+			tapkee::LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 3.");
 			return 0;
 		}
 	}
