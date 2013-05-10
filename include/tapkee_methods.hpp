@@ -248,7 +248,7 @@ private:
 	TapkeeOutput embedLandmarkMultidimensionalScaling()
 	{
 		ratio.checked()
-			.inClosedRange(static_cast<ScalarType>(2.0/n_vectors),
+			.inClosedRange(static_cast<ScalarType>(3.0/n_vectors),
 			               static_cast<ScalarType>(1.0));
 
 		Landmarks landmarks = 
@@ -288,7 +288,7 @@ private:
 	TapkeeOutput embedLandmarkIsomap()
 	{
 		ratio.checked()
-			.inClosedRange(static_cast<ScalarType>(2.0/n_vectors),
+			.inClosedRange(static_cast<ScalarType>(3.0/n_vectors),
 			               static_cast<ScalarType>(1.0));
 
 		Neighbors neighbors = findNeighborsWith(plain_distance);
