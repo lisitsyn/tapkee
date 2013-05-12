@@ -142,11 +142,12 @@ TEST(Interface, OneParameterParametersSet)
 
 TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding) 
 {
-	vector<int> data;
-	ASSERT_EQ(0,data.size());
-	tapkee::dummy_kernel_callback<int> kcb;
-	tapkee::dummy_distance_callback<int> dcb;
-	tapkee::dummy_features_callback<int> fcb;
+	vector<float> data;
+	data.push_back(0.0);
+	ASSERT_EQ(1,data.size());
+	float_kernel_callback kcb;
+	tapkee::dummy_distance_callback<float> dcb;
+	tapkee::dummy_features_callback<float> fcb;
 
 	TapkeeOutput output;
 	// fails with wrong parameter type as '-1' is not a valid value.
@@ -163,7 +164,6 @@ TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding)
 	tapkee::dummy_features_callback<int> fcb;
 
 	TapkeeOutput output;
-	// fails with wrong parameter type as '-1' is not a valid value.
 	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,
 	                            (method=KernelLocallyLinearEmbedding,num_neighbors=6,num_neighbors=5)), 
 	             multiple_parameter_error);

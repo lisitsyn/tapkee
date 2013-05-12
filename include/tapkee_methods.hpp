@@ -83,11 +83,11 @@ public:
 		perplexity = parameters(keywords::sne_perplexity).checked().nonNegative();
 		ratio = parameters(keywords::landmark_ratio);
 
-		try 
+		if (!is_dummy<FeaturesCallback>::value)
 		{
 			current_dimension = features.dimension();
 		}
-		catch (const unsupported_method_error&)
+		else
 		{
 			current_dimension = 0;
 		}

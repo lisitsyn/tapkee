@@ -15,8 +15,8 @@ TEST(EigenEmbedding, EigenDenseLargestEigenvector)
 
 	mat << 1, -1, -1, 1;
 
-	tapkee::tapkee_internal::EmbeddingResult result = 
-		tapkee::tapkee_internal::eigen_embedding<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
+	tapkee::tapkee_internal::EigendecompositionResult result = 
+		tapkee::tapkee_internal::eigendecomposition<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
 		(tapkee::Dense, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
@@ -46,8 +46,8 @@ TEST(EigenEmbedding, EigenSparseSmallestEigenvector)
 	mat.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
 #endif
 
-	tapkee::tapkee_internal::EmbeddingResult result = 
-		tapkee::tapkee_internal::eigen_embedding<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
+	tapkee::tapkee_internal::EigendecompositionResult result = 
+		tapkee::tapkee_internal::eigendecomposition<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
 		(tapkee::Dense, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
@@ -64,8 +64,8 @@ TEST(EigenEmbedding, ArpackDenseLargestEigenvector)
 	tapkee::DenseMatrix mat(2,2);
 	mat << 1, -1, -1, 1;
 
-	tapkee::tapkee_internal::EmbeddingResult result = 
-		tapkee::tapkee_internal::eigen_embedding<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
+	tapkee::tapkee_internal::EigendecompositionResult result = 
+		tapkee::tapkee_internal::eigendecomposition<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
 		(tapkee::Arpack, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
@@ -95,8 +95,8 @@ TEST(EigenEmbedding, ArpackSparseSmallestEigenvector)
 	mat.setFromTriplets(sparse_triplets.begin(),sparse_triplets.end());
 #endif
 
-	tapkee::tapkee_internal::EmbeddingResult result = 
-		tapkee::tapkee_internal::eigen_embedding<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
+	tapkee::tapkee_internal::EigendecompositionResult result = 
+		tapkee::tapkee_internal::eigendecomposition<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
 		(tapkee::Arpack, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
@@ -113,8 +113,8 @@ TEST(EigenEmbedding, RandomizedDenseLargestEigenvector)
 	tapkee::DenseMatrix mat(2,2);
 	mat << 1, -1, -1, 1;
 
-	tapkee::tapkee_internal::EmbeddingResult result = 
-		tapkee::tapkee_internal::eigen_embedding<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
+	tapkee::tapkee_internal::EigendecompositionResult result = 
+		tapkee::tapkee_internal::eigendecomposition<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
 		(tapkee::Randomized, mat, 1, 0);
 
 	ASSERT_EQ(1,result.second.size());
