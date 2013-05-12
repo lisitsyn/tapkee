@@ -61,9 +61,9 @@ DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomA
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
-EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback distance_callback,
-                            const Landmarks& landmarks, const DenseVector& landmark_distances_squared, 
-                            EmbeddingResult& landmarks_embedding, IndexType target_dimension)
+DenseMatrix triangulate(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback distance_callback,
+                        const Landmarks& landmarks, const DenseVector& landmark_distances_squared, 
+                        EigendecompositionResult& landmarks_embedding, IndexType target_dimension)
 {
 	timed_context context("Landmark triangulation");
 	
@@ -109,7 +109,7 @@ EmbeddingResult triangulate(RandomAccessIterator begin, RandomAccessIterator end
 
 	delete[] to_process;
 
-	return EmbeddingResult(embedding,DenseVector());
+	return embedding;
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>

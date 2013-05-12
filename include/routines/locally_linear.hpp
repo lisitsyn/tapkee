@@ -7,7 +7,7 @@
 #define TAPKEE_LOCALLY_LINEAR_H_
 
 /* Tapkee includes */
-#include <routines/eigen_embedding.hpp>
+#include <routines/eigendecomposition.hpp>
 #include <tapkee_defines.hpp>
 #include <utils/matrix.hpp>
 #include <utils/time.hpp>
@@ -62,7 +62,8 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 #ifdef TAPKEE_WITH_ARPACK
 			if (partial_eigendecomposer)
 			{
-				G.rightCols(target_dimension).noalias() = eigen_embedding<DenseMatrix,DenseMatrixOperation>(Arpack,gram_matrix,target_dimension,0).first;
+				G.rightCols(target_dimension).noalias() =
+					eigendecomposition<DenseMatrix,DenseMatrixOperation>(Arpack,gram_matrix,target_dimension,0).first;
 			}
 			else
 #endif

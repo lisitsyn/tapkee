@@ -658,7 +658,7 @@ namespace tapkee_internal
 	typedef TAPKEE_INTERNAL_VECTOR<SparseTriplet> SparseTriplets;
 	typedef TAPKEE_INTERNAL_VECTOR<IndexType> LocalNeighbors;
 	typedef TAPKEE_INTERNAL_VECTOR<LocalNeighbors> Neighbors;
-	typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,DenseVector> EmbeddingResult;
+	typedef TAPKEE_INTERNAL_PAIR<DenseMatrix,DenseVector> EigendecompositionResult;
 	typedef Eigen::DiagonalMatrix<ScalarType,Eigen::Dynamic> DenseDiagonalMatrix;
 	typedef TAPKEE_INTERNAL_VECTOR<IndexType> Landmarks;
 	typedef TAPKEE_INTERNAL_PAIR<SparseWeightMatrix,DenseDiagonalMatrix> Laplacian;
