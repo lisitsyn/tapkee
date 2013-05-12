@@ -7,12 +7,11 @@
 
 using namespace tapkee;
 using namespace tapkee::keywords;
-using std::vector;
 
 TEST(Interface,ChainInterfaceOrder)
 {
 	const int N = 20;
-	vector<float> indices(N);
+	std::vector<float> indices(N);
 	for (int i=0; i<N; i++) 
 		indices[i] = i;
 
@@ -100,7 +99,7 @@ TEST(Interface,ChainInterfaceOrder)
 
 TEST(Interface, NoDataPassThru) 
 {
-	vector<int> data;
+	std::vector<int> data;
 	ASSERT_EQ(0,data.size());
 	tapkee::dummy_kernel_callback<int> kcb;
 	tapkee::dummy_distance_callback<int> dcb;
@@ -142,7 +141,7 @@ TEST(Interface, OneParameterParametersSet)
 
 TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding) 
 {
-	vector<float> data;
+	std::vector<float> data;
 	data.push_back(0.0);
 	ASSERT_EQ(1,data.size());
 	float_kernel_callback kcb;
@@ -157,7 +156,7 @@ TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding)
 
 TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding) 
 {
-	vector<int> data;
+	std::vector<int> data;
 	ASSERT_EQ(0,data.size());
 	tapkee::dummy_kernel_callback<int> kcb;
 	tapkee::dummy_distance_callback<int> dcb;
@@ -177,7 +176,7 @@ bool always_cancel()
 
 TEST(Interface, CancellationPassThru)
 {
-	vector<int> data;
+	std::vector<int> data;
 	ASSERT_EQ(0,data.size());
 	tapkee::dummy_kernel_callback<int> kcb;
 	tapkee::dummy_distance_callback<int> dcb;
@@ -191,7 +190,7 @@ TEST(Interface, CancellationPassThru)
 
 TEST(Interface, NoReductionMethodSetFailPassThru)
 {
-	vector<int> data;
+	std::vector<int> data;
 	ASSERT_EQ(0,data.size());
 	tapkee::dummy_kernel_callback<int> kcb;
 	tapkee::dummy_distance_callback<int> dcb;
@@ -205,7 +204,7 @@ TEST(Interface, NoReductionMethodSetFailPassThru)
 
 TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 {
-	vector<int> data;
+	std::vector<int> data;
 	for (int i=0; i<20; i++) 
 		data.push_back(i);
 	
@@ -221,7 +220,7 @@ TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 TEST(Interface, EigenDecompositionFailMDS)
 {
 	const int N = 100;
-	vector<float> data(N);
+	std::vector<float> data(N);
 	for (int i=0; i<N; i++) 
 		data[i] = 0.0;
 	
@@ -237,7 +236,7 @@ TEST(Interface, EigenDecompositionFailMDS)
 TEST(Interface, NotEnoughMemoryMDS)
 {
 	const int N = 10000000;
-	vector<float> data(N);
+	std::vector<float> data(N);
 	for (int i=0; i<N; i++) 
 		data[i] = i;
 	

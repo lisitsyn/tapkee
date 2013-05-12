@@ -13,9 +13,6 @@
 
 #include <algorithm>
 
-using std::random_shuffle;
-using std::fill;
-
 namespace tapkee
 {
 namespace tapkee_internal
@@ -28,7 +25,7 @@ Landmarks select_landmarks_random(RandomAccessIterator begin, RandomAccessIterat
 	landmarks.reserve(end-begin);
 	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
 		landmarks.push_back(iter-begin);
-	random_shuffle(landmarks.begin(),landmarks.end());
+	std::random_shuffle(landmarks.begin(),landmarks.end());
 	landmarks.erase(landmarks.begin() + static_cast<IndexType>(landmarks.size()*ratio),landmarks.end());
 	return landmarks;
 }
@@ -71,7 +68,7 @@ DenseMatrix triangulate(RandomAccessIterator begin, RandomAccessIterator end, Pa
 	const IndexType n_landmarks = landmarks.size();
 
 	bool* to_process = new bool[n_vectors];
-	fill(to_process,to_process+n_vectors,true);
+	std::fill(to_process,to_process+n_vectors,true);
 	
 	DenseMatrix embedding(n_vectors,target_dimension);
 

@@ -20,8 +20,6 @@
 #include <tapkee_defines.hpp>
 /* End of Tapkee includes */
 
-using std::string;
-
 namespace tapkee
 {
 namespace tapkee_internal
@@ -39,7 +37,7 @@ EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType& wm, In
 
 	if (arpack.info() == Eigen::Success)
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << "Took " << arpack.getNbrIterations() << " iterations.";
 		LoggingSingleton::instance().message_info(ss.str());
 		DenseMatrix selected_eigenvectors = arpack.eigenvectors().rightCols(target_dimension);
@@ -50,7 +48,7 @@ EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType& wm, In
 		throw eigendecomposition_error("eigendecomposition failed");
 	}
 	return EigendecompositionResult();
-};
+}
 #endif
 
 //! Eigen library dense implementation of eigendecomposition-based embedding
@@ -81,7 +79,7 @@ EigendecompositionResult eigendecomposition_impl_dense(const MatrixType& wm, Ind
 		throw eigendecomposition_error("eigendecomposition failed");
 	}
 	return EigendecompositionResult();
-};
+}
 
 //! Randomized redsvd-like implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixOperationType> 
@@ -151,7 +149,7 @@ EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType& wm
 		throw eigendecomposition_error("eigendecomposition failed");
 	}
 	return EigendecompositionResult();
-};
+}
 
 //! Multiple implementation handler method for various eigendecomposition methods. 
 //!

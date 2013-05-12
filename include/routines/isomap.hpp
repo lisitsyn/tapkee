@@ -15,8 +15,6 @@
 
 #include <limits>
 
-using std::numeric_limits;
-
 namespace tapkee
 {
 namespace tapkee_internal
@@ -70,7 +68,7 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(const RandomAccessIterato
 			// fill s and f with false, fill shortest_D with infinity
 			for (IndexType j=0; j<N; j++)
 			{
-				shortest_distances(k,j) = numeric_limits<DenseMatrix::Scalar>::max();
+				shortest_distances(k,j) = std::numeric_limits<DenseMatrix::Scalar>::max();
 				s[j] = false;
 				f[j] = false;
 			}
@@ -188,7 +186,7 @@ DenseMatrix compute_shortest_distances_matrix(const RandomAccessIterator& begin,
 			// fill s and f with false, fill shortest_D with infinity
 			for (IndexType j=0; j<N; j++)
 			{
-				shortest_distances(k,j) = numeric_limits<DenseMatrix::Scalar>::max();
+				shortest_distances(k,j) = std::numeric_limits<DenseMatrix::Scalar>::max();
 				s[j] = false;
 				f[j] = false;
 			}

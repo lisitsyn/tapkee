@@ -422,7 +422,7 @@ namespace tapkee_internal
 		 */
 		TapkeeOutput embedUsing(const DenseMatrix& matrix) const
 		{
-			vector<IndexType> indices(matrix.cols());
+			std::vector<IndexType> indices(matrix.cols());
 			for (IndexType i=0; i<matrix.cols(); i++) indices[i] = i;
 			eigen_kernel_callback kcb(matrix);
 			eigen_distance_callback dcb(matrix);

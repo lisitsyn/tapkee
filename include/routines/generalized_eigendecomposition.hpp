@@ -3,8 +3,8 @@
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
 
-#ifndef TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
-#define TAPKEE_GENERALIZED_EIGEN_EMBEDDING_H_
+#ifndef TAPKEE_GENERALIZED_EIGENDECOMPOSITION_H_
+#define TAPKEE_GENERALIZED_EIGENDECOMPOSITION_H_
 
 /* Tapkee includes */
 #ifdef TAPKEE_WITH_ARPACK
@@ -31,7 +31,7 @@ EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatri
 	
 	if (arpack.info() == Eigen::Success)
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << "Took " << arpack.getNbrIterations() << " iterations.";
 		LoggingSingleton::instance().message_info(ss.str());
 		DenseMatrix selected_eigenvectors = (arpack.eigenvectors()).rightCols(target_dimension);
@@ -42,7 +42,7 @@ EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatri
 		throw eigendecomposition_error("eigendecomposition failed");
 	}
 	return EigendecompositionResult();
-};
+}
 #endif
 
 //! Eigen library dense implementation of eigendecomposition
@@ -75,7 +75,7 @@ EigendecompositionResult generalized_eigendecomposition_impl_dense(const LMatrix
 	}
 
 	return EigendecompositionResult();
-};
+}
 
 template <class LMatrixType, class RMatrixType, class MatrixOperationType>
 EigendecompositionResult generalized_eigendecomposition(EigenMethod method, const LMatrixType& lhs,

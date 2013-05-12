@@ -13,7 +13,6 @@
 
 using namespace tapkee;
 using namespace tapkee::keywords;
-using std::vector;
 
 void smoketest(DimensionReductionMethod m)
 {
@@ -22,7 +21,7 @@ void smoketest(DimensionReductionMethod m)
 	tapkee::eigen_kernel_callback kcb(X);
 	tapkee::eigen_distance_callback dcb(X);
 	tapkee::eigen_features_callback fcb(X);
-	vector<int> data(N);
+	std::vector<int> data(N);
 	for (int i=0; i<N; ++i) data[i] = i;
 	TapkeeOutput result;
 	ASSERT_NO_THROW(result = embed(data.begin(), data.end(),

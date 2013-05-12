@@ -18,8 +18,6 @@
 #include <iostream>
 #include <cmath>
 
-using std::sqrt;
-
 namespace tapkee
 {
 namespace tapkee_internal
@@ -149,7 +147,7 @@ struct distance_impl<KernelType,RandomAccessIterator,Callback>
 	inline ScalarType operator()(Callback& cb, const CoverTreePoint<RandomAccessIterator>& l,
                                  const CoverTreePoint<RandomAccessIterator>& r, ScalarType /*upper_bound*/)
 	{
-		return sqrt(l.norm_ + r.norm_ - 2*cb(r.iter_,l.iter_));
+		return std::sqrt(l.norm_ + r.norm_ - 2*cb(r.iter_,l.iter_));
 	}
 };
 
