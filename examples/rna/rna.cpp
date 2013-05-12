@@ -1,5 +1,5 @@
-#include <tapkee.hpp>
-#include <callbacks/dummy_callbacks.hpp>
+#include <tapkee/tapkee.hpp>
+#include <tapkee/callbacks/dummy_callbacks.hpp>
 
 #include <numeric>
 #include <functional>

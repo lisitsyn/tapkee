@@ -1,5 +1,5 @@
-#include <tapkee.hpp>
-#include <callbacks/precomputed_callbacks.hpp>
+#include <tapkee/tapkee.hpp>
+#include <tapkee/callbacks/precomputed_callbacks.hpp>
 
 using namespace std;
 using namespace tapkee;

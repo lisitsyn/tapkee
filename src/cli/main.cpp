@@ -3,12 +3,12 @@
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias 
  */
 
-#include <tapkee.hpp>
-#include <tapkee_defines.hpp>
-#include <tapkee_projection.hpp>
-#include <callbacks/eigen_callbacks.hpp>
-#include <callbacks/precomputed_callbacks.hpp>
-#include <utils/logging.hpp>
+#include <tapkee/tapkee.hpp>
+#include <tapkee/defines.hpp>
+#include <tapkee/projection.hpp>
+#include <tapkee/callbacks/eigen_callbacks.hpp>
+#include <tapkee/callbacks/precomputed_callbacks.hpp>
+#include <tapkee/utils/logging.hpp>
 #include <algorithm>
 #include <string>
 #include <vector>
