@@ -49,7 +49,17 @@ the following directories:
   a few helper scripts.
 - `examples/` that contains a few examples including already mentioned
   (these examples are supposed to be called through `make` as described
-   above, e.g. `make minimal`)
+   above, e.g. `make minimal`).
+- `data/` a git submodule that contains data required for 
+  examples. To initialize this submodule use `git submodule init --update`.
+- `doc/` that contains Doxygen interface file which is used to
+  generate HTML documentation of the library. Calling 
+  `doxygen doc/Doxyfile` will generate it in this folder.
+
+Once built, the root will also contain the following directories:
+- `bin` that contains binaries (`tapkee_cli` that is command line application
+  and various tests with common naming `test_*`)
+- `lib` that contains gtest shared libraries.
 
 API
 ---
