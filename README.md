@@ -35,6 +35,22 @@ a package manager. The promoters example also has non-trivial
 dependency on Shogun machine learning toolbox 
 (minimal version is 2.1.0).
 
+Directory contents
+------------------
+
+This file should be included in the root that contains
+the following directories:
+
+- `src/` that contains simple command-line application (`src/cli`)
+  and CMake module finders (`src/cmake`).
+- `includes/` that contains the library itself in the `includes/tapkee`
+  subdirectory.
+- `test/` that contains unit-tests in the `test/unit` subdirectory and 
+  a few helper scripts.
+- `examples/` that contains a few examples including already mentioned
+  (these examples are supposed to be called through `make` as described
+   above, e.g. `make minimal`)
+
 API
 ---
 
@@ -106,8 +122,8 @@ Minimal example
 
 A minimal working example of a program that uses the library is:
 
-	#include <tapkee.hpp>
-	#include <callback/dummy_callbacks.hpp>
+	#include <tapkee/tapkee.hpp>
+	#include <tapkee/callback/dummy_callbacks.hpp>
 
 	using namespace std;
 	using namespace tapkee;
