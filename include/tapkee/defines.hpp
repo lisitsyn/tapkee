@@ -26,6 +26,7 @@
 #include <tapkee/defines/keywords.hpp>
 #include <tapkee/defines/stdtypes.hpp>
 #include <tapkee/defines/synonyms.hpp>
+#include <tapkee/defines/random.hpp>
 #include <tapkee/projection.hpp>
 /* End of Tapkee includes */
 
