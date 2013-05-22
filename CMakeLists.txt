@@ -34,7 +34,10 @@ include_directories("${TAPKEE_INCLUDE_DIR}")
 # CLI executable
 add_executable(tapkee_cli ${TAPKEE_SRC_DIR}/cli/main.cpp)
 # Examples
-add_subdirectory(examples)
+option(BUILD_EXAMPLES "Whether to build examples or not" ON)
+if (BUILD_EXAMPLES)
+	add_subdirectory(examples)
+endif()
 
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee_cli arpack)
