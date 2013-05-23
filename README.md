@@ -35,32 +35,6 @@ a package manager. The promoters example also has non-trivial
 dependency on Shogun machine learning toolbox 
 (minimal version is 2.1.0).
 
-Directory contents
-------------------
-
-This file should be included in the root that contains
-the following directories:
-
-- `src/` that contains simple command-line application (`src/cli`)
-  and CMake module finders (`src/cmake`).
-- `includes/` that contains the library itself in the `includes/tapkee`
-  subdirectory.
-- `test/` that contains unit-tests in the `test/unit` subdirectory and 
-  a few helper scripts.
-- `examples/` that contains a few examples including already mentioned
-  (these examples are supposed to be called through `make` as described
-   above, e.g. `make minimal`).
-- `data/` a git submodule that contains data required for 
-  examples. To initialize this submodule use `git submodule init --update`.
-- `doc/` that contains Doxygen interface file which is used to
-  generate HTML documentation of the library. Calling 
-  `doxygen doc/Doxyfile` will generate it in this folder.
-
-Once built, the root will also contain the following directories:
-- `bin` that contains binaries (`tapkee_cli` that is command line application
-  and various tests with common naming `test_*`)
-- `lib` that contains gtest shared libraries.
-
 API
 ---
 
@@ -268,6 +242,31 @@ If you are using Mac OS X and Macports you can install these packages with
 
 In case you want to use some non-default 
 compiler use `CC=your-C-compiler CXX=your-C++-compiler cmake [definitions] ..` when running cmake.
+
+Directory contents
+------------------
+
+The repository of Tapkee contains the following directories:
+
+- `src/` that contains simple command-line application (`src/cli`)
+  and CMake module finders (`src/cmake`).
+- `includes/` that contains the library itself in the `includes/tapkee`
+  subdirectory.
+- `test/` that contains unit-tests in the `test/unit` subdirectory and 
+  a few helper scripts.
+- `examples/` that contains a few examples including already mentioned
+  (these examples are supposed to be called through `make` as described
+   above, e.g. `make minimal`).
+- `data/` a git submodule that contains data required for 
+  examples. To initialize this submodule use `git submodule init --update`.
+- `doc/` that contains Doxygen interface file which is used to
+  generate HTML documentation of the library. Calling 
+  `doxygen doc/Doxyfile` will generate it in this folder.
+
+Once built, the root will also contain the following directories:
+- `bin` that contains binaries (`tapkee_cli` that is command line application
+  and various tests with common naming `test_*`)
+- `lib` that contains gtest shared libraries.
 
 Need help?
 ----------
