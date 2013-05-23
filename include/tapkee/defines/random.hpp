@@ -32,7 +32,7 @@ inline ScalarType uniform_random()
 #ifdef CUSTOM_UNIFORM_RANDOM_FUNCTION
 	return CUSTOM_UNIFORM_RANDOM_FUNCTION;
 #else
-	return std::rand()/std::numeric_limits<ScalarType>::max();
+	return std::rand()/((double)RAND_MAX+1);
 #endif
 }
 
@@ -43,8 +43,8 @@ inline ScalarType gaussian_random()
 #else
 	ScalarType x, y, radius;
 	do {
-		x = 2*uniform_random() - 1;
-		y = 2*uniform_random() - 1;
+		x = 2*(std::rand()/((double)RAND_MAX+1)) - 1;
+		y = 2*(std::rand()/((double)RAND_MAX+1)) - 1;
 		radius = (x * x) + (y * y);
 	} while ((radius >= 1.0) || (radius == 0.0));
 	radius = std::sqrt(-2 * std::log(radius) / radius);
