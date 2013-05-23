@@ -82,6 +82,7 @@ bool method_needs_kernel(tapkee::DimensionReductionMethod method)
 		IF_NEEDS_KERNEL(tapkee::PassThru);
 		IF_NEEDS_KERNEL(tapkee::FactorAnalysis);
 		IF_NEEDS_KERNEL(tapkee::tDistributedStochasticNeighborEmbedding);
+		IF_NEEDS_KERNEL(tapkee::ManifoldSculpting);
 #undef IF_NEEDS_KERNEL
 	}
 	return false;
@@ -111,6 +112,7 @@ bool method_needs_distance(tapkee::DimensionReductionMethod method)
 		IF_NEEDS_DISTANCE(tapkee::PassThru);
 		IF_NEEDS_DISTANCE(tapkee::FactorAnalysis);
 		IF_NEEDS_DISTANCE(tapkee::tDistributedStochasticNeighborEmbedding);
+		IF_NEEDS_DISTANCE(tapkee::ManifoldSculpting);
 #undef IF_NEEDS_DISTANCE
 	}
 	return false;
@@ -156,6 +158,8 @@ tapkee::DimensionReductionMethod parse_reduction_method(const char* str)
 		return tapkee::FactorAnalysis;
 	if (!strcmp(str,"t-stochastic_neighbor_embedding") || !strcmp(str,"t-sne"))
 		return tapkee::tDistributedStochasticNeighborEmbedding;
+	if (!strcmp(str,"manifold_sculpting") || !strcmp(str,"ms"))
+		return tapkee::ManifoldSculpting;
 	
 	throw std::exception();
 	return tapkee::PassThru;

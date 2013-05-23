@@ -94,7 +94,8 @@ int run(int argc, const char** argv)
 			"hessian_locally_linear_embedding (hlle), laplacian_eigenmaps (la), locality_preserving_projections (lpp), \n"
 			"diffusion_map (dm), isomap, landmark_isomap (l-isomap), multidimensional_scaling (mds), \n"
 			"landmark_multidimensional_scaling (l-mds), stochastic_proximity_embedding (spe), \n"
-			"kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), t-stochastic_neighborhood_embedding (t-sne).",
+			"kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), \n"
+			"t-stochastic_neighborhood_embedding (t-sne), manifold_sculpting (ms).",
 			OPT_PREFIX "m",
 			OPT_LONG_PREFIX METHOD_KEYWORD);
 #define NEIGHBORS_METHOD_KEYWORD "neighbors-method"
@@ -166,8 +167,11 @@ int run(int argc, const char** argv)
 	opt.add("30.0",0,1,0,"Perplexity for the t-SNE algorithm (default 30.0)",
 		OPT_LONG_PREFIX SNE_PERPLEXITY_KEYWORD);
 #define SNE_THETA_KEYWORD "sne-theta"
-	opt.add("0.5",0,1,0,"Theta for the t-SNE algorithm (defualt 0.5)",
+	opt.add("0.5",0,1,0,"Theta for the t-SNE algorithm (default 0.5)",
 		OPT_LONG_PREFIX SNE_THETA_KEYWORD);
+#define MS_SQUISHING_RATE_KEYWORD "squishing-rate"
+	opt.add("0.99",0,1,0,"Squishing rate of the Manifold Sculpting algorithm (default 0.5)",
+		OPT_LONG_PREFIX MS_SQUISHING_RATE_KEYWORD);
 
 	opt.parse(argc, argv);
 
@@ -314,6 +318,10 @@ int run(int argc, const char** argv)
 	{
 		opt.get(OPT_LONG_PREFIX SNE_THETA_KEYWORD)->getDouble(theta);
 	}
+	double squishing = 0.99;
+	{
+		opt.get(OPT_LONG_PREFIX MS_SQUISHING_RATE_KEYWORD)->getDouble(squishing);
+	}
 
 	// Load data
 	string input_filename;
@@ -378,7 +386,8 @@ int run(int argc, const char** argv)
 			 check_connectivity = true,
 			 fa_epsilon = fa_eps,
 			 sne_perplexity = perplexity,
-			 sne_theta = theta);
+			 sne_theta = theta,
+			 squishing_rate = squishing);
 
 #ifdef USE_PRECOMPUTED
 	vector<tapkee::IndexType> indices(input_data.cols());
