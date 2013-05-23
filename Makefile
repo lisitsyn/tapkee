@@ -34,6 +34,24 @@ precomputed: default
 	  echo 'Result is: ';                        \
 	  ./bin/precomputed)
 
+langs:
+	@(if (python -c 'from modshogun import LocallyLinearEmbedding' > /dev/null 2>&1); \
+	  then                                         \
+	    echo '--- Description ---';                \
+	    cat ./examples/langs/langs.md;     \
+	    echo '--- Python example ---';  \
+	    cat examples/langs/lle.py;    \
+	    echo '--- Running ---';      \
+	    python examples/langs/lle.py;    \
+	    echo '--- Octave example ---';  \
+	    cat examples/langs/ltsa.m;    \
+	    echo '--- Running ---';      \
+	    octave examples/langs/ltsa.m;    \
+	  else                                         \
+	    echo 'Shogun machine learning toolbox is not installed or compiled without Tapkee (may lack some dependencies)' \
+	         ' (https://github.com/shogun-toolbox/shogun)';     \
+	  fi;)
+
 promoters:
 	@(if (python -c 'from modshogun import LocallyLinearEmbedding' > /dev/null 2>&1); \
 	  then                                         \
@@ -42,7 +60,7 @@ promoters:
 	    echo '--- Embedding and plotting (please wait, a window will appear in a minute) ---';  \
 	    python examples/promoters/promoters.py data/mml.txt;    \
 	  else                                         \
-	    echo 'Shogun machine learning toolbox is not installed' \
+	    echo 'Shogun machine learning toolbox is not installed or compiled without Tapkee (may lack some dependencies)' \
 	         ' (https://github.com/shogun-toolbox/shogun)';     \
 	  fi;)
 
