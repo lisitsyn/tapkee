@@ -30,6 +30,10 @@
 #include <tapkee/projection.hpp>
 /* End of Tapkee includes */
 
+#ifdef TAPKEE_WITH_OPENCL
+#include <tapkee/utils/opencl.hpp>
+#endif
+
 #ifdef TAPKEE_CUSTOM_PROPERTIES
 	#include TAPKEE_CUSTOM_PROPERTIES
 #else

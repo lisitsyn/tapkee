@@ -54,6 +54,7 @@ endif()
 
 if (OPENCL_FOUND)
 	target_link_libraries(tapkee_cli OpenCL)
+	add_definitions(-DTAPKEE_WITH_OPENCL)
 endif()
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
