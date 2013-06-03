@@ -30,6 +30,14 @@ if (OPENMP_FOUND)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+# OpenCL detection
+find_package(OpenCL)
+if (OPENCL_FOUND)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPENCL_C_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENCL_CXX_FLAGS}")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OPENCL_EXE_LINKER_FLAGS}")
+endif()
+
 include_directories("${TAPKEE_INCLUDE_DIR}")
 # CLI executable
 add_executable(tapkee_cli ${TAPKEE_SRC_DIR}/cli/main.cpp)
@@ -42,6 +50,10 @@ endif()
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee_cli arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
+endif()
+
+if (OPENCL_FOUND)
+	target_link_libraries(tapkee_cli OpenCL)
 endif()
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
