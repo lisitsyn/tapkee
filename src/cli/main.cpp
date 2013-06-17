@@ -58,9 +58,12 @@ int run(int argc, const char** argv)
 	opt.add("",0,1,0,"Input file",
 			OPT_PREFIX "i",
 		    OPT_LONG_PREFIX INPUT_FILE_KEYWORD);
-#define TRANSPOSE_INPUT_KEYWORD "transpose"
+#define TRANSPOSE_INPUT_KEYWORD "transpose-input"
 	opt.add("",0,0,0,"Transpose input file if set",
 		OPT_LONG_PREFIX TRANSPOSE_INPUT_KEYWORD);
+#define TRANSPOSE_OUTPUT_KEYWORD "transpose-output"
+	opt.add("",0,0,0,"Transpose output file if set",
+		OPT_LONG_PREFIX TRANSPOSE_OUTPUT_KEYWORD);
 #define OUTPUT_FILE_KEYWORD "output-file"
 	opt.add("",0,1,0,"Output file",
 		OPT_PREFIX "o",
@@ -426,7 +429,10 @@ int run(int argc, const char** argv)
 		.embedUsing(input_data);
 #endif
 	// Save obtained data
-	ofs << output.embedding.transpose();
+	if (opt.isSet(OPT_LONG_PREFIX TRANSPOSE_OUTPUT_KEYWORD))
+		ofs << output.embedding;
+	else
+		ofs << output.embedding.transpose();
 	ofs.close();
 
 	if (output_projection && output.projection.implementation) 
