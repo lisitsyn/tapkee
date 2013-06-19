@@ -6,7 +6,12 @@
 #ifndef TAPKEE_OPENCL_H_
 #define TAPKEE_OPENCL_H_
 
-#include <CL/cl.hpp>
+#ifdef __APPLE__
+	#include <OpenCL/opencl.hpp>
+#else
+	#include <CL/cl.hpp>
+#endif
+
 #include <iostream>
 
 namespace tapkee
@@ -56,30 +61,14 @@ class OpenCL
 			                  sizeof(T)*size);
 		}
 
-		void load(const cl::Buffer& buffer, DenseMatrix& matrix)
+		void copy(const cl::Buffer& buffer, DenseMatrix& matrix)
 		{
 			queue_.enqueueReadBuffer(buffer, false, 0, sizeof(ScalarType)*matrix.cols()*matrix.rows(), matrix.data());
 		}
 
-		cl::KernelFunctor kernel(const char* name, unsigned int x)
+		void copy(DenseMatrix& matrix, const cl::Buffer& buffer)
 		{
-			cl::Kernel kernel(program_, name, &error_code);
-			return cl::KernelFunctor(kernel, queue_, cl::NullRange,
-			                         cl::NDRange(x), cl::NullRange);
-		}
-
-		cl::KernelFunctor kernel(const char* name, unsigned int x, unsigned int y)
-		{
-			cl::Kernel kernel(program_, name, &error_code);
-			return cl::KernelFunctor(kernel, queue_, cl::NullRange,
-			                         cl::NDRange(x, y), cl::NullRange);
-		}
-		
-		cl::KernelFunctor kernel(const char* name, unsigned int x, unsigned int y, unsigned int z)
-		{
-			cl::Kernel kernel(program_, name, &error_code);
-			return cl::KernelFunctor(kernel, queue_, cl::NullRange,
-			                         cl::NDRange(x, y, z), cl::NullRange);
+			queue_.enqueueWriteBuffer(buffer, false, 0, sizeof(ScalarType)*matrix.cols()*matrix.rows(), matrix.data());
 		}
 
 		void buildPrograms()
