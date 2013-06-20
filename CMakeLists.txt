@@ -31,11 +31,12 @@ if (OPENMP_FOUND)
 endif()
 
 # OpenCL detection
-find_package(OpenCL)
-if (OPENCL_FOUND)
+find_package(ViennaCL)
+if (VIENNACL_FOUND)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPENCL_C_FLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENCL_CXX_FLAGS}")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OPENCL_EXE_LINKER_FLAGS}")
+	include_directories("${VIENNACL_INCLUDE_DIRS}")
 endif()
 
 include_directories("${TAPKEE_INCLUDE_DIR}")
@@ -52,9 +53,9 @@ if (ARPACK_FOUND)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
 
-if (OPENCL_FOUND)
+if (VIENNACL_FOUND)
 	target_link_libraries(tapkee_cli OpenCL)
-	add_definitions(-DTAPKEE_WITH_OPENCL)
+	add_definitions(-DTAPKEE_WITH_VIENNACL)
 endif()
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)

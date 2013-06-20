@@ -227,7 +227,7 @@ private:
 
 	TapkeeOutput embedDiffusionMap()
 	{
-		#ifdef TAPKEE_GPU
+		#ifdef TAPKEE_WITH_VIENNACL
 			#define DM_MATRIX_OP GPUDenseImplicitSquareMatrixOperation
 		#else
 			#define DM_MATRIX_OP DenseImplicitSquareSymmetricMatrixOperation
@@ -246,7 +246,7 @@ private:
 
 	TapkeeOutput embedMultidimensionalScaling()
 	{
-		#ifdef TAPKEE_GPU
+		#ifdef TAPKEE_WITH_VIENNACL
 			#define MDS_MATRIX_OP GPUDenseImplicitSquareMatrixOperation
 		#else
 			#define MDS_MATRIX_OP DenseMatrixOperation

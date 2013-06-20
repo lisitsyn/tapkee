@@ -11,6 +11,12 @@
 #include <tapkee/defines.hpp>
 /* End of Tapkee includes */
 
+#ifdef TAPKEE_WITH_VIENNACL
+	#define VIENNACL_HAVE_EIGEN
+	#include <viennacl/matrix.hpp>
+	#include <viennacl/linalg/prod.hpp>
+#endif
+
 namespace tapkee
 {
 namespace tapkee_internal
@@ -149,7 +155,7 @@ struct DenseImplicitSquareMatrixOperation
 const char* DenseImplicitSquareMatrixOperation::ARPACK_CODE = "LM";
 const bool DenseImplicitSquareMatrixOperation::largest = true;
 
-#ifdef TAPKEE_GPU
+#ifdef TAPKEE_WITH_VIENNACL
 struct GPUDenseImplicitSquareMatrixOperation
 {
 	GPUDenseImplicitSquareMatrixOperation(const DenseMatrix& matrix)
@@ -180,7 +186,7 @@ struct GPUDenseImplicitSquareMatrixOperation
 	viennacl::matrix<ScalarType> vec;
 	viennacl::matrix<ScalarType> res;
 	static const char* ARPACK_CODE;
-	static bool largest;
+	static const bool largest;
 };
 const char* GPUDenseImplicitSquareMatrixOperation::ARPACK_CODE = "LM";
 const bool GPUDenseImplicitSquareMatrixOperation::largest = true;
@@ -211,7 +217,7 @@ struct GPUDenseMatrixOperation
 	viennacl::matrix<ScalarType> vec;
 	viennacl::matrix<ScalarType> res;
 	static const char* ARPACK_CODE;
-	static bool largest;
+	static const bool largest;
 };
 const char* GPUDenseMatrixOperation::ARPACK_CODE = "LM";
 const bool GPUDenseMatrixOperation::largest = true;

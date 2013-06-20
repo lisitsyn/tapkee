@@ -17,7 +17,7 @@
 
 #define TAPKEE_WORLD_VERSION 1
 #define TAPKEE_MAJOR_VERSION 0
-#define TAPKEE_MINOR_VERSION 0
+#define TAPKEE_MINOR_VERSION 1
 
 /* Tapkee includes */
 #include <tapkee/defines/eigen3.hpp>
@@ -29,10 +29,6 @@
 #include <tapkee/defines/random.hpp>
 #include <tapkee/projection.hpp>
 /* End of Tapkee includes */
-
-#ifdef TAPKEE_WITH_OPENCL
-#include <tapkee/utils/opencl.hpp>
-#endif
 
 #ifdef TAPKEE_CUSTOM_PROPERTIES
 	#include TAPKEE_CUSTOM_PROPERTIES
