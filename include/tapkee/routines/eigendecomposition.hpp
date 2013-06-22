@@ -169,7 +169,7 @@ struct eigendecomposition_impl<DenseMatrix>
 				return eigendecomposition_impl_arpack<DenseMatrix,DenseMatrixOperation>
 					(m,target_dimension,eigen_strategy.skip());
 			if (eigen_strategy.is(SquaredLargestEigenvalues))
-				return eigendecomposition_impl_arpack<DenseMatrix,DenseImplicitSquareSymmetricMatrixOperation>
+				return eigendecomposition_impl_arpack<DenseMatrix,DenseImplicitSquareMatrixOperation>
 					(m,target_dimension,eigen_strategy.skip());
 			if (eigen_strategy.is(SmallestEigenvalues))
 				return eigendecomposition_impl_arpack<DenseMatrix,DenseInverseMatrixOperation>
@@ -222,7 +222,7 @@ struct eigendecomposition_impl<DenseMatrix>
 				return eigendecomposition_impl_randomized<DenseMatrix,DenseMatrixOperation>
 					(m,target_dimension,eigen_strategy.skip());
 			if (eigen_strategy.is(SquaredLargestEigenvalues))
-				return eigendecomposition_impl_randomized<DenseMatrix,DenseImplicitSquareSymmetricMatrixOperation>
+				return eigendecomposition_impl_randomized<DenseMatrix,DenseImplicitSquareMatrixOperation>
 					(m,target_dimension,eigen_strategy.skip());
 			if (eigen_strategy.is(SmallestEigenvalues))
 				return eigendecomposition_impl_randomized<DenseMatrix,DenseInverseMatrixOperation>
