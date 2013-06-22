@@ -13,6 +13,7 @@ namespace tapkee_internal
 
 namespace {
 const ParametersSet defaults = (
+	tapkee::keywords::computation_strategy = tapkee::keywords::by_default,
 	tapkee::keywords::eigen_method = tapkee::keywords::by_default,
 	tapkee::keywords::neighbors_method = tapkee::keywords::by_default,
 	tapkee::keywords::num_neighbors = tapkee::keywords::by_default,
@@ -33,7 +34,6 @@ const ParametersSet defaults = (
 	tapkee::keywords::sne_perplexity = tapkee::keywords::by_default,
 	tapkee::keywords::squishing_rate = tapkee::keywords::by_default,
 	tapkee::keywords::sne_theta = tapkee::keywords::by_default);
-	
 }
 
 }

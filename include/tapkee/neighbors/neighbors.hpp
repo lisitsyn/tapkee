@@ -181,16 +181,16 @@ Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& beg
 		k = static_cast<IndexType>(end-begin-1);
 	}
 	LoggingSingleton::instance().message_info("Using the " + get_neighbors_method_name(method) + " neighbors computation method.");
+
 	Neighbors neighbors;
-	switch (method)
-	{
-		case Brute: neighbors = find_neighbors_bruteforce_impl(begin,end,callback,k); break;
-		case VpTree: neighbors = find_neighbors_vptree_impl(begin,end,callback,k); break;
+	if (method.is(Brute))
+		neighbors = find_neighbors_bruteforce_impl(begin,end,callback,k);
+	if (method.is(VpTree))
+		neighbors = find_neighbors_vptree_impl(begin,end,callback,k);
 #ifdef TAPKEE_USE_LGPL_COVERTREE
-		case CoverTree: neighbors = find_neighbors_covertree_impl(begin,end,callback,k); break;
+	if (method.is(CoverTree))
+		neighbors = find_neighbors_covertree_impl(begin,end,callback,k);
 #endif
-		default: break;
-	}
 
 	if (check_connectivity)
 	{

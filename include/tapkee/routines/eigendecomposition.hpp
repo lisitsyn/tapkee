@@ -139,6 +139,170 @@ EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType& wm
 	return EigendecompositionResult();
 }
 
+template <typename MatrixType>
+struct eigendecomposition_impl
+{
+#ifdef TAPKEE_WITH_ARPACK
+	EigendecompositionResult arpack(const MatrixType& m, const ComputationStrategy& strategy, 
+                                    const EigendecompositionStrategy& eigen_strategy, 
+                                    IndexType target_dimension);
+#endif
+	EigendecompositionResult dense(const MatrixType& m, const ComputationStrategy& strategy, 
+                                   const EigendecompositionStrategy& eigen_strategy, 
+                                   IndexType target_dimension);
+	EigendecompositionResult randomized(const MatrixType& m, const ComputationStrategy& strategy, 
+                                        const EigendecompositionStrategy& eigen_strategy, 
+                                        IndexType target_dimension);
+};
+
+template <>
+struct eigendecomposition_impl<DenseMatrix>
+{
+#ifdef TAPKEE_WITH_ARPACK
+	EigendecompositionResult arpack(const DenseMatrix& m, const ComputationStrategy& strategy, 
+                                    const EigendecompositionStrategy& eigen_strategy, 
+                                    IndexType target_dimension)
+	{
+		if (strategy.is(HomogeneousCPUStrategy))
+		{
+			if (eigen_strategy.is(LargestEigenvalues))
+				return eigendecomposition_impl_arpack<DenseMatrix,DenseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SquaredLargestEigenvalues))
+				return eigendecomposition_impl_arpack<DenseMatrix,DenseImplicitSquareSymmetricMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SmallestEigenvalues))
+				return eigendecomposition_impl_arpack<DenseMatrix,DenseInverseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+#ifdef TAPKEE_WITH_VIENNACL
+		if (strategy.is(HeterogeneousOpenCLStrategy))
+		{
+			if (eigen_strategy.is(LargestEigenvalues))
+				return eigendecomposition_impl_arpack<DenseMatrix,GPUDenseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SquaredLargestEigenvalues))
+				return eigendecomposition_impl_arpack<DenseMatrix,GPUDenseImplicitSquareMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+#endif
+		unsupported();
+		return EigendecompositionResult();
+	}
+#endif
+	EigendecompositionResult dense(const DenseMatrix& m, const ComputationStrategy& strategy, 
+                                   const EigendecompositionStrategy& eigen_strategy, 
+                                   IndexType target_dimension)
+	{
+		if(strategy.is(HomogeneousCPUStrategy))
+		{
+			if (eigen_strategy.is(LargestEigenvalues))
+				return eigendecomposition_impl_dense<DenseMatrix,DenseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SquaredLargestEigenvalues))
+				return eigendecomposition_impl_dense<DenseMatrix,DenseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SmallestEigenvalues))
+				return eigendecomposition_impl_dense<DenseMatrix,DenseInverseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+		unsupported();
+		return EigendecompositionResult();
+	}
+	EigendecompositionResult randomized(const DenseMatrix& m, const ComputationStrategy& strategy, 
+                                        const EigendecompositionStrategy& eigen_strategy, 
+                                        IndexType target_dimension)
+	{
+		if (strategy.is(HomogeneousCPUStrategy))
+		{
+			if (eigen_strategy.is(LargestEigenvalues))
+				return eigendecomposition_impl_randomized<DenseMatrix,DenseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SquaredLargestEigenvalues))
+				return eigendecomposition_impl_randomized<DenseMatrix,DenseImplicitSquareSymmetricMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SmallestEigenvalues))
+				return eigendecomposition_impl_randomized<DenseMatrix,DenseInverseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+#ifdef TAPKEE_WITH_VIENNACL
+		if (strategy.is(HeterogeneousOpenCLStrategy))
+		{
+			if (eigen_strategy.is(LargestEigenvalues))
+				return eigendecomposition_impl_randomized<DenseMatrix,GPUDenseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			if (eigen_strategy.is(SquaredLargestEigenvalues))
+				return eigendecomposition_impl_randomized<DenseMatrix,GPUDenseImplicitSquareMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+#endif
+		unsupported();
+		return EigendecompositionResult();
+	}
+	inline void unsupported() const 
+	{
+		throw unsupported_method_error("Unsupported method");
+	}
+};
+
+template <>
+struct eigendecomposition_impl<SparseWeightMatrix>
+{
+#ifdef TAPKEE_WITH_ARPACK
+	EigendecompositionResult arpack(const SparseWeightMatrix& m, const ComputationStrategy& strategy, 
+                                    const EigendecompositionStrategy& eigen_strategy, 
+                                    IndexType target_dimension)
+	{
+		if (strategy.is(HomogeneousCPUStrategy))
+		{
+			if (eigen_strategy.is(SmallestEigenvalues))
+				return eigendecomposition_impl_arpack<SparseWeightMatrix,SparseInverseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+		unsupported();
+		return EigendecompositionResult();
+	}
+#endif
+	EigendecompositionResult dense(const SparseWeightMatrix& m, const ComputationStrategy& strategy, 
+                                   const EigendecompositionStrategy& eigen_strategy, 
+                                   IndexType target_dimension)
+	{
+		if (strategy.is(HomogeneousCPUStrategy))
+		{
+			if (eigen_strategy.is(SmallestEigenvalues))
+				return eigendecomposition_impl_dense<SparseWeightMatrix,SparseInverseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+		unsupported();
+		return EigendecompositionResult();
+	}
+	EigendecompositionResult randomized(const SparseWeightMatrix& m, const ComputationStrategy& strategy, 
+                                        const EigendecompositionStrategy& eigen_strategy, 
+                                        IndexType target_dimension)
+	{
+		if (strategy.is(HomogeneousCPUStrategy))
+		{
+			if (eigen_strategy.is(SmallestEigenvalues))
+				return eigendecomposition_impl_randomized<SparseWeightMatrix,SparseInverseMatrixOperation>
+					(m,target_dimension,eigen_strategy.skip());
+			unsupported();
+		}
+		unsupported();
+		return EigendecompositionResult();
+	}
+	inline void unsupported() const 
+	{
+		throw unsupported_method_error("Unsupported method");
+	}
+};
+
 //! Multiple implementation handler method for various eigendecomposition methods. 
 //!
 //! Has three template parameters:
@@ -167,25 +331,23 @@ EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType& wm
 //!        computed
 //! @param skip number of eigenvectors to skip (from either smallest or largest side)
 //!
-template <class MatrixType, class MatrixOperationType>
-EigendecompositionResult eigendecomposition(EigenMethod method, const MatrixType& m, 
-                                            IndexType target_dimension, unsigned int skip)
+template <class MatrixType>
+EigendecompositionResult eigendecomposition(const EigenMethod& method, const ComputationStrategy& strategy, 
+                                            const EigendecompositionStrategy& eigen_strategy, 
+                                            const MatrixType& m, IndexType target_dimension)
 {
 	LoggingSingleton::instance().message_info("Using the " + get_eigen_method_name(method) + " eigendecomposition method.");
-	switch (method)
-	{
 #ifdef TAPKEE_WITH_ARPACK
-		case Arpack: 
-			return eigendecomposition_impl_arpack<MatrixType, MatrixOperationType>(m, target_dimension, skip);
+	if (method.is(Arpack))
+		return eigendecomposition_impl<MatrixType>().arpack(m,strategy,eigen_strategy,target_dimension);
 #endif
-		case Randomized: 
-			return eigendecomposition_impl_randomized<MatrixType, MatrixOperationType>(m, target_dimension, skip);
-		case Dense:
-			return eigendecomposition_impl_dense<MatrixType, MatrixOperationType>(m, target_dimension, skip);
-		default: break;
-	}
+	if (method.is(Randomized))
+		return eigendecomposition_impl<MatrixType>().randomized(m,strategy,eigen_strategy,target_dimension);
+	if (method.is(Dense))
+		return eigendecomposition_impl<MatrixType>().dense(m,strategy,eigen_strategy,target_dimension);
 	return EigendecompositionResult();
 }
+
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee

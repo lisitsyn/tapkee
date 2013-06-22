@@ -14,6 +14,7 @@
 #ifdef TAPKEE_WITH_VIENNACL
 	#define VIENNACL_HAVE_EIGEN
 	#include <viennacl/matrix.hpp>
+	#include <viennacl/vector.hpp>
 	#include <viennacl/linalg/prod.hpp>
 #endif
 
@@ -160,10 +161,9 @@ struct GPUDenseImplicitSquareMatrixOperation
 {
 	GPUDenseImplicitSquareMatrixOperation(const DenseMatrix& matrix)
 	{
-		timed_context c("Storing matrices");
 		mat = viennacl::matrix<ScalarType>(matrix.cols(),matrix.rows());
-		vec = viennacl::matrix<ScalarType>(matrix.cols(),1);
-		res = viennacl::matrix<ScalarType>(matrix.cols(),1);
+		vec = viennacl::vector<ScalarType>(matrix.cols());
+		res = viennacl::vector<ScalarType>(matrix.cols());
 		viennacl::copy(matrix,mat);
 	}
 	//! Computes matrix product of the matrix and provided right-hand 
@@ -171,20 +171,19 @@ struct GPUDenseImplicitSquareMatrixOperation
 	//! 
 	//! @param rhs right-hand side matrix
 	//!
-	inline DenseMatrix operator()(const DenseMatrix& rhs)
+	inline DenseVector operator()(const DenseVector& rhs)
 	{
-		timed_context c("Computing product");
 		viennacl::copy(rhs,vec);
 		res = viennacl::linalg::prod(mat, vec);
 		vec = res;
 		res = viennacl::linalg::prod(mat, vec);
-		DenseMatrix result(rhs);
+		DenseVector result(rhs);
 		viennacl::copy(res,result);
 		return result;
 	}
 	viennacl::matrix<ScalarType> mat;
-	viennacl::matrix<ScalarType> vec;
-	viennacl::matrix<ScalarType> res;
+	viennacl::vector<ScalarType> vec;
+	viennacl::vector<ScalarType> res;
 	static const char* ARPACK_CODE;
 	static const bool largest;
 };
@@ -196,8 +195,8 @@ struct GPUDenseMatrixOperation
 	GPUDenseMatrixOperation(const DenseMatrix& matrix)
 	{
 		mat = viennacl::matrix<ScalarType>(matrix.cols(),matrix.rows());
-		vec = viennacl::matrix<ScalarType>(matrix.cols(),1);
-		res = viennacl::matrix<ScalarType>(matrix.cols(),1);
+		vec = viennacl::vector<ScalarType>(matrix.cols());
+		res = viennacl::vector<ScalarType>(matrix.cols());
 		viennacl::copy(matrix,mat);
 	}
 	//! Computes matrix product of the matrix and provided right-hand 
@@ -205,17 +204,17 @@ struct GPUDenseMatrixOperation
 	//! 
 	//! @param rhs right-hand side matrix
 	//!
-	inline DenseMatrix operator()(const DenseMatrix& rhs)
+	inline DenseVector operator()(const DenseVector& rhs)
 	{
 		viennacl::copy(rhs,vec);
 		res = viennacl::linalg::prod(mat, vec);
-		DenseMatrix result(rhs);
+		DenseVector result(rhs);
 		viennacl::copy(res,result);
 		return result;
 	}
 	viennacl::matrix<ScalarType> mat;
-	viennacl::matrix<ScalarType> vec;
-	viennacl::matrix<ScalarType> res;
+	viennacl::vector<ScalarType> vec;
+	viennacl::vector<ScalarType> res;
 	static const char* ARPACK_CODE;
 	static const bool largest;
 };

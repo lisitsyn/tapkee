@@ -195,6 +195,17 @@ tapkee::EigenMethod parse_eigen_method(const char* str)
 	return tapkee::Dense;
 }
 
+tapkee::ComputationStrategy parse_computation_strategy(const char* str)
+{
+	if (!strcmp(str,"cpu"))
+		return tapkee::HomogeneousCPUStrategy;
+#ifdef TAPKEE_WITH_VIENNACL
+	if (!strcmp(str,"opencl"))
+		return tapkee::HeterogeneousOpenCLStrategy;
+#endif
+	return tapkee::HomogeneousCPUStrategy;
+}
+
 template <class PairwiseCallback>
 tapkee::DenseMatrix matrix_from_callback(const tapkee::IndexType N, PairwiseCallback callback)
 {

@@ -161,7 +161,13 @@ if (BUILD_TESTS)
 	foreach(i ${TAPKEE_TESTS_SOURCES})
 		get_filename_component(exe ${i} NAME_WE)
 		add_executable(test_${exe} ${i})
-		target_link_libraries(test_${exe} gtest gtest_main arpack)
+		target_link_libraries(test_${exe} gtest gtest_main)
+		if (ARPACK_FOUND)
+			target_link_libraries(test_${exe} arpack)
+		endif()
+		if (VIENNACL_FOUND)
+			target_link_libraries(test_${exe} OpenCL)
+		endif()
 		add_test(
 			NAME ${exe}
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

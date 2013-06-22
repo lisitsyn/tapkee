@@ -49,7 +49,7 @@ public:
 		parameters(pmap), context(ctx), kernel(k), distance(d), features(f),
 		plain_distance(PlainDistance<RandomAccessIterator,DistanceCallback>(distance)),
 		kernel_distance(KernelDistance<RandomAccessIterator,KernelCallback>(kernel)),
-		begin(b), end(e), 
+		begin(b), end(e), computation_strategy(),
 		eigen_method(), neighbors_method(), eigenshift(), traceshift(),
 		check_connectivity(), n_neighbors(), width(), timesteps(),
 		ratio(), max_iteration(), tolerance(), n_updates(), perplexity(), 
@@ -69,6 +69,7 @@ public:
 				.inRange(static_cast<IndexType>(3),static_cast<IndexType>(n_vectors));
 		}
 
+		computation_strategy = parameters(keywords::computation_strategy);
 		eigen_method = parameters(keywords::eigen_method);
 		neighbors_method = parameters(keywords::neighbors_method);
 		check_connectivity = parameters(keywords::check_connectivity);
@@ -148,9 +149,6 @@ public:
 
 private:
 
-	static const IndexType SkipOneEigenvalue = 1;
-	static const IndexType SkipNoEigenvalues = 0;
-
 	ParametersSet parameters;
 	Context context;
 	KernelCallback kernel;
@@ -162,6 +160,7 @@ private:
 	RandomAccessIterator begin;
 	RandomAccessIterator end;
 
+	Parameter computation_strategy;
 	Parameter eigen_method;
 	Parameter neighbors_method;
 	Parameter eigenshift;
@@ -207,8 +206,8 @@ private:
 		SparseWeightMatrix weight_matrix =
 			linear_weight_matrix(begin,end,neighbors,kernel,eigenshift,traceshift);
 		DenseMatrix embedding = 
-			eigendecomposition<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
-				weight_matrix,target_dimension,SkipOneEigenvalue).first;
+			eigendecomposition(eigen_method,computation_strategy,SmallestEigenvalues,
+					weight_matrix,target_dimension).first;
 
 		return TapkeeOutput(embedding, unimplementedProjectingFunction());
 	}
@@ -219,45 +218,31 @@ private:
 		SparseWeightMatrix weight_matrix = 
 			tangent_weight_matrix(begin,end,neighbors,kernel,target_dimension,eigenshift);
 		DenseMatrix embedding =
-			eigendecomposition<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
-				weight_matrix,target_dimension,SkipOneEigenvalue).first;
+			eigendecomposition(eigen_method,computation_strategy,SmallestEigenvalues,
+					weight_matrix,target_dimension).first;
 
 		return TapkeeOutput(embedding, unimplementedProjectingFunction());
 	}
 
 	TapkeeOutput embedDiffusionMap()
 	{
-		#ifdef TAPKEE_WITH_VIENNACL
-			#define DM_MATRIX_OP GPUDenseImplicitSquareMatrixOperation
-		#else
-			#define DM_MATRIX_OP DenseImplicitSquareSymmetricMatrixOperation
-		#endif
-
 		DenseSymmetricMatrix diffusion_matrix =
 			compute_diffusion_matrix(begin,end,distance,timesteps,width);
 		DenseMatrix embedding =
-			eigendecomposition<DenseSymmetricMatrix,DM_MATRIX_OP>(eigen_method,diffusion_matrix,
-				target_dimension,SkipNoEigenvalues).first;
+			eigendecomposition(eigen_method,computation_strategy,SquaredLargestEigenvalues,
+					diffusion_matrix,target_dimension).first;
 
 		return TapkeeOutput(embedding, unimplementedProjectingFunction());
-
-		#undef DM_MATRIX_OP
 	}
 
 	TapkeeOutput embedMultidimensionalScaling()
 	{
-		#ifdef TAPKEE_WITH_VIENNACL
-			#define MDS_MATRIX_OP GPUDenseImplicitSquareMatrixOperation
-		#else
-			#define MDS_MATRIX_OP DenseMatrixOperation
-		#endif
-
 		DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin,end,distance);
 		centerMatrix(distance_matrix);
 		distance_matrix.array() *= -0.5;
 		EigendecompositionResult embedding = 
-			eigendecomposition<DenseSymmetricMatrix,MDS_MATRIX_OP>(eigen_method,
-				distance_matrix,target_dimension,SkipNoEigenvalues);
+			eigendecomposition(eigen_method,computation_strategy,LargestEigenvalues,
+					distance_matrix,target_dimension);
 
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			embedding.first.col(i).array() *= sqrt(embedding.second(i));
@@ -279,8 +264,8 @@ private:
 		centerMatrix(distance_matrix);
 		distance_matrix.array() *= -0.5;
 		EigendecompositionResult landmarks_embedding = 
-			eigendecomposition<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
-				distance_matrix,target_dimension,SkipNoEigenvalues);
+			eigendecomposition(eigen_method,computation_strategy,LargestEigenvalues,
+					distance_matrix,target_dimension);
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			landmarks_embedding.first.col(i).array() *= sqrt(landmarks_embedding.second(i));
 		return TapkeeOutput(triangulate(begin,end,distance,landmarks,
@@ -297,8 +282,8 @@ private:
 		shortest_distances_matrix.array() *= -0.5;
 		
 		EigendecompositionResult embedding = 
-			eigendecomposition<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
-				shortest_distances_matrix,target_dimension,SkipNoEigenvalues);
+			eigendecomposition(eigen_method,computation_strategy,LargestEigenvalues,
+					shortest_distances_matrix,target_dimension);
 
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			embedding.first.col(i).array() *= sqrt(embedding.second(i));
@@ -332,13 +317,13 @@ private:
 		if (eigen_method.is(Dense))
 		{
 			DenseMatrix distance_matrix_sym = distance_matrix*distance_matrix.transpose();
-			landmarks_embedding = eigendecomposition<DenseSymmetricMatrix,DenseImplicitSquareMatrixOperation>
-				(eigen_method,distance_matrix_sym,target_dimension,SkipNoEigenvalues);
+			landmarks_embedding = eigendecomposition(eigen_method,computation_strategy,
+					LargestEigenvalues,distance_matrix_sym,target_dimension);
 		}
 		else 
 		{
-			landmarks_embedding = eigendecomposition<DenseSymmetricMatrix,DenseImplicitSquareMatrixOperation>
-				(eigen_method,distance_matrix,target_dimension,SkipNoEigenvalues);
+			landmarks_embedding = eigendecomposition(eigen_method,computation_strategy,
+					SquaredLargestEigenvalues,distance_matrix,target_dimension);
 		}
 
 		DenseMatrix embedding = distance_matrix.transpose()*landmarks_embedding.first;
@@ -357,8 +342,8 @@ private:
 			construct_neighborhood_preserving_eigenproblem(weight_matrix,begin,end,
 				features,current_dimension);
 		EigendecompositionResult projection_result = 
-			generalized_eigendecomposition<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
-				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SkipNoEigenvalues);
+			generalized_eigendecomposition(eigen_method,computation_strategy,
+					SmallestEigenvalues,eig_matrices.first,eig_matrices.second,target_dimension);
 		DenseVector mean_vector = 
 			compute_mean(begin,end,features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
@@ -370,8 +355,9 @@ private:
 		Neighbors neighbors = findNeighborsWith(kernel_distance);
 		SparseWeightMatrix weight_matrix =
 			hessian_weight_matrix(begin,end,neighbors,kernel,target_dimension);
-		return TapkeeOutput(eigendecomposition<SparseWeightMatrix,SparseInverseMatrixOperation>(eigen_method,
-			weight_matrix,target_dimension,SkipOneEigenvalue).first, unimplementedProjectingFunction());
+		return TapkeeOutput(eigendecomposition(eigen_method,computation_strategy,
+					SmallestEigenvalues,weight_matrix,target_dimension).first, 
+				unimplementedProjectingFunction());
 	}
 
 	TapkeeOutput embedLaplacianEigenmaps()
@@ -379,8 +365,9 @@ private:
 		Neighbors neighbors = findNeighborsWith(plain_distance);
 		Laplacian laplacian = 
 			compute_laplacian(begin,end,neighbors,distance,width);
-		return TapkeeOutput(generalized_eigendecomposition<SparseWeightMatrix,DenseDiagonalMatrix,SparseInverseMatrixOperation>(
-			eigen_method,laplacian.first,laplacian.second,target_dimension,SkipOneEigenvalue).first, unimplementedProjectingFunction());
+		return TapkeeOutput(generalized_eigendecomposition(eigen_method,computation_strategy,
+					SmallestEigenvalues,laplacian.first,laplacian.second,target_dimension).first,
+				unimplementedProjectingFunction());
 	}
 
 	TapkeeOutput embedLocalityPreservingProjections()
@@ -392,8 +379,8 @@ private:
 			construct_locality_preserving_eigenproblem(laplacian.first,laplacian.second,begin,end,
 					features,current_dimension);
 		EigendecompositionResult projection_result = 
-			generalized_eigendecomposition<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
-				eigen_method,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension,SkipNoEigenvalues);
+			generalized_eigendecomposition(eigen_method,computation_strategy,
+					SmallestEigenvalues,eigenproblem_matrices.first,eigenproblem_matrices.second,target_dimension);
 		DenseVector mean_vector = 
 			compute_mean(begin,end,features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
@@ -407,7 +394,8 @@ private:
 		DenseSymmetricMatrix centered_covariance_matrix = 
 			compute_covariance_matrix(begin,end,mean_vector,features,current_dimension);
 		EigendecompositionResult projection_result = 
-			eigendecomposition<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,centered_covariance_matrix,target_dimension,SkipNoEigenvalues);
+			eigendecomposition(eigen_method,computation_strategy,
+					LargestEigenvalues,centered_covariance_matrix,target_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
 		return TapkeeOutput(project(projection_result.first,mean_vector,begin,end,features,current_dimension), projecting_function);
 	}
@@ -427,8 +415,8 @@ private:
 	{
 		DenseSymmetricMatrix centered_kernel_matrix = 
 			compute_centered_kernel_matrix(begin,end,kernel);
-		EigendecompositionResult embedding = eigendecomposition<DenseSymmetricMatrix,DenseMatrixOperation>(eigen_method,
-			centered_kernel_matrix,target_dimension,SkipNoEigenvalues);
+		EigendecompositionResult embedding = eigendecomposition(eigen_method,computation_strategy,
+				LargestEigenvalues,centered_kernel_matrix,target_dimension);
 		for (IndexType i=0; i<static_cast<IndexType>(target_dimension); i++)
 			embedding.first.col(i).array() *= sqrt(embedding.second(i));
 		return TapkeeOutput(embedding.first, unimplementedProjectingFunction());
@@ -443,8 +431,8 @@ private:
 			construct_lltsa_eigenproblem(weight_matrix,begin,end,
 				features,current_dimension);
 		EigendecompositionResult projection_result = 
-			generalized_eigendecomposition<DenseSymmetricMatrix,DenseSymmetricMatrix,DenseInverseMatrixOperation>(
-				eigen_method,eig_matrices.first,eig_matrices.second,target_dimension,SkipNoEigenvalues);
+			generalized_eigendecomposition(eigen_method,computation_strategy,SmallestEigenvalues,
+					eig_matrices.first,eig_matrices.second,target_dimension);
 		DenseVector mean_vector = 
 			compute_mean(begin,end,features,current_dimension);
 		tapkee::ProjectingFunction projecting_function(new tapkee::MatrixProjectionImplementation(projection_result.first,mean_vector));
@@ -507,7 +495,7 @@ private:
 
 		manifold_sculpting_embed(begin, end, embedding, target_dimension, neighbors, distance, max_iteration, squishing_rate);
 
-		return TapkeeOutput(embedding, tapkee::ProjectingFunction());	
+		return TapkeeOutput(embedding, tapkee::ProjectingFunction());
 	}
 
 };

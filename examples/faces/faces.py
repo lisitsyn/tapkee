@@ -14,7 +14,7 @@ def embed(feature_matrix):
 	input_file = 'tmp_faces_input'
 	numpy.savetxt(input_file,feature_matrix)
 	output_file = 'tmp_faces_output.dat'
-	run_string = './bin/tapkee_cli -i %s -o %s -m diffusion_map --transpose --verbose --benchmark' % (input_file,output_file)
+	run_string = './bin/tapkee_cli -i %s -o %s -m diffusion_map --transpose-input --verbose --benchmark' % (input_file,output_file)
 	output = subprocess.check_output(run_string, shell=True)
 	print output
 	embedding = numpy.loadtxt(output_file)

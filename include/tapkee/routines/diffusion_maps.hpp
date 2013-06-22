@@ -3,13 +3,13 @@
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
 
-#ifndef TAPKEE_DiffusionMapS_H_
-#define TAPKEE_DiffusionMapS_H_
+#ifndef TAPKEE_DIFFUSIONMAP_H_
+#define TAPKEE_DIFFUSIONMAP_H_
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
 #include <tapkee/utils/time.hpp>
-/* End of Tapke includes */
+/* End of Tapkee includes */
 
 namespace tapkee
 {
@@ -72,7 +72,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 	p = diffusion_matrix.colwise().sum().cwiseSqrt();
 	
 	for (IndexType i=0; i<n_vectors; i++)
-		for (IndexType j=i; j<n_vectors; j++)
+		for (IndexType j=0; j<n_vectors; j++)
 			diffusion_matrix(i,j) /= p(i)*p(j);
 
 	UNRESTRICT_ALLOC;

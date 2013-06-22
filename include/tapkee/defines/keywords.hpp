@@ -72,6 +72,16 @@ namespace tapkee
 		using keywords_internal::DefaultValue;
 
 		namespace {
+			
+			/** The keyword for the value that stands for the computation strategy 
+			 * to be used.
+			 *
+			 * Default value is @ref tapkee::HomogeneousCPUStrategy.
+			 *
+			 */
+			const ParameterKeyword<ComputationStrategy>
+				computation_strategy("computation strategy (cpu, cpu+gpu)", HomogeneousCPUStrategy);
+			
 			/** The keyword for the value that stands for the dimension reduction 
 			 * method to be used.
 			 *

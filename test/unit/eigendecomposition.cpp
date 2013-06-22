@@ -16,8 +16,8 @@ TEST(EigenDecomposition, EigenDenseLargestEigenvector)
 	mat << 1, -1, -1, 1;
 
 	tapkee::tapkee_internal::EigendecompositionResult result = 
-		tapkee::tapkee_internal::eigendecomposition<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
-		(tapkee::Dense, mat, 1, 0);
+		tapkee::tapkee_internal::eigendecomposition
+		(tapkee::Dense, tapkee::HomogeneousCPUStrategy, tapkee::tapkee_internal::LargestEigenvalues, mat, 1);
 
 	ASSERT_EQ(1,result.second.size());
 	// eigenvalue is 2
@@ -47,12 +47,12 @@ TEST(EigenDecomposition, EigenSparseSmallestEigenvector)
 #endif
 
 	tapkee::tapkee_internal::EigendecompositionResult result = 
-		tapkee::tapkee_internal::eigendecomposition<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
-		(tapkee::Dense, mat, 1, 0);
+		tapkee::tapkee_internal::eigendecomposition
+		(tapkee::Dense, tapkee::HomogeneousCPUStrategy, tapkee::tapkee_internal::SmallestEigenvalues, mat, 1);
 
-	ASSERT_EQ(1,result.second.size());
+	ASSERT_EQ(2,result.second.size());
 	// smallest eigenvalue is 1
-	ASSERT_NEAR(1,result.second[0],PRECISION);
+	ASSERT_NEAR(2,result.second[0],PRECISION);
 	ASSERT_EQ(1,result.first.cols());
 	ASSERT_EQ(3,result.first.rows());
 	// check if it is an eigenvector
@@ -65,8 +65,8 @@ TEST(EigenDecomposition, ArpackDenseLargestEigenvector)
 	mat << 1, -1, -1, 1;
 
 	tapkee::tapkee_internal::EigendecompositionResult result = 
-		tapkee::tapkee_internal::eigendecomposition<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
-		(tapkee::Arpack, mat, 1, 0);
+		tapkee::tapkee_internal::eigendecomposition
+		(tapkee::Arpack, tapkee::HomogeneousCPUStrategy, tapkee::tapkee_internal::LargestEigenvalues, mat, 1);
 
 	ASSERT_EQ(1,result.second.size());
 	// eigenvalue is 2
@@ -96,12 +96,12 @@ TEST(EigenDecomposition, ArpackSparseSmallestEigenvector)
 #endif
 
 	tapkee::tapkee_internal::EigendecompositionResult result = 
-		tapkee::tapkee_internal::eigendecomposition<tapkee::SparseWeightMatrix,tapkee::tapkee_internal::SparseInverseMatrixOperation>
-		(tapkee::Arpack, mat, 1, 0);
+		tapkee::tapkee_internal::eigendecomposition
+		(tapkee::Arpack, tapkee::HomogeneousCPUStrategy, tapkee::tapkee_internal::SmallestEigenvalues, mat, 1);
 
 	ASSERT_EQ(1,result.second.size());
 	// smallest eigenvalue is 1
-	ASSERT_NEAR(1,result.second[0],PRECISION);
+	ASSERT_NEAR(2,result.second[0],PRECISION);
 	ASSERT_EQ(1,result.first.cols());
 	ASSERT_EQ(3,result.first.rows());
 	// check if it is an eigenvector
@@ -114,8 +114,8 @@ TEST(EigenDecomposition, RandomizedDenseLargestEigenvector)
 	mat << 1, -1, -1, 1;
 
 	tapkee::tapkee_internal::EigendecompositionResult result = 
-		tapkee::tapkee_internal::eigendecomposition<tapkee::DenseMatrix,tapkee::tapkee_internal::DenseMatrixOperation>
-		(tapkee::Randomized, mat, 1, 0);
+		tapkee::tapkee_internal::eigendecomposition
+		(tapkee::Randomized, tapkee::HomogeneousCPUStrategy, tapkee::tapkee_internal::LargestEigenvalues, mat, 1);
 
 	ASSERT_EQ(1,result.second.size());
 	// eigenvalue is 2

@@ -130,6 +130,16 @@ int run(int argc, const char** argv)
 		"randomized, dense.",
 		OPT_PREFIX "em",
 		OPT_LONG_PREFIX EIGEN_METHOD_KEYWORD);
+#define COMPUTATION_STRATEGY_KEYWORD "computation-strategy"
+	opt.add(
+		"cpu",
+		0,1,0,"Computation strategy (default is 'cpu'). One of the following: "
+#ifdef TAPKEE_WITH_VIENNACL
+		"opencl, "
+#endif
+		"cpu.",
+		OPT_PREFIX "cs",
+		OPT_LONG_PREFIX COMPUTATION_STRATEGY_KEYWORD);
 #define TARGET_DIMENSION_KEYWORD "target-dimension"
 	opt.add("2",0,1,0,"Target dimension (default 2)",
 		OPT_PREFIX "td",
@@ -217,7 +227,7 @@ int run(int argc, const char** argv)
 		}
 	}
 	
-	tapkee::NeighborsMethod tapkee_neighbors_method;
+	tapkee::NeighborsMethod tapkee_neighbors_method = tapkee::Brute;
 	{
 		string method;
 		opt.get(OPT_LONG_PREFIX NEIGHBORS_METHOD_KEYWORD)->getString(method);
@@ -231,7 +241,7 @@ int run(int argc, const char** argv)
 			return 0;
 		}
 	}
-	tapkee::EigenMethod tapkee_eigen_method;
+	tapkee::EigenMethod tapkee_eigen_method = tapkee::Dense;
 	{
 		string method;
 		opt.get(OPT_LONG_PREFIX EIGEN_METHOD_KEYWORD)->getString(method);
@@ -242,6 +252,20 @@ int run(int argc, const char** argv)
 		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
+			return 0;
+		}
+	}
+	tapkee::ComputationStrategy tapkee_computation_strategy = tapkee::HomogeneousCPUStrategy;
+	{
+		string method;
+		opt.get(OPT_LONG_PREFIX COMPUTATION_STRATEGY_KEYWORD)->getString(method);
+		try
+		{
+			tapkee_computation_strategy = parse_computation_strategy(method.c_str());
+		}
+		catch (const std::exception&)
+		{
+			tapkee::LoggingSingleton::instance().message_error(string("Unknown computation strategy ") + method);
 			return 0;
 		}
 	}
@@ -374,6 +398,7 @@ int run(int argc, const char** argv)
 	using namespace tapkee::keywords;
 	tapkee::ParametersSet parameters = 
 			(method = tapkee_method,
+			 computation_strategy = tapkee_computation_strategy,
 			 eigen_method = tapkee_eigen_method,
 			 neighbors_method = tapkee_neighbors_method,
 			 num_neighbors = k,
