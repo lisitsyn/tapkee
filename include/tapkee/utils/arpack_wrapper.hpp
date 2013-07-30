@@ -404,12 +404,12 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 	/*
 	if (!isBempty)
 	{
-	Scalar scale = B.norm() / std::sqrt(n);
-	scale = std::pow(2, std::floor(std::log(scale+1)));
-	////M /= scale;
-	for (size_t i=0; i<(size_t)B.outerSize(); i++)
-	    for (typename RMatrixType::InnerIterator it(B, i); it; ++it)
-	        it.valueRef() /= scale;
+		scale = B.norm() / std::sqrt(n);
+		scale = std::pow(2, std::floor(std::log(scale+1)));
+		////M /= scale;
+		for (size_t i=0; i<(size_t)B.outerSize(); i++)
+			for (typename RMatrixType::InnerIterator it(B, i); it; ++it)
+				it.valueRef() /= scale;
 	}
 	*/
 

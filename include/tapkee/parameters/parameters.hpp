@@ -8,6 +8,7 @@
 
 /* Tapkee includes */
 #include <tapkee/parameters/value_keeper.hpp>
+#include <tapkee/utils/logging.hpp>
 /* End of Tapkee includes */
 
 #include <sstream>
@@ -16,25 +17,6 @@
 
 namespace tapkee
 {
-
-struct Message
-{
-	Message() : ss()
-	{
-	}
-	template <typename T>
-	Message& operator<<(const T& data)
-	{
-		ss << data;
-		return *this;
-	}
-	operator std::string() 
-	{
-		return ss.str();
-	}
-
-	std::stringstream ss;
-};
 
 class ParametersSet;
 class CheckedParameter;
@@ -245,10 +227,8 @@ public:
 	{
 		if (!parameter.isInRange(lower, upper))
 		{
-			std::string reason = 
-				(Message() << "Value of " << parameter.name() << " " 
-				 << parameter.getValue<T>() << " doesn't fit the range [" << 
-				    lower << ", " << upper << ")");
+			std::string reason = formatting::format("Value of {} doesn't fit the range [{}, {})",
+					parameter.name(), parameter.getValue<T>(), lower, upper);
 			parameter.invalidate(reason);
 		}
 		return *this;
@@ -259,10 +239,8 @@ public:
 	{
 		if (!parameter.isInRange(lower, upper) && !parameter.is(upper))
 		{
-			std::string reason = 
-				(Message() << "Value of " << parameter.name() << " " 
-				 << parameter.getValue<T>() << " doesn't fit the range [" << 
-				    lower << ", " << upper << "]");
+			std::string reason = formatting::format("Value of {} doesn't fit the range [{}, {}]",
+					parameter.name(), parameter.getValue<T>(), lower, upper);
 			parameter.invalidate(reason);
 		}
 		return *this;
@@ -272,8 +250,8 @@ public:
 	{
 		if (!parameter.isPositive())
 		{
-			std::string reason = 
-				(Message() << "Value of " << parameter.name() << " is not positive");
+			std::string reason = formatting::format("Value of {} is not positive",
+					parameter.name());
 			parameter.invalidate(reason);
 		}
 		return *this;
@@ -283,8 +261,8 @@ public:
 	{
 		if (!parameter.isNonNegative())
 		{
-			std::string reason = 
-				(Message() << "Value of " << parameter.name() << " is negative");
+			std::string reason = formatting::format("Value of {} is negative",
+					parameter.name());
 			parameter.invalidate(reason);
 		}
 		return *this;
@@ -314,7 +292,7 @@ public:
 	void add(const Parameter& p) 
 	{
 		if (pmap.count(p.name()))
-			throw multiple_parameter_error(Message() << "Parameter " << p.name() << " is set more than once");
+			throw multiple_parameter_error(formatting::format("Parameter {} is set more than once", p.name()));
 
 		pmap[p.name()] = p;
 	}
@@ -342,7 +320,7 @@ public:
 		}
 		else
 		{
-			throw missed_parameter_error(Message() << "Parameter " << name << " is missed");
+			throw missed_parameter_error(formatting::format("Parameter {} is missed", name));
 		}
 	}
 	ParametersSet& operator,(const Parameter& p)

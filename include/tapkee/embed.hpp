@@ -112,7 +112,7 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end,
 
 	try 
 	{
-		LoggingSingleton::instance().message_info("Using the " + get_method_name(selected_method) + " method.");
+		LoggingSingleton::instance().message_info(formatting::format("Using the {} method.", get_method_name(selected_method)));
 		
 		output = tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,features_callback,parameters,context)
 		                         .embedUsing(selected_method);

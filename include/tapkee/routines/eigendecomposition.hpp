@@ -37,9 +37,8 @@ EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType& wm, In
 
 	if (arpack.info() == Eigen::Success)
 	{
-		std::stringstream ss;
-		ss << "Took " << arpack.getNbrIterations() << " iterations.";
-		LoggingSingleton::instance().message_info(ss.str());
+		std::string message = formatting::format("Took {} iterations.", arpack.getNbrIterations());
+		LoggingSingleton::instance().message_info(message);
 		DenseMatrix selected_eigenvectors = arpack.eigenvectors().rightCols(target_dimension);
 		return EigendecompositionResult(selected_eigenvectors,arpack.eigenvalues().tail(target_dimension));
 	}
@@ -336,7 +335,8 @@ EigendecompositionResult eigendecomposition(const EigenMethod& method, const Com
                                             const EigendecompositionStrategy& eigen_strategy, 
                                             const MatrixType& m, IndexType target_dimension)
 {
-	LoggingSingleton::instance().message_info("Using the " + get_eigen_method_name(method) + " eigendecomposition method.");
+	LoggingSingleton::instance().message_info(formatting::format("Using the {} eigendecomposition method.",
+		get_eigen_method_name(method)));
 #ifdef TAPKEE_WITH_ARPACK
 	if (method.is(Arpack))
 		return eigendecomposition_impl<MatrixType>().arpack(m,strategy,eigen_strategy,target_dimension);
