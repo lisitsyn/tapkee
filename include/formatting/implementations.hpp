@@ -27,6 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef FORMATTING_IMPLEMENTATIONS_H_
+#define FORMATTING_IMPLEMENTATIONS_H_
+
 namespace formatting
 {
 	/** Default precision - be careful to change due to no thread safety */
@@ -121,3 +124,4 @@ namespace formatting
 		};
 	}
 }
+#endif

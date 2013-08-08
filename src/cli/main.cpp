@@ -395,27 +395,26 @@ int run(int argc, const char** argv)
 	
 	tapkee::TapkeeOutput output;
 
-	using namespace tapkee::keywords;
-	tapkee::ParametersSet parameters = 
-			(method = tapkee_method,
-			 computation_strategy = tapkee_computation_strategy,
-			 eigen_method = tapkee_eigen_method,
-			 neighbors_method = tapkee_neighbors_method,
-			 num_neighbors = k,
-			 target_dimension = target_dim,
-			 diffusion_map_timesteps = timesteps,
-			 gaussian_kernel_width = width,
-			 max_iteration = max_iters,
-			 spe_global_strategy = spe_global,
-			 spe_num_updates = spe_num_upd,
-			 spe_tolerance = spe_tol,
-			 landmark_ratio = landmark_rt,
-			 nullspace_shift = eigenshift,
-			 check_connectivity = true,
-			 fa_epsilon = fa_eps,
-			 sne_perplexity = perplexity,
-			 sne_theta = theta,
-			 squishing_rate = squishing);
+	stichwort::ParametersSet parameters = 
+			(tapkee::method = tapkee_method,
+			 tapkee::computation_strategy = tapkee_computation_strategy,
+			 tapkee::eigen_method = tapkee_eigen_method,
+			 tapkee::neighbors_method = tapkee_neighbors_method,
+			 tapkee::num_neighbors = k,
+			 tapkee::target_dimension = target_dim,
+			 tapkee::diffusion_map_timesteps = timesteps,
+			 tapkee::gaussian_kernel_width = width,
+			 tapkee::max_iteration = max_iters,
+			 tapkee::spe_global_strategy = spe_global,
+			 tapkee::spe_num_updates = spe_num_upd,
+			 tapkee::spe_tolerance = spe_tol,
+			 tapkee::landmark_ratio = landmark_rt,
+			 tapkee::nullspace_shift = eigenshift,
+			 tapkee::check_connectivity = true,
+			 tapkee::fa_epsilon = fa_eps,
+			 tapkee::sne_perplexity = perplexity,
+			 tapkee::sne_theta = theta,
+			 tapkee::squishing_rate = squishing);
 
 #ifdef USE_PRECOMPUTED
 	vector<tapkee::IndexType> indices(input_data.cols());

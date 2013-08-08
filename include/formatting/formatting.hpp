@@ -27,6 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef FORMATTING_H_
+#define FORMATTING_H_
+
 #include <string>
 #include <stdexcept>
 #include <sstream>
@@ -546,3 +549,4 @@ namespace formatting
 		return implementation_->representation();
 	}
 }
+#endif

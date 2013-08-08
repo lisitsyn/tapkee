@@ -9,7 +9,6 @@
 
 using namespace std;
 using namespace tapkee;
-using namespace tapkee::keywords;
 
 struct MatchKernelCallback
 {

@@ -94,7 +94,7 @@ namespace tapkee
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>
 TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end,
                    KernelCallback kernel_callback, DistanceCallback distance_callback,
-                   FeaturesCallback features_callback, ParametersSet parameters)
+                   FeaturesCallback features_callback, stichwort::ParametersSet parameters)
 {
 #if EIGEN_VERSION_AT_LEAST(3,1,0)
 	Eigen::initParallel();
@@ -103,12 +103,12 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end,
 
 	parameters.merge(tapkee_internal::defaults);
 
-	DimensionReductionMethod selected_method = parameters(keywords::method);
+	DimensionReductionMethod selected_method = parameters(method);
 	
-	void (*progress_function)(double) = parameters(keywords::progress_function);
-	bool (*cancel_function)() = parameters(keywords::cancel_function);
+	void (*progress_function_ptr)(double) = parameters(progress_function);
+	bool (*cancel_function_ptr)() = parameters(cancel_function);
 
-	tapkee_internal::Context context(progress_function,cancel_function);
+	tapkee_internal::Context context(progress_function_ptr,cancel_function_ptr);
 
 	try 
 	{

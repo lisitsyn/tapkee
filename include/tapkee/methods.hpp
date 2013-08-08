@@ -45,7 +45,7 @@ public:
 
 	ImplementationBase(RandomAccessIterator b, RandomAccessIterator e,
 	                   KernelCallback k, DistanceCallback d, FeaturesCallback f,
-	                   ParametersSet& pmap, const Context& ctx) : 
+	                   stichwort::ParametersSet& pmap, const Context& ctx) : 
 		parameters(pmap), context(ctx), kernel(k), distance(d), features(f),
 		plain_distance(PlainDistance<RandomAccessIterator,DistanceCallback>(distance)),
 		kernel_distance(KernelDistance<RandomAccessIterator,KernelCallback>(kernel)),
@@ -58,8 +58,8 @@ public:
 	{
 		n_vectors = (end-begin);
 
-		target_dimension = parameters(keywords::target_dimension);
-		n_neighbors = parameters(keywords::num_neighbors).checked().positive();
+		target_dimension = parameters(target_dimension);
+		n_neighbors = parameters(num_neighbors).checked().positive();
 		
 		if (n_vectors > 0)
 		{
@@ -69,23 +69,23 @@ public:
 				.inRange(static_cast<IndexType>(3),static_cast<IndexType>(n_vectors));
 		}
 
-		computation_strategy = parameters(keywords::computation_strategy);
-		eigen_method = parameters(keywords::eigen_method);
-		neighbors_method = parameters(keywords::neighbors_method);
-		check_connectivity = parameters(keywords::check_connectivity);
-		width = parameters(keywords::gaussian_kernel_width).checked().positive();
-		timesteps = parameters(keywords::diffusion_map_timesteps).checked().positive();
-		eigenshift = parameters(keywords::nullspace_shift);
-		traceshift = parameters(keywords::klle_shift);
-		max_iteration = parameters(keywords::max_iteration);
-		tolerance = parameters(keywords::spe_tolerance).checked().positive();
-		n_updates = parameters(keywords::spe_num_updates).checked().positive();
-		theta = parameters(keywords::sne_theta).checked().nonNegative();
-		squishing_rate = parameters(keywords::squishing_rate);
-		global_strategy = parameters(keywords::spe_global_strategy);
-		epsilon = parameters(keywords::fa_epsilon).checked().nonNegative();
-		perplexity = parameters(keywords::sne_perplexity).checked().nonNegative();
-		ratio = parameters(keywords::landmark_ratio);
+		computation_strategy = parameters(computation_strategy);
+		eigen_method = parameters(eigen_method);
+		neighbors_method = parameters(neighbors_method);
+		check_connectivity = parameters(check_connectivity);
+		width = parameters(gaussian_kernel_width).checked().positive();
+		timesteps = parameters(diffusion_map_timesteps).checked().positive();
+		eigenshift = parameters(nullspace_shift);
+		traceshift = parameters(klle_shift);
+		max_iteration = parameters(max_iteration);
+		tolerance = parameters(spe_tolerance).checked().positive();
+		n_updates = parameters(spe_num_updates).checked().positive();
+		theta = parameters(sne_theta).checked().nonNegative();
+		squishing_rate = parameters(squishing_rate);
+		global_strategy = parameters(spe_global_strategy);
+		epsilon = parameters(fa_epsilon).checked().nonNegative();
+		perplexity = parameters(sne_perplexity).checked().nonNegative();
+		ratio = parameters(landmark_ratio);
 
 		if (!is_dummy<FeaturesCallback>::value)
 		{
@@ -149,7 +149,7 @@ public:
 
 private:
 
-	ParametersSet parameters;
+	stichwort::ParametersSet parameters;
 	Context context;
 	KernelCallback kernel;
 	DistanceCallback distance;
@@ -160,25 +160,25 @@ private:
 	RandomAccessIterator begin;
 	RandomAccessIterator end;
 
-	Parameter computation_strategy;
-	Parameter eigen_method;
-	Parameter neighbors_method;
-	Parameter eigenshift;
-	Parameter traceshift;
-	Parameter check_connectivity;
-	Parameter n_neighbors;
-	Parameter width;
-	Parameter timesteps;
-	Parameter ratio;
-	Parameter max_iteration;
-	Parameter tolerance;
-	Parameter n_updates;
-	Parameter perplexity;
-	Parameter theta;
-	Parameter squishing_rate;	
-	Parameter global_strategy;
-	Parameter epsilon;
-	Parameter target_dimension;
+	stichwort::Parameter computation_strategy;
+	stichwort::Parameter eigen_method;
+	stichwort::Parameter neighbors_method;
+	stichwort::Parameter eigenshift;
+	stichwort::Parameter traceshift;
+	stichwort::Parameter check_connectivity;
+	stichwort::Parameter n_neighbors;
+	stichwort::Parameter width;
+	stichwort::Parameter timesteps;
+	stichwort::Parameter ratio;
+	stichwort::Parameter max_iteration;
+	stichwort::Parameter tolerance;
+	stichwort::Parameter n_updates;
+	stichwort::Parameter perplexity;
+	stichwort::Parameter theta;
+	stichwort::Parameter squishing_rate;	
+	stichwort::Parameter global_strategy;
+	stichwort::Parameter epsilon;
+	stichwort::Parameter target_dimension;
 
 	IndexType n_vectors;
 	IndexType current_dimension;
@@ -505,7 +505,7 @@ template <class RandomAccessIterator, class KernelCallback,
 ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeaturesCallback>
 	initialize(RandomAccessIterator begin, RandomAccessIterator end,
 	           KernelCallback kernel, DistanceCallback distance, FeaturesCallback features,
-	           ParametersSet& pmap, const Context& ctx)
+	           stichwort::ParametersSet& pmap, const Context& ctx)
 {
 	return ImplementationBase<RandomAccessIterator,KernelCallback,DistanceCallback,FeaturesCallback>(
 			begin,end,kernel,distance,features,pmap,ctx);

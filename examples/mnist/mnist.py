@@ -33,7 +33,8 @@ def plot_embedding(embedding,data):
 		ab = AnnotationBbox(imagebox, (embedding[0][i], embedding[1,i]),pad=0.001,frameon=False)
 		ax.add_artist(ab)
 	plt.title('MNIST embedding')
-	plt.grid()
+	plt.axis('off')
+	#plt.grid()
 	plt.show()
 
 def export_json(outfile,embedding,data):

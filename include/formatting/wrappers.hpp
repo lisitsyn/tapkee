@@ -27,6 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef FORMATTING_WRAPPERS_H_
+#define FORMATTING_WRAPPERS_H_
+
 #include <limits>
 #include <iomanip>
 
@@ -219,3 +222,4 @@ static const wrappers::WidthWrapperBuilderHelper width;
 static const wrappers::PrecisionWrapperBuilderHelper precision;
 
 }
+#endif

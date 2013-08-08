@@ -21,7 +21,7 @@ namespace tapkee_internal
 	class CallbacksInitializedState
 	{
 	public:
-		CallbacksInitializedState(const ParametersSet& params, const KernelCallback& k,
+		CallbacksInitializedState(const stichwort::ParametersSet& params, const KernelCallback& k,
 								  const DistanceCallback& d, const FeaturesCallback& f) :
 			parameters(params), kernel(k), distance(d), features(f) { }
 
@@ -48,7 +48,7 @@ namespace tapkee_internal
 			return embedRange(container.begin(),container.end());
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 		KernelCallback kernel;
 		DistanceCallback distance;
 		FeaturesCallback features;
@@ -58,7 +58,7 @@ namespace tapkee_internal
 	class KernelAndDistanceInitializedState
 	{
 	public:
-		KernelAndDistanceInitializedState(const ParametersSet& params, const KernelCallback& k, const DistanceCallback& d) :
+		KernelAndDistanceInitializedState(const stichwort::ParametersSet& params, const KernelCallback& k, const DistanceCallback& d) :
 			parameters(params), kernel(k), distance(d) { }
 
 		/** Sets features callback.
@@ -96,7 +96,7 @@ namespace tapkee_internal
 			return embedRange(container.begin(),container.end());
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 		KernelCallback kernel;
 		DistanceCallback distance;
 	};
@@ -105,7 +105,7 @@ namespace tapkee_internal
 	class KernelAndFeaturesInitializedState
 	{
 	public:
-		KernelAndFeaturesInitializedState(const ParametersSet& params, const KernelCallback& k, const FeaturesCallback& f) :
+		KernelAndFeaturesInitializedState(const stichwort::ParametersSet& params, const KernelCallback& k, const FeaturesCallback& f) :
 			parameters(params), kernel(k), features(f) { }
 
 		/** Sets distance callback.
@@ -143,7 +143,7 @@ namespace tapkee_internal
 			return embedRange(container.begin(),container.end());
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 		KernelCallback kernel;
 		FeaturesCallback features;
 	};
@@ -157,7 +157,7 @@ namespace tapkee_internal
 	class DistanceAndFeaturesInitializedState
 	{
 	public:
-		DistanceAndFeaturesInitializedState(const ParametersSet& params, const DistanceCallback& d, const FeaturesCallback& f) :
+		DistanceAndFeaturesInitializedState(const stichwort::ParametersSet& params, const DistanceCallback& d, const FeaturesCallback& f) :
 			parameters(params), distance(d), features(f) { }
 
 		/** Sets kernel callback.
@@ -195,7 +195,7 @@ namespace tapkee_internal
 			return embedRange(container.begin(),container.end());
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 		DistanceCallback distance;
 		FeaturesCallback features;
 	};
@@ -204,7 +204,7 @@ namespace tapkee_internal
 	class KernelFirstInitializedState
 	{
 	public:
-		KernelFirstInitializedState(const ParametersSet& params, const KernelCallback& callback) :
+		KernelFirstInitializedState(const stichwort::ParametersSet& params, const KernelCallback& callback) :
 			parameters(params), kernel(callback) { }
 
 		/** Sets distance callback.
@@ -254,7 +254,7 @@ namespace tapkee_internal
 			return embedRange(container.begin(),container.end());
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 		KernelCallback kernel;
 	};
 
@@ -262,7 +262,7 @@ namespace tapkee_internal
 	class DistanceFirstInitializedState
 	{
 	public:
-		DistanceFirstInitializedState(const ParametersSet& params, const DistanceCallback& callback) :
+		DistanceFirstInitializedState(const stichwort::ParametersSet& params, const DistanceCallback& callback) :
 			parameters(params), distance(callback) { }
 
 		/** Sets kernel callback.
@@ -312,7 +312,7 @@ namespace tapkee_internal
 			return embedRange(container.begin(),container.end());
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 		DistanceCallback distance;
 	};
 
@@ -320,7 +320,7 @@ namespace tapkee_internal
 	class FeaturesFirstInitializedState
 	{
 	public:
-		FeaturesFirstInitializedState(const ParametersSet& params, const FeaturesCallback& callback) :
+		FeaturesFirstInitializedState(const stichwort::ParametersSet& params, const FeaturesCallback& callback) :
 			parameters(params), features(callback) { }
 
 		/** Sets kernel callback.
@@ -370,14 +370,14 @@ namespace tapkee_internal
 			return embedRange(container.begin(),container.end());
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 		FeaturesCallback features;
 	};
 
 	class ParametersInitializedState
 	{
 	public:
-		ParametersInitializedState(const ParametersSet& that) : parameters(that) { }
+		ParametersInitializedState(const stichwort::ParametersSet& that) : parameters(that) { }
 		ParametersInitializedState(const ParametersInitializedState&);
 		ParametersInitializedState& operator=(const ParametersInitializedState&);
 
@@ -430,7 +430,7 @@ namespace tapkee_internal
 			return tapkee::embed(indices.begin(),indices.end(),kcb,dcb,fcb,parameters);
 		}
 	private:
-		ParametersSet parameters;
+		stichwort::ParametersSet parameters;
 	};
 } /* End of namespace tapkee_internal */
 
@@ -455,7 +455,7 @@ struct initialize
 	 * @param parameters a set of parameters formed from keywords assigned
 	 *                   to values 
 	 */
-	tapkee_internal::ParametersInitializedState withParameters(const ParametersSet& parameters) const
+	tapkee_internal::ParametersInitializedState withParameters(const stichwort::ParametersSet& parameters) const
 	{
 		return tapkee_internal::ParametersInitializedState(parameters);
 	}

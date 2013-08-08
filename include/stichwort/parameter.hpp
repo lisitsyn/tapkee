@@ -1,21 +1,41 @@
-/* This software is distributed under BSD 3-clause license (see LICENSE file).
+/** Stichwort
  *
- * Copyright (c) 2012-2013 Sergey Lisitsyn
+ * Copyright (c) 2013, Sergey Lisitsyn <lisitsyn.s.o@gmail.com>
+ * All rights reserved.
+ *
+ * Distributed under the BSD 2-clause license:
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, 
+ *   this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, 
+ *   this list of conditions and the following disclaimer in the documentation 
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TAPKEE_PARAMETERS_H_
-#define TAPKEE_PARAMETERS_H_
+#ifndef STICHWORT_PARAMETER_H_
+#define STICHWORT_PARAMETER_H_
 
-/* Tapkee includes */
-#include <tapkee/parameters/value_keeper.hpp>
-#include <tapkee/utils/logging.hpp>
-/* End of Tapkee includes */
+#include <stichwort/value_keeper.hpp>
 
 #include <sstream>
 #include <vector>
 #include <map>
 
-namespace tapkee
+namespace stichwort
 {
 
 class ParametersSet;
@@ -32,7 +52,7 @@ private:
 	template <typename T>
 	Parameter(const ParameterName& pname, const T& value) : 
 		valid(true), invalidity_reason(),
-		parameter_name(pname), keeper(tapkee_internal::ValueKeeper(value))
+		parameter_name(pname), keeper(stichwort_internal::ValueKeeper(value))
 	{
 	}
 
@@ -46,7 +66,7 @@ public:
 
 	Parameter() : 
 		valid(false), invalidity_reason(),
-		parameter_name("unknown"), keeper(tapkee_internal::ValueKeeper())
+		parameter_name("unknown"), keeper(stichwort_internal::ValueKeeper())
 	{
 	}
 
@@ -65,7 +85,7 @@ public:
 	{
 		if (!isInitialized())
 		{
-			keeper = tapkee_internal::ValueKeeper(value);
+			keeper = stichwort_internal::ValueKeeper(value);
 		}
 		return *this;
 	}
@@ -192,7 +212,7 @@ private:
 
 	ParameterName parameter_name;
 
-	tapkee_internal::ValueKeeper keeper; 
+	stichwort_internal::ValueKeeper keeper; 
 
 };
 
@@ -227,9 +247,11 @@ public:
 	{
 		if (!parameter.isInRange(lower, upper))
 		{
-			std::string reason = formatting::format("Value of {} doesn't fit the range [{}, {})",
-					parameter.name(), parameter.getValue<T>(), lower, upper);
-			parameter.invalidate(reason);
+			std::stringstream reason;
+			reason << "Value of " << parameter.name() 
+				   << " doesn't fit the range [" << lower
+				   << ", " << upper << ")";
+			parameter.invalidate(reason.str());
 		}
 		return *this;
 	}
@@ -239,9 +261,11 @@ public:
 	{
 		if (!parameter.isInRange(lower, upper) && !parameter.is(upper))
 		{
-			std::string reason = formatting::format("Value of {} doesn't fit the range [{}, {}]",
-					parameter.name(), parameter.getValue<T>(), lower, upper);
-			parameter.invalidate(reason);
+			std::stringstream reason;
+			reason << "Value of " << parameter.name() 
+				   << " doesn't fit the range [" << lower
+				   << ", " << upper << "]";
+			parameter.invalidate(reason.str());
 		}
 		return *this;
 	}
@@ -250,8 +274,8 @@ public:
 	{
 		if (!parameter.isPositive())
 		{
-			std::string reason = formatting::format("Value of {} is not positive",
-					parameter.name());
+			std::string reason = "Value of " + parameter.name() + 
+				" is not positive";
 			parameter.invalidate(reason);
 		}
 		return *this;
@@ -261,8 +285,8 @@ public:
 	{
 		if (!parameter.isNonNegative())
 		{
-			std::string reason = formatting::format("Value of {} is negative",
-					parameter.name());
+			std::string reason = "Value of " + parameter.name() + 
+				" is negative";
 			parameter.invalidate(reason);
 		}
 		return *this;
@@ -292,7 +316,7 @@ public:
 	void add(const Parameter& p) 
 	{
 		if (pmap.count(p.name()))
-			throw multiple_parameter_error(formatting::format("Parameter {} is set more than once", p.name()));
+			throw multiple_parameter_error(p.name() + " is set more than once");
 
 		pmap[p.name()] = p;
 	}
@@ -320,7 +344,7 @@ public:
 		}
 		else
 		{
-			throw missed_parameter_error(formatting::format("Parameter {} is missed", name));
+			throw missed_parameter_error(name + " is missed");
 		}
 	}
 	ParametersSet& operator,(const Parameter& p)

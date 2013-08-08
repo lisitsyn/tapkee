@@ -3,7 +3,6 @@
 
 using namespace std;
 using namespace tapkee;
-using namespace tapkee::keywords;
 
 int main(int argc, const char** argv)
 {
