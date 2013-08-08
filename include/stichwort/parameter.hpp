@@ -34,6 +34,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <iostream>
 
 namespace stichwort
 {
@@ -65,7 +66,7 @@ public:
 	}
 
 	Parameter() : 
-		valid(false), invalidity_reason(),
+		valid(true), invalidity_reason(),
 		parameter_name("unknown"), keeper(stichwort_internal::ValueKeeper())
 	{
 	}

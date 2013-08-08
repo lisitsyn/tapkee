@@ -6,7 +6,6 @@
 #include "callbacks.hpp"
 
 using namespace tapkee;
-using namespace tapkee::keywords;
 
 TEST(Interface,ChainInterfaceOrder)
 {
@@ -119,7 +118,7 @@ TEST(Interface, NoDataPassThru)
 TEST(Interface, ParameterTargetDimension)
 {
 	int td = 3;
-	Parameter target_dimension = Parameter::create("td", td);
+	stichwort::Parameter target_dimension = stichwort::Parameter::create("td", td);
 	ASSERT_EQ(td,static_cast<int>(target_dimension));
 }
 
@@ -127,7 +126,7 @@ TEST(Interface, ParametersSet)
 {
 	int td = 3;
 	int k = 5;
-	ParametersSet pg = (target_dimension=td, num_neighbors=k);
+	stichwort::ParametersSet pg = (target_dimension=td, num_neighbors=k);
 	ASSERT_EQ(static_cast<int>(pg(target_dimension)),td);
 	ASSERT_EQ(static_cast<int>(pg(num_neighbors)),k);
 }
@@ -135,7 +134,7 @@ TEST(Interface, ParametersSet)
 TEST(Interface, OneParameterParametersSet)
 {
 	int td = 3;
-	ParametersSet pg = (target_dimension=td);
+	stichwort::ParametersSet pg = (target_dimension=td);
 	ASSERT_EQ(static_cast<int>(pg(target_dimension)),td);
 }
 
@@ -151,7 +150,7 @@ TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding)
 	TapkeeOutput output;
 	// fails with wrong parameter type as '-1' is not a valid value.
 	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=KernelLocallyLinearEmbedding,num_neighbors=-3)), 
-	             wrong_parameter_error);
+	             stichwort::wrong_parameter_error);
 }
 
 TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding) 
@@ -165,7 +164,7 @@ TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding)
 	TapkeeOutput output;
 	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,
 	                            (method=KernelLocallyLinearEmbedding,num_neighbors=6,num_neighbors=5)), 
-	             multiple_parameter_error);
+	             stichwort::multiple_parameter_error);
 }
 
 
@@ -199,7 +198,7 @@ TEST(Interface, NoReductionMethodSetFailPassThru)
 	TapkeeOutput output;
 	// should fail with missed parameter
 	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(eigen_method=Dense)),
-	             missed_parameter_error);
+	             stichwort::missed_parameter_error);
 }
 
 TEST(Interface, UnsupportedRandomizedForGeneralizedLE)

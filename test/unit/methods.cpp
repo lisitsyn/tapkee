@@ -12,7 +12,6 @@
 #include <set>
 
 using namespace tapkee;
-using namespace tapkee::keywords;
 
 void smoketest(DimensionReductionMethod m)
 {
