@@ -101,25 +101,45 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end,
 #endif
 	TapkeeOutput output;
 
-	parameters.merge(tapkee_internal::defaults);
-
-	DimensionReductionMethod selected_method = parameters(method);
-	
-	void (*progress_function_ptr)(double) = parameters(progress_function);
-	bool (*cancel_function_ptr)() = parameters(cancel_function);
-
-	tapkee_internal::Context context(progress_function_ptr,cancel_function_ptr);
-
 	try 
 	{
-		LoggingSingleton::instance().message_info(formatting::format("Using the {} method.", get_method_name(selected_method)));
+		parameters.check();
+		parameters.merge(tapkee_internal::defaults);
+
+		DimensionReductionMethod selected_method = parameters[method];
 		
-		output = tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,features_callback,parameters,context)
-		                         .embedUsing(selected_method);
+		void (*progress_function_ptr)(double) = parameters[progress_function];
+		bool (*cancel_function_ptr)() = parameters[cancel_function];
+
+		tapkee_internal::Context context(progress_function_ptr,cancel_function_ptr);
+
+		try 
+		{
+			LoggingSingleton::instance().message_info(formatting::format("Using the {} method.", get_method_name(selected_method)));
+			
+			output = tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,features_callback,parameters,context)
+									 .embedUsing(selected_method);
+		}
+		catch (const std::bad_alloc&)
+		{
+			throw not_enough_memory_error("Not enough memory");
+		}
 	}
-	catch (const std::bad_alloc&)
+	catch (const stichwort::wrong_parameter_error& ex)
 	{
-		throw not_enough_memory_error("Not enough memory");
+		throw tapkee::wrong_parameter_error(ex.what());
+	}
+	catch (const stichwort::wrong_parameter_type_error& ex)
+	{
+		throw tapkee::wrong_parameter_type_error(ex.what());
+	}
+	catch (const stichwort::multiple_parameter_error& ex)
+	{
+		throw tapkee::multiple_parameter_error(ex.what());
+	}
+	catch (const stichwort::missed_parameter_error& ex)
+	{
+		throw tapkee::missed_parameter_error(ex.what());
 	}
 
 	return output;

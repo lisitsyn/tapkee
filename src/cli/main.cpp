@@ -394,9 +394,10 @@ int run(int argc, const char** argv)
 	tapkee::LoggingSingleton::instance().message_info(ss.str());
 	
 	tapkee::TapkeeOutput output;
-
-	stichwort::ParametersSet parameters = 
-			(tapkee::method = tapkee_method,
+	
+	tapkee::ParametersSet parameters = 
+			tapkee::kwargs[
+			 tapkee::method = tapkee_method,
 			 tapkee::computation_strategy = tapkee_computation_strategy,
 			 tapkee::eigen_method = tapkee_eigen_method,
 			 tapkee::neighbors_method = tapkee_neighbors_method,
@@ -414,7 +415,8 @@ int run(int argc, const char** argv)
 			 tapkee::fa_epsilon = fa_eps,
 			 tapkee::sne_perplexity = perplexity,
 			 tapkee::sne_theta = theta,
-			 tapkee::squishing_rate = squishing);
+			 tapkee::squishing_rate = squishing];
+
 
 #ifdef USE_PRECOMPUTED
 	vector<tapkee::IndexType> indices(input_data.cols());

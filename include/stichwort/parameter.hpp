@@ -35,6 +35,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <list>
 
 namespace stichwort
 {
@@ -310,14 +311,36 @@ class ParametersSet
 public:
 
 	typedef std::map<std::string, Parameter> ParametersMap;
+	typedef std::list<std::string> DuplicatesList;
 
-	ParametersSet() : pmap() 
+	ParametersSet() : pmap(), dups()
 	{
+	}
+	ParametersSet(const ParametersSet& other) : pmap(other.pmap), dups(other.dups)
+	{
+	}
+	ParametersSet& operator=(const ParametersSet& other)
+	{
+		this->pmap = other.pmap;
+		this->dups = other.dups;
+		return *this;
+	}
+	void check() 
+	{
+		if (!dups.empty())
+		{
+			std::stringstream ss;
+			ss << "The following parameters are set more than once: ";
+			for (DuplicatesList::const_iterator iter=dups.begin(); iter!=dups.end(); ++iter)
+				ss << *iter << " ";
+
+			throw multiple_parameter_error(ss.str());
+		}
 	}
 	void add(const Parameter& p) 
 	{
 		if (pmap.count(p.name()))
-			throw multiple_parameter_error(p.name() + " is set more than once");
+			dups.push_back(p.name());
 
 		pmap[p.name()] = p;
 	}
@@ -336,7 +359,7 @@ public:
 			}
 		}
 	}
-	Parameter operator()(const std::string& name) const
+	Parameter operator[](const std::string& name) const
 	{
 		ParametersMap::const_iterator it = pmap.find(name);
 		if (it != pmap.end())
@@ -357,6 +380,7 @@ public:
 private:
 
 	ParametersMap pmap;
+	DuplicatesList dups;
 };
 
 ParametersSet Parameter::operator,(const Parameter& p)

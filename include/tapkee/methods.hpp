@@ -45,7 +45,7 @@ public:
 
 	ImplementationBase(RandomAccessIterator b, RandomAccessIterator e,
 	                   KernelCallback k, DistanceCallback d, FeaturesCallback f,
-	                   stichwort::ParametersSet& pmap, const Context& ctx) : 
+	                   ParametersSet& pmap, const Context& ctx) : 
 		parameters(pmap), context(ctx), kernel(k), distance(d), features(f),
 		plain_distance(PlainDistance<RandomAccessIterator,DistanceCallback>(distance)),
 		kernel_distance(KernelDistance<RandomAccessIterator,KernelCallback>(kernel)),
@@ -58,8 +58,8 @@ public:
 	{
 		n_vectors = (end-begin);
 
-		p_target_dimension = parameters(target_dimension);
-		p_n_neighbors = parameters(num_neighbors).checked().positive();
+		p_target_dimension = parameters[target_dimension];
+		p_n_neighbors = parameters[num_neighbors].checked().positive();
 		
 		if (n_vectors > 0)
 		{
@@ -69,23 +69,23 @@ public:
 				.inRange(static_cast<IndexType>(3),static_cast<IndexType>(n_vectors));
 		}
 
-		p_computation_strategy = parameters(computation_strategy);
-		p_eigen_method = parameters(eigen_method);
-		p_neighbors_method = parameters(neighbors_method);
-		p_check_connectivity = parameters(check_connectivity);
-		p_width = parameters(gaussian_kernel_width).checked().positive();
-		p_timesteps = parameters(diffusion_map_timesteps).checked().positive();
-		p_eigenshift = parameters(nullspace_shift);
-		p_traceshift = parameters(klle_shift);
-		p_max_iteration = parameters(max_iteration);
-		p_tolerance = parameters(spe_tolerance).checked().positive();
-		p_n_updates = parameters(spe_num_updates).checked().positive();
-		p_theta = parameters(sne_theta).checked().nonNegative();
-		p_squishing_rate = parameters(squishing_rate);
-		p_global_strategy = parameters(spe_global_strategy);
-		p_epsilon = parameters(fa_epsilon).checked().nonNegative();
-		p_perplexity = parameters(sne_perplexity).checked().nonNegative();
-		p_ratio = parameters(landmark_ratio);
+		p_computation_strategy = parameters[computation_strategy];
+		p_eigen_method = parameters[eigen_method];
+		p_neighbors_method = parameters[neighbors_method];
+		p_check_connectivity = parameters[check_connectivity];
+		p_width = parameters[gaussian_kernel_width].checked().positive();
+		p_timesteps = parameters[diffusion_map_timesteps].checked().positive();
+		p_eigenshift = parameters[nullspace_shift];
+		p_traceshift = parameters[klle_shift];
+		p_max_iteration = parameters[max_iteration];
+		p_tolerance = parameters[spe_tolerance].checked().positive();
+		p_n_updates = parameters[spe_num_updates].checked().positive();
+		p_theta = parameters[sne_theta].checked().nonNegative();
+		p_squishing_rate = parameters[squishing_rate];
+		p_global_strategy = parameters[spe_global_strategy];
+		p_epsilon = parameters[fa_epsilon].checked().nonNegative();
+		p_perplexity = parameters[sne_perplexity].checked().nonNegative();
+		p_ratio = parameters[landmark_ratio];
 
 		if (!is_dummy<FeaturesCallback>::value)
 		{
@@ -149,7 +149,7 @@ public:
 
 private:
 
-	stichwort::ParametersSet parameters;
+	ParametersSet parameters;
 	Context context;
 	KernelCallback kernel;
 	DistanceCallback distance;
@@ -160,25 +160,25 @@ private:
 	RandomAccessIterator begin;
 	RandomAccessIterator end;
 
-	stichwort::Parameter p_computation_strategy;
-	stichwort::Parameter p_eigen_method;
-	stichwort::Parameter p_neighbors_method;
-	stichwort::Parameter p_eigenshift;
-	stichwort::Parameter p_traceshift;
-	stichwort::Parameter p_check_connectivity;
-	stichwort::Parameter p_n_neighbors;
-	stichwort::Parameter p_width;
-	stichwort::Parameter p_timesteps;
-	stichwort::Parameter p_ratio;
-	stichwort::Parameter p_max_iteration;
-	stichwort::Parameter p_tolerance;
-	stichwort::Parameter p_n_updates;
-	stichwort::Parameter p_perplexity;
-	stichwort::Parameter p_theta;
-	stichwort::Parameter p_squishing_rate;	
-	stichwort::Parameter p_global_strategy;
-	stichwort::Parameter p_epsilon;
-	stichwort::Parameter p_target_dimension;
+	Parameter p_computation_strategy;
+	Parameter p_eigen_method;
+	Parameter p_neighbors_method;
+	Parameter p_eigenshift;
+	Parameter p_traceshift;
+	Parameter p_check_connectivity;
+	Parameter p_n_neighbors;
+	Parameter p_width;
+	Parameter p_timesteps;
+	Parameter p_ratio;
+	Parameter p_max_iteration;
+	Parameter p_tolerance;
+	Parameter p_n_updates;
+	Parameter p_perplexity;
+	Parameter p_theta;
+	Parameter p_squishing_rate;	
+	Parameter p_global_strategy;
+	Parameter p_epsilon;
+	Parameter p_target_dimension;
 
 	IndexType n_vectors;
 	IndexType current_dimension;

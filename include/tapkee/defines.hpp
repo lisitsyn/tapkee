@@ -58,6 +58,10 @@ namespace tapkee
 		tapkee::DenseMatrix embedding;
 		tapkee::ProjectingFunction projection;
 	};
+
+	const stichwort::ParametersForwarder kwargs;
+	typedef stichwort::ParametersSet ParametersSet;
+	typedef stichwort::Parameter Parameter;
 }
 
 #endif // TAPKEE_DEFINES_H_

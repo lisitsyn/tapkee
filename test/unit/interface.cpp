@@ -118,7 +118,7 @@ TEST(Interface, NoDataPassThru)
 TEST(Interface, ParameterTargetDimension)
 {
 	int td = 3;
-	stichwort::Parameter target_dimension = stichwort::Parameter::create("td", td);
+	tapkee::Parameter target_dimension = tapkee::Parameter::create("td", td);
 	ASSERT_EQ(td,static_cast<int>(target_dimension));
 }
 
@@ -126,16 +126,16 @@ TEST(Interface, ParametersSet)
 {
 	int td = 3;
 	int k = 5;
-	stichwort::ParametersSet pg = (target_dimension=td, num_neighbors=k);
-	ASSERT_EQ(static_cast<int>(pg(target_dimension)),td);
-	ASSERT_EQ(static_cast<int>(pg(num_neighbors)),k);
+	tapkee::ParametersSet pg = tapkee::kwargs[target_dimension=td, num_neighbors=k];
+	ASSERT_EQ(static_cast<int>(pg[target_dimension]),td);
+	ASSERT_EQ(static_cast<int>(pg[num_neighbors]),k);
 }
 
 TEST(Interface, OneParameterParametersSet)
 {
 	int td = 3;
-	stichwort::ParametersSet pg = (target_dimension=td);
-	ASSERT_EQ(static_cast<int>(pg(target_dimension)),td);
+	tapkee::ParametersSet pg = tapkee::kwargs[target_dimension=td];
+	ASSERT_EQ(static_cast<int>(pg[target_dimension]),td);
 }
 
 TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding) 
@@ -149,8 +149,8 @@ TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding)
 
 	TapkeeOutput output;
 	// fails with wrong parameter type as '-1' is not a valid value.
-	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=KernelLocallyLinearEmbedding,num_neighbors=-3)), 
-	             stichwort::wrong_parameter_error);
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,tapkee::kwargs[method=KernelLocallyLinearEmbedding,num_neighbors=-3]), 
+	             wrong_parameter_error);
 }
 
 TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding) 
@@ -161,10 +161,11 @@ TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding)
 	tapkee::dummy_distance_callback<int> dcb;
 	tapkee::dummy_features_callback<int> fcb;
 
-	TapkeeOutput output;
-	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,
-	                            (method=KernelLocallyLinearEmbedding,num_neighbors=6,num_neighbors=5)), 
-	             stichwort::multiple_parameter_error);
+	tapkee::TapkeeOutput output;
+	tapkee::ParametersSet parameters;
+	ASSERT_THROW((output = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,
+		tapkee::kwargs[method=KernelLocallyLinearEmbedding,num_neighbors=6,num_neighbors=5])),
+		multiple_parameter_error);
 }
 
 
@@ -183,7 +184,7 @@ TEST(Interface, CancellationPassThru)
 
 	TapkeeOutput output;
 	// should cancel
-	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=PassThru,cancel_function=always_cancel)),
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,tapkee::kwargs[method=PassThru,cancel_function=always_cancel]),
 	             cancelled_exception);
 }
 
@@ -197,8 +198,8 @@ TEST(Interface, NoReductionMethodSetFailPassThru)
 
 	TapkeeOutput output;
 	// should fail with missed parameter
-	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(eigen_method=Dense)),
-	             stichwort::missed_parameter_error);
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,tapkee::kwargs[eigen_method=Dense]),
+	             missed_parameter_error);
 }
 
 TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
@@ -212,7 +213,7 @@ TEST(Interface, UnsupportedRandomizedForGeneralizedLE)
 	tapkee::dummy_features_callback<int> fcb;
 
 	TapkeeOutput output;
-	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=LaplacianEigenmaps,eigen_method=Randomized)),
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,tapkee::kwargs[method=LaplacianEigenmaps,eigen_method=Randomized]),
 	             unsupported_method_error);
 }
 
@@ -228,7 +229,7 @@ TEST(Interface, EigenDecompositionFailMDS)
 	tapkee::dummy_features_callback<float> fcb;
 
 	TapkeeOutput output;
-	ASSERT_THROW(output = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,(method=MultidimensionalScaling,eigen_method=Randomized)),
+	ASSERT_THROW(output = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,tapkee::kwargs[method=MultidimensionalScaling,eigen_method=Randomized]),
 	             eigendecomposition_error);
 }
 
@@ -245,6 +246,6 @@ TEST(Interface, NotEnoughMemoryMDS)
 
 	tapkee::TapkeeOutput output;
 	// tries to form 10000000 x 10000000 matrix (won't work on any machine in 2013)
-	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,(method=MultidimensionalScaling,eigen_method=Dense)),
+	ASSERT_THROW(output = embed(data.begin(),data.end(),kcb,dcb,fcb,tapkee::kwargs[method=MultidimensionalScaling,eigen_method=Dense]),
 	             not_enough_memory_error);
 }

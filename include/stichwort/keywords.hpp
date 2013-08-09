@@ -83,10 +83,23 @@ namespace stichwort
 		Name name;
 		T default_value;
 	};
+	
+	struct ParametersForwarder
+	{
+		ParametersSet operator[](ParametersSet parameters) const
+		{
+			return parameters;
+		}
+	};
 
-	/** The default value - assigning any keyword to this
-	 * static struct produces a parameter with its default value.
-	 */
-	const DefaultValue by_default;
+	namespace
+	{
+		/** The default value - assigning any keyword to this
+		 * static struct produces a parameter with its default value.
+		 */
+		const DefaultValue by_default;
+
+		const ParametersForwarder kwargs;
+	}
 }
 #endif
