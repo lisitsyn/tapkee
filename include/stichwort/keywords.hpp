@@ -86,6 +86,12 @@ namespace stichwort
 	
 	struct ParametersForwarder
 	{
+		ParametersForwarder()
+		{
+
+		}
+		ParametersForwarder(const ParametersForwarder&);
+		ParametersForwarder& operator=(const ParametersForwarder&);
 		ParametersSet operator[](ParametersSet parameters) const
 		{
 			return parameters;
