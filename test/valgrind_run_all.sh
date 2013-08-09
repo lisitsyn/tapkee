@@ -11,9 +11,9 @@ $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m lltsa -k 15 | $TRANSFORM
 echo "===== Hessian Locally Linear Embedding (k=15) ======"
 $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m hlle -k 15 | $TRANSFORM
 echo "===== Diffusion map (t=2, w=10.0, arpack) ======"
-$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -t 2 -w 10.0 | $TRANSFORM
+$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -t 2 -gw 10.0 | $TRANSFORM
 echo "===== Diffusion map (t=2, w=10.0, randomized) ======"
-$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -em randomized -t 2 -w 10.0 | $TRANSFORM
+$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m diffusion_map -em randomized -t 2 -gw 10.0 | $TRANSFORM
 echo "===== Multidimensional scaling (arpack) ======"
 $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m mds | $TRANSFORM
 echo "===== Multidimensional scaling (randomized) ======"
@@ -31,9 +31,9 @@ $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m l-isomap -k 15 --landmark
 echo "===== Landmark Isomap (k=15, randomized) ======"
 $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m l-isomap -k 15 -em randomized --landmark-ratio 0.1 | $TRANSFORM
 echo "===== Laplacian Eigenmaps (w=1000.0) ======"
-$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m laplacian_eigenmaps -w 1000.0 | $TRANSFORM
+$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m laplacian_eigenmaps -gw 1000.0 | $TRANSFORM
 echo "===== Locality Preserving Projections (w=1000.0) ======"
-$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m lpp -w 1000.0 | $TRANSFORM
+$CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m lpp -gw 1000.0 | $TRANSFORM
 echo "===== PCA (arpack) ======"
 $CALLENV $TAPKEE_ELF -i $INPUT_FILE -o $OUTPUT_FILE -m pca  | $TRANSFORM
 echo "===== PCA (randomized) ======"
