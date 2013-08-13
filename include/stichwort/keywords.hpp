@@ -62,6 +62,7 @@ namespace stichwort
 	struct ParameterKeyword
 	{
 		typedef std::string Name;
+		typedef T Type;
 
 		ParameterKeyword(const Name& n, const T& dv) : name(n), default_value(dv) { }
 		ParameterKeyword(const ParameterKeyword& pk);

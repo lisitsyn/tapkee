@@ -113,17 +113,14 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end,
 
 		tapkee_internal::Context context(progress_function_ptr,cancel_function_ptr);
 
-		try 
-		{
-			LoggingSingleton::instance().message_info(formatting::format("Using the {} method.", get_method_name(selected_method)));
-			
-			output = tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,features_callback,parameters,context)
-									 .embedUsing(selected_method);
-		}
-		catch (const std::bad_alloc&)
-		{
-			throw not_enough_memory_error("Not enough memory");
-		}
+		LoggingSingleton::instance().message_info(formatting::format("Using the {} method.", get_method_name(selected_method)));
+		
+		output = tapkee_internal::initialize(begin,end,kernel_callback,distance_callback,features_callback,parameters,context)
+								 .embedUsing(selected_method);
+	}
+	catch (const std::bad_alloc&)
+	{
+		throw not_enough_memory_error("Not enough memory");
 	}
 	catch (const stichwort::wrong_parameter_error& ex)
 	{

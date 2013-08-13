@@ -37,6 +37,64 @@ namespace tapkee
 namespace tapkee_internal
 {
 
+template <typename T>
+struct Positivity
+{
+	inline bool operator()(T v) const
+	{
+		return v>0;
+	}
+	inline std::string failureMessage(const stichwort::Parameter& p) const
+	{
+		return formatting::format("Positivity check failed for {}, its value is {}", p.name(), p.repr());
+	}
+};
+
+template <typename T>
+struct NonNegativity
+{
+	inline bool operator()(T v) const
+	{
+		return v>=0;
+	}
+	inline std::string failureMessage(const stichwort::Parameter& p) const
+	{
+		return formatting::format("Non-negativity check failed for {}, its value is {}", p.name(), p.repr());
+	}
+};
+
+template <typename T>
+struct InRange
+{
+	InRange(T l, T u) : lower(l), upper(u) { }
+	inline bool operator()(T v) const
+	{
+		return (v>=lower) && (v<upper);
+	}
+	T lower;
+	T upper;
+	inline std::string failureMessage(const stichwort::Parameter& p) const
+	{
+		return formatting::format("[{}, {}) range check failed for {}, its value is {}", lower, upper, p.name(), p.repr());
+	}
+};
+
+template <typename T>
+struct InClosedRange
+{
+	InClosedRange(T l, T u) : lower(l), upper(u) { }
+	inline bool operator()(T v) const
+	{
+		return (v>=lower) && (v<=upper);
+	}
+	T lower;
+	T upper;
+	inline std::string failureMessage(const stichwort::Parameter& p) const
+	{
+		return formatting::format("[{}, {}] range check failed for {}, its value is {}", lower, upper, p.name(), p.repr());
+	}
+};
+
 template <class RandomAccessIterator, class KernelCallback,
           class DistanceCallback, class FeaturesCallback>
 class ImplementationBase
@@ -59,42 +117,36 @@ public:
 		n_vectors = (end-begin);
 
 		p_target_dimension = parameters[target_dimension];
-		p_n_neighbors = parameters[num_neighbors].checked().positive();
+		p_n_neighbors = parameters[num_neighbors].checked().satisfies(Positivity<IndexType>());
 		
 		if (n_vectors > 0)
 		{
-			p_target_dimension.checked()
-				.inRange(static_cast<IndexType>(1),static_cast<IndexType>(n_vectors));
-			p_n_neighbors.checked()
-				.inRange(static_cast<IndexType>(3),static_cast<IndexType>(n_vectors));
+			p_target_dimension.checked().satisfies(InRange<IndexType>(1,n_vectors));
+			p_n_neighbors.checked().satisfies(InRange<IndexType>(3,n_vectors));
 		}
 
 		p_computation_strategy = parameters[computation_strategy];
 		p_eigen_method = parameters[eigen_method];
 		p_neighbors_method = parameters[neighbors_method];
 		p_check_connectivity = parameters[check_connectivity];
-		p_width = parameters[gaussian_kernel_width].checked().positive();
-		p_timesteps = parameters[diffusion_map_timesteps].checked().positive();
+		p_width = parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>());
+		p_timesteps = parameters[diffusion_map_timesteps].checked().satisfies(Positivity<IndexType>());
 		p_eigenshift = parameters[nullspace_shift];
 		p_traceshift = parameters[klle_shift];
 		p_max_iteration = parameters[max_iteration];
-		p_tolerance = parameters[spe_tolerance].checked().positive();
-		p_n_updates = parameters[spe_num_updates].checked().positive();
-		p_theta = parameters[sne_theta].checked().nonNegative();
+		p_tolerance = parameters[spe_tolerance].checked().satisfies(Positivity<ScalarType>());
+		p_n_updates = parameters[spe_num_updates].checked().satisfies(Positivity<IndexType>());
+		p_theta = parameters[sne_theta].checked().satisfies(NonNegativity<ScalarType>());
 		p_squishing_rate = parameters[squishing_rate];
 		p_global_strategy = parameters[spe_global_strategy];
-		p_epsilon = parameters[fa_epsilon].checked().nonNegative();
-		p_perplexity = parameters[sne_perplexity].checked().nonNegative();
+		p_epsilon = parameters[fa_epsilon].checked().satisfies(NonNegativity<ScalarType>());
+		p_perplexity = parameters[sne_perplexity].checked().satisfies(NonNegativity<ScalarType>());
 		p_ratio = parameters[landmark_ratio];
 
 		if (!is_dummy<FeaturesCallback>::value)
-		{
 			current_dimension = features.dimension();
-		}
 		else
-		{
 			current_dimension = 0;
-		}
 	}
 
 	TapkeeOutput embedUsing(DimensionReductionMethod method)
@@ -252,9 +304,7 @@ private:
 
 	TapkeeOutput embedLandmarkMultidimensionalScaling()
 	{
-		p_ratio.checked()
-			.inClosedRange(static_cast<ScalarType>(3.0/n_vectors),
-			               static_cast<ScalarType>(1.0));
+		p_ratio.checked().satisfies(InClosedRange<ScalarType>(3.0/n_vectors,1.0));
 
 		Landmarks landmarks = 
 			select_landmarks_random(begin,end,p_ratio);
@@ -293,9 +343,7 @@ private:
 
 	TapkeeOutput embedLandmarkIsomap()
 	{
-		p_ratio.checked()
-			.inClosedRange(static_cast<ScalarType>(3.0/n_vectors),
-			               static_cast<ScalarType>(1.0));
+		p_ratio.checked().satisfies(InClosedRange<ScalarType>(3.0/n_vectors,1.0));
 
 		Neighbors neighbors = findNeighborsWith(plain_distance);
 		Landmarks landmarks = 
@@ -468,9 +516,7 @@ private:
 
 	TapkeeOutput embedtDistributedStochasticNeighborEmbedding()
 	{
-		p_perplexity.checked()
-			.inClosedRange(static_cast<ScalarType>(0.0),
-			               static_cast<ScalarType>((n_vectors-1)/3.0));
+		p_perplexity.checked().satisfies(InClosedRange<ScalarType>(0.0,(n_vectors-1)/3.0));
 
 		DenseMatrix data = 
 			dense_matrix_from_features(features, current_dimension, begin, end);
@@ -484,9 +530,7 @@ private:
 
 	TapkeeOutput embedManifoldSculpting()
 	{
-		p_squishing_rate.checked()
-			.inRange(static_cast<ScalarType>(0.0),
-			         static_cast<ScalarType>(1.0));
+		p_squishing_rate.checked().satisfies(InRange<ScalarType>(0.0,1.0));
 
 		DenseMatrix embedding =
 			dense_matrix_from_features(features, current_dimension, begin, end);

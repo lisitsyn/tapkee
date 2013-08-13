@@ -16,7 +16,7 @@
 
 #define TAPKEE_WORLD_VERSION 1
 #define TAPKEE_MAJOR_VERSION 0
-#define TAPKEE_MINOR_VERSION 1
+#define TAPKEE_MINOR_VERSION 2
 
 /* Tapkee includes */
 #include <tapkee/defines/eigen3.hpp>

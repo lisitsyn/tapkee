@@ -29,10 +29,34 @@
 #ifndef STICHWORT_POLICY_H_
 #define STICHWORT_POLICY_H_
 
+#include <string>
+#include <sstream>
+
 namespace stichwort
 {
 namespace stichwort_internal
 {
+namespace streams_sfinae
+{
+	typedef char yes;
+	typedef long no;
+
+	struct any_wrapper
+	{
+		template <class T> any_wrapper(const T&); 
+	};
+	no operator<<(const any_wrapper&, const any_wrapper&);
+	template <class T> yes check(T const&);
+	no check(no);
+
+	template <typename S, typename T>
+	struct supports_saving
+	{
+		static S& s;
+		static T& x;
+		static const bool value = sizeof(check(s << x)) == sizeof(yes);
+	};
+}
 
 struct TypePolicyBase
 {
@@ -42,6 +66,13 @@ struct TypePolicyBase
 	virtual void free(void**) const = 0;
 	virtual void clone(void* const*, void**) const = 0;
 	virtual void move(void* const*, void**) const = 0;
+	virtual std::string repr(void **) const = 0;
+};
+
+template <typename T, bool>
+struct repr_impl_if_streaming_supported
+{
+	std::string operator()(const TypePolicyBase* const impl, void** src) const;
 };
 
 template <typename T>
@@ -72,137 +103,47 @@ struct PointerTypePolicyImpl : public TypePolicyBase
 		(*reinterpret_cast<T**>(dest))->~T();
 		**reinterpret_cast<T**>(dest) = **reinterpret_cast<T* const*>(src); 
 	}
+	inline virtual std::string repr(void** src) const
+	{
+		return repr_impl_if_streaming_supported<T,streams_sfinae::supports_saving<std::stringstream,T>::value>()(this,src);
+	}
+};
+
+struct EmptyType;
+
+template <>
+std::string PointerTypePolicyImpl<EmptyType>::repr(void**) const
+{
+	return "uninitialized";
+}
+
+template <typename T>
+struct repr_impl_if_streaming_supported<T,true>
+{
+	std::string operator()(const TypePolicyBase* const impl, void** src) const
+	{
+		void* vv = impl->getValue(src);
+		T* vp = reinterpret_cast<T*>(vv);
+		T v = *vp;
+		std::stringstream ss;
+		ss << v;
+		return ss.str();
+	}
+};
+
+template <typename T>
+struct repr_impl_if_streaming_supported<T,false>
+{
+	std::string operator()(const TypePolicyBase* const, void**) const
+	{
+		return "(can't obtain value)";
+	}
 };
 
 template <typename T>
 TypePolicyBase* getPolicy()
 {
 	static PointerTypePolicyImpl<T> policy;
-	return &policy;
-}
-
-struct CheckerPolicyBase
-{
-	virtual ~CheckerPolicyBase() {}
-	virtual bool isInRange(void* const*, void*, void*) const = 0;
-	virtual bool isEqual(void* const*, void*) const = 0;
-	virtual bool isNotEqual(void* const*, void*) const = 0;
-	virtual bool isPositive(void* const*) const = 0;
-	virtual bool isNonNegative(void * const*) const = 0;
-	virtual bool isNegative(void* const*) const = 0;
-	virtual bool isNonPositive(void * const*) const = 0;
-	virtual bool isGreater(void* const*, void*) const = 0;
-	virtual bool isLesser(void* const*, void*) const = 0;
-};
-
-template <typename T>
-struct PointerCheckerPolicyImpl : public CheckerPolicyBase
-{
-	virtual bool isInRange(void* const*, void*, void*) const
-	{
-		return false;
-	}
-	virtual bool isEqual(void* const*, void*) const
-	{
-		return false;
-	}
-	virtual bool isNotEqual(void* const*, void*) const
-	{
-		return false;
-	}
-	virtual bool isPositive(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isNonNegative(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isNegative(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isNonPositive(void* const*) const
-	{
-		return false;
-	}
-	virtual bool isGreater(void* const*, void*) const
-	{
-		return false;
-	}
-	virtual bool isLesser(void* const*, void*) const
-	{
-		return false;
-	}
-};
-
-#define default_policy_for(Type) \
-template <>																		\
-struct PointerCheckerPolicyImpl<Type> : public CheckerPolicyBase				\
-{																				\
-	inline Type value(void* v) const											\
-	{																			\
-		return *reinterpret_cast<Type*>(v);										\
-	}																			\
-	virtual bool isInRange(void* const* src, void* lower, void* upper) const	\
-	{																			\
-		Type v = value(*src);													\
-		Type l = value(lower);													\
-		Type u = value(upper);													\
-		return (v>=l) && (v<u);													\
-	}																			\
-	virtual bool isEqual(void* const* src, void* other_src) const				\
-	{																			\
-		Type v = value(*src);													\
-		Type ov = value(other_src);												\
-		return (v==ov);															\
-	}																			\
-	virtual bool isNotEqual(void* const* src, void* other_src) const			\
-	{																			\
-		Type v = value(*src);													\
-		Type ov = value(other_src);												\
-		return (v!=ov);															\
-	}																			\
-	virtual bool isPositive(void* const* src) const								\
-	{																			\
-		Type v = value(*src);													\
-		return (v>0);															\
-	}																			\
-	virtual bool isNonNegative(void* const* src) const							\
-	{																			\
-		Type v = value(*src);													\
-		return (v>=0);															\
-	}																			\
-	virtual bool isNegative(void* const* src) const								\
-	{																			\
-		Type v = value(*src);													\
-		return (v<0);															\
-	}																			\
-	virtual bool isNonPositive(void* const* src) const							\
-	{																			\
-		Type v = value(*src);													\
-		return (v<=0);															\
-	}																			\
-	virtual bool isGreater(void* const* src, void* lower) const					\
-	{																			\
-		Type v = value(*src);													\
-		return (v>value(lower));												\
-	}																			\
-	virtual bool isLesser(void* const* src, void* upper) const					\
-	{																			\
-		Type v = value(*src);													\
-		return (v<value(upper));												\
-	}																			\
-}
-
-default_policy_for(double);
-default_policy_for(float);
-default_policy_for(int);
-
-template <typename T>
-CheckerPolicyBase* getCheckerPolicy()
-{
-	static PointerCheckerPolicyImpl<T> policy;
 	return &policy;
 }
 

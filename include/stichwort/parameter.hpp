@@ -53,7 +53,7 @@ private:
 
 	template <typename T>
 	Parameter(const ParameterName& pname, const T& value) : 
-		valid(true), invalidity_reason(),
+		valid(true), invalidity_reasons(),
 		parameter_name(pname), keeper(stichwort_internal::ValueKeeper(value))
 	{
 	}
@@ -67,13 +67,13 @@ public:
 	}
 
 	Parameter() : 
-		valid(true), invalidity_reason(),
+		valid(true), invalidity_reasons(),
 		parameter_name("unknown"), keeper(stichwort_internal::ValueKeeper())
 	{
 	}
 
 	Parameter(const Parameter& p) : 
-		valid(p.valid), invalidity_reason(p.invalidity_reason),
+		valid(p.valid), invalidity_reasons(p.invalidity_reasons),
 		parameter_name(p.name()), keeper(p.keeper)
 	{
 	}
@@ -97,7 +97,7 @@ public:
 	{
 		if (!valid)
 		{
-			throw wrong_parameter_error(invalidity_reason);
+			throw wrong_parameter_error(invalidity_reasons);
 		}
 		try 
 		{
@@ -130,59 +130,25 @@ public:
 
 	CheckedParameter checked();
 
-	template <typename T>
-	bool isInRange(T lower, T upper) const
-	{
-		return keeper.inRange<T>(lower, upper);
-	}
-
-	template <typename T>
-	bool isEqual(T value) const
-	{
-		return keeper.equal<T>(value);
-	}
-
-	template <typename T>
-	bool isNotEqual(T value) const
-	{
-		return keeper.notEqual<T>(value);
-	}
-
-	bool isPositive() const 
-	{
-		return keeper.positive();
-	}
-	
-	bool isNonNegative() const 
-	{
-		return keeper.nonNegative();
-	}
-
-	bool isNegative() const
-	{
-		return keeper.negative();
-	}
-
-	template <typename T>
-	bool isGreater(T lower) const
-	{
-		return keeper.greater<T>(lower);
-	}
-
-	template <typename T>
-	bool isLesser(T upper) const
-	{
-		return keeper.lesser<T>(upper);
-	}
-
 	bool isInitialized() const
 	{
 		return keeper.isInitialized();
+	}
+	
+	template <template<class> class F, class Q>
+	inline bool isCondition(F<Q> cond) const
+	{
+		return keeper.isCondition(cond);
 	}
 
 	ParameterName name() const 
 	{
 		return parameter_name;
+	}
+
+	std::string repr() const
+	{
+		return keeper.repr();
 	}
 
 	ParametersSet operator,(const Parameter& p);
@@ -203,17 +169,17 @@ private:
 
 	inline void invalidate(const std::string& reason)
 	{
-		valid = false;
-		invalidity_reason = reason;
+		if (valid) 
+			valid = false;
+
+		invalidity_reasons += reason;
 	}
 
 private:
 
 	bool valid;
-	std::string invalidity_reason;
-
+	std::string invalidity_reasons;
 	ParameterName parameter_name;
-
 	stichwort_internal::ValueKeeper keeper; 
 
 };
@@ -238,62 +204,20 @@ public:
 		return parameter.is<T>(v);
 	}
 
+	template <template<class> class F, class Q>
+	inline Parameter& satisfies(const F<Q>& cond) const
+	{
+		if (!parameter.isCondition(cond))
+			parameter.invalidate(cond.failureMessage(parameter));
+
+		return parameter;
+	}
+
 	template <typename T>
 	bool operator==(T v)
 	{
 		return is<T>(v);
 	}
-
-	template <typename T>
-	CheckedParameter& inRange(T lower, T upper)
-	{
-		if (!parameter.isInRange(lower, upper))
-		{
-			std::stringstream reason;
-			reason << "Value of " << parameter.name() 
-				   << " doesn't fit the range [" << lower
-				   << ", " << upper << ")";
-			parameter.invalidate(reason.str());
-		}
-		return *this;
-	}
-
-	template <typename T>
-	CheckedParameter& inClosedRange(T lower, T upper)
-	{
-		if (!parameter.isInRange(lower, upper) && !parameter.is(upper))
-		{
-			std::stringstream reason;
-			reason << "Value of " << parameter.name() 
-				   << " doesn't fit the range [" << lower
-				   << ", " << upper << "]";
-			parameter.invalidate(reason.str());
-		}
-		return *this;
-	}
-
-	CheckedParameter& positive()
-	{
-		if (!parameter.isPositive())
-		{
-			std::string reason = "Value of " + parameter.name() + 
-				" is not positive";
-			parameter.invalidate(reason);
-		}
-		return *this;
-	}
-
-	CheckedParameter& nonNegative()
-	{
-		if (!parameter.isNonNegative())
-		{
-			std::string reason = "Value of " + parameter.name() + 
-				" is negative";
-			parameter.invalidate(reason);
-		}
-		return *this;
-	}
-
 
 private:
 
