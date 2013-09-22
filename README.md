@@ -13,7 +13,10 @@ the data representation and storage schemes.
 The library is distributed under permissive 
 [BSD 3-clause license](https://github.com/lisitsyn/tapkee/tree/master/include/LICENSE) 
 (except a few rather optional parts that are distributed under other 
-open sources licenses, see Licensing section of this document).
+open sources licenses, see Licensing section of this document). If you use
+this software in any publication we would be happy if you cite the following paper:
+
+	Sergey Lisitsyn and Christian Widmer and Fernando J. Iglesias Garcia. Tapkee: An Efficient Dimension Reduction Library. Journal of Machine Learning Research, 14: 2355-2359, 2013.
 
 To get started with dimension reduction you may try the 
 [borsch script](https://github.com/lisitsyn/tapkee/tree/master/examples/borsch/borsch.py)
