@@ -78,7 +78,7 @@ namespace tapkee
 		 * - @ref tapkee::Isomap
 		 * - @ref tapkee::LandmarkIsomap
 		 * - @ref tapkee::StochasticProximityEmbedding (with local strategy, i.e. 
-		 *        when @ref tapkee::keywords::spe_global_strategy is set to false)
+		 *        when @ref tapkee::spe_global_strategy is set to false)
 		 * - @ref tapkee::ManifoldSculpting
 		 *
 		 * Default value is @ref tapkee::CoverTree if available, @ref tapkee::Brute otherwise.

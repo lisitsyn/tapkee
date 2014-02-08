@@ -53,7 +53,7 @@ argument is formed with the following syntax:
 Such syntax is possible due to comma operator overloading which groups all assigned keywords
 in the comma separated list.
 
-Keywords are defined in the `tapkee::keywords` namespace. Currently, the following keywords
+Keywords are defined in the `tapkee` namespace. Currently, the following keywords
 are defined: `method`, `eigen_method`, `neighbors_method`, `num_neighbors`, `target_dimension`,
 `diffusion_map_timesteps`, `gaussian_kernel_width`, `max_iteration`, `spe_global_strategy`, 
 `spe_num_updates`, `spe_tolerance`, `landmark_ratio`, `nullspace_shift`, `klle_shift`, 
@@ -63,24 +63,24 @@ are defined: `method`, `eigen_method`, `neighbors_method`, `num_neighbors`, `tar
 As an example of parameters setting, if you want to use the Isomap 
 algorithm with the number of neighbors set to 15:
 
-	initialize().withParameters((method=Isomap,num_neighbors=15))
+	tapkee::initialize().withParameters((method=Isomap,num_neighbors=15))
 
 Please note that the inner parentheses are necessary as it uses the 
 comma operator which appears to be ambiguous in this case.
 
 Next, with initialized parameters you may either embed the provided matrix with:
 
-	initialize().withParameters((method=Isomap,num_neighbors=15)).
-	            .embedUsing(matrix);
+	tapkee::initialize().withParameters((method=Isomap,num_neighbors=15)).
+	                    .embedUsing(matrix);
 
 Or provide callbacks (kernel, distance and features) using any combination 
 of the `withKernel(KernelCallback)`, `withDistance(DistanceCallback)` and 
 `withFeatures(FeaturesCallback)` member functions:
 
-	initialize().withParameters((method=Isomap,num_neighbors=15))
-	            .withKernel(kernel_callback)
-	            .withDistance(distance_callback)
-	            .withFeatures(features_callback)
+	tapkee::initialize().withParameters((method=Isomap,num_neighbors=15))
+	                    .withKernel(kernel_callback)
+	                    .withDistance(distance_callback)
+	                    .withFeatures(features_callback)
 
 Once callbacks are initialized you may either embed data using an 
 STL-compatible sequence of indices or objects (that supports the 
@@ -112,11 +112,10 @@ Minimal example
 A minimal working example of a program that uses the library is:
 
 	#include <tapkee/tapkee.hpp>
-	#include <tapkee/callback/dummy_callbacks.hpp>
+	#include <tapkee/callbacks/dummy_callbacks.hpp>
 
 	using namespace std;
 	using namespace tapkee;
-	using namespace tapkee::keywords;
 
 	struct MyDistanceCallback
 	{
@@ -131,7 +130,7 @@ A minimal working example of a program that uses the library is:
 
 		MyDistanceCallback d;
 
-		TapkeeOutput output = initialize() 
+		TapkeeOutput output = tapkee::initialize() 
 		   .withParameters((method=MultidimensionalScaling,target_dimension=1))
 		   .withDistance(d)
 		   .embedUsing(indices);
