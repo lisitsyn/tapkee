@@ -64,10 +64,10 @@ public:
 			for(int d = 0; d < _D; d++) _x[d] = other.x(d);
 		}
 	}
-	~DataPoint() { if(_x != NULL) free(_x); }
+	~DataPoint() { free(_x); }
 	DataPoint& operator= (const DataPoint& other) {         // asignment should free old object
 		if(this != &other) {
-			if(_x != NULL) free(_x);
+			free(_x);
 			_D = other.dimensionality();
 			_ind = other.index();
 			_x = (ScalarType*) malloc(_D * sizeof(ScalarType));
