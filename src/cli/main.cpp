@@ -1,6 +1,6 @@
 /* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias 
+ * Copyright (c) 2012-2014 Sergey Lisitsyn, Fernando Iglesias 
  */
 
 #include <tapkee/tapkee.hpp>
@@ -483,5 +483,9 @@ int main(int argc, const char** argv)
 	catch (const std::exception& exc) 
 	{
 		std::cout << "Some error occured: " << exc.what() << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "Unknown error occured" << std::endl;
 	}
 }
