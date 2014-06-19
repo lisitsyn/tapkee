@@ -27,7 +27,7 @@
  */
 
 #ifndef STICHWORT_KEEPER_H_
-#define STICHWORD_KEEPER_H_
+#define STICHWORT_KEEPER_H_
 
 #include <stichwort/policy.hpp>
 #include <stichwort/exceptions.hpp>
