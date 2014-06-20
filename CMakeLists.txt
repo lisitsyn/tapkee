@@ -44,7 +44,7 @@ endif()
 
 include_directories("${TAPKEE_INCLUDE_DIR}")
 # CLI executable
-add_executable(tapkee_cli "${TAPKEE_SRC_DIR}/cli/main.cpp")
+add_executable(tapkee "${TAPKEE_SRC_DIR}/cli/main.cpp")
 # Examples
 option(BUILD_EXAMPLES "Whether to build examples or not" ON)
 if (BUILD_EXAMPLES)
@@ -52,12 +52,12 @@ if (BUILD_EXAMPLES)
 endif()
 
 if (ARPACK_FOUND)
-	target_link_libraries(tapkee_cli arpack)
+	target_link_libraries(tapkee arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
 
 if (VIENNACL_FOUND)
-	target_link_libraries(tapkee_cli OpenCL)
+	target_link_libraries(tapkee OpenCL)
 	add_definitions(-DTAPKEE_WITH_VIENNACL)
 endif()
 
@@ -99,7 +99,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
 
-		add_custom_target(lcov DEPENDS tapkee_cli)
+		add_custom_target(lcov DEPENDS tapkee)
 		add_custom_command(TARGET lcov COMMAND mkdir -p coverage WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 		add_custom_command(TARGET lcov COMMAND lcov --directory . --zerocounters WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 		add_custom_command(TARGET lcov COMMAND make test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
