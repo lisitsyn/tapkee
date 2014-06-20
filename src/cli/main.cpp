@@ -355,16 +355,16 @@ int run(int argc, const char** argv)
 	string output_filename;
 	if (!opt.isSet(OPT_LONG_PREFIX INPUT_FILE_KEYWORD))
 	{
-		tapkee::LoggingSingleton::instance().message_error("No input file specified. Please use " OPT_PREFIX "h flag if stucked");
-		return 0;
+		tapkee::LoggingSingleton::instance().message_warning("No input file specified, using stdin");
+		input_filename = "/dev/stdin";
 	}
 	else
 		opt.get(OPT_LONG_PREFIX INPUT_FILE_KEYWORD)->getString(input_filename);
 
 	if (!opt.isSet(OPT_LONG_PREFIX OUTPUT_FILE_KEYWORD))
 	{
-		tapkee::LoggingSingleton::instance().message_warning("No output file specified, using /dev/tty");
-		output_filename = "/dev/tty";
+		tapkee::LoggingSingleton::instance().message_warning("No output file specified, using stdout");
+		output_filename = "/dev/stdout";
 	}
 	else
 		opt.get(OPT_LONG_PREFIX OUTPUT_FILE_KEYWORD)->getString(output_filename);
