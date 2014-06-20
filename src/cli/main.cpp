@@ -482,10 +482,10 @@ int main(int argc, const char** argv)
 	}
 	catch (const std::exception& exc) 
 	{
-		std::cout << "Some error occured: " << exc.what() << std::endl;
+		std::cerr << "Some error occured: " << exc.what() << std::endl;
 	}
 	catch (...)
 	{
-		std::cout << "Unknown error occured" << std::endl;
+		std::cerr << "Unknown error occured" << std::endl;
 	}
 }
