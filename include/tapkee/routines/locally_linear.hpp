@@ -81,7 +81,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 			}
 #pragma omp critical
 			{
-				copy(local_triplets.begin(),local_triplets.end(),back_inserter(sparse_triplets));
+				copy(local_triplets.begin(),local_triplets.end(),std::back_inserter(sparse_triplets));
 			}
 			
 			local_triplets.clear();
@@ -151,7 +151,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
 
 #pragma omp critical
 			{
-				copy(local_triplets.begin(),local_triplets.end(),back_inserter(sparse_triplets));
+				copy(local_triplets.begin(),local_triplets.end(),std::back_inserter(sparse_triplets));
 			}
 			
 			local_triplets.clear();
@@ -248,7 +248,7 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 
 			#pragma omp critical
 			{
-				copy(local_triplets.begin(),local_triplets.end(),back_inserter(sparse_triplets));
+				copy(local_triplets.begin(),local_triplets.end(),std::back_inserter(sparse_triplets));
 			}
 
 			local_triplets.clear();

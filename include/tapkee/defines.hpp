@@ -13,6 +13,7 @@
 /* End of Tapkee includes */
 
 #include <string>
+#include <iterator>
 
 #define TAPKEE_WORLD_VERSION 1
 #define TAPKEE_MAJOR_VERSION 0
