@@ -389,7 +389,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 
 	int *iparam= new int[11];
 	iparam[0] = 1; // 1 means we let ARPACK perform the shifts, 0 means we'd have to do it
-	iparam[2] = std::max(300, (int)std::ceil(2*n/std::max(ncv,1)));
+	iparam[2] = std::max(300, static_cast<int>(std::ceil(static_cast<double>(2*n/std::max(ncv,1)))));
 	iparam[6] = mode; // The mode, 1 is standard ev problem, 2 for generalized ev, 3 for shift-and-invert
 
 	// Used during reverse communicate to notify where arrays start
