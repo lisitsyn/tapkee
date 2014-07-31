@@ -363,7 +363,9 @@ int run(int argc, const char** argv)
 		input_filename = "/dev/stdin";
 	}
 	else
+	{
 		opt.get(OPT_LONG_PREFIX INPUT_FILE_KEYWORD)->getString(input_filename);
+	}
 
 	if (!opt.isSet(OPT_LONG_PREFIX OUTPUT_FILE_KEYWORD))
 	{
@@ -371,7 +373,9 @@ int run(int argc, const char** argv)
 		output_filename = "/dev/stdout";
 	}
 	else
+	{
 		opt.get(OPT_LONG_PREFIX OUTPUT_FILE_KEYWORD)->getString(output_filename);
+	}
 
 	bool output_projection = false;
 	std::string output_matrix_filename = "/dev/null";
@@ -389,7 +393,11 @@ int run(int argc, const char** argv)
 	ofstream ofs_matrix(output_matrix_filename.c_str());
 	ofstream ofs_mean(output_matrix_filename.c_str());
 
-	tapkee::DenseMatrix input_data = read_data(ifs);
+	std::string delimiter = ",";
+	if (opt.isSet(OPT_LONG_PREFIX DELIMITER_KEYWORD))
+		opt.get(OPT_LONG_PREFIX DELIMITER_KEYWORD)->getString(delimiter);
+
+	tapkee::DenseMatrix input_data = read_data(ifs, delimiter[0]);
 	if (opt.isSet(OPT_LONG_PREFIX TRANSPOSE_INPUT_KEYWORD))
 		input_data.transposeInPlace();
 	
@@ -461,13 +469,9 @@ int run(int argc, const char** argv)
 	// Save obtained data
 	if (!opt.isSet(OPT_LONG_PREFIX TRANSPOSE_OUTPUT_KEYWORD))
 	{
-		ofs << output.embedding;
+		output.embedding.transposeInPlace();
 	}
-	else
-	{
-		ofs << output.embedding.transpose();
-	}
-	ofs << std::endl;
+	write_data(output.embedding, ofs, delimiter[0]);
 	ofs.close();
 
 	if (output_projection && output.projection.implementation) 

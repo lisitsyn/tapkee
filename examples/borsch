@@ -34,13 +34,13 @@ def embed(data,method):
 		raise Error('Method is not supported by this script')
 	input_file = 'tapkee_input_data'
 	output_file = 'tapkee_output_data'
-	numpy.savetxt(input_file, data)
+	numpy.savetxt(input_file, data,delimiter=',')
 	tapkee_binary = 'bin/tapkee'
 	runner_string = '%s -i %s -o %s -m %s -k 20 --verbose --transpose-output --benchmark' % (tapkee_binary,input_file,output_file,method)
 	print '-- To reproduce this use the following command', runner_string
 	output = subprocess.check_output(runner_string,shell=True)
 	print '-- Library output is \n', output
-	embedded_data = numpy.loadtxt(output_file)
+	embedded_data = numpy.loadtxt(output_file,delimiter=',').T
 	os.remove(input_file)
 	os.remove(output_file)
 	return embedded_data

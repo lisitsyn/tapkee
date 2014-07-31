@@ -21,24 +21,31 @@ inline bool is_wrong_char(char c) {
 	return false;
 } 
 
-// TODO this absolutely unexceptionally definitive should be improved later
-tapkee::DenseMatrix read_data(ifstream& ifs)
+tapkee::DenseMatrix read_data(ifstream& ifs, char delimiter)
 {
 	string str;
 	vector< vector<tapkee::ScalarType> > input_data;
-	while (!ifs.eof())
+	while (ifs)
 	{
 		getline(ifs,str);
 
-		if (find_if(str.begin(), str.end(), is_wrong_char) != str.end())
-			throw std::runtime_error("Input file contains some junk, please check it");
+		//if (find_if(str.begin(), str.end(), is_wrong_char) != str.end())
+		//	throw std::runtime_error("Input file contains some junk, please check it");
 
+		istringstream ss(str);
 		if (str.size())
 		{
-			stringstream strstr(str);
-			istream_iterator<tapkee::ScalarType> it(strstr);
-			istream_iterator<tapkee::ScalarType> end;
-			vector<tapkee::ScalarType> row(it, end);
+			vector<tapkee::ScalarType> row;
+			while (ss)
+			{
+				string value_string;
+				if (!getline(ss, value_string, delimiter))
+					break;
+				istringstream value_stream(value_string);
+				tapkee::ScalarType value;
+				if (value_stream >> value)
+						row.push_back(value);
+			}
 			input_data.push_back(row);
 		}
 	}
@@ -56,6 +63,20 @@ tapkee::DenseMatrix read_data(ifstream& ifs)
 			fm(i,j) = input_data[i][j];
 	}
 	return fm;
+}
+
+void write_data(tapkee::DenseMatrix& matrix, ofstream& of, char delimiter)
+{
+	for (int i=0; i<matrix.rows(); i++)
+	{
+		for (int j=0; j<matrix.cols(); j++)
+		{
+			of << matrix(i,j);
+			if (j!=matrix.cols()-1)
+				of << delimiter;
+		}
+		of << endl;
+	}
 }
 
 bool method_needs_kernel(tapkee::DimensionReductionMethod method) 
