@@ -36,7 +36,7 @@ int run(int argc, const char** argv)
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	ezOptionParser opt;
-	opt.footer = "Copyright (C) 2012-2013 Sergey Lisitsyn <lisitsyn.s.o@gmail.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n"
+	opt.footer = "Copyright (C) 2012-2014 Sergey Lisitsyn <lisitsyn.s.o@gmail.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n"
 	             "This is free software: you are free to change and redistribute it.\n"
 	             "There is NO WARRANTY, to the extent permitted by law.";
 	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.\n"
@@ -76,6 +76,10 @@ int run(int argc, const char** argv)
 	opt.add("",0,1,0,"Output file for mean of data",
 		OPT_PREFIX "opmean",
 		OPT_LONG_PREFIX OUTPUT_PROJECTION_MEAN_FILE_KEYWORD);
+#define DELIMITER_KEYWORD "delimiter"
+	opt.add("",0,1,0,"Delimiter",
+		OPT_PREFIX "d",
+		OPT_LONG_PREFIX DELIMITER_KEYWORD);
 #define HELP_KEYWORD "help"
 	opt.add("",0,0,0,"Display help",
 		OPT_PREFIX "h",
@@ -355,7 +359,7 @@ int run(int argc, const char** argv)
 	string output_filename;
 	if (!opt.isSet(OPT_LONG_PREFIX INPUT_FILE_KEYWORD))
 	{
-		tapkee::LoggingSingleton::instance().message_warning("No input file specified, using stdin");
+		//tapkee::LoggingSingleton::instance().message_warning("No input file specified, using stdin");
 		input_filename = "/dev/stdin";
 	}
 	else
@@ -363,7 +367,7 @@ int run(int argc, const char** argv)
 
 	if (!opt.isSet(OPT_LONG_PREFIX OUTPUT_FILE_KEYWORD))
 	{
-		tapkee::LoggingSingleton::instance().message_warning("No output file specified, using stdout");
+		//tapkee::LoggingSingleton::instance().message_warning("No output file specified, using stdout");
 		output_filename = "/dev/stdout";
 	}
 	else
@@ -455,10 +459,15 @@ int run(int argc, const char** argv)
 		.embedUsing(input_data);
 #endif
 	// Save obtained data
-	if (opt.isSet(OPT_LONG_PREFIX TRANSPOSE_OUTPUT_KEYWORD))
+	if (!opt.isSet(OPT_LONG_PREFIX TRANSPOSE_OUTPUT_KEYWORD))
+	{
 		ofs << output.embedding;
+	}
 	else
+	{
 		ofs << output.embedding.transpose();
+	}
+	ofs << std::endl;
 	ofs.close();
 
 	if (output_projection && output.projection.implementation) 
