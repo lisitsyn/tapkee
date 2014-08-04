@@ -398,7 +398,7 @@ int run(int argc, const char** argv)
 		opt.get(OPT_LONG_PREFIX DELIMITER_KEYWORD)->getString(delimiter);
 
 	tapkee::DenseMatrix input_data = read_data(ifs, delimiter[0]);
-	if (opt.isSet(OPT_LONG_PREFIX TRANSPOSE_INPUT_KEYWORD))
+	if (!opt.isSet(OPT_LONG_PREFIX TRANSPOSE_INPUT_KEYWORD))
 		input_data.transposeInPlace();
 	
 	std::stringstream ss;
