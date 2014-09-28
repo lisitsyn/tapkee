@@ -82,7 +82,7 @@ public:
 		for(int i = 0; i < N * no_dims; i++) gains[i] = 1.0;
 		
 		// Normalize input data (to prevent numerical problems)
-		ScalarType* P=NULL; int* row_P; int* col_P; ScalarType* val_P;
+		ScalarType* P=NULL; int* row_P=NULL; int* col_P=NULL; ScalarType* val_P=NULL;
 		{
 			tapkee::tapkee_internal::timed_context context("Input similarities computation");
 			start = clock();
