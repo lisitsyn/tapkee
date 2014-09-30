@@ -467,7 +467,7 @@ int run(int argc, const char** argv)
 		.embedUsing(input_data);
 #endif
 	// Save obtained data
-	if (!opt.isSet(OPT_LONG_PREFIX TRANSPOSE_OUTPUT_KEYWORD))
+	if (opt.isSet(OPT_LONG_PREFIX TRANSPOSE_OUTPUT_KEYWORD))
 	{
 		output.embedding.transposeInPlace();
 	}
