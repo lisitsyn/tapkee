@@ -50,19 +50,26 @@ tapkee::DenseMatrix read_data(ifstream& ifs, char delimiter)
 		}
 	}
 
-	tapkee::DenseMatrix fm(input_data.size(),input_data[0].size());
-	for (int i=0; i<fm.rows(); i++)
+	if (!input_data.empty())
 	{
-		if (static_cast<tapkee::DenseMatrix::Index>(input_data[i].size()) != fm.cols()) 
+		tapkee::DenseMatrix fm(input_data.size(),input_data[0].size());
+		for (int i=0; i<fm.rows(); i++)
 		{
-			stringstream ss;
-			ss << "Wrong data at line " << i;
-			throw std::runtime_error(ss.str());
+			if (static_cast<tapkee::DenseMatrix::Index>(input_data[i].size()) != fm.cols()) 
+			{
+				stringstream ss;
+				ss << "Wrong data at line " << i;
+				throw std::runtime_error(ss.str());
+			}
+			for (int j=0; j<fm.cols(); j++)
+				fm(i,j) = input_data[i][j];
 		}
-		for (int j=0; j<fm.cols(); j++)
-			fm(i,j) = input_data[i][j];
+		return fm;
 	}
-	return fm;
+	else
+	{
+		return tapkee::DenseMatrix(0,0);
+	}
 }
 
 void write_data(tapkee::DenseMatrix& matrix, ofstream& of, char delimiter)

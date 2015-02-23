@@ -12,6 +12,16 @@
 namespace tapkee
 {
 
+//! An exception type that is thrown when no data is given
+//!
+class no_data_error : public std::logic_error
+{
+	public:
+		/** @param what_msg message of the exception */
+		explicit no_data_error() : 
+			std::logic_error("No data to embed") {};
+};
+
 //! An exception type that is thrown when unsupported method
 //! is called.
 class unsupported_method_error : public std::logic_error

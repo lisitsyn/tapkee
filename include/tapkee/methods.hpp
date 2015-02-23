@@ -124,6 +124,9 @@ public:
 			p_target_dimension.checked().satisfies(InRange<IndexType>(1,n_vectors));
 			p_n_neighbors.checked().satisfies(InRange<IndexType>(3,n_vectors));
 		}
+		if (n_vectors == 0)
+			throw no_data_error();
+
 
 		p_computation_strategy = parameters[computation_strategy];
 		p_eigen_method = parameters[eigen_method];
