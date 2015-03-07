@@ -526,7 +526,7 @@ private:
 
 		DenseMatrix embedding(static_cast<IndexType>(p_target_dimension),n_vectors);
 		tsne::TSNE tsne;
-		tsne.run(data.data(),n_vectors,current_dimension,embedding.data(),p_target_dimension,p_perplexity,p_theta);
+		tsne.run(data,data.cols(),data.rows(),embedding.data(),p_target_dimension,p_perplexity,p_theta);
 
 		return TapkeeOutput(embedding.transpose(), unimplementedProjectingFunction());
 	}

@@ -120,7 +120,7 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end,
 	}
 	catch (const std::bad_alloc&)
 	{
-		throw not_enough_memory_error("Not enough memory");
+		throw tapkee::not_enough_memory_error("Not enough memory");
 	}
 	catch (const stichwort::wrong_parameter_error& ex)
 	{

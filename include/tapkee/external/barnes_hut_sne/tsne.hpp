@@ -57,7 +57,7 @@ static inline ScalarType sign(ScalarType x) { return (x == .0 ? .0 : (x < .0 ? -
 class TSNE
 {    
 public:
-	void run(ScalarType* X, int N, int D, ScalarType* Y, int no_dims, ScalarType perplexity, ScalarType theta)
+	void run(tapkee::DenseMatrix& X, int N, int D, ScalarType* Y, int no_dims, ScalarType perplexity, ScalarType theta)
 	{
 		// Determine whether we are using an exact algorithm
 		bool exact = (theta == .0) ? true : false;
@@ -68,56 +68,46 @@ public:
 		
 		// Set learning parameters
 		float total_time = .0;
-		clock_t start, end;
 		int max_iter = 1000, stop_lying_iter = 250, mom_switch_iter = 250;
 		ScalarType momentum = .5, final_momentum = .8;
 		ScalarType eta = 200.0;
 		
-		// Allocate some memory
-		ScalarType* dY    = (ScalarType*) malloc(N * no_dims * sizeof(ScalarType));
-		ScalarType* uY    = (ScalarType*) malloc(N * no_dims * sizeof(ScalarType));
-		ScalarType* gains = (ScalarType*) malloc(N * no_dims * sizeof(ScalarType));
-		if(dY == NULL || uY == NULL || gains == NULL) { printf("Memory allocation failed!\n"); exit(1); }
-		for(int i = 0; i < N * no_dims; i++)    uY[i] =  .0;
-		for(int i = 0; i < N * no_dims; i++) gains[i] = 1.0;
+		tapkee::DenseMatrix dY(N, no_dims);
+		tapkee::DenseMatrix uY(N, no_dims);
+		tapkee::DenseMatrix gains(N, no_dims);
+		tapkee::DenseMatrix P;
+		uY.setZero();
+		gains.setConstant(1.0);
 		
 		// Normalize input data (to prevent numerical problems)
-		ScalarType* P=NULL; int* row_P=NULL; int* col_P=NULL; ScalarType* val_P=NULL;
+		int* row_P=NULL; int* col_P=NULL; ScalarType* val_P=NULL;
 		{
 			tapkee::tapkee_internal::timed_context context("Input similarities computation");
-			start = clock();
-			zeroMean(X, N, D);
-			ScalarType max_X = .0;
-			for(int i = 0; i < N * D; i++) {
-				if(X[i] > max_X) max_X = X[i];
-			}
-			for(int i = 0; i < N * D; i++) X[i] /= max_X;
+			zeroMean(X.data(), N, D);
+			X.array() /= X.maxCoeff();
 			
 			// Compute input similarities for exact t-SNE
 			if(exact) {
 				
 				// Compute similarities
-				P = (ScalarType*) malloc(N * N * sizeof(ScalarType));
-				if(P == NULL) { printf("Memory allocation failed!\n"); exit(1); }
-				computeGaussianPerplexity(X, N, D, P, perplexity);
+				P = tapkee::DenseMatrix(N,N);
+				computeGaussianPerplexity(X.data(), N, D, P.data(), perplexity);
 			
 				// Symmetrize input similarities
 				for(int n = 0; n < N; n++) {
 					for(int m = n + 1; m < N; m++) {
-						P[n * N + m] += P[m * N + n];
-						P[m * N + n]  = P[n * N + m];
+						P.data()[n * N + m] += P.data()[m * N + n];
+						P.data()[m * N + n]  = P.data()[n * N + m];
 					}
 				}
-				ScalarType sum_P = .0;
-				for(int i = 0; i < N * N; i++) sum_P += P[i];
-				for(int i = 0; i < N * N; i++) P[i] /= sum_P;
+				P.array() /= P.array().sum();
 			}
 			
 			// Compute input similarities for approximate t-SNE
 			else {
 			
 				// Compute asymmetric pairwise input similarities
-				computeGaussianPerplexity(X, N, D, &row_P, &col_P, &val_P, perplexity, (int) (3 * perplexity));
+				computeGaussianPerplexity(X.data(), N, D, &row_P, &col_P, &val_P, perplexity, (int) (3 * perplexity));
 				
 				// Symmetrize input similarities
 				symmetrizeMatrix(&row_P, &col_P, &val_P, N);
@@ -127,8 +117,12 @@ public:
 			}
 			
 			// Lie about the P-values
-			if(exact) { for(int i = 0; i < N * N; i++)        P[i] *= 12.0; }
-			else {      for(int i = 0; i < row_P[N]; i++) val_P[i] *= 12.0; }
+			if(exact)
+				P.array() *= 12.0;
+			else
+			{
+				for(int i = 0; i < row_P[N]; i++) val_P[i] *= 12.0;
+			}
 
 			// Initialize solution (randomly)
 			for(int i = 0; i < N * no_dims; i++) Y[i] = tapkee::gaussian_random() * .0001;
@@ -139,55 +133,43 @@ public:
 			for(int iter = 0; iter < max_iter; iter++) {
 				
 				// Compute (approximate) gradient
-				if(exact) computeExactGradient(P, Y, N, no_dims, dY);
-				else computeGradient(P, row_P, col_P, val_P, Y, N, no_dims, dY, theta);
+				if(exact) computeExactGradient(P.data(), Y, N, no_dims, dY.data());
+				else computeGradient(P.data(), row_P, col_P, val_P, Y, N, no_dims, dY.data(), theta);
 				
 				// Update gains
-				for(int i = 0; i < N * no_dims; i++) gains[i] = (sign(dY[i]) != sign(uY[i])) ? (gains[i] + .2) : (gains[i] * .8);
-				for(int i = 0; i < N * no_dims; i++) if(gains[i] < .01) gains[i] = .01;
+				for(int i = 0; i < N * no_dims; i++) gains.data()[i] = (sign(dY.data()[i]) != sign(uY.data()[i])) ? (gains.data()[i] + .2) : (gains.data()[i] * .8);
+				for(int i = 0; i < N * no_dims; i++) if(gains.data()[i] < .01) gains.data()[i] = .01;
 					
 				// Perform gradient update (with momentum and gains)
-				for(int i = 0; i < N * no_dims; i++) uY[i] = momentum * uY[i] - eta * gains[i] * dY[i];
-				for(int i = 0; i < N * no_dims; i++)  Y[i] = Y[i] + uY[i];
+				for(int i = 0; i < N * no_dims; i++) uY.data()[i] = momentum * uY.data()[i] - eta * gains.data()[i] * dY.data()[i];
+				for(int i = 0; i < N * no_dims; i++)  Y[i] = Y[i] + uY.data()[i];
 				
 				// Make solution zero-mean
 				zeroMean(Y, N, no_dims);
 				
 				// Stop lying about the P-values after a while, and switch momentum
 				if(iter == stop_lying_iter) {
-					if(exact) { for(int i = 0; i < N * N; i++)        P[i] /= 12.0; }
-					else      { for(int i = 0; i < row_P[N]; i++) val_P[i] /= 12.0; }
+					if (exact)
+						P.array() /= 12.0;
+					else
+					{
+						for(int i = 0; i < row_P[N]; i++) val_P[i] /= 12.0;
+					}
 				}
 				if(iter == mom_switch_iter) momentum = final_momentum;
 				
 				// Print out progress
-				/*
 				if((iter > 0) && ((iter % 50 == 0) || (iter == max_iter - 1))) {
-					end = clock();
 					ScalarType C = .0;
-					if(exact) C = evaluateError(P, Y, N);
+					if(exact) C = evaluateError(P.data(), Y, N);
 					else      C = evaluateError(row_P, col_P, val_P, Y, N, theta);  // doing approximate computation here!
-					if(iter == 0) 
-					{
-						//printf("Iteration %d: error is %f\n", iter + 1, C);
-					}
-					else 
-					{
-						total_time += (float) (end - start) / CLOCKS_PER_SEC;
-						//printf("Iteration %d: error is %f (50 iterations in %4.2f seconds)\n", iter, C, (float) (end - start) / CLOCKS_PER_SEC);
-					}
-					start = clock();
+					tapkee::LoggingSingleton::instance().message_info(
+							formatting::format("Iteration {}: error is {}\n", iter, C));
 				}
-				*/
 			}
-			end = clock(); total_time += (float) (end - start) / CLOCKS_PER_SEC;
-			
 			// Clean up memory
-			free(dY);
-			free(uY);
-			free(gains);
-			if(exact) free(P);
-			else {
+			if(!exact)
+			{
 				free(row_P); row_P = NULL;
 				free(col_P); col_P = NULL;
 				free(val_P); val_P = NULL;
