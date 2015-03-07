@@ -132,10 +132,10 @@ endif()
 option(BUILD_TESTS "Build tests" OFF)
 
 if (BUILD_TESTS)
-	if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gtest-1.6.0/")
-		add_subdirectory(gtest-1.6.0)
+	if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gtest-1.7.0/")
+		add_subdirectory(gtest-1.7.0)
 		set(GTEST_SOURCE_DIR "${gtest_SOURCE_DIR}")
-		include_directories(SYSTEM "${GTEST_SOURCE_DIR}/include ${GTEST_SOURCE_DIR}")
+		include_directories(SYSTEM "${GTEST_SOURCE_DIR}/include")
 	else()
 		if (NOT GTEST_SOURCE_DIR)
 			# try with default ubuntu location
@@ -154,7 +154,7 @@ if (BUILD_TESTS)
 			find_package(Threads)
 			target_link_libraries(gtest ${CMAKE_THREAD_LIBS_INIT})
 		else()
-			message(FATAL_ERROR "gtest-1.6.0 is required to be available in the root of the project or reachable 
+			message(FATAL_ERROR "gtest-1.7.0 is required to be available in the root of the project or reachable 
 			                     by GTEST_SOURCE_DIR and GTEST_INCLUDE_DIR")
 		endif()
 	endif()
