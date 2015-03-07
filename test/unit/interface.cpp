@@ -106,7 +106,7 @@ TEST(Interface, NoDataPassThru)
 
 	TapkeeOutput output;
 	// should produce no error
-	ASSERT_NO_THROW(output = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,(method = PassThru)));
+	ASSERT_THROW(output = tapkee::embed(data.begin(),data.end(),kcb,dcb,fcb,(method = PassThru)), no_data_error);
 	// that's normal
 	ASSERT_EQ(0,output.embedding.cols());
 	// that's normal
@@ -177,7 +177,7 @@ bool always_cancel()
 TEST(Interface, CancellationPassThru)
 {
 	std::vector<int> data;
-	ASSERT_EQ(0,data.size());
+	data.push_back(0);
 	tapkee::dummy_kernel_callback<int> kcb;
 	tapkee::dummy_distance_callback<int> dcb;
 	tapkee::dummy_features_callback<int> fcb;
