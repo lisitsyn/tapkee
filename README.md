@@ -262,7 +262,7 @@ The repository of Tapkee contains the following directories:
   (these examples are supposed to be called through `make` as described
    above, e.g. `make minimal`).
 - `data/` a git submodule that contains data required for 
-  examples. To initialize this submodule use `git submodule init --update`.
+  examples. To initialize this submodule use `git submodule update --init`.
 - `doc/` that contains Doxygen interface file which is used to
   generate HTML documentation of the library. Calling 
   `doxygen doc/Doxyfile` will generate it in this folder.
