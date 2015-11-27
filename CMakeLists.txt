@@ -46,7 +46,7 @@ include_directories("${TAPKEE_INCLUDE_DIR}")
 # CLI executable
 add_executable(tapkee "${TAPKEE_SRC_DIR}/cli/main.cpp")
 # Examples
-option(BUILD_EXAMPLES "Whether to build examples or not" ON)
+option(BUILD_EXAMPLES "Whether to build examples or not" OFF)
 if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()
