@@ -1,3 +1,5 @@
+#include <cmath>
+
 struct float_kernel_callback
 {
 	tapkee::ScalarType kernel(float a, float b) const
@@ -10,7 +12,7 @@ struct float_distance_callback
 {
 	tapkee::ScalarType distance(float a, float b) const
 	{
-		return abs(a-b);
+		return std::abs(a-b);
 	}
 };
 
