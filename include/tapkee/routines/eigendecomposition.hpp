@@ -56,8 +56,8 @@ EigendecompositionResult eigendecomposition_impl_dense(const MatrixType& wm, Ind
 {
 	timed_context context("Eigen library dense eigendecomposition");
 
-	DenseMatrix dense_wm = wm;
-	DenseSelfAdjointEigenSolver solver(dense_wm);
+	DenseSymmetricMatrix dense_wm = wm;
+	DenseSelfAdjointEigenSolver solver(dense_wm.selfadjointView<Eigen::Upper>());
 
 	if (solver.info() == Eigen::Success)
 	{
