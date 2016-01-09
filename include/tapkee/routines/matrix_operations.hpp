@@ -97,7 +97,7 @@ struct DenseMatrixOperation
 	static const char* ARPACK_CODE;
 	static const bool largest;
 };
-const char* DenseMatrixOperation::ARPACK_CODE = "LM";
+const char* DenseMatrixOperation::ARPACK_CODE = "LA";
 const bool DenseMatrixOperation::largest = true;
 
 //! Matrix-matrix operation used to
@@ -125,7 +125,7 @@ struct DenseImplicitSquareSymmetricMatrixOperation
 	static const char* ARPACK_CODE;
 	static const bool largest;
 };
-const char* DenseImplicitSquareSymmetricMatrixOperation::ARPACK_CODE = "LM";
+const char* DenseImplicitSquareSymmetricMatrixOperation::ARPACK_CODE = "LA";
 const bool DenseImplicitSquareSymmetricMatrixOperation::largest = true;
 
 //! Matrix-matrix operation used to
@@ -153,7 +153,7 @@ struct DenseImplicitSquareMatrixOperation
 	static const char* ARPACK_CODE;
 	static const bool largest;
 };
-const char* DenseImplicitSquareMatrixOperation::ARPACK_CODE = "LM";
+const char* DenseImplicitSquareMatrixOperation::ARPACK_CODE = "LA";
 const bool DenseImplicitSquareMatrixOperation::largest = true;
 
 #ifdef TAPKEE_WITH_VIENNACL
@@ -187,7 +187,7 @@ struct GPUDenseImplicitSquareMatrixOperation
 	static const char* ARPACK_CODE;
 	static const bool largest;
 };
-const char* GPUDenseImplicitSquareMatrixOperation::ARPACK_CODE = "LM";
+const char* GPUDenseImplicitSquareMatrixOperation::ARPACK_CODE = "LA";
 const bool GPUDenseImplicitSquareMatrixOperation::largest = true;
 
 struct GPUDenseMatrixOperation
@@ -218,7 +218,7 @@ struct GPUDenseMatrixOperation
 	static const char* ARPACK_CODE;
 	static const bool largest;
 };
-const char* GPUDenseMatrixOperation::ARPACK_CODE = "LM";
+const char* GPUDenseMatrixOperation::ARPACK_CODE = "LA";
 const bool GPUDenseMatrixOperation::largest = true;
 #endif
 
