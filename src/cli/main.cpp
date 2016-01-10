@@ -471,15 +471,15 @@ int run(int argc, const char** argv)
 	{
 		output.embedding.transposeInPlace();
 	}
-	write_data(&output.embedding, ofs, delimiter[0]);
+	write_matrix(&output.embedding, ofs, delimiter[0]);
 	ofs.close();
 
 	if (output_projection && output.projection.implementation)
 	{
 		tapkee::MatrixProjectionImplementation* matrix_projection =
 			dynamic_cast<tapkee::MatrixProjectionImplementation*>(output.projection.implementation);
-		write_data(&matrix_projection->proj_mat, ofs_matrix, delimiter[0]);
-		write_data(&matrix_projection->mean_vec, ofs_mean, delimiter[1]);
+		write_matrix(&matrix_projection->proj_mat, ofs_matrix, delimiter[0]);
+		write_vector(&matrix_projection->mean_vec, ofs_mean);
 	}
 	output.projection.clear();
 	ofs_matrix.close();
