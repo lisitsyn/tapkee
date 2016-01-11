@@ -391,7 +391,7 @@ int run(int argc, const char** argv)
 	ifstream ifs(input_filename.c_str());
 	ofstream ofs(output_filename.c_str());
 	ofstream ofs_matrix(output_matrix_filename.c_str());
-	ofstream ofs_mean(output_matrix_filename.c_str());
+	ofstream ofs_mean(output_mean_filename.c_str());
 
 	std::string delimiter = ",";
 	if (opt.isSet(OPT_LONG_PREFIX DELIMITER_KEYWORD))
@@ -471,13 +471,15 @@ int run(int argc, const char** argv)
 	{
 		output.embedding.transposeInPlace();
 	}
-	write_data(output.embedding, ofs, delimiter[0]);
+	write_matrix(&output.embedding, ofs, delimiter[0]);
 	ofs.close();
 
-	if (output_projection && output.projection.implementation) 
+	if (output_projection && output.projection.implementation)
 	{
-		ofs_matrix << ((tapkee::MatrixProjectionImplementation*)output.projection.implementation)->proj_mat;
-		ofs_mean << ((tapkee::MatrixProjectionImplementation*)output.projection.implementation)->mean_vec;
+		tapkee::MatrixProjectionImplementation* matrix_projection =
+			dynamic_cast<tapkee::MatrixProjectionImplementation*>(output.projection.implementation);
+		write_matrix(&matrix_projection->proj_mat, ofs_matrix, delimiter[0]);
+		write_vector(&matrix_projection->mean_vec, ofs_mean);
 	}
 	output.projection.clear();
 	ofs_matrix.close();

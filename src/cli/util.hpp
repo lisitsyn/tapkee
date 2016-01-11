@@ -72,17 +72,25 @@ tapkee::DenseMatrix read_data(ifstream& ifs, char delimiter)
 	}
 }
 
-void write_data(tapkee::DenseMatrix& matrix, ofstream& of, char delimiter)
+void write_matrix(tapkee::DenseMatrix* matrix, ofstream& of, char delimiter)
 {
-	for (int i=0; i<matrix.rows(); i++)
+	for (int i=0; i<matrix->rows(); i++)
 	{
-		for (int j=0; j<matrix.cols(); j++)
+		for (int j=0; j<matrix->cols(); j++)
 		{
-			of << matrix(i,j);
-			if (j!=matrix.cols()-1)
+			of << (*matrix)(i,j);
+			if (j!=matrix->cols()-1)
 				of << delimiter;
 		}
 		of << endl;
+	}
+}
+
+void write_vector(tapkee::DenseVector* matrix, ofstream& of)
+{
+	for (int i=0; i<matrix->rows(); i++)
+	{
+		of << (*matrix)(i) << endl;
 	}
 }
 
