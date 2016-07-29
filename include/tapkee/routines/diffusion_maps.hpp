@@ -34,7 +34,7 @@ namespace tapkee_internal
 //!
 template <class RandomAccessIterator, class DistanceCallback>
 DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, DistanceCallback callback, 
-                                              const IndexType timesteps, const ScalarType width)
+                                              const ScalarType width)
 {
 	timed_context context("Diffusion map matrix computation");
 
@@ -64,9 +64,10 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 	p = diffusion_matrix.colwise().sum();
 
 	// compute full matrix as we need to compute sum later
+	// TODO add weighting alpha, use linear algebra to compute D^-alpha K D^-alpha
 	for (IndexType i=0; i<n_vectors; i++)
 		for (IndexType j=0; j<n_vectors; j++)
-			diffusion_matrix(i,j) /= pow(p(i)*p(j),timesteps);
+			diffusion_matrix(i,j) /= p(i)*p(j);
 
 	// compute sqrt of column sum vector
 	p = diffusion_matrix.colwise().sum().cwiseSqrt();
