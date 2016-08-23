@@ -21,9 +21,9 @@ namespace tapkee_internal
 //! <ol>
 //! <li> Compute matrix \f$ K \f$ such as \f$ K_{i,j} = \exp\left(-\frac{d(x_i,x_j)^2}{w}\right) \f$.
 //! <li> Compute sum vector \f$ p = \sum_i K_{i,j}\f$.
-//! <li> Modify \f$ K \f$ with \f$ K_{i,j} = K_{i,j} / (p_i  p_j)^t \f$.
+//! <li> Modify \f$ K \f$ with \f$ K_{i,j} = K_{i,j} / (p_i  p_j)^\alpha \f$.
 //! <li> Compute sum vector \f$ p = \sum_i K_{i,j}\f$ again.
-//! <li> Normalize \f$ K \f$ with \f$ K_{i,j} = K_{i,j} / (p_i p_j) \f$.
+//! <li> Normalize \f$ K \f$ with \f$ K_{i,j} = K_{i,j} / \sqrt(p_i p_j) \f$.
 //! </ol>
 //!
 //! @param begin begin data iterator
