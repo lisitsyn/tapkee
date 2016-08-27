@@ -281,12 +281,19 @@ private:
 
 	TapkeeOutput embedDiffusionMap()
 	{
+		IndexType target_dimension = static_cast<IndexType>(p_target_dimension);
+		Parameter target_dimension_add = Parameter::create("target_dimension", target_dimension + 1);
 		DenseSymmetricMatrix diffusion_matrix =
-			compute_diffusion_matrix(begin,end,distance,p_timesteps,p_width);
-		DenseMatrix embedding =
-			eigendecomposition(p_eigen_method,p_computation_strategy,SquaredLargestEigenvalues,
-					diffusion_matrix,p_target_dimension).first;
-
+			compute_diffusion_matrix(begin,end,distance,p_width);
+		EigendecompositionResult decomposition_result = eigendecomposition(p_eigen_method,p_computation_strategy,
+							LargestEigenvalues,diffusion_matrix,target_dimension_add);
+		DenseMatrix embedding = (decomposition_result.first).leftCols(target_dimension);
+		// scaling with lambda_i^t 
+		for (IndexType i=0; i<target_dimension; i++)
+			embedding.col(i).array() *= pow(decomposition_result.second(i), static_cast<IndexType>(p_timesteps));
+		// scaling by eigenvector to largest eigenvalue 1
+		for (IndexType i=0; i<target_dimension; i++)
+			embedding.col(i).array() /= decomposition_result.first.col(target_dimension).array();
 		return TapkeeOutput(embedding, unimplementedProjectingFunction());
 	}
 
