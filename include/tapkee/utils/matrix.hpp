@@ -11,7 +11,7 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-void centerMatrix(DenseMatrix& matrix)
+inline void centerMatrix(DenseMatrix& matrix)
 {
 	DenseVector col_means = matrix.colwise().mean().transpose();
 	DenseMatrix::Scalar grand_mean = matrix.mean();

@@ -112,7 +112,7 @@ struct PointerTypePolicyImpl : public TypePolicyBase
 struct EmptyType;
 
 template <>
-std::string PointerTypePolicyImpl<EmptyType>::repr(void**) const
+inline std::string PointerTypePolicyImpl<EmptyType>::repr(void**) const
 {
 	return "uninitialized";
 }

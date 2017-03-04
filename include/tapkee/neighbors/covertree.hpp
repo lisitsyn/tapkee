@@ -407,7 +407,7 @@ void halfsort (v_array<d_node<P> > cover_set)
 {
 	if (cover_set.index <= 1)
 		return;
-	register d_node<P> *base_ptr =  cover_set.elements;
+	d_node<P> *base_ptr =  cover_set.elements;
 
 	d_node<P> *hi = &base_ptr[cover_set.index - 1];
 	d_node<P> *right_ptr = hi;

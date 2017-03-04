@@ -92,8 +92,8 @@ SparseMatrix neighbors_distances_matrix(RandomAccessIterator begin, RandomAccess
 	return sparse_matrix_from_triplets(sparse_triplets, n, n);
 }
 
-SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors& neighbors, 
-                                                      const DenseMatrix& data)
+inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors& neighbors, 
+                                                             const DenseMatrix& data)
 {
 	const IndexType k = neighbors[0].size();
 	const IndexType n_vectors = data.cols();
@@ -143,7 +143,7 @@ SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors& neighbors
 		 most_collinear_neighbors_of_neighbors);
 }
 
-ScalarType average_neighbor_distance(const DenseMatrix& data, const Neighbors& neighbors)
+inline ScalarType average_neighbor_distance(const DenseMatrix& data, const Neighbors& neighbors)
 {
 	IndexType k = neighbors[0].size();
 	ScalarType average_distance = 0;
@@ -158,8 +158,8 @@ ScalarType average_neighbor_distance(const DenseMatrix& data, const Neighbors& n
 	return average_distance / (k * data.cols());
 }
 
-ScalarType compute_error_for_point(const IndexType index, const DenseMatrix& data,
-                                   const DataForErrorFunc& error_func_data)
+inline ScalarType compute_error_for_point(const IndexType index, const DenseMatrix& data,
+                                          const DataForErrorFunc& error_func_data)
 {
 	IndexType k = error_func_data.distance_neighbors[0].size();
 	ScalarType error_value = 0;
@@ -213,11 +213,11 @@ ScalarType compute_error_for_point(const IndexType index, const DenseMatrix& dat
  * @return a number of steps it took to  adjust the
  * point
  */
-IndexType adjust_point_at_index(const IndexType index, DenseMatrix& data, 
-                                const IndexType target_dimension, 
-                                const ScalarType learning_rate,
-                                const DataForErrorFunc& error_func_data,
-                                ScalarType& point_error)
+inline IndexType adjust_point_at_index(const IndexType index, DenseMatrix& data, 
+                                       const IndexType target_dimension, 
+                                       const ScalarType learning_rate,
+                                       const DataForErrorFunc& error_func_data,
+                                       ScalarType& point_error)
 {
 	IndexType n_steps = 0;
 	ScalarType old_error, new_error;
