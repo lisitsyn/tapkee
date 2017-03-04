@@ -408,21 +408,21 @@ namespace formatting
 		formatting::internal::ValueWrapperImplementationBase* implementation_;
 	};
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a) 
 	{
 		const ValueWrapper* handlers[] = {&a};
 		return formatting::internal::formatImplementation(fmt, handlers, 1);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b)
 	{
 		const ValueWrapper* handlers[] = {&a, &b};
 		return formatting::internal::formatImplementation(fmt, handlers, 2);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b,
 			const ValueWrapper c)
 	{
@@ -430,7 +430,7 @@ namespace formatting
 		return formatting::internal::formatImplementation(fmt, handlers, 3);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b,
 			const ValueWrapper c, const ValueWrapper d)
 	{
@@ -438,7 +438,7 @@ namespace formatting
 		return formatting::internal::formatImplementation(fmt, handlers, 4);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b, 
 			const ValueWrapper c, const ValueWrapper d,
 			const ValueWrapper e) 
@@ -447,7 +447,7 @@ namespace formatting
 		return formatting::internal::formatImplementation(fmt, handlers, 5);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b, 
 			const ValueWrapper c, const ValueWrapper d,
 			const ValueWrapper e, const ValueWrapper f) 
@@ -456,7 +456,7 @@ namespace formatting
 		return formatting::internal::formatImplementation(fmt, handlers, 6);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b, 
 			const ValueWrapper c, const ValueWrapper d,
 			const ValueWrapper e, const ValueWrapper f,
@@ -466,7 +466,7 @@ namespace formatting
 		return formatting::internal::formatImplementation(fmt, handlers, 7);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b, 
 			const ValueWrapper c, const ValueWrapper d,
 			const ValueWrapper e, const ValueWrapper f,
@@ -476,7 +476,7 @@ namespace formatting
 		return formatting::internal::formatImplementation(fmt, handlers, 8);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b, 
 			const ValueWrapper c, const ValueWrapper d,
 			const ValueWrapper e, const ValueWrapper f,
@@ -487,7 +487,7 @@ namespace formatting
 		return formatting::internal::formatImplementation(fmt, handlers, 9);
 	}
 
-	std::string format(const std::string& fmt, 
+    inline std::string format(const std::string& fmt,
 			const ValueWrapper a, const ValueWrapper b, 
 			const ValueWrapper c, const ValueWrapper d,
 			const ValueWrapper e, const ValueWrapper f,
@@ -500,7 +500,7 @@ namespace formatting
 
 	namespace internal
 	{
-		std::string formatImplementation(const std::string& formatter_string,
+        inline std::string formatImplementation(const std::string& formatter_string,
 		                                 const ValueWrapper** handlers,
 		                                 std::size_t n_handlers) 
 		{
@@ -529,22 +529,22 @@ namespace formatting
 	{
 	}
 
-	ValueWrapper::ValueWrapper() :
+    inline ValueWrapper::ValueWrapper() :
 		implementation_(new formatting::internal::ValueWrapperImplementation<const char*>("invalid argument"))
 	{
 	}
 
-	ValueWrapper::ValueWrapper(const ValueWrapper& wrapper) : 
+    inline ValueWrapper::ValueWrapper(const ValueWrapper& wrapper) :
 		implementation_(wrapper.implementation_)
 	{
 	}
 
-	ValueWrapper::~ValueWrapper() 
+    inline ValueWrapper::~ValueWrapper()
 	{
 		delete implementation_;
 	}
 
-	std::string ValueWrapper::representation() const 
+    inline std::string ValueWrapper::representation() const
 	{
 		return implementation_->representation();
 	}

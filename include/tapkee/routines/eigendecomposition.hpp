@@ -33,7 +33,7 @@ EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType& wm, In
 	timed_context context("ARPACK eigendecomposition");
 
 	ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixOperationType> 
-		arpack(wm,target_dimension+skip,MatrixOperationType::ARPACK_CODE);
+		arpack(wm,target_dimension+skip,MatrixOperationType::ARPACK_CODE());
 
 	if (arpack.info() == Eigen::Success)
 	{
