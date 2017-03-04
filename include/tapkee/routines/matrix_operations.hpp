@@ -37,16 +37,18 @@ struct SparseInverseMatrixOperation
 	}
 	/** Solves linear system with provided right-hand size
 	 */
-	inline DenseMatrix operator()(const DenseMatrix& operatee)
+	DenseMatrix operator()(const DenseMatrix& operatee)
 	{
 		return solver.solve(operatee);
 	}
 	SparseSolver solver;
-	static const char* ARPACK_CODE;
-	static const bool largest;
+    static const std::string& ARPACK_CODE()
+    {
+        static std::string foo("SM");
+        return foo;
+    }
+	static const bool largest = false;
 };
-const char* SparseInverseMatrixOperation::ARPACK_CODE = "SM";
-const bool SparseInverseMatrixOperation::largest = false;
 
 //! Matrix-matrix operation used to 
 //! compute smallest eigenvalues and 
@@ -62,16 +64,18 @@ struct DenseInverseMatrixOperation
 	}
 	/** Solves linear system with provided right-hand size
 	 */
-	inline DenseMatrix operator()(const DenseMatrix& operatee)
+	DenseMatrix operator()(const DenseMatrix& operatee)
 	{
 		return solver.solve(operatee);
 	}
 	DenseSolver solver;
-	static const char* ARPACK_CODE;
-	static const bool largest;
+    static const std::string& ARPACK_CODE()
+    {
+        static std::string foo("SM");
+        return foo;
+    }
+	static const bool largest = false;
 };
-const char* DenseInverseMatrixOperation::ARPACK_CODE = "SM";
-const bool DenseInverseMatrixOperation::largest = false;
 
 //! Matrix-matrix operation used to
 //! compute largest eigenvalues and
@@ -89,16 +93,18 @@ struct DenseMatrixOperation
 	//! 
 	//! @param rhs right-hand size matrix
 	//!
-	inline DenseMatrix operator()(const DenseMatrix& rhs)
+	DenseMatrix operator()(const DenseMatrix& rhs)
 	{
 		return _matrix.selfadjointView<Eigen::Upper>()*rhs;
 	}
 	const DenseMatrix& _matrix;
-	static const char* ARPACK_CODE;
-	static const bool largest;
+    static const std::string& ARPACK_CODE()
+    {
+        static std::string foo("LA");
+        return foo;
+    }
+	static const bool largest = true;
 };
-const char* DenseMatrixOperation::ARPACK_CODE = "LA";
-const bool DenseMatrixOperation::largest = true;
 
 //! Matrix-matrix operation used to
 //! compute largest eigenvalues and
@@ -117,16 +123,18 @@ struct DenseImplicitSquareSymmetricMatrixOperation
 	//! 
 	//! @param rhs right-hand side matrix
 	//!
-	inline DenseMatrix operator()(const DenseMatrix& rhs)
+	DenseMatrix operator()(const DenseMatrix& rhs)
 	{
 		return _matrix.selfadjointView<Eigen::Upper>()*(_matrix.selfadjointView<Eigen::Upper>()*rhs);
 	}
 	const DenseMatrix& _matrix;
-	static const char* ARPACK_CODE;
-	static const bool largest;
+    static const std::string& ARPACK_CODE()
+    {
+        static std::string foo("LA");
+        return foo;
+    }
+	static const bool largest = true;
 };
-const char* DenseImplicitSquareSymmetricMatrixOperation::ARPACK_CODE = "LA";
-const bool DenseImplicitSquareSymmetricMatrixOperation::largest = true;
 
 //! Matrix-matrix operation used to
 //! compute largest eigenvalues and
@@ -137,7 +145,7 @@ const bool DenseImplicitSquareSymmetricMatrixOperation::largest = true;
 //!
 struct DenseImplicitSquareMatrixOperation
 {
-	DenseImplicitSquareMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
+    DenseImplicitSquareMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
 	//! Computes matrix product of the matrix and provided right-hand 
@@ -145,16 +153,18 @@ struct DenseImplicitSquareMatrixOperation
 	//! 
 	//! @param rhs right-hand side matrix
 	//!
-	inline DenseMatrix operator()(const DenseMatrix& rhs)
+	DenseMatrix operator()(const DenseMatrix& rhs)
 	{
 		return _matrix*(_matrix.transpose()*rhs);
 	}
 	const DenseMatrix& _matrix;
-	static const char* ARPACK_CODE;
-	static const bool largest;
+    static const std::string& ARPACK_CODE()
+    {
+        static std::string foo("LA");
+        return foo;
+    }
+    static constexpr bool largest = true;
 };
-const char* DenseImplicitSquareMatrixOperation::ARPACK_CODE = "LA";
-const bool DenseImplicitSquareMatrixOperation::largest = true;
 
 #ifdef TAPKEE_WITH_VIENNACL
 struct GPUDenseImplicitSquareMatrixOperation
@@ -171,7 +181,7 @@ struct GPUDenseImplicitSquareMatrixOperation
 	//! 
 	//! @param rhs right-hand side matrix
 	//!
-	inline DenseVector operator()(const DenseVector& rhs)
+	DenseVector operator()(const DenseVector& rhs)
 	{
 		viennacl::copy(rhs,vec);
 		res = viennacl::linalg::prod(mat, vec);
@@ -184,11 +194,13 @@ struct GPUDenseImplicitSquareMatrixOperation
 	viennacl::matrix<ScalarType> mat;
 	viennacl::vector<ScalarType> vec;
 	viennacl::vector<ScalarType> res;
-	static const char* ARPACK_CODE;
-	static const bool largest;
+    static const std::string& ARPACK_CODE()
+    {
+        static std::string foo("LA");
+        return foo;
+    }
+	static const bool largest = true;
 };
-const char* GPUDenseImplicitSquareMatrixOperation::ARPACK_CODE = "LA";
-const bool GPUDenseImplicitSquareMatrixOperation::largest = true;
 
 struct GPUDenseMatrixOperation
 {
@@ -204,7 +216,7 @@ struct GPUDenseMatrixOperation
 	//! 
 	//! @param rhs right-hand side matrix
 	//!
-	inline DenseVector operator()(const DenseVector& rhs)
+	DenseVector operator()(const DenseVector& rhs)
 	{
 		viennacl::copy(rhs,vec);
 		res = viennacl::linalg::prod(mat, vec);
@@ -215,11 +227,13 @@ struct GPUDenseMatrixOperation
 	viennacl::matrix<ScalarType> mat;
 	viennacl::vector<ScalarType> vec;
 	viennacl::vector<ScalarType> res;
-	static const char* ARPACK_CODE;
-	static const bool largest;
+    static const std::string& ARPACK_CODE()
+    {
+        static std::string foo("LA");
+        return foo;
+    }
+	static const bool largest = true;
 };
-const char* GPUDenseMatrixOperation::ARPACK_CODE = "LA";
-const bool GPUDenseMatrixOperation::largest = true;
 #endif
 
 }
