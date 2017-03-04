@@ -54,11 +54,10 @@ endif()
 # library interface
 file(GLOB_RECURSE headers_library "${TAPKEE_INCLUDE_DIR}/*.hpp")
 add_library(tapkee_library INTERFACE)
-target_include_directories(tapkee_library INTERFACE ${TAPKEE_INCLUDE_DIR} "${EIGEN3_INCLUDE_DIR}")
+target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}" "${EIGEN3_INCLUDE_DIR}")
 
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee arpack)
-	include_directories(${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS})
 	target_link_libraries(tapkee_library INTERFACE arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
