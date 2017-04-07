@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 
 import numpy
 import sys
@@ -37,7 +38,7 @@ def embed(data,method):
 	numpy.savetxt(input_file, data.T,delimiter=',')
 	tapkee_binary = 'bin/tapkee'
 	runner_string = '%s -i %s -o %s -m %s -k 20 --verbose --transpose-output --benchmark' % (tapkee_binary,input_file,output_file,method)
-	print '-- To reproduce this use the following command', runner_string
+	print('-- To reproduce this use the following command', runner_string)
 	output = subprocess.check_output(runner_string,shell=True)
 	embedded_data = numpy.loadtxt(output_file,delimiter=',')
 	os.remove(input_file)
@@ -64,9 +65,9 @@ if __name__ == "__main__":
 	
 	dataset = args.dataset[0]
 	method = args.method[0]
-	print '-- Loading %s data' % dataset
+	print('-- Loading %s data' % dataset)
 	data, colors = generate_data(dataset)
-	print '-- Embedding %s data with %s' % (dataset,method) 
+	print('-- Embedding %s data with %s' % (dataset,method))
 	embedded_data = embed(data,method)
-	print '-- Plotting embedded data'
+	print('-- Plotting embedded data')
 	plot(data,embedded_data,colors)
