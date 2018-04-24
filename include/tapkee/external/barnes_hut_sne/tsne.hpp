@@ -67,7 +67,6 @@ public:
 			tapkee::LoggingSingleton::instance().message_info("Using Barnes-Hut-SNE algorithm");
 		
 		// Set learning parameters
-		float total_time = .0;
 		int max_iter = 1000, stop_lying_iter = 250, mom_switch_iter = 250;
 		ScalarType momentum = .5, final_momentum = .8;
 		ScalarType eta = 200.0;
