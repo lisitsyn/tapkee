@@ -18,7 +18,7 @@ RUN cd /tapkee && \
     ctest -VV
 
 RUN cd /tapkee && \
-    python test/generate_swissroll.py 100 \
+    python test/generate_swissroll.py 100 && \
     CALLENV='valgrind --leak-check=full --xml=yes --xml-file=/dev/stdout' \
     TAPKEE_ELF='bin/tapkee' \
     INPUT_FILE='input.dat' \
