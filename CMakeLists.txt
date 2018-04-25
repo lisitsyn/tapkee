@@ -1,24 +1,9 @@
-project (Tapkee)
+project (Tapkee  LANGUAGES CXX)
 
-cmake_minimum_required (VERSION 2.8)
-
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-
-# cmake version > 3.1
-#set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(CMAKE_CXX_EXTENSIONS OFF)
+cmake_minimum_required (VERSION 3.3)
 
 # set paths
+set (CMAKE_CXX_STANDARD 11)
 set (TAPKEE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set (TAPKEE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set (TAPKEE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/unit")
@@ -67,13 +52,20 @@ if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()
 
+# library interface
+file(GLOB_RECURSE headers_library "${TAPKEE_INCLUDE_DIR}/*.hpp")
+add_library(tapkee_library INTERFACE)
+target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}" "${EIGEN3_INCLUDE_DIR}")
+
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee arpack)
+	target_link_libraries(tapkee_library INTERFACE arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
 
 if (VIENNACL_FOUND)
 	target_link_libraries(tapkee OpenCL)
+	target_link_libraries(tapkee_library INTERFACE OpenCL)
 	add_definitions(-DTAPKEE_WITH_VIENNACL)
 endif()
 
@@ -169,8 +161,8 @@ if (BUILD_TESTS)
 			find_package(Threads)
 			target_link_libraries(gtest ${CMAKE_THREAD_LIBS_INIT})
 		else()
-			message(FATAL_ERROR "gtest-1.7.0 is required to be available in the root of the project or reachable 
-			                     by GTEST_SOURCE_DIR and GTEST_INCLUDE_DIR")
+			message(FATAL_ERROR "gtest-1.8.0 is required to be available in the root of the project or reachable
+			by GTEST_SOURCE_DIR and GTEST_INCLUDE_DIR")
 		endif()
 	endif()
 	enable_testing()
