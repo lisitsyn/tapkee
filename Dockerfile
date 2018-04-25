@@ -6,7 +6,6 @@ RUN apt-get update && \
     --force-yes -y --no-install-recommends -q0
 
 COPY include /tapkee/include
-COPY lib /tapkee/lib
 COPY src /tapkee/src
 COPY test /tapkee/test
 COPY CMakeLists.txt /tapkee/CMakeLists.txt
