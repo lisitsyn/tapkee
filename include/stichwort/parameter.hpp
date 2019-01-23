@@ -4,25 +4,25 @@
  * All rights reserved.
  *
  * Distributed under the BSD 2-clause license:
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, 
+ * * Redistributions of source code must retain the above copyright notice,
  *   this list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, 
- *   this list of conditions and the following disclaimer in the documentation 
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -52,7 +52,7 @@ class Parameter
 private:
 
 	template <typename T>
-	Parameter(const ParameterName& pname, const T& value) : 
+	Parameter(const ParameterName& pname, const T& value) :
 		valid(true), invalidity_reasons(),
 		parameter_name(pname), keeper(stichwort_internal::ValueKeeper(value))
 	{
@@ -61,18 +61,18 @@ private:
 public:
 
 	template <typename T>
-	static Parameter create(const std::string& name, const T& value) 
+	static Parameter create(const std::string& name, const T& value)
 	{
 		return Parameter(name, value);
 	}
 
-	Parameter() : 
+	Parameter() :
 		valid(true), invalidity_reasons(),
 		parameter_name("unknown"), keeper(stichwort_internal::ValueKeeper())
 	{
 	}
 
-	Parameter(const Parameter& p) : 
+	Parameter(const Parameter& p) :
 		valid(p.valid), invalidity_reasons(p.invalidity_reasons),
 		parameter_name(p.name()), keeper(p.keeper)
 	{
@@ -99,7 +99,7 @@ public:
 		{
 			throw wrong_parameter_error(invalidity_reasons);
 		}
-		try 
+		try
 		{
 			return getValue<T>();
 		}
@@ -134,14 +134,14 @@ public:
 	{
 		return keeper.isInitialized();
 	}
-	
+
 	template <template<class> class F, class Q>
 	inline bool isCondition(F<Q> cond) const
 	{
 		return keeper.isCondition(cond);
 	}
 
-	ParameterName name() const 
+	ParameterName name() const
 	{
 		return parameter_name;
 	}
@@ -160,7 +160,7 @@ private:
 	{
 		return keeper.getValue<T>();
 	}
-	
+
 	template <typename T>
 	inline bool isTypeCorrect() const
 	{
@@ -169,7 +169,7 @@ private:
 
 	inline void invalidate(const std::string& reason)
 	{
-		if (valid) 
+		if (valid)
 			valid = false;
 
 		invalidity_reasons += reason;
@@ -180,7 +180,7 @@ private:
 	bool valid;
 	std::string invalidity_reasons;
 	ParameterName parameter_name;
-	stichwort_internal::ValueKeeper keeper; 
+	stichwort_internal::ValueKeeper keeper;
 
 };
 
@@ -249,7 +249,7 @@ public:
 		this->dups = other.dups;
 		return *this;
 	}
-	void check() 
+	void check()
 	{
 		if (!dups.empty())
 		{
@@ -261,7 +261,7 @@ public:
 			throw multiple_parameter_error(ss.str());
 		}
 	}
-	void add(const Parameter& p) 
+	void add(const Parameter& p)
 	{
 		if (pmap.count(p.name()))
 			dups.push_back(p.name());
@@ -272,7 +272,7 @@ public:
 	{
 		return pmap.count(name) > 0;
 	}
-	void merge(const ParametersSet& pg) 
+	void merge(const ParametersSet& pg)
 	{
 		typedef ParametersMap::const_iterator MapIter;
 		for (MapIter iter = pg.pmap.begin(); iter!=pg.pmap.end(); ++iter)

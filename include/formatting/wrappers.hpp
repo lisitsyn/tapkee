@@ -5,25 +5,25 @@
  * All rights reserved.
  *
  * Distributed under the BSD 2-clause license:
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, 
+ * * Redistributions of source code must retain the above copyright notice,
  *   this list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, 
- *   this list of conditions and the following disclaimer in the documentation 
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -42,7 +42,7 @@ namespace utils
 	template <> struct compile_time_assert<true> {};
 }
 
-namespace wrappers 
+namespace wrappers
 {
 	template <typename T>
 	struct HexWrapper
@@ -162,7 +162,7 @@ namespace wrappers
 
 }
 
-/** Returns a wrapper that makes the provided 
+/** Returns a wrapper that makes the provided
  * value represented as hex when formatting.
  *
  * E.g. formatting::hex(10) => '0xA'
@@ -170,7 +170,7 @@ namespace wrappers
  * @param value a numerical value to be presented as hex
  */
 template<typename T>
-inline wrappers::HexWrapper<T> hex(T value) 
+inline wrappers::HexWrapper<T> hex(T value)
 {
 	return wrappers::HexWrapper<T>(value);
 }
@@ -193,7 +193,7 @@ inline wrappers::OctWrapper<T> oct(T value)
  *
  * @param value a pointer to be represented as hex
  */
-inline wrappers::HexWrapper<size_t> raw(void* value) 
+inline wrappers::HexWrapper<size_t> raw(void* value)
 {
 	size_t ptr = reinterpret_cast<size_t>(value);
 	return wrappers::HexWrapper<size_t>(ptr);
@@ -204,7 +204,7 @@ inline wrappers::HexWrapper<size_t> raw(void* value)
  *
  * @param value a pointer to be represented as hex
  */
-inline wrappers::HexWrapper<size_t> raw(const void* value) 
+inline wrappers::HexWrapper<size_t> raw(const void* value)
 {
 	size_t ptr = reinterpret_cast<size_t>(value);
 	return wrappers::HexWrapper<size_t>(ptr);
@@ -215,8 +215,8 @@ inline wrappers::HexWrapper<size_t> raw(const void* value)
  */
 static const wrappers::WidthWrapperBuilderHelper width;
 
-/** Precision wrapper helper that allows to set output 
- * precision with the brackets operator 
+/** Precision wrapper helper that allows to set output
+ * precision with the brackets operator
  * (e.g. precision[6](2.718281828) => "2.71828")
  */
 static const wrappers::PrecisionWrapperBuilderHelper precision;

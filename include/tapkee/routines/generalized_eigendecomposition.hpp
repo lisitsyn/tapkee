@@ -20,15 +20,15 @@ namespace tapkee_internal
 
 #ifdef TAPKEE_WITH_ARPACK
 //! ARPACK implementation of eigendecomposition-based embedding
-template <class LMatrixType, class RMatrixType, class MatrixOperationType> 
-EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatrixType& lhs, 
+template <class LMatrixType, class RMatrixType, class MatrixOperationType>
+EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatrixType& lhs,
 		const RMatrixType& rhs, IndexType target_dimension, unsigned int skip)
 {
 	timed_context context("ARPACK DSXUPD generalized eigendecomposition");
 
-	ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperationType> 
+	ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperationType>
 		arpack(lhs,rhs,target_dimension+skip,"SM");
-	
+
 	if (arpack.info() == Eigen::Success)
 	{
 		std::string message = formatting::format("Took {} iterations.", arpack.getNbrIterations());
@@ -45,7 +45,7 @@ EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatri
 #endif
 
 //! Eigen library dense implementation of eigendecomposition
-template <class LMatrixType, class RMatrixType, class MatrixOperationType> 
+template <class LMatrixType, class RMatrixType, class MatrixOperationType>
 EigendecompositionResult generalized_eigendecomposition_impl_dense(const LMatrixType& lhs,
 		const RMatrixType& rhs, IndexType target_dimension, unsigned int skip)
 {
@@ -61,7 +61,7 @@ EigendecompositionResult generalized_eigendecomposition_impl_dense(const LMatrix
 			assert(skip==0);
 			DenseMatrix selected_eigenvectors = solver.eigenvectors().rightCols(target_dimension);
 			return EigendecompositionResult(selected_eigenvectors,solver.eigenvalues().tail(target_dimension));
-		} 
+		}
 		else
 		{
 			DenseMatrix selected_eigenvectors = solver.eigenvectors().leftCols(target_dimension+skip).rightCols(target_dimension);
@@ -80,14 +80,14 @@ template <typename LMatrixType, typename RMatrixType>
 struct generalized_eigendecomposition_impl
 {
 #ifdef TAPKEE_WITH_ARPACK
-	EigendecompositionResult arpack(const LMatrixType& lhs, const RMatrixType& rhs, 
-                                    const ComputationStrategy& strategy, 
-                                    const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult arpack(const LMatrixType& lhs, const RMatrixType& rhs,
+                                    const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy,
                                     IndexType target_dimension);
 #endif
 	EigendecompositionResult dense(const LMatrixType& lhs, const RMatrixType& rhs,
-                                   const ComputationStrategy& strategy, 
-                                   const EigendecompositionStrategy& eigen_strategy, 
+                                   const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy,
                                    IndexType target_dimension);
 };
 
@@ -96,11 +96,11 @@ struct generalized_eigendecomposition_impl<SparseWeightMatrix, DenseDiagonalMatr
 {
 #ifdef TAPKEE_WITH_ARPACK
 	EigendecompositionResult arpack(const SparseWeightMatrix& lhs, const DenseDiagonalMatrix& rhs,
-                                    const ComputationStrategy& strategy, 
-                                    const EigendecompositionStrategy& eigen_strategy, 
+                                    const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy,
                                     IndexType target_dimension)
 	{
-		if (strategy.is(HomogeneousCPUStrategy)) 
+		if (strategy.is(HomogeneousCPUStrategy))
 		{
 			if (eigen_strategy.is(SmallestEigenvalues))
 				return generalized_eigendecomposition_impl_arpack
@@ -113,11 +113,11 @@ struct generalized_eigendecomposition_impl<SparseWeightMatrix, DenseDiagonalMatr
 	}
 #endif
 	EigendecompositionResult dense(const SparseWeightMatrix& lhs, const DenseDiagonalMatrix& rhs,
-                                   const ComputationStrategy& strategy, 
-                                   const EigendecompositionStrategy& eigen_strategy, 
+                                   const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy,
                                    IndexType target_dimension)
 	{
-		if (strategy.is(HomogeneousCPUStrategy)) 
+		if (strategy.is(HomogeneousCPUStrategy))
 		{
 			if (eigen_strategy.is(SmallestEigenvalues))
 				return generalized_eigendecomposition_impl_dense
@@ -128,7 +128,7 @@ struct generalized_eigendecomposition_impl<SparseWeightMatrix, DenseDiagonalMatr
 		unsupported();
 		return EigendecompositionResult();
 	}
-	inline void unsupported() const 
+	inline void unsupported() const
 	{
 		throw unsupported_method_error("Unsupported method");
 	}
@@ -139,11 +139,11 @@ struct generalized_eigendecomposition_impl<DenseMatrix, DenseMatrix>
 {
 #ifdef TAPKEE_WITH_ARPACK
 	EigendecompositionResult arpack(const DenseMatrix& lhs, const DenseMatrix& rhs,
-                                    const ComputationStrategy& strategy, 
-                                    const EigendecompositionStrategy& eigen_strategy, 
+                                    const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy,
                                     IndexType target_dimension)
 	{
-		if (strategy.is(HomogeneousCPUStrategy)) 
+		if (strategy.is(HomogeneousCPUStrategy))
 		{
 			if (eigen_strategy.is(SmallestEigenvalues))
 				return generalized_eigendecomposition_impl_arpack
@@ -156,11 +156,11 @@ struct generalized_eigendecomposition_impl<DenseMatrix, DenseMatrix>
 	}
 #endif
 	EigendecompositionResult dense(const DenseMatrix& lhs, const DenseMatrix& rhs,
-                                   const ComputationStrategy& strategy, 
-                                   const EigendecompositionStrategy& eigen_strategy, 
+                                   const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy,
                                    IndexType target_dimension)
 	{
-		if (strategy.is(HomogeneousCPUStrategy)) 
+		if (strategy.is(HomogeneousCPUStrategy))
 		{
 			if (eigen_strategy.is(SmallestEigenvalues))
 				return generalized_eigendecomposition_impl_dense
@@ -171,7 +171,7 @@ struct generalized_eigendecomposition_impl<DenseMatrix, DenseMatrix>
 		unsupported();
 		return EigendecompositionResult();
 	}
-	inline void unsupported() const 
+	inline void unsupported() const
 	{
 		throw unsupported_method_error("Unsupported method");
 	}
@@ -182,7 +182,7 @@ EigendecompositionResult generalized_eigendecomposition(const EigenMethod& metho
                                                         const EigendecompositionStrategy& eigen_strategy,
                                                         const LMatrixType& lhs, const RMatrixType& rhs, IndexType target_dimension)
 {
-	LoggingSingleton::instance().message_info(formatting::format("Using the {} eigendecomposition method.", 
+	LoggingSingleton::instance().message_info(formatting::format("Using the {} eigendecomposition method.",
 		get_eigen_method_name(method)));
 #ifdef TAPKEE_WITH_ARPACK
 	if (method.is(Arpack))

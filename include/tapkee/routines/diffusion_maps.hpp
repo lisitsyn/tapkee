@@ -33,7 +33,7 @@ namespace tapkee_internal
 //! @param width width \f$ w \f$ of the gaussian kernel
 //!
 template <class RandomAccessIterator, class DistanceCallback>
-DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, DistanceCallback callback, 
+DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, DistanceCallback callback,
                                               const ScalarType width)
 {
 	timed_context context("Diffusion map matrix computation");
@@ -71,7 +71,7 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 
 	// compute sqrt of column sum vector
 	p = diffusion_matrix.colwise().sum().cwiseSqrt();
-	
+
 	for (IndexType i=0; i<n_vectors; i++)
 		for (IndexType j=0; j<n_vectors; j++)
 			diffusion_matrix(i,j) /= p(i)*p(j);

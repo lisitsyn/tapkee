@@ -27,12 +27,12 @@ namespace tapkee_internal
 
 #ifdef TAPKEE_WITH_ARPACK
 //! ARPACK implementation of eigendecomposition-based embedding
-template <class MatrixType, class MatrixOperationType> 
+template <class MatrixType, class MatrixOperationType>
 EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 {
 	timed_context context("ARPACK eigendecomposition");
 
-	ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixOperationType> 
+	ArpackGeneralizedSelfAdjointEigenSolver<MatrixType, MatrixType, MatrixOperationType>
 		arpack(wm,target_dimension+skip,MatrixOperationType::ARPACK_CODE());
 
 	if (arpack.info() == Eigen::Success)
@@ -51,7 +51,7 @@ EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType& wm, In
 #endif
 
 //! Eigen library dense implementation of eigendecomposition-based embedding
-template <class MatrixType, class MatrixOperationType> 
+template <class MatrixType, class MatrixOperationType>
 EigendecompositionResult eigendecomposition_impl_dense(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 {
 	timed_context context("Eigen library dense eigendecomposition");
@@ -68,7 +68,7 @@ EigendecompositionResult eigendecomposition_impl_dense(const MatrixType& wm, Ind
 			assert(skip==0);
 			DenseMatrix selected_eigenvectors = solver.eigenvectors().rightCols(target_dimension);
 			return EigendecompositionResult(selected_eigenvectors,solver.eigenvalues().tail(target_dimension));
-		} 
+		}
 		else
 		{
 			DenseMatrix selected_eigenvectors = solver.eigenvectors().leftCols(target_dimension+skip).rightCols(target_dimension);
@@ -83,11 +83,11 @@ EigendecompositionResult eigendecomposition_impl_dense(const MatrixType& wm, Ind
 }
 
 //! Randomized redsvd-like implementation of eigendecomposition-based embedding
-template <class MatrixType, class MatrixOperationType> 
+template <class MatrixType, class MatrixOperationType>
 EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType& wm, IndexType target_dimension, unsigned int skip)
 {
 	timed_context context("Randomized eigendecomposition");
-	
+
 	DenseMatrix O(wm.rows(), target_dimension+skip);
 	for (IndexType i=0; i<O.rows(); ++i)
 	{
@@ -126,7 +126,7 @@ EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType& wm
 			assert(skip==0);
 			DenseMatrix selected_eigenvectors = (Y*eigenOfB.eigenvectors()).rightCols(target_dimension);
 			return EigendecompositionResult(selected_eigenvectors,eigenOfB.eigenvalues());
-		} 
+		}
 		else
 		{
 			DenseMatrix selected_eigenvectors = (Y*eigenOfB.eigenvectors()).leftCols(target_dimension+skip).rightCols(target_dimension);
@@ -144,15 +144,15 @@ template <typename MatrixType>
 struct eigendecomposition_impl
 {
 #ifdef TAPKEE_WITH_ARPACK
-	EigendecompositionResult arpack(const MatrixType& m, const ComputationStrategy& strategy, 
-                                    const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult arpack(const MatrixType& m, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy,
                                     IndexType target_dimension);
 #endif
-	EigendecompositionResult dense(const MatrixType& m, const ComputationStrategy& strategy, 
-                                   const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult dense(const MatrixType& m, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy,
                                    IndexType target_dimension);
-	EigendecompositionResult randomized(const MatrixType& m, const ComputationStrategy& strategy, 
-                                        const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult randomized(const MatrixType& m, const ComputationStrategy& strategy,
+                                        const EigendecompositionStrategy& eigen_strategy,
                                         IndexType target_dimension);
 };
 
@@ -160,8 +160,8 @@ template <>
 struct eigendecomposition_impl<DenseMatrix>
 {
 #ifdef TAPKEE_WITH_ARPACK
-	EigendecompositionResult arpack(const DenseMatrix& m, const ComputationStrategy& strategy, 
-                                    const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult arpack(const DenseMatrix& m, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy,
                                     IndexType target_dimension)
 	{
 		if (strategy.is(HomogeneousCPUStrategy))
@@ -193,8 +193,8 @@ struct eigendecomposition_impl<DenseMatrix>
 		return EigendecompositionResult();
 	}
 #endif
-	EigendecompositionResult dense(const DenseMatrix& m, const ComputationStrategy& strategy, 
-                                   const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult dense(const DenseMatrix& m, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy,
                                    IndexType target_dimension)
 	{
 		if(strategy.is(HomogeneousCPUStrategy))
@@ -213,8 +213,8 @@ struct eigendecomposition_impl<DenseMatrix>
 		unsupported();
 		return EigendecompositionResult();
 	}
-	EigendecompositionResult randomized(const DenseMatrix& m, const ComputationStrategy& strategy, 
-                                        const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult randomized(const DenseMatrix& m, const ComputationStrategy& strategy,
+                                        const EigendecompositionStrategy& eigen_strategy,
                                         IndexType target_dimension)
 	{
 		if (strategy.is(HomogeneousCPUStrategy))
@@ -245,7 +245,7 @@ struct eigendecomposition_impl<DenseMatrix>
 		unsupported();
 		return EigendecompositionResult();
 	}
-	inline void unsupported() const 
+	inline void unsupported() const
 	{
 		throw unsupported_method_error("Unsupported method");
 	}
@@ -255,8 +255,8 @@ template <>
 struct eigendecomposition_impl<SparseWeightMatrix>
 {
 #ifdef TAPKEE_WITH_ARPACK
-	EigendecompositionResult arpack(const SparseWeightMatrix& m, const ComputationStrategy& strategy, 
-                                    const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult arpack(const SparseWeightMatrix& m, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy,
                                     IndexType target_dimension)
 	{
 		if (strategy.is(HomogeneousCPUStrategy))
@@ -270,8 +270,8 @@ struct eigendecomposition_impl<SparseWeightMatrix>
 		return EigendecompositionResult();
 	}
 #endif
-	EigendecompositionResult dense(const SparseWeightMatrix& m, const ComputationStrategy& strategy, 
-                                   const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult dense(const SparseWeightMatrix& m, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy,
                                    IndexType target_dimension)
 	{
 		if (strategy.is(HomogeneousCPUStrategy))
@@ -284,8 +284,8 @@ struct eigendecomposition_impl<SparseWeightMatrix>
 		unsupported();
 		return EigendecompositionResult();
 	}
-	EigendecompositionResult randomized(const SparseWeightMatrix& m, const ComputationStrategy& strategy, 
-                                        const EigendecompositionStrategy& eigen_strategy, 
+	EigendecompositionResult randomized(const SparseWeightMatrix& m, const ComputationStrategy& strategy,
+                                        const EigendecompositionStrategy& eigen_strategy,
                                         IndexType target_dimension)
 	{
 		if (strategy.is(HomogeneousCPUStrategy))
@@ -298,13 +298,13 @@ struct eigendecomposition_impl<SparseWeightMatrix>
 		unsupported();
 		return EigendecompositionResult();
 	}
-	inline void unsupported() const 
+	inline void unsupported() const
 	{
 		throw unsupported_method_error("Unsupported method");
 	}
 };
 
-//! Multiple implementation handler method for various eigendecomposition methods. 
+//! Multiple implementation handler method for various eigendecomposition methods.
 //!
 //! Has three template parameters:
 //! MatrixType - class of weight matrix to perform eigendecomposition of
@@ -313,11 +313,11 @@ struct eigendecomposition_impl<SparseWeightMatrix>
 //! In order to compute largest eigenvalues MatrixOperationType should provide
 //! implementation of operator()(DenseMatrix) which computes right product
 //! of the parameter with the MatrixType.
-//! 
+//!
 //! In order to compute smallest eigenvalues MatrixOperationType should provide
 //! implementation of operator()(DenseMatrix) which solves linear system with
-//! given right-hand side part. 
-//! 
+//! given right-hand side part.
+//!
 //! Currently supports three methods:
 //!
 //! <ul>
@@ -327,14 +327,14 @@ struct eigendecomposition_impl<SparseWeightMatrix>
 //! </ul>
 //!
 //! @param method one of supported eigendecomposition methods
-//! @param m matrix to be eigendecomposed 
+//! @param m matrix to be eigendecomposed
 //! @param target_dimension target dimension of embedding i.e. number of eigenvectors to be
 //!        computed
 //! @param skip number of eigenvectors to skip (from either smallest or largest side)
 //!
 template <class MatrixType>
-EigendecompositionResult eigendecomposition(const EigenMethod& method, const ComputationStrategy& strategy, 
-                                            const EigendecompositionStrategy& eigen_strategy, 
+EigendecompositionResult eigendecomposition(const EigenMethod& method, const ComputationStrategy& strategy,
+                                            const EigendecompositionStrategy& eigen_strategy,
                                             const MatrixType& m, IndexType target_dimension)
 {
 	LoggingSingleton::instance().message_info(formatting::format("Using the {} eigendecomposition method.",

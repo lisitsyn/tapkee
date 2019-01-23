@@ -23,10 +23,10 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-//! Matrix-matrix operation used to 
-//! compute smallest eigenvalues and 
+//! Matrix-matrix operation used to
+//! compute smallest eigenvalues and
 //! associated eigenvectors of a sparse matrix
-//! Essentially solves linear system 
+//! Essentially solves linear system
 //! with provided right-hand side part.
 //!
 struct SparseInverseMatrixOperation
@@ -50,10 +50,10 @@ struct SparseInverseMatrixOperation
 	static const bool largest = false;
 };
 
-//! Matrix-matrix operation used to 
-//! compute smallest eigenvalues and 
+//! Matrix-matrix operation used to
+//! compute smallest eigenvalues and
 //! associated eigenvectors of a dense matrix
-//! Essentially solves linear system 
+//! Essentially solves linear system
 //! with provided right-hand side part.
 //!
 struct DenseInverseMatrixOperation
@@ -80,7 +80,7 @@ struct DenseInverseMatrixOperation
 //! Matrix-matrix operation used to
 //! compute largest eigenvalues and
 //! associated eigenvectors. Essentially
-//! computes matrix product with 
+//! computes matrix product with
 //! provided right-hand side part.
 //!
 struct DenseMatrixOperation
@@ -88,9 +88,9 @@ struct DenseMatrixOperation
 	DenseMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
-	//! Computes matrix product of the matrix and provided right-hand 
+	//! Computes matrix product of the matrix and provided right-hand
 	//! side matrix
-	//! 
+	//!
 	//! @param rhs right-hand size matrix
 	//!
 	DenseMatrix operator()(const DenseMatrix& rhs)
@@ -118,9 +118,9 @@ struct DenseImplicitSquareSymmetricMatrixOperation
 	DenseImplicitSquareSymmetricMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
-	//! Computes matrix product of the matrix and provided right-hand 
+	//! Computes matrix product of the matrix and provided right-hand
 	//! side matrix twice
-	//! 
+	//!
 	//! @param rhs right-hand side matrix
 	//!
 	DenseMatrix operator()(const DenseMatrix& rhs)
@@ -148,9 +148,9 @@ struct DenseImplicitSquareMatrixOperation
 	DenseImplicitSquareMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
 	{
 	}
-	//! Computes matrix product of the matrix and provided right-hand 
+	//! Computes matrix product of the matrix and provided right-hand
 	//! side matrix twice
-	//! 
+	//!
 	//! @param rhs right-hand side matrix
 	//!
 	DenseMatrix operator()(const DenseMatrix& rhs)
@@ -176,9 +176,9 @@ struct GPUDenseImplicitSquareMatrixOperation
 		res = viennacl::vector<ScalarType>(matrix.cols());
 		viennacl::copy(matrix,mat);
 	}
-	//! Computes matrix product of the matrix and provided right-hand 
+	//! Computes matrix product of the matrix and provided right-hand
 	//! side matrix twice
-	//! 
+	//!
 	//! @param rhs right-hand side matrix
 	//!
 	DenseVector operator()(const DenseVector& rhs)
@@ -211,9 +211,9 @@ struct GPUDenseMatrixOperation
 		res = viennacl::vector<ScalarType>(matrix.cols());
 		viennacl::copy(matrix,mat);
 	}
-	//! Computes matrix product of the matrix and provided right-hand 
+	//! Computes matrix product of the matrix and provided right-hand
 	//! side matrix twice
-	//! 
+	//!
 	//! @param rhs right-hand side matrix
 	//!
 	DenseVector operator()(const DenseVector& rhs)

@@ -39,7 +39,7 @@
 #ifndef VPTREE_H
 #define VPTREE_H
 
-namespace tsne 
+namespace tsne
 {
 
 class DataPoint
@@ -147,7 +147,7 @@ private:
 
 		Node() : index(0), threshold(0.), left(0), right(0) {}
 
-		~Node() 
+		~Node()
 		{
 			delete left;
 			delete right;
@@ -217,7 +217,7 @@ private:
 		return node;
 	}
 
-	// Helper function that searches the tree    
+	// Helper function that searches the tree
 	void search(Node* node, const T& target, int k, std::priority_queue<HeapItem>& heap)
 	{
 		if(node == NULL) return;     // indicates that we're done here
