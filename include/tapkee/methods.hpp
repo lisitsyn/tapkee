@@ -118,7 +118,7 @@ public:
 
 		p_target_dimension = parameters[target_dimension];
 		p_n_neighbors = parameters[num_neighbors].checked().satisfies(Positivity<IndexType>());
-		
+
 		if (n_vectors > 0)
 		{
 			p_target_dimension.checked().satisfies(InRange<IndexType>(1,n_vectors));
@@ -157,23 +157,21 @@ public:
 		if (context.is_cancelled()) 
 			throw cancelled_exception();
 
-		using std::mem_fun_ref_t;
-		using std::mem_fun_ref;
-		typedef std::mem_fun_ref_t<TapkeeOutput,ImplementationBase> ImplRef;
-
 #define tapkee_method_handle(X)																	\
 		case X:																					\
 		{																						\
 			timed_context tctx__("[+] embedding with " # X);									\
-			ImplRef ref = conditional_select<													\
+			if constexpr (																		\
 				((!MethodTraits<X>::needs_kernel)   || (!is_dummy<KernelCallback>::value))   &&	\
 				((!MethodTraits<X>::needs_distance) || (!is_dummy<DistanceCallback>::value)) &&	\
-				((!MethodTraits<X>::needs_features) || (!is_dummy<FeaturesCallback>::value)),	\
-					ImplRef>()(mem_fun_ref(&ImplementationBase::embed##X),						\
-					           mem_fun_ref(&ImplementationBase::embedEmpty));					\
-			return ref(*this);																	\
+				((!MethodTraits<X>::needs_features) || (!is_dummy<FeaturesCallback>::value))	\
+			) {																					\
+				return ImplementationBase::embed##X();											\
+			} else {																			\
+				return ImplementationBase::embedEmpty();										\
+			}																					\
 		}																						\
-		break																					\
+		break;																					\
 
 		switch (method)
 		{
