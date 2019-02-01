@@ -161,7 +161,7 @@ public:
 		case X:																					\
 		{																						\
 			timed_context tctx__("[+] embedding with " # X);									\
-			if constexpr (																		\
+			if (																				\
 				((!MethodTraits<X>::needs_kernel)   || (!is_dummy<KernelCallback>::value))   &&	\
 				((!MethodTraits<X>::needs_distance) || (!is_dummy<DistanceCallback>::value)) &&	\
 				((!MethodTraits<X>::needs_features) || (!is_dummy<FeaturesCallback>::value))	\
