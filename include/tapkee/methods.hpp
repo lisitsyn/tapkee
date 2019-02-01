@@ -11,7 +11,6 @@
 #include <tapkee/utils/naming.hpp>
 #include <tapkee/utils/time.hpp>
 #include <tapkee/utils/logging.hpp>
-#include <tapkee/utils/conditional_select.hpp>
 #include <tapkee/utils/features.hpp>
 #include <tapkee/parameters/defaults.hpp>
 #include <tapkee/parameters/context.hpp>
