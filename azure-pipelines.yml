@@ -1,0 +1,17 @@
+jobs: 
+  - job: ubuntu
+    trigger:
+      - master
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+      - task: CMake@1
+        displayName: 'Build with CMake'
+  - job: windows
+    trigger:
+      - master
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+      - task: CMake@1
+        displayName: 'Build with CMake'
