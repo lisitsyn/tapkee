@@ -3,6 +3,8 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
     steps:
+      - script: |
+          sudo apt-get install -y libeigen-dev
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
@@ -14,10 +16,18 @@ jobs:
     pool:
       vmImage: vs2017-win2016
     steps:
+      - task: CondaEnvironment@1
+        displayName: Install dependencies
+        inputs:
+          createCustomEnvironment: True
+          environmentName: shogun
+          packageSpecs: 'python=3.6.* eigen'
+          createOptions: '-c conda-forge'
+          updateConda: false
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
-          cmakeArgs: -DCMAKE_BUILD_TYPE=Release $(cmakeOptions) ..
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library $(cmakeOptions) ..
       - script: cmake --build .
         displayName: 'Build with CMake'
         workingDirectory: build
