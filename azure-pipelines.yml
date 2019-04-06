@@ -4,14 +4,20 @@ jobs:
       vmImage: 'Ubuntu-16.04'
     steps:
       - task: CMake@1
-        displayName: 'Build with CMake'
+        displayName: 'Setup with CMake'
+        inputs:
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release $(cmakeOptions) ..
+      - script: make
+        displayName: 'Build with Make'
+        workingDirectory: build
   - job: windows
     pool:
       vmImage: vs2017-win2016
     steps:
       - task: CMake@1
         displayName: 'Setup with CMake'
-        cmakeArgs: -DCMAKE_BUILD_TYPE=Release $(cmakeOptions) ..
+        inputs:
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release $(cmakeOptions) ..
       - script: cmake --build .
-        displayName: 'Build ($(buildConfiguration) $(buildPlatform))'
-        workingDirectory: $(Build.SourcesDirectory)\build
+        displayName: 'Build with CMake'
+        workingDirectory: build
