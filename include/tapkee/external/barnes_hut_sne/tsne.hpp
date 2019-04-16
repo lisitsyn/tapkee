@@ -369,6 +369,7 @@ private:
 		ScalarType buff[QT_NO_DIMS] = {.0, .0};
 		ScalarType sum_Q = .0;
 		for(int n = 0; n < N; n++) tree->computeNonEdgeForces(n, theta, buff, &sum_Q);
+		delete tree;
 
 		// Loop over all edges to compute t-SNE error
 		int ind1, ind2;
