@@ -23,7 +23,7 @@ jobs:
         displayName: ‘Create GitHub Release’
         inputs:
           tag: latest-macosx
-          githubConnection: lisitsyn
+          githubConnection: tapkee
           repositoryName: lisitsyn/tapkee
   - job: ubuntu
     pool:
@@ -47,7 +47,7 @@ jobs:
         displayName: ‘Create GitHub Release’
         inputs:
           tag: latest-linux
-          githubConnection: lisitsyn
+          githubConnection: tapkee
           repositoryName: lisitsyn/tapkee
   - job: windows
     pool:
@@ -77,5 +77,5 @@ jobs:
         displayName: ‘Create GitHub Release’
         inputs:
           tag: latest-windows
-          githubConnection: lisitsyn
+          githubConnection: tapkee
           repositoryName: lisitsyn/tapkee
