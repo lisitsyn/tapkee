@@ -1,4 +1,19 @@
-jobs: 
+jobs:
+  - job: macosx
+    pool:
+      vmImage: xcode9-macos10.13
+    steps:
+      - script: |
+          brew update
+          brew install arpack eigen
+        displayName: 'Install dependencies'
+      - task: CMake@1
+        displayName: 'Setup with CMake'
+        inputs:
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release $(cmakeOptions) ..
+      - script: make
+        displayName: 'Build with Make'
+        workingDirectory: build
   - job: ubuntu
     pool:
       vmImage: 'Ubuntu-16.04'
