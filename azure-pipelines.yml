@@ -15,8 +15,9 @@ jobs:
         displayName: 'Build with Make'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
+        displayName: 'Publish'
         inputs:
-          pathtoPublish: 'build'
+          pathtoPublish: 'bin'
           artifactName: latest-macosx
   - job: ubuntu
     pool:
@@ -32,8 +33,9 @@ jobs:
         displayName: 'Build with Make'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
+        displayName: 'Publish'
         inputs:
-          pathtoPublish: 'build'
+          pathtoPublish: 'bin'
           artifactName: latest-ubuntu
   - job: windows
     pool:
@@ -55,6 +57,7 @@ jobs:
         displayName: 'Build with CMake'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
+        displayName: 'Publish'
         inputs:
-          pathtoPublish: 'build'
+          pathtoPublish: 'bin'
           artifactName: latest-windows
