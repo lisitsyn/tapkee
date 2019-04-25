@@ -14,17 +14,10 @@ jobs:
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
-      - task: CopyFiles@2
-        displayName: 'Copy to staging'
+      - task: PublishBuildArtifacts@1
         inputs:
-          contents: 'build/tapkee'
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: GithubRelease@0
-        displayName: ‘Create GitHub Release’
-        inputs:
-          tag: latest-macosx
-          githubConnection: tapkee
-          repositoryName: lisitsyn/tapkee
+          pathtoPublish: 'build'
+          artifactName: latest-macosx
   - job: ubuntu
     pool:
       vmImage: 'Ubuntu-16.04'
@@ -38,17 +31,10 @@ jobs:
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
-      - task: CopyFiles@2
-        displayName: 'Copy to staging'
+      - task: PublishBuildArtifacts@1
         inputs:
-          contents: 'build/tapkee'
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: GithubRelease@0
-        displayName: ‘Create GitHub Release’
-        inputs:
-          tag: latest-linux
-          githubConnection: tapkee
-          repositoryName: lisitsyn/tapkee
+          pathtoPublish: 'build'
+          artifactName: latest-ubuntu
   - job: windows
     pool:
       vmImage: vs2017-win2016
@@ -68,14 +54,7 @@ jobs:
       - script: cmake --build .
         displayName: 'Build with CMake'
         workingDirectory: build
-      - task: CopyFiles@2
-        displayName: 'Copy to staging'
+      - task: PublishBuildArtifacts@1
         inputs:
-          contents: build\tapkee
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: GithubRelease@0
-        displayName: ‘Create GitHub Release’
-        inputs:
-          tag: latest-windows
-          githubConnection: tapkee
-          repositoryName: lisitsyn/tapkee
+          pathtoPublish: 'build'
+          artifactName: latest-windows
