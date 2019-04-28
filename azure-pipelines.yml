@@ -45,7 +45,7 @@ jobs:
         displayName: Install dependencies
         inputs:
           createCustomEnvironment: True
-          environmentName: shogun
+          environmentName: tapkee
           packageSpecs: 'python=3.6.* eigen'
           createOptions: '-c conda-forge'
           updateConda: false
@@ -53,7 +53,7 @@ jobs:
         displayName: 'Setup with CMake'
         inputs:
           cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library $(cmakeOptions) ..
-      - script: cmake --build .
+      - script: cmake --build . --config Release
         displayName: 'Build with CMake'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
