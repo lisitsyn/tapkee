@@ -46,7 +46,7 @@ int run(int argc, const char** argv)
 	              "tapkee -i input.dat -o output.dat --method lle --eigen-method arpack -k 10\n\n";
 	opt.syntax = "tapkee [options]\n";
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(USE_SLASH_CLI_WINDOWS) && (defined(_WIN32) || defined(_WIN64))
 	#define OPT_PREFIX "/"
 	#define OPT_LONG_PREFIX "/"
 #else

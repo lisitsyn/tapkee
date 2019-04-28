@@ -52,6 +52,8 @@ if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()
 
+option(USE_SLASH_CLI_WINDOWS "Whether to use slash command line parameters" OFF)
+
 # library interface
 file(GLOB_RECURSE headers_library "${TAPKEE_INCLUDE_DIR}/*.hpp")
 add_library(tapkee_library INTERFACE)
