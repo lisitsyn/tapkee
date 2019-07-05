@@ -32,7 +32,8 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve((k*k+2*k+1)*(end-begin));
 
-#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets) default(none)
+#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets, \
+		target_dimension,shift,k) default(none)
 	{
 		IndexType index_iter;
 		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
@@ -102,7 +103,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
 	SparseTriplets sparse_triplets;
 	sparse_triplets.reserve((k*k+2*k+1)*(end-begin));
 
-#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets) default(none)
+#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets,k,trace_shift,shift) default(none)
 	{
 		IndexType index_iter;
 		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
@@ -175,7 +176,8 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 
 	const IndexType dp = target_dimension*(target_dimension+1)/2;
 
-#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets) default(none)
+#pragma omp parallel shared(begin,end,neighbors,callback,sparse_triplets, \
+		target_dimension,dp,k) default(none)
 	{
 		IndexType index_iter;
 		DenseMatrix gram_matrix = DenseMatrix::Zero(k,k);
