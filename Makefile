@@ -2,6 +2,7 @@ python_plotter := python -c 'from pylab import*;X=loadtxt(sys.stdin);scatter(X[0
 plotter := $(python_plotter)
 
 default:
+	@(git submodule update --init)
 	@(mkdir -p build; cd build; cmake ..; make)
 
 test: default
