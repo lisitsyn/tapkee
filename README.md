@@ -19,12 +19,12 @@ this software in any publication we would be happy if you cite the following pap
 	Sergey Lisitsyn and Christian Widmer and Fernando J. Iglesias Garcia. Tapkee: An Efficient Dimension Reduction Library. Journal of Machine Learning Research, 14: 2355-2359, 2013.
 
 To get started with dimension reduction you may try the
-[borsch script](https://github.com/lisitsyn/tapkee/blob/master/examples/borsch/borsch.py)
+[go.py script](https://github.com/lisitsyn/tapkee/blob/master/examples/go.py)
 that embeds common datasets (swissroll, helix, scurve) using
 the Tapkee library and outputs it with the help of
 Matplotlib library. To use the script build the
 sample application (see the Application section for more details)
-and call borsch with the following command:
+and call go.py with the following command:
 
 	./examples/go.py [swissroll|helix|scurve|...] [lle|isomap|...]
 
