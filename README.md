@@ -11,7 +11,7 @@ greater flexibility we provide a callback interface which decouples dimension re
 the data representation and storage schemes.
 
 The library is distributed under permissive
-[BSD 3-clause license](https://github.com/lisitsyn/tapkee/tree/master/include/LICENSE)
+[BSD 3-clause license](https://github.com/lisitsyn/tapkee/blob/master/include/LICENSE)
 (except a few rather optional parts that are distributed under other
 open sources licenses, see Licensing section of this document). If you use
 this software in any publication we would be happy if you cite the following paper:
@@ -19,14 +19,14 @@ this software in any publication we would be happy if you cite the following pap
 	Sergey Lisitsyn and Christian Widmer and Fernando J. Iglesias Garcia. Tapkee: An Efficient Dimension Reduction Library. Journal of Machine Learning Research, 14: 2355-2359, 2013.
 
 To get started with dimension reduction you may try the
-[borsch script](https://github.com/lisitsyn/tapkee/tree/master/examples/borsch/borsch.py)
+[borsch script](https://github.com/lisitsyn/tapkee/blob/master/examples/borsch/borsch.py)
 that embeds common datasets (swissroll, helix, scurve) using
 the Tapkee library and outputs it with the help of
 Matplotlib library. To use the script build the
 sample application (see the Application section for more details)
 and call borsch with the following command:
 
-	./examples/borsch [swissroll|helix|scurve|...] [lle|isomap|...]
+	./examples/go.py [swissroll|helix|scurve|...] [lle|isomap|...]
 
 You may also try out an minimal example using `make minimal` (examples/minimal)
 and the RNA example using `make rna` (examples/rna). There are also a few graphical
@@ -181,7 +181,7 @@ Tapkee is designed to be highly customizable with preprocessor definitions.
 
 If you want to use float as internal numeric type (default is double) you may do
 that with definition of `#define TAPKEE_CUSTOM_NUMTYPE float`
-before including [defines header](https://github.com/lisitsyn/tapkee/tree/master/include/tapkee_defines.hpp).
+before including [defines header](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp).
 
 If you use some non-standard STL-compatible realization of vector, map and pair you may redefine them
 with `TAPKEE_INTERNAL_VECTOR`, `TAPKEE_INTERNAL_PAIR`, `TAPKEE_INTERNAL_MAP`
@@ -312,15 +312,15 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 Licensing
 ---------
 
-The library is distributed under the [BSD 3-clause](https://github.com/lisitsyn/tapkee/tree/master/LICENSE) license.
+The library is distributed under the [BSD 3-clause](https://github.com/lisitsyn/tapkee/blob/master/LICENSE) license.
 
 Exceptions are:
 
-- [Barnes-Hut-SNE code](https://github.com/lisitsyn/tapkee/tree/master/include/external/barnes_hut_sne/) by Laurens van der Maaten which
+- [Barnes-Hut-SNE code](https://github.com/lisitsyn/tapkee/blob/master/include/external/barnes_hut_sne/) by Laurens van der Maaten which
   is distributed under the BSD 4-clause license.
 
-- [Covertree code](https://github.com/lisitsyn/tapkee/tree/master/include/neighbors/covertree.hpp) by John Langford and Dinoj Surendran
-  which is distributed under the [LGPLv3 license](https://github.com/lisitsyn/tapkee/tree/master/LGPL-LICENSE).
+- [Covertree code](https://github.com/lisitsyn/tapkee/blob/master/include/neighbors/covertree.hpp) by John Langford and Dinoj Surendran
+  which is distributed under the [LGPLv3 license](https://github.com/lisitsyn/tapkee/blob/master/LGPL-LICENSE).
 
-- [EZOptionsParser](https://github.com/lisitsyn/tapkee/tree/master/src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed
-  under the [MIT license](https://github.com/lisitsyn/tapkee/tree/master/MIT-LICENSE).
+- [EZOptionsParser](https://github.com/lisitsyn/tapkee/blob/master/src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed
+  under the [MIT license](https://github.com/lisitsyn/tapkee/blob/master/MIT-LICENSE).

@@ -29,10 +29,13 @@ def generate_data(type, N=1000):
 		             [numpy.sin(8*tt)]]
 		return X,tt
 
+	raise Exception('Dataset is not supported')
+
 
 def embed(data,method):
 	if method not in supported_methods:
-		raise Error('Method is not supported by this script')
+		raise Exception('Method is not supported by this script')
+
 	input_file = 'tapkee_input_data'
 	output_file = 'tapkee_output_data'
 	numpy.savetxt(input_file, data.T,delimiter=',')
@@ -62,7 +65,7 @@ if __name__ == "__main__":
 	parser.add_argument('dataset',type=str,nargs=1,help='A dataset to embed. One of the following: swissroll, scurve, helix.')
 	parser.add_argument('method',type=str,nargs=1,help='A method to use. One of the following %s' % str(supported_methods))
 	args = parser.parse_args()
-	
+
 	dataset = args.dataset[0]
 	method = args.method[0]
 	print('-- Loading %s data' % dataset)

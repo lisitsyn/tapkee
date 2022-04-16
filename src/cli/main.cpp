@@ -1,6 +1,6 @@
 /* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * Copyright (c) 2012-2014 Sergey Lisitsyn, Fernando Iglesias 
+ * Copyright (c) 2012-2022 Sergey Lisitsyn, Fernando Iglesias 
  */
 
 #include <tapkee/tapkee.hpp>
@@ -36,7 +36,7 @@ int run(int argc, const char** argv)
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	ezOptionParser opt;
-	opt.footer = "Copyright (C) 2012-2019 Sergey Lisitsyn <lisitsyn.s.o@gmail.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n"
+	opt.footer = "Copyright (C) 2012-2022 Sergey Lisitsyn <lisitsyn@hey.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n"
 	             "This is free software: you are free to change and redistribute it.\n"
 	             "There is NO WARRANTY, to the extent permitted by law.";
 	opt.overview = "Tapkee library application for reduction dimensions of dense matrices.\n"
