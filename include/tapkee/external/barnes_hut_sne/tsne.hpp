@@ -163,7 +163,7 @@ public:
 					if(exact) C = evaluateError(P.data(), Y, N);
 					else      C = evaluateError(row_P, col_P, val_P, Y, N, theta);  // doing approximate computation here!
 					tapkee::LoggingSingleton::instance().message_info(
-							formatting::format("Iteration {}: error is {}\n", iter, C));
+							formatting::format("Iteration {}: error is {}", iter, C));
 				}
 			}
 			// Clean up memory
