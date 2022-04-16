@@ -26,9 +26,9 @@ def plot_embedding(embedding,data):
 	ax.scatter(embedding[0],embedding[1],alpha=0.0)
 	for i in range(embedding.shape[1]):
 		img = numpy.zeros((28,28,4))
-		img[:,:,0] = 255*data[i,:].reshape(28,28)
-		img[:,:,1] = 255*data[i,:].reshape(28,28)
-		img[:,:,2] = 255*data[i,:].reshape(28,28)
+		img[:,:,0] = 1.0 - data[i,:].reshape(28,28)
+		img[:,:,1] = 1.0 - data[i,:].reshape(28,28)
+		img[:,:,2] = 1.0 - data[i,:].reshape(28,28)
 		img[:,:,3] = data[i,:].reshape(28,28)
 		imagebox = OffsetImage(img,cmap=plt.cm.gray,zoom=0.5)
 		ab = AnnotationBbox(imagebox, (embedding[0][i], embedding[1,i]),pad=0.001,frameon=False)
@@ -45,10 +45,10 @@ def export_json(outfile,embedding,data):
 	import scipy.misc
 	for i in range(N):
 		img = numpy.zeros((28,28,4))
-		img[:,:,0] = 255*data[i,:].reshape(28,28)
-		img[:,:,1] = 255*data[i,:].reshape(28,28)
-		img[:,:,2] = 255*data[i,:].reshape(28,28)
-		img[:,:,3] = 255*data[i,:].reshape(28,28)
+		img[:,:,0] = 1.0 - data[i,:].reshape(28,28)
+		img[:,:,1] = 1.0 - data[i,:].reshape(28,28)
+		img[:,:,2] = 1.0 - data[i,:].reshape(28,28)
+		img[:,:,3] = data[i,:].reshape(28,28)
 		scipy.misc.imsave('mnist/%d.png' % i,img)
 	json_dict['data'] = [{'cx':embedding[0,i], 'cy':embedding[1,i], 'fname':'%d.png' % i} for i in range(N)]
 	json.dump(json_dict, open(outfile, 'w'))

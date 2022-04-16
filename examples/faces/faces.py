@@ -1,12 +1,12 @@
 from __future__ import print_function
 import numpy, datetime, json, subprocess, sys, os, glob
-import scipy.misc
+import imageio
 
 def load(dir):
 	images = []
 	vecs = []
 	for f in glob.glob(os.path.join(dir,'*.pgm')):
-		image = numpy.array(scipy.misc.imread(f))
+		image = numpy.array(imageio.imread(f))
 		images.append((f,image))
 		image_vector = image.ravel().astype(numpy.float32)
 		image_vector /= numpy.linalg.norm(image_vector)
@@ -43,12 +43,12 @@ def plot_embedding(embedding,images):
 	ax.scatter(embedding[0],embedding[1],alpha=0.0)
 	for i in range(embedding.shape[1]):
 		img = numpy.zeros((images[i][1].shape[0],images[i][1].shape[1],4))
-		img[:,:,0] = 255*images[i][1]
-		img[:,:,1] = 255*images[i][1]
-		img[:,:,2] = 255*images[i][1]
-		img[:,:,3] = 1
-		imagebox = OffsetImage(img,cmap=plt.cm.gray,zoom=0.5)
-		ab = AnnotationBbox(imagebox, (embedding[0][i], embedding[1,i]),pad=0.001,frameon=False)
+		img[:,:,0] = images[i][1] / 255.0
+		img[:,:,1] = images[i][1] / 255.0
+		img[:,:,2] = images[i][1] / 255.0
+		img[:,:,3] = 1.0
+		imagebox = OffsetImage(img, cmap=plt.cm.gray, zoom=0.25)
+		ab = AnnotationBbox(imagebox, (embedding[0][i], embedding[1,i]), pad=0.001, frameon=False)
 		ax.add_artist(ab)
 	plt.show()
 

@@ -3,7 +3,7 @@ plotter := $(python_plotter)
 
 default:
 	@(git submodule update --init)
-	@(mkdir -p build; cd build; cmake ..; make)
+	@(mkdir -p build; cd build; cmake -DBUILD_EXAMPLES=ON ..; make)
 
 test: default
 	@(cd build; ctest -VV)
