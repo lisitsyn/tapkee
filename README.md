@@ -273,7 +273,7 @@ Once built, the root will also contain the following directories:
 Need help?
 ----------
 
-If you need any help or advice don't hesitate to send [an email](mailto://lisitsyn.s.o@gmail.com) or
+If you need any help or advice don't hesitate to send [an email](mailto://lisitsyn@hey.com) or
 fire [an issue at github](https://github.com/lisitsyn/tapkee/issues/new).
 
 Supported platforms
@@ -283,7 +283,7 @@ Tapkee is tested to be fully functional on Linux (ICC, GCC, Clang compilers)
 and Mac OS X (GCC and Clang compilers). It also compiles under Windows natively
 (MSVS 2012 compiler) with a few known issues. In general, Tapkee uses no platform
 specific code and should work on other systems as well. Please
-[let us know](mailto://lisitsyn.s.o@gmail.com) if you have successfully compiled
+[let us know](mailto://lisitsyn@hey.com) if you have successfully compiled
 or have got any issues on any other system not listed above.
 
 Supported dimension reduction methods

@@ -1,6 +1,6 @@
 /** Stichwort
  *
- * Copyright (c) 2013, Sergey Lisitsyn <lisitsyn.s.o@gmail.com>
+ * Copyright (c) 2013, Sergey Lisitsyn <lisitsyn@hey.com>
  * All rights reserved.
  *
  * Distributed under the BSD 2-clause license:
