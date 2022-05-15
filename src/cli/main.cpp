@@ -197,7 +197,7 @@ int run(int argc, const char** argv)
 		string usage;
 		opt.getUsage(usage);
 		std::cout << usage << std::endl;
-		return 0;
+		return 1;
 	}
 
 	if (opt.isSet(OPT_LONG_PREFIX VERBOSE_KEYWORD))
@@ -227,7 +227,7 @@ int run(int argc, const char** argv)
 		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown method ") + method);
-			return 0;
+			return 1;
 		}
 	}
 	
@@ -242,7 +242,7 @@ int run(int argc, const char** argv)
 		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
-			return 0;
+			return 1;
 		}
 	}
 	tapkee::EigenMethod tapkee_eigen_method = tapkee::Dense;
@@ -256,7 +256,7 @@ int run(int argc, const char** argv)
 		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
-			return 0;
+			return 1;
 		}
 	}
 	tapkee::ComputationStrategy tapkee_computation_strategy = tapkee::HomogeneousCPUStrategy;
@@ -270,7 +270,7 @@ int run(int argc, const char** argv)
 		catch (const std::exception&)
 		{
 			tapkee::LoggingSingleton::instance().message_error(string("Unknown computation strategy ") + method);
-			return 0;
+			return 1;
 		}
 	}
 	int target_dim = 1;
@@ -280,7 +280,7 @@ int run(int argc, const char** argv)
 		{
 			tapkee::LoggingSingleton::instance().message_error("Negative target dimensionality is not possible in current circumstances. "
 			                                                   "Please visit other universe");
-			return 0;
+			return 1;
 		}
 	}
 	int k = 1;
@@ -289,7 +289,7 @@ int run(int argc, const char** argv)
 		if (k < 3)
 		{
 			tapkee::LoggingSingleton::instance().message_error("The provided number of neighbors is too small, consider at least 3.");
-			return 0;
+			return 1;
 		}
 	}
 	double width = 1.0;
@@ -298,7 +298,7 @@ int run(int argc, const char** argv)
 		if (width < 0.0) 
 		{
 			tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
-			return 0;
+			return 1;
 		}
 	}
 	int timesteps = 1;
@@ -307,7 +307,7 @@ int run(int argc, const char** argv)
 		if (timesteps < 0)
 		{
 			tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
-			return 0;
+			return 1;
 		}
 	}
 	double eigenshift = 1e-9;
@@ -498,9 +498,11 @@ int main(int argc, const char** argv)
 	catch (const std::exception& exc) 
 	{
 		std::cerr << "Some error occured: " << exc.what() << std::endl;
+		return 1;
 	}
 	catch (...)
 	{
 		std::cerr << "Unknown error occured" << std::endl;
+		return 1;
 	}
 }
