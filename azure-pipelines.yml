@@ -14,6 +14,9 @@ jobs:
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
+      - script: ctest
+        displayName: 'Test'
+        workingDirectory: build
       - task: PublishBuildArtifacts@1
         displayName: 'Publish'
         inputs:
@@ -31,6 +34,9 @@ jobs:
           cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $(cmakeOptions) ..
       - script: make
         displayName: 'Build with Make'
+        workingDirectory: build
+      - script: ctest
+        displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
         displayName: 'Publish'
@@ -55,6 +61,9 @@ jobs:
           cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library $(cmakeOptions) ..
       - script: cmake --build . --config Release
         displayName: 'Build with CMake'
+        workingDirectory: build
+      - script: ctest
+        displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
         displayName: 'Publish'
