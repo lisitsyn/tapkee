@@ -5,12 +5,12 @@ jobs:
     steps:
       - script: |
           brew update
-          brew install arpack eigen
+          brew install arpack eigen googletest
         displayName: 'Install dependencies'
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
-          cmakeArgs: -DCMAKE_BUILD_TYPE=Release $(cmakeOptions) ..
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $(cmakeOptions) ..
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
@@ -28,7 +28,7 @@ jobs:
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
-          cmakeArgs: -DCMAKE_BUILD_TYPE=Release $(cmakeOptions) ..
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $(cmakeOptions) ..
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
@@ -46,13 +46,13 @@ jobs:
         inputs:
           createCustomEnvironment: True
           environmentName: tapkee
-          packageSpecs: 'python=3.6.* eigen'
+          packageSpecs: 'python=3.6.* eigen gtest'
           createOptions: '-c conda-forge'
           updateConda: false
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
-          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library $(cmakeOptions) ..
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library $(cmakeOptions) ..
       - script: cmake --build . --config Release
         displayName: 'Build with CMake'
         workingDirectory: build
