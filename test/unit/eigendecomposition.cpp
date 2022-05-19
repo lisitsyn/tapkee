@@ -59,6 +59,7 @@ TEST(EigenDecomposition, EigenSparseSmallestEigenvector)
 	ASSERT_NEAR(0.0,(mat*result.first - result.second[0]*result.first).norm(),PRECISION);
 }
 
+#ifdef TAPKEE_WITH_ARPACK
 TEST(EigenDecomposition, ArpackDenseLargestEigenvector) 
 {
 	tapkee::DenseMatrix mat(2,2);
@@ -107,6 +108,7 @@ TEST(EigenDecomposition, ArpackSparseSmallestEigenvector)
 	// check if it is an eigenvector
 	ASSERT_NEAR(0.0,(mat*result.first - result.second[0]*result.first).norm(),PRECISION);
 }
+#endif
 
 TEST(EigenDecomposition, RandomizedDenseLargestEigenvector) 
 {

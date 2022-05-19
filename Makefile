@@ -5,7 +5,9 @@ default:
 	@(git submodule update --init)
 	@(mkdir -p build; cd build; cmake -DBUILD_EXAMPLES=ON ..; make)
 
-test: default
+test:
+	@(git submodule update --init)
+	@(mkdir -p build; cd build; cmake -DBUILD_TESTS=ON ..; make)
 	@(cd build; ctest -VV)
 
 minimal: default

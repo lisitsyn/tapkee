@@ -2,6 +2,10 @@
 
 #include <fstream>
 
+#ifndef M_PI
+#define M_PI (3.14159265358979323846)
+#endif
+
 tapkee::DenseMatrix swissroll(int N) {
 	tapkee::DenseVector tt = (3.0*M_PI/4.0)*(tapkee::DenseVector::Random(N).array()+0.5);
 	tapkee::DenseVector height = tapkee::DenseVector::Random(N).array() - 0.5;
