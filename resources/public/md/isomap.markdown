@@ -7,7 +7,7 @@ Scaling algorithm. The algorithm itself is consisted of the following steps:
 * For each feature vector $ x \in X $ find $ k $ its nearest neighbors and
   construct the sparse neighborhood graph.
 
-* Compute squared distances matrix $ D $ such as $ D_{i,j} = d^2(x_i,x_j) $.
+* Compute squared distances matrix $ D $ such as $ D\_{i,j} = d^2(x\_i,x\_j) $.
  
 * Relax distances with shortest (so-called geodesic) distances on the sparse 
   neighborhood graph (e.g. with sparse Dijkstra algorithm).

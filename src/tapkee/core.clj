@@ -43,13 +43,30 @@
 (defn mathjax-config []
   [:script """
    MathJax = {
-      inlineMath: [['$','$']],
-      displayMath: [['$$','$$']],
+      tex: {
+        inlineMath: [['$','$']],
+        displayMath: [['$$','$$']]
+      },
       options: {
         skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
       }
    };
   """])
+
+(defn yandex-metrica []
+  [:script """
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    var z = null;m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, \"script\", \"https://mc.yandex.ru/metrika/tag.js\", \"ym\");
+
+    ym(64440154, \"init\", {
+         clickmap:true,
+         trackLinks:true,
+         accurateTrackBounce:true
+    });
+   """])
 
 (defn google-analytics []
   [:script """
@@ -156,14 +173,31 @@
        [:a {:href "https://github.com/weavejester/compojure"} "Compojure"] ", "
        [:a {:href "https://github.com/weavejester/hiccup"} "Hiccup"]
        " and " [:a {:href "http://twitter.github.com/bootstrap/"} "Bootstrap"] " libraries " [:br] 
-       "Developed by " [:a {:href "mailto://lisitsyn.s.o@gmail.com"} "Sergey Lisitsyn"] ". Dedicated to Oksana Bayda"
+       "Developed by " [:a {:href "mailto://lisitsyn@hey.com"} "Sergey Lisitsyn"] ". Dedicated to Oksana Bayda"
         ]]]])
 
 (defn htmlize-markdown [id file]
-  (str "jQuery.get('" file "',function(d){$('"id"').html(markdown.toHTML(d));MathJax.Hub.Queue([\"Typeset\",MathJax.Hub]);});"))
+  (str """
+      $(document).ready(function () {
+         jQuery.get('" file "', function (d) {
+              $('"id"').html(markdown.toHTML(d));
+              $('"id"').each(function(i,e){
+                MathJax.typeset([e]);
+              });
+         });
+      })"""))
 
 (defn load-sources [id file]
-  (str "jQuery.get('" file "',function(d){$('"id"').text(d);$('"id"').each(function(i,e){hljs.highlightBlock(e)});});"))
+  (str """
+       $(document).ready(function () {
+         jQuery.get('" file "', function (d) {
+              $('"id"').text(d);
+              $('"id"').each(function(i,e){
+                hljs.highlightElement(e);
+              });
+         });
+        })"""))
+
 
 (defn script [& operations]
   (str operations))
@@ -178,7 +212,7 @@
       (include-css "css/tipsy.css") 
       (include-css "css/docs.css")
       (include-css "http://fonts.googleapis.com/css?family=Nunito") (include-css "css/override.css") 
-      (include-css "http://yandex.st/highlightjs/7.3/styles/default.min.css")
+      (include-css "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/styles/default.min.css")
       ;;;
       (include-js "js/d3.v3.min.js") (include-js "js/jquery-1.9.1.min.js") 
       (include-js "js/jquery.tipsy.js") (include-js "js/bootstrap.min.js") 
@@ -186,8 +220,9 @@
       (include-js "js/bootstrap-modalmanager.js") 
       (include-js "js/bootstrap-modal.js") 
       (include-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js")
-      (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
+      ;;;
       (mathjax-config)
+      (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
       ;;;
       (forkme)]
     [:body
@@ -227,6 +262,7 @@
               all-usage-examples))
     ]
     (footer)
+    (yandex-metrica)
     (google-analytics)))
 
 (defroutes routes
