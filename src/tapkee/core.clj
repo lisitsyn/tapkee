@@ -42,14 +42,13 @@
 
 (defn mathjax-config []
   [:script """
-   MathJax.Hub.Config({
-    tex2jax: {
+   MathJax = {
       inlineMath: [['$','$']],
       displayMath: [['$$','$$']],
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] // removed 'code' entry                 
-    }             
-   });
-   MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: \"AMS\"}    }    });
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+   };
   """])
 
 (defn google-analytics []
@@ -186,8 +185,8 @@
       (include-js "js/markdown.js") 
       (include-js "js/bootstrap-modalmanager.js") 
       (include-js "js/bootstrap-modal.js") 
-      (include-js "http://yandex.st/highlightjs/7.3/highlight.min.js")
-      (include-js "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+      (include-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js")
+      (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
       (mathjax-config)
       ;;;
       (forkme)]
