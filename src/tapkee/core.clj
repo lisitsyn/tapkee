@@ -164,18 +164,6 @@
                    });
       """]]]])
 
-(defn footer []
-  [:footer {:class "footer"}
-   [:div {:class "container"}
-    [:p
-      [:small 
-       "Hosted on " [:a {:href "https://www.heroku.com/"} "Heroku"] " with help of "
-       [:a {:href "https://github.com/weavejester/compojure"} "Compojure"] ", "
-       [:a {:href "https://github.com/weavejester/hiccup"} "Hiccup"]
-       " and " [:a {:href "http://twitter.github.com/bootstrap/"} "Bootstrap"] " libraries " [:br] 
-       "Developed by " [:a {:href "mailto://lisitsyn@hey.com"} "Sergey Lisitsyn"] ". Dedicated to Oksana Bayda"
-        ]]]])
-
 (defn htmlize-markdown [id file]
   (str """
       $(document).ready(function () {
@@ -261,7 +249,6 @@
                        ""))
               all-usage-examples))
     ]
-    (footer)
     (yandex-metrica)
     (google-analytics)))
 
