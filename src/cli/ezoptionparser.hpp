@@ -2109,12 +2109,13 @@ void ezOptionParser::parse(int argc, const char * argv[]) {
 }
 /* ################################################################### */
 void ezOptionParser::prettyPrint(std::string & out) {
-	char tmp[512];
+	const unsigned int tmpSize = 512;
+	char tmp[tmpSize];
 	unsigned int i,j,k;
 
 	out += "First Args:\n";
 	for(i=0; i < firstArgs.size(); ++i) {
-		sprintf(tmp, "%d: %s\n", i+1, firstArgs[i]->c_str());
+		snprintf(tmp, tmpSize, "%d: %s\n", i+1, firstArgs[i]->c_str());
 		out += tmp;
 	}
 
@@ -2130,51 +2131,51 @@ void ezOptionParser::prettyPrint(std::string & out) {
 
 	out += "\nOptions:\n";
 	OptionGroup *g;
-	for(i=0; i < n; ++i) {            
+	for(i=0; i < n; ++i) {
 		g = get(stringPtrs[i]->c_str());
 		out += "\n";
 		// The flag names:
 		for(j=0; j < g->flags.size()-1; ++j) {
-			sprintf(tmp, "%s, ", g->flags[j]->c_str());
+			snprintf(tmp, tmpSize, "%s, ", g->flags[j]->c_str());
 			out += tmp;
 		}
-		sprintf(tmp, "%s:\n", g->flags.back()->c_str());
+		snprintf(tmp, tmpSize, "%s:\n", g->flags.back()->c_str());
 		out += tmp;
 
 		if (g->isSet) {
 			if (g->expectArgs) {
 				if (g->args.empty()) {
-					sprintf(tmp, "%s (default)\n", g->defaults.c_str());
+					snprintf(tmp, tmpSize, "%s (default)\n", g->defaults.c_str());
 					out += tmp;
 				} else {
-					for(k=0; k < g->args.size(); ++k) {            
+					for(k=0; k < g->args.size(); ++k) {
 						for(j=0; j < g->args[k]->size()-1; ++j) {
-							sprintf(tmp, "%s%c", g->args[k]->at(j)->c_str(), g->delim);
+							snprintf(tmp, tmpSize, "%s%c", g->args[k]->at(j)->c_str(), g->delim);
 							out += tmp;
 						}
-						sprintf(tmp, "%s\n", g->args[k]->back()->c_str());
+						snprintf(tmp, tmpSize, "%s\n", g->args[k]->back()->c_str());
 						out += tmp;
 					}
 				}
 			} else { // Set but no args expected.
-				sprintf(tmp, "Set\n");
+				snprintf(tmp, tmpSize, "Set\n");
 				out += tmp;
 			}
 		} else {
-			sprintf(tmp, "Not set\n");
+			snprintf(tmp, tmpSize, "Not set\n");
 			out += tmp;
 		}
 	}
 
 	out += "\nLast Args:\n";
 	for(i=0; i < lastArgs.size(); ++i) {
-		sprintf(tmp, "%d: %s\n", i+1, lastArgs[i]->c_str());
+		snprintf(tmp, tmpSize, "%d: %s\n", i+1, lastArgs[i]->c_str());
 		out += tmp;
 	}
 
 	out += "\nUnknown Args:\n";
 	for(i=0; i < unknownArgs.size(); ++i) {
-		sprintf(tmp, "%d: %s\n", i+1, unknownArgs[i]->c_str());
+		snprintf(tmp, tmpSize, "%d: %s\n", i+1, unknownArgs[i]->c_str());
 		out += tmp;
 	}
 }
