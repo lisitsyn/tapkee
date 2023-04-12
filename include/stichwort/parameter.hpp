@@ -67,19 +67,37 @@ public:
 	}
 
 	Parameter() :
-		valid(true), invalidity_reasons(),
-		parameter_name("unknown"), keeper(stichwort_internal::ValueKeeper())
+		valid(true),
+		invalidity_reasons(),
+		parameter_name("unknown"),
+		keeper(stichwort_internal::ValueKeeper())
 	{
 	}
 
 	Parameter(const Parameter& p) :
-		valid(p.valid), invalidity_reasons(p.invalidity_reasons),
-		parameter_name(p.name()), keeper(p.keeper)
+		valid(p.valid),
+		invalidity_reasons(p.invalidity_reasons),
+		parameter_name(p.name()),
+		keeper(p.keeper)
 	{
 	}
 
 	~Parameter()
 	{
+	}
+
+	Parameter& operator=(const Parameter& p)
+	{
+		if (this == &p)
+		{
+			return *this;
+		}
+
+		this->valid = p.valid;
+		this->invalidity_reasons = p.invalidity_reasons;
+		this->parameter_name = p.parameter_name;
+		this->keeper = p.keeper;
+		return *this;
 	}
 
 	template <typename T>
