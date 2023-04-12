@@ -43,19 +43,36 @@ namespace tapkee
 	struct TapkeeOutput
 	{
 		TapkeeOutput() :
-			embedding(), projection()
+			embedding(),
+			projection()
 		{
 		}
+
 		TapkeeOutput(const tapkee::DenseMatrix& e, const tapkee::ProjectingFunction& p) :
-			embedding(), projection(p)
+			embedding(e),
+			projection(p)
 		{
-			embedding = e;
 		}
+
 		TapkeeOutput(const TapkeeOutput& that) :
-			embedding(), projection(that.projection)
+			embedding(that.embedding),
+			projection(that.projection)
 		{
-			this->embedding = that.embedding;
 		}
+
+		TapkeeOutput& operator=(const TapkeeOutput& that)
+		{
+			if (this == &that)
+			{
+				return *this;
+			}
+
+			this->embedding = that.embedding;
+			this->projection = that.projection;
+
+			return *this;
+		}
+
 		tapkee::DenseMatrix embedding;
 		tapkee::ProjectingFunction projection;
 	};
