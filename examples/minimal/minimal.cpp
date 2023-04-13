@@ -5,27 +5,27 @@ using namespace tapkee;
 
 struct MyDistanceCallback
 {
-	ScalarType distance(IndexType l, IndexType r) 
-	{ 
-		return abs(static_cast<ScalarType>(l) - static_cast<ScalarType>(r));
-	} 
-}; 
+    ScalarType distance(IndexType l, IndexType r)
+    {
+        return abs(static_cast<ScalarType>(l) - static_cast<ScalarType>(r));
+    }
+};
 
-int main(int argc, const char** argv)
+int main(int argc, const char **argv)
 {
-	const int N = 100;
-	vector<IndexType> indices(N);
-	for (int i=0; i<N; i++) indices[i] = i;
+    const int N = 100;
+    vector<IndexType> indices(N);
+    for (int i = 0; i < N; i++)
+        indices[i] = i;
 
-	MyDistanceCallback distance;
+    MyDistanceCallback distance;
 
-	TapkeeOutput output = initialize() 
-	  .withParameters((method=MultidimensionalScaling,
-	                   target_dimension=1))
-	  .withDistance(distance)
-	  .embedUsing(indices);
-	
-	cout << output.embedding.transpose() << endl;
+    TapkeeOutput output = initialize()
+                              .withParameters((method = MultidimensionalScaling, target_dimension = 1))
+                              .withDistance(distance)
+                              .embedUsing(indices);
 
-	return 0;
+    cout << output.embedding.transpose() << endl;
+
+    return 0;
 }
