@@ -10,10 +10,9 @@
 #include <tapkee/tapkee_defines.hpp>
 /* End of Tapkee includes */
 
-template<class RandomAccessIterator>
-struct neighbors_finder
+template <class RandomAccessIterator> struct neighbors_finder
 {
-	virtual Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, IndexType k);
+    virtual Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, IndexType k);
 };
 
 #endif
