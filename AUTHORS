@@ -1,4 +1,9 @@
 Sergey Lisitsyn <lisitsyn@hey.com>
-
 Fernando José Iglesias García <fernando.iglesiasg@gmail.com>
 
+Laurens van der Maaten (barnes-hut-sne)
+John Langford and Dinoj Surendran (CoverTree)
+Evgeniy Andreev (FibonacciHeap class)
+David Harmon (ARPACK wrapper code)
+Daisuke Okanohara (redsvd)
+Christopher Diggins and Pablo Aguilar and Kevlin Henney (any type)
