@@ -29,8 +29,8 @@
 #ifndef STICHWORT_KEEPER_H_
 #define STICHWORT_KEEPER_H_
 
-#include <stichwort/policy.hpp>
 #include <stichwort/exceptions.hpp>
+#include <stichwort/policy.hpp>
 
 namespace stichwort
 {
@@ -44,84 +44,76 @@ struct EmptyType
 class ValueKeeper
 {
 
-public:
-	template <typename T>
-	explicit ValueKeeper(const T& value) :
-		policy(getPolicy<T>()), value_ptr(NULL)
-	{
-		policy->copyFromValue(&value, &value_ptr);
-	}
+  public:
+    template <typename T> explicit ValueKeeper(const T &value) : policy(getPolicy<T>()), value_ptr(NULL)
+    {
+        policy->copyFromValue(&value, &value_ptr);
+    }
 
-	ValueKeeper() :
-		policy(getPolicy<EmptyType>()), value_ptr(NULL)
-	{
-	}
+    ValueKeeper() : policy(getPolicy<EmptyType>()), value_ptr(NULL)
+    {
+    }
 
-	~ValueKeeper()
-	{
-		policy->free(&value_ptr);
-	}
+    ~ValueKeeper()
+    {
+        policy->free(&value_ptr);
+    }
 
-	ValueKeeper(const ValueKeeper& v) : policy(v.policy), value_ptr(NULL)
-	{
-		policy->clone(&(v.value_ptr), &value_ptr);
-	}
+    ValueKeeper(const ValueKeeper &v) : policy(v.policy), value_ptr(NULL)
+    {
+        policy->clone(&(v.value_ptr), &value_ptr);
+    }
 
-	ValueKeeper& operator=(const ValueKeeper& v)
-	{
-		policy->free(&value_ptr);
-		policy = v.policy;
-		policy->clone(&(v.value_ptr), &value_ptr);
-		return *this;
-	}
+    ValueKeeper &operator=(const ValueKeeper &v)
+    {
+        policy->free(&value_ptr);
+        policy = v.policy;
+        policy->clone(&(v.value_ptr), &value_ptr);
+        return *this;
+    }
 
-	template <typename T>
-	inline T getValue() const
-	{
-		T* v;
-		if (!isInitialized())
-			throw missed_parameter_error("Parameter is missed");
+    template <typename T> inline T getValue() const
+    {
+        T *v;
+        if (!isInitialized())
+            throw missed_parameter_error("Parameter is missed");
 
-		if (isTypeCorrect<T>())
-		{
-			void* vv = policy->getValue(const_cast<void**>(&value_ptr));
-			v = reinterpret_cast<T*>(vv);
-		}
-		else
-			throw wrong_parameter_type_error("Wrong value type");
-		return *v;
-	}
+        if (isTypeCorrect<T>())
+        {
+            void *vv = policy->getValue(const_cast<void **>(&value_ptr));
+            v = reinterpret_cast<T *>(vv);
+        }
+        else
+            throw wrong_parameter_type_error("Wrong value type");
+        return *v;
+    }
 
-	template <typename T>
-	inline bool isTypeCorrect() const
-	{
-		return getPolicy<T>() == policy;
-	}
+    template <typename T> inline bool isTypeCorrect() const
+    {
+        return getPolicy<T>() == policy;
+    }
 
-	inline bool isInitialized() const
-	{
-		return getPolicy<EmptyType>() != policy;
-	}
+    inline bool isInitialized() const
+    {
+        return getPolicy<EmptyType>() != policy;
+    }
 
-	template <template<class> class F, class Q>
-	inline bool isCondition(F<Q> cond) const
-	{
-		Q value = getValue<Q>();
-		return cond(value);
-	}
+    template <template <class> class F, class Q> inline bool isCondition(F<Q> cond) const
+    {
+        Q value = getValue<Q>();
+        return cond(value);
+    }
 
-	inline std::string repr() const
-	{
-		return policy->repr(const_cast<void**>(&value_ptr));
-	}
+    inline std::string repr() const
+    {
+        return policy->repr(const_cast<void **>(&value_ptr));
+    }
 
-private:
-
-	TypePolicyBase* policy;
-	void* value_ptr;
-
+  private:
+    TypePolicyBase *policy;
+    void *value_ptr;
 };
 
-}
-}
+} // namespace stichwort_internal
+} // namespace stichwort
 #endif
