@@ -7,7 +7,7 @@ struct MyDistanceCallback
 {
 	ScalarType distance(IndexType l, IndexType r) 
 	{ 
-		return abs(l-r);
+		return abs(static_cast<ScalarType>(l) - static_cast<ScalarType>(r));
 	} 
 }; 
 
