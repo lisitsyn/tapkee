@@ -30,137 +30,140 @@
 #ifndef FORMATTING_WRAPPERS_H_
 #define FORMATTING_WRAPPERS_H_
 
-#include <limits>
 #include <iomanip>
+#include <limits>
 
 namespace formatting
 {
 
 namespace utils
 {
-	template <bool> struct compile_time_assert;
-	template <> struct compile_time_assert<true> {};
-}
+template <bool> struct compile_time_assert;
+template <> struct compile_time_assert<true>
+{
+};
+} // namespace utils
 
 namespace wrappers
 {
-	template <typename T>
-	struct HexWrapper
-	{
-		utils::compile_time_assert<std::numeric_limits<T>::is_integer> HEX_USED_FOR_NON_INTEGER_TYPE;
-		explicit HexWrapper(T value) : value_(value) { }
-		const T value_;
+template <typename T> struct HexWrapper
+{
+    utils::compile_time_assert<std::numeric_limits<T>::is_integer> HEX_USED_FOR_NON_INTEGER_TYPE;
+    explicit HexWrapper(T value) : value_(value)
+    {
+    }
+    const T value_;
 
-		template <typename U>
-		friend std::ostream& operator<<(std::ostream& out, const HexWrapper<U>& h);
-	};
+    template <typename U> friend std::ostream &operator<<(std::ostream &out, const HexWrapper<U> &h);
+};
 
-	template <typename T>
-	std::ostream& operator<<(std::ostream& out, const HexWrapper<T>& h)
-	{
-		out << "0x" << std::hex << std::uppercase << h.value_;
-		return out;
-	}
-
-	template <typename T>
-	struct OctWrapper
-	{
-		utils::compile_time_assert<std::numeric_limits<T>::is_integer> OCT_USED_FOR_NON_INTEGER_TYPE;
-		explicit OctWrapper(T value) : value_(value) { }
-		const T value_;
-
-		template <typename U>
-		friend std::ostream& operator<<(std::ostream& out, const HexWrapper<U>& h);
-	};
-
-	template <typename T>
-	std::ostream& operator<<(std::ostream& out, const OctWrapper<T>& h)
-	{
-		out << "0" << std::oct << std::uppercase << h.value_;
-		return out;
-	}
-
-	template <typename T>
-	struct WidthWrapper
-	{
-		explicit WidthWrapper(unsigned int width, T value) : value_(value), width_(width) { }
-		const T value_;
-		const unsigned int width_;
-
-		template <typename U>
-		friend std::ostream& operator<<(std::ostream& out, const WidthWrapper& h);
-	};
-
-	template <typename T>
-	std::ostream& operator<<(std::ostream& out, const WidthWrapper<T>& h)
-	{
-		out << std::setw(h.width_) << h.value_;
-		return out;
-	}
-
-	struct WidthWrapperBuilder
-	{
-		explicit WidthWrapperBuilder(unsigned int width) : width_(width) { }
-		unsigned int width_;
-
-		template <typename T>
-		inline WidthWrapper<T> operator()(T value)
-		{
-			return WidthWrapper<T>(width_,value);
-		}
-	};
-
-	struct WidthWrapperBuilderHelper
-	{
-		WidthWrapperBuilderHelper() { }
-		inline wrappers::WidthWrapperBuilder operator[](unsigned int w) const
-		{
-			return wrappers::WidthWrapperBuilder(w);
-		}
-	};
-
-	template <typename T>
-	struct PrecisionWrapper
-	{
-		utils::compile_time_assert<std::numeric_limits<T>::is_specialized> PRECISION_USED_FOR_NON_NUMERIC_TYPE;
-		explicit PrecisionWrapper(unsigned int precision, T value) : value_(value), precision_(precision) { }
-		const T value_;
-		const unsigned int precision_;
-
-		template <typename U>
-		friend std::ostream& operator<<(std::ostream& out, const PrecisionWrapper& h);
-	};
-
-	template <typename T>
-	std::ostream& operator<<(std::ostream& out, const PrecisionWrapper<T>& h)
-	{
-		out << std::setprecision(h.precision_) << h.value_;
-		return out;
-	}
-
-	struct PrecisionWrapperBuilder
-	{
-		explicit PrecisionWrapperBuilder(unsigned int precision) : precision_(precision) { }
-		unsigned int precision_;
-
-		template <typename T>
-		inline PrecisionWrapper<T> operator()(T value)
-		{
-			return PrecisionWrapper<T>(precision_,value);
-		}
-	};
-
-	struct PrecisionWrapperBuilderHelper
-	{
-		PrecisionWrapperBuilderHelper() { }
-		inline wrappers::PrecisionWrapperBuilder operator[](unsigned int p) const
-		{
-			return wrappers::PrecisionWrapperBuilder(p);
-		}
-	};
-
-
+template <typename T> std::ostream &operator<<(std::ostream &out, const HexWrapper<T> &h)
+{
+    out << "0x" << std::hex << std::uppercase << h.value_;
+    return out;
 }
+
+template <typename T> struct OctWrapper
+{
+    utils::compile_time_assert<std::numeric_limits<T>::is_integer> OCT_USED_FOR_NON_INTEGER_TYPE;
+    explicit OctWrapper(T value) : value_(value)
+    {
+    }
+    const T value_;
+
+    template <typename U> friend std::ostream &operator<<(std::ostream &out, const HexWrapper<U> &h);
+};
+
+template <typename T> std::ostream &operator<<(std::ostream &out, const OctWrapper<T> &h)
+{
+    out << "0" << std::oct << std::uppercase << h.value_;
+    return out;
+}
+
+template <typename T> struct WidthWrapper
+{
+    explicit WidthWrapper(unsigned int width, T value) : value_(value), width_(width)
+    {
+    }
+    const T value_;
+    const unsigned int width_;
+
+    template <typename U> friend std::ostream &operator<<(std::ostream &out, const WidthWrapper &h);
+};
+
+template <typename T> std::ostream &operator<<(std::ostream &out, const WidthWrapper<T> &h)
+{
+    out << std::setw(h.width_) << h.value_;
+    return out;
+}
+
+struct WidthWrapperBuilder
+{
+    explicit WidthWrapperBuilder(unsigned int width) : width_(width)
+    {
+    }
+    unsigned int width_;
+
+    template <typename T> inline WidthWrapper<T> operator()(T value)
+    {
+        return WidthWrapper<T>(width_, value);
+    }
+};
+
+struct WidthWrapperBuilderHelper
+{
+    WidthWrapperBuilderHelper()
+    {
+    }
+    inline wrappers::WidthWrapperBuilder operator[](unsigned int w) const
+    {
+        return wrappers::WidthWrapperBuilder(w);
+    }
+};
+
+template <typename T> struct PrecisionWrapper
+{
+    utils::compile_time_assert<std::numeric_limits<T>::is_specialized> PRECISION_USED_FOR_NON_NUMERIC_TYPE;
+    explicit PrecisionWrapper(unsigned int precision, T value) : value_(value), precision_(precision)
+    {
+    }
+    const T value_;
+    const unsigned int precision_;
+
+    template <typename U> friend std::ostream &operator<<(std::ostream &out, const PrecisionWrapper &h);
+};
+
+template <typename T> std::ostream &operator<<(std::ostream &out, const PrecisionWrapper<T> &h)
+{
+    out << std::setprecision(h.precision_) << h.value_;
+    return out;
+}
+
+struct PrecisionWrapperBuilder
+{
+    explicit PrecisionWrapperBuilder(unsigned int precision) : precision_(precision)
+    {
+    }
+    unsigned int precision_;
+
+    template <typename T> inline PrecisionWrapper<T> operator()(T value)
+    {
+        return PrecisionWrapper<T>(precision_, value);
+    }
+};
+
+struct PrecisionWrapperBuilderHelper
+{
+    PrecisionWrapperBuilderHelper()
+    {
+    }
+    inline wrappers::PrecisionWrapperBuilder operator[](unsigned int p) const
+    {
+        return wrappers::PrecisionWrapperBuilder(p);
+    }
+};
+
+} // namespace wrappers
 
 /** Returns a wrapper that makes the provided
  * value represented as hex when formatting.
@@ -169,10 +172,9 @@ namespace wrappers
  *
  * @param value a numerical value to be presented as hex
  */
-template<typename T>
-inline wrappers::HexWrapper<T> hex(T value)
+template <typename T> inline wrappers::HexWrapper<T> hex(T value)
 {
-	return wrappers::HexWrapper<T>(value);
+    return wrappers::HexWrapper<T>(value);
 }
 
 /** Returns a wrapper that makes the provided
@@ -182,10 +184,9 @@ inline wrappers::HexWrapper<T> hex(T value)
  *
  * @param value a numerical value to be presented as oct
  */
-template<typename T>
-inline wrappers::OctWrapper<T> oct(T value)
+template <typename T> inline wrappers::OctWrapper<T> oct(T value)
 {
-	return wrappers::OctWrapper<T>(value);
+    return wrappers::OctWrapper<T>(value);
 }
 
 /** Returns a wrapper that makes the provided
@@ -193,10 +194,10 @@ inline wrappers::OctWrapper<T> oct(T value)
  *
  * @param value a pointer to be represented as hex
  */
-inline wrappers::HexWrapper<size_t> raw(void* value)
+inline wrappers::HexWrapper<size_t> raw(void *value)
 {
-	size_t ptr = reinterpret_cast<size_t>(value);
-	return wrappers::HexWrapper<size_t>(ptr);
+    size_t ptr = reinterpret_cast<size_t>(value);
+    return wrappers::HexWrapper<size_t>(ptr);
 }
 
 /** Returns a wrapper that makes the provided
@@ -204,10 +205,10 @@ inline wrappers::HexWrapper<size_t> raw(void* value)
  *
  * @param value a pointer to be represented as hex
  */
-inline wrappers::HexWrapper<size_t> raw(const void* value)
+inline wrappers::HexWrapper<size_t> raw(const void *value)
 {
-	size_t ptr = reinterpret_cast<size_t>(value);
-	return wrappers::HexWrapper<size_t>(ptr);
+    size_t ptr = reinterpret_cast<size_t>(value);
+    return wrappers::HexWrapper<size_t>(ptr);
 }
 
 /** Width wrapper helper that allows to set output width
@@ -221,5 +222,5 @@ static const wrappers::WidthWrapperBuilderHelper width;
  */
 static const wrappers::PrecisionWrapperBuilderHelper precision;
 
-}
+} // namespace formatting
 #endif

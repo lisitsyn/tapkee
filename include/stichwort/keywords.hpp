@@ -34,79 +34,81 @@
 //! The namespace that contains implementations for the keywords
 namespace stichwort
 {
-	/** DefaultValue instance is useful
-	 * to set a parameter its default value.
-	 *
-	 * Once assigned to a keyword it produces a parameter
-	 * with the default value assigned to the keyword.
-	 */
-	struct DefaultValue
-	{
-		DefaultValue() { }
-	};
+/** DefaultValue instance is useful
+ * to set a parameter its default value.
+ *
+ * Once assigned to a keyword it produces a parameter
+ * with the default value assigned to the keyword.
+ */
+struct DefaultValue
+{
+    DefaultValue()
+    {
+    }
+};
 
-	/** ParameterKeyword instance is used to represent
-	 * a keyword that is assigned to some value. Such
-	 * an assignment results to instance of @ref Parameter
-	 * class which can be later checked and casted back
-	 * to the value it represents.
-	 *
-	 * Usage is
-	 * @code
-	 * 	ParameterKeyword<int> keyword;
-	 * 	Parameter p = (keyword = 5);
-	 * 	int p_value = p;
-	 * @endcode
-	 */
-	template <typename T>
-	struct ParameterKeyword
-	{
-		typedef std::string Name;
-		typedef T Type;
+/** ParameterKeyword instance is used to represent
+ * a keyword that is assigned to some value. Such
+ * an assignment results to instance of @ref Parameter
+ * class which can be later checked and casted back
+ * to the value it represents.
+ *
+ * Usage is
+ * @code
+ * 	ParameterKeyword<int> keyword;
+ * 	Parameter p = (keyword = 5);
+ * 	int p_value = p;
+ * @endcode
+ */
+template <typename T> struct ParameterKeyword
+{
+    typedef std::string Name;
+    typedef T Type;
 
-		ParameterKeyword(const Name& n, const T& dv) : name(n), default_value(dv) { }
-		ParameterKeyword(const ParameterKeyword& pk);
-		ParameterKeyword operator=(const ParameterKeyword& pk);
+    ParameterKeyword(const Name &n, const T &dv) : name(n), default_value(dv)
+    {
+    }
+    ParameterKeyword(const ParameterKeyword &pk);
+    ParameterKeyword operator=(const ParameterKeyword &pk);
 
-		Parameter operator=(const T& value) const
-		{
-			return Parameter::create(name,value);
-		}
-		Parameter operator=(const DefaultValue&) const
-		{
-			return Parameter::create(name,default_value);
-		}
-		operator Name() const
-		{
-			return name;
-		}
+    Parameter operator=(const T &value) const
+    {
+        return Parameter::create(name, value);
+    }
+    Parameter operator=(const DefaultValue &) const
+    {
+        return Parameter::create(name, default_value);
+    }
+    operator Name() const
+    {
+        return name;
+    }
 
-		Name name;
-		T default_value;
-	};
+    Name name;
+    T default_value;
+};
 
-	struct ParametersForwarder
-	{
-		ParametersForwarder()
-		{
+struct ParametersForwarder
+{
+    ParametersForwarder()
+    {
+    }
+    ParametersForwarder(const ParametersForwarder &);
+    ParametersForwarder &operator=(const ParametersForwarder &);
+    ParametersSet operator[](ParametersSet parameters) const
+    {
+        return parameters;
+    }
+};
 
-		}
-		ParametersForwarder(const ParametersForwarder&);
-		ParametersForwarder& operator=(const ParametersForwarder&);
-		ParametersSet operator[](ParametersSet parameters) const
-		{
-			return parameters;
-		}
-	};
+namespace
+{
+/** The default value - assigning any keyword to this
+ * static struct produces a parameter with its default value.
+ */
+const DefaultValue by_default;
 
-	namespace
-	{
-		/** The default value - assigning any keyword to this
-		 * static struct produces a parameter with its default value.
-		 */
-		const DefaultValue by_default;
-
-		const ParametersForwarder kwargs;
-	}
-}
+const ParametersForwarder kwargs;
+} // namespace
+} // namespace stichwort
 #endif

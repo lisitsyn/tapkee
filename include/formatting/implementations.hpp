@@ -30,98 +30,102 @@
 #ifndef FORMATTING_IMPLEMENTATIONS_H_
 #define FORMATTING_IMPLEMENTATIONS_H_
 
+#include <iomanip>
+
 namespace formatting
 {
-	/** Default precision - be careful to change due to no thread safety */
-	static unsigned int default_precision = 9;
+/** Default precision - be careful to change due to no thread safety */
+static unsigned int default_precision = 9;
 
-	namespace internal
-	{
-		class ValueWrapperImplementationBase
-		{
-		public:
-			virtual ~ValueWrapperImplementationBase() { }
-			virtual std::string representation() const = 0;
-		};
+namespace internal
+{
+class ValueWrapperImplementationBase
+{
+  public:
+    virtual ~ValueWrapperImplementationBase()
+    {
+    }
+    virtual std::string representation() const = 0;
+};
 
-		template <typename T>
-		class ValueWrapperImplementation :
-			public ValueWrapperImplementationBase
-		{
-		public:
-			ValueWrapperImplementation(const T& value) :
-				value_(value) { }
-			virtual std::string representation() const
-			{
-				std::stringstream string_stream;
-				string_stream << std::setprecision(default_precision) << value_;
-				return string_stream.str();
-			}
-		private:
-			const T value_;
-		};
+template <typename T> class ValueWrapperImplementation : public ValueWrapperImplementationBase
+{
+  public:
+    ValueWrapperImplementation(const T &value) : value_(value)
+    {
+    }
+    virtual std::string representation() const
+    {
+        std::stringstream string_stream;
+        string_stream << std::setprecision(default_precision) << value_;
+        return string_stream.str();
+    }
 
-		template <>
-		class ValueWrapperImplementation<const char*> :
-			public ValueWrapperImplementationBase
-		{
-		public:
-			ValueWrapperImplementation(const char* value) :
-				value_(value) { }
-			virtual std::string representation() const
-			{
-				return std::string(value_);
-			}
-		private:
-			const char* value_;
-		};
+  private:
+    const T value_;
+};
 
-		template <>
-		class ValueWrapperImplementation<bool> :
-			public ValueWrapperImplementationBase
-		{
-		public:
-			ValueWrapperImplementation(bool value) :
-				value_(value) { }
-			virtual std::string representation() const
-			{
-				return value_ ? "true" : "false";
-			}
-		private:
-			bool value_;
-		};
+template <> class ValueWrapperImplementation<const char *> : public ValueWrapperImplementationBase
+{
+  public:
+    ValueWrapperImplementation(const char *value) : value_(value)
+    {
+    }
+    virtual std::string representation() const
+    {
+        return std::string(value_);
+    }
 
-		template <>
-		class ValueWrapperImplementation<std::string> :
-			public ValueWrapperImplementationBase
-		{
-		public:
-			ValueWrapperImplementation(const std::string& value) :
-				value_(value) { }
-			virtual std::string representation() const
-			{
-				return value_;
-			}
-		private:
-			const std::string value_;
-		};
+  private:
+    const char *value_;
+};
 
-		template <typename T>
-		class ValueWrapperImplementation<T*> :
-			public ValueWrapperImplementationBase
-		{
-		public:
-			ValueWrapperImplementation(const T* value) :
-				value_(value) { }
-			virtual std::string representation() const
-			{
-				std::stringstream string_stream;
-				string_stream << *value_;
-				return string_stream.str();
-			}
-		private:
-			const T* value_;
-		};
-	}
-}
+template <> class ValueWrapperImplementation<bool> : public ValueWrapperImplementationBase
+{
+  public:
+    ValueWrapperImplementation(bool value) : value_(value)
+    {
+    }
+    virtual std::string representation() const
+    {
+        return value_ ? "true" : "false";
+    }
+
+  private:
+    bool value_;
+};
+
+template <> class ValueWrapperImplementation<std::string> : public ValueWrapperImplementationBase
+{
+  public:
+    ValueWrapperImplementation(const std::string &value) : value_(value)
+    {
+    }
+    virtual std::string representation() const
+    {
+        return value_;
+    }
+
+  private:
+    const std::string value_;
+};
+
+template <typename T> class ValueWrapperImplementation<T *> : public ValueWrapperImplementationBase
+{
+  public:
+    ValueWrapperImplementation(const T *value) : value_(value)
+    {
+    }
+    virtual std::string representation() const
+    {
+        std::stringstream string_stream;
+        string_stream << *value_;
+        return string_stream.str();
+    }
+
+  private:
+    const T *value_;
+};
+} // namespace internal
+} // namespace formatting
 #endif
