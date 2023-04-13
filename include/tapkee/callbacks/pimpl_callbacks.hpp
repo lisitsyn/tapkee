@@ -6,6 +6,8 @@
 #ifndef TAPKEE_PIMPL_CALLBACKS_H_
 #define TAPKEE_PIMPL_CALLBACKS_H_
 
+#include <tapkee/defines.hpp>
+
 // Kernel function callback that computes
 // similarity function values on vectors
 // given by their indices. This impl. computes

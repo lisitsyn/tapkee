@@ -6,6 +6,8 @@
 #ifndef TAPKEE_EIGEN_CALLBACKS_H_
 #define TAPKEE_EIGEN_CALLBACKS_H_
 
+#include <tapkee/defines.hpp>
+
 namespace tapkee
 {
 // Features callback that provides operation that
