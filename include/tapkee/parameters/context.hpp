@@ -14,32 +14,30 @@ namespace tapkee_internal
 
 class Context
 {
-public:
+  public:
+    Context(void (*progress)(double), bool (*cancel)()) : progress_function(progress), cancel_function(cancel)
+    {
+    }
 
-	Context(void (*progress)(double), bool (*cancel)()) :
-		progress_function(progress), cancel_function(cancel)
-	{
-	}
+    inline void report_progress(double x) const
+    {
+        if (progress_function)
+            progress_function(x);
+    }
 
-	inline void report_progress(double x) const
-	{
-		if (progress_function)
-			progress_function(x);
-	}
+    inline bool is_cancelled() const
+    {
+        if (cancel_function)
+            return cancel_function();
+        return false;
+    }
 
-	inline bool is_cancelled() const
-	{
-		if (cancel_function)
-			return cancel_function();
-		return false;
-	}
-
-private:
-	void (*progress_function)(double);
-	bool (*cancel_function)();
+  private:
+    void (*progress_function)(double);
+    bool (*cancel_function)();
 };
 
-}
-}
+} // namespace tapkee_internal
+} // namespace tapkee
 
 #endif

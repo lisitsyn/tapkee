@@ -29,11 +29,11 @@
  *
  */
 
-#include <math.h>
-#include <float.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <algorithm>
+#include <float.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifndef QUADTREE_H
 #define QUADTREE_H
@@ -43,412 +43,485 @@ namespace tsne
 
 using tapkee::ScalarType;
 
-class Cell {
+class Cell
+{
 
-public:
+  public:
+    ScalarType x;
+    ScalarType y;
+    ScalarType hw;
+    ScalarType hh;
 
-	ScalarType x;
-	ScalarType y;
-	ScalarType hw;
-	ScalarType hh;
-
-	bool containsPoint(ScalarType point[])
-	{
-		if(x - hw > point[0]) return false;
-		if(x + hw < point[0]) return false;
-		if(y - hh > point[1]) return false;
-		if(y + hh < point[1]) return false;
-		return true;
-	}
-
+    bool containsPoint(ScalarType point[])
+    {
+        if (x - hw > point[0])
+            return false;
+        if (x + hw < point[0])
+            return false;
+        if (y - hh > point[1])
+            return false;
+        if (y + hh < point[1])
+            return false;
+        return true;
+    }
 };
-
 
 class QuadTree
 {
 
-	// Fixed constants
-	static const int QT_NO_DIMS = 2;
-	static const int QT_NODE_CAPACITY = 1;
+    // Fixed constants
+    static const int QT_NO_DIMS = 2;
+    static const int QT_NODE_CAPACITY = 1;
 
-	// A buffer we use when doing force computations
-	ScalarType buff[QT_NO_DIMS];
+    // A buffer we use when doing force computations
+    ScalarType buff[QT_NO_DIMS];
 
-	// Properties of this node in the tree
-	QuadTree* parent;
-	bool is_leaf;
-	int size;
-	int cum_size;
+    // Properties of this node in the tree
+    QuadTree *parent;
+    bool is_leaf;
+    int size;
+    int cum_size;
 
-	// Axis-aligned bounding box stored as a center with half-dimensions to represent the boundaries of this quad tree
-	Cell boundary;
+    // Axis-aligned bounding box stored as a center with half-dimensions to represent the boundaries of this quad tree
+    Cell boundary;
 
-	// Indices in this quad tree node, corresponding center-of-mass, and list of all children
-	ScalarType* data;
-	ScalarType center_of_mass[QT_NO_DIMS];
-	int index[QT_NODE_CAPACITY];
+    // Indices in this quad tree node, corresponding center-of-mass, and list of all children
+    ScalarType *data;
+    ScalarType center_of_mass[QT_NO_DIMS];
+    int index[QT_NODE_CAPACITY];
 
-	// Children
-	QuadTree* northWest;
-	QuadTree* northEast;
-	QuadTree* southWest;
-	QuadTree* southEast;
+    // Children
+    QuadTree *northWest;
+    QuadTree *northEast;
+    QuadTree *southWest;
+    QuadTree *southEast;
 
-public:
+  public:
+    // Default constructor for quadtree -- build tree, too!
+    QuadTree(ScalarType *inp_data, int N)
+        : parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL), northWest(NULL), northEast(NULL),
+          southWest(NULL), southEast(NULL)
+    {
+        // Compute mean, width, and height of current map (boundaries of quadtree)
+        ScalarType *mean_Y = new ScalarType[QT_NO_DIMS];
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            mean_Y[d] = .0;
+        ScalarType *min_Y = new ScalarType[QT_NO_DIMS];
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            min_Y[d] = DBL_MAX;
+        ScalarType *max_Y = new ScalarType[QT_NO_DIMS];
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            max_Y[d] = -DBL_MAX;
+        for (int n = 0; n < N; n++)
+        {
+            for (int d = 0; d < QT_NO_DIMS; d++)
+            {
+                mean_Y[d] += inp_data[n * QT_NO_DIMS + d];
+                if (inp_data[n * QT_NO_DIMS + d] < min_Y[d])
+                    min_Y[d] = inp_data[n * QT_NO_DIMS + d];
+                if (inp_data[n * QT_NO_DIMS + d] > max_Y[d])
+                    max_Y[d] = inp_data[n * QT_NO_DIMS + d];
+            }
+        }
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            mean_Y[d] /= (ScalarType)N;
 
-	// Default constructor for quadtree -- build tree, too!
-	QuadTree(ScalarType* inp_data, int N) :
-		parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL),
-		northWest(NULL), northEast(NULL), southWest(NULL), southEast(NULL)
-	{
-		// Compute mean, width, and height of current map (boundaries of quadtree)
-		ScalarType* mean_Y = new ScalarType[QT_NO_DIMS]; for(int d = 0; d < QT_NO_DIMS; d++) mean_Y[d] = .0;
-		ScalarType*  min_Y = new ScalarType[QT_NO_DIMS]; for(int d = 0; d < QT_NO_DIMS; d++)  min_Y[d] =  DBL_MAX;
-		ScalarType*  max_Y = new ScalarType[QT_NO_DIMS]; for(int d = 0; d < QT_NO_DIMS; d++)  max_Y[d] = -DBL_MAX;
-		for(int n = 0; n < N; n++) {
-			for(int d = 0; d < QT_NO_DIMS; d++) {
-				mean_Y[d] += inp_data[n * QT_NO_DIMS + d];
-				if(inp_data[n * QT_NO_DIMS + d] < min_Y[d]) min_Y[d] = inp_data[n * QT_NO_DIMS + d];
-				if(inp_data[n * QT_NO_DIMS + d] > max_Y[d]) max_Y[d] = inp_data[n * QT_NO_DIMS + d];
-			}
-		}
-		for(int d = 0; d < QT_NO_DIMS; d++) mean_Y[d] /= (ScalarType) N;
+        // Construct quadtree
+        init(NULL, inp_data, mean_Y[0], mean_Y[1], std::max(max_Y[0] - mean_Y[0], mean_Y[0] - min_Y[0]) + 1e-5,
+             std::max(max_Y[1] - mean_Y[1], mean_Y[1] - min_Y[1]) + 1e-5);
+        fill(N);
+        delete[] mean_Y;
+        delete[] max_Y;
+        delete[] min_Y;
+    }
 
-		// Construct quadtree
-		init(NULL, inp_data, mean_Y[0], mean_Y[1], std::max(max_Y[0] - mean_Y[0], mean_Y[0] - min_Y[0]) + 1e-5,
-		                                           std::max(max_Y[1] - mean_Y[1], mean_Y[1] - min_Y[1]) + 1e-5);
-		fill(N);
-		delete[] mean_Y; delete[] max_Y; delete[] min_Y;
-	}
+    // Constructor for quadtree with particular size and parent -- build the tree, too!
+    QuadTree(ScalarType *inp_data, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw, ScalarType inp_hh)
+        : parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL), northWest(NULL), northEast(NULL),
+          southWest(NULL), southEast(NULL)
+    {
+        init(NULL, inp_data, inp_x, inp_y, inp_hw, inp_hh);
+    }
 
-	// Constructor for quadtree with particular size and parent -- build the tree, too!
-	QuadTree(ScalarType* inp_data, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw, ScalarType inp_hh) :
-		parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL),
-		northWest(NULL), northEast(NULL), southWest(NULL), southEast(NULL)
-	{
-		init(NULL, inp_data, inp_x, inp_y, inp_hw, inp_hh);
-	}
+    // Constructor for quadtree with particular size and parent -- build the tree, too!
+    QuadTree(ScalarType *inp_data, int N, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw, ScalarType inp_hh)
+        : parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL), northWest(NULL), northEast(NULL),
+          southWest(NULL), southEast(NULL)
+    {
+        init(NULL, inp_data, inp_x, inp_y, inp_hw, inp_hh);
+        fill(N);
+    }
 
-	// Constructor for quadtree with particular size and parent -- build the tree, too!
-	QuadTree(ScalarType* inp_data, int N, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw, ScalarType inp_hh) :
-		parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL),
-		northWest(NULL), northEast(NULL), southWest(NULL), southEast(NULL)
-	{
-		init(NULL, inp_data, inp_x, inp_y, inp_hw, inp_hh);
-		fill(N);
-	}
+    // Constructor for quadtree with particular size (do not fill the tree)
+    QuadTree(QuadTree *inp_parent, ScalarType *inp_data, int N, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw,
+             ScalarType inp_hh)
+        : parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL), northWest(NULL), northEast(NULL),
+          southWest(NULL), southEast(NULL)
+    {
+        init(inp_parent, inp_data, inp_x, inp_y, inp_hw, inp_hh);
+        fill(N);
+    }
 
-	// Constructor for quadtree with particular size (do not fill the tree)
-	QuadTree(QuadTree* inp_parent, ScalarType* inp_data, int N, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw, ScalarType inp_hh) :
-		parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL),
-		northWest(NULL), northEast(NULL), southWest(NULL), southEast(NULL)
-	{
-		init(inp_parent, inp_data, inp_x, inp_y, inp_hw, inp_hh);
-		fill(N);
-	}
+    // Constructor for quadtree with particular size and parent (do not fill the tree)
+    QuadTree(QuadTree *inp_parent, ScalarType *inp_data, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw,
+             ScalarType inp_hh)
+        : parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL), northWest(NULL), northEast(NULL),
+          southWest(NULL), southEast(NULL)
+    {
+        init(inp_parent, inp_data, inp_x, inp_y, inp_hw, inp_hh);
+    }
 
-	// Constructor for quadtree with particular size and parent (do not fill the tree)
-	QuadTree(QuadTree* inp_parent, ScalarType* inp_data, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw, ScalarType inp_hh) :
-		parent(NULL), is_leaf(false), size(0), cum_size(0), boundary(), data(NULL),
-		northWest(NULL), northEast(NULL), southWest(NULL), southEast(NULL)
-	{
-		init(inp_parent, inp_data, inp_x, inp_y, inp_hw, inp_hh);
-	}
+    // Destructor for quadtree
+    ~QuadTree()
+    {
+        delete northWest;
+        delete northEast;
+        delete southWest;
+        delete southEast;
+    }
 
-	// Destructor for quadtree
-	~QuadTree()
-	{
-		delete northWest;
-		delete northEast;
-		delete southWest;
-		delete southEast;
-	}
+    void setData(ScalarType *inp_data)
+    {
+        data = inp_data;
+    }
 
-	void setData(ScalarType* inp_data)
-	{
-		data = inp_data;
-	}
+    QuadTree *getParent()
+    {
+        return parent;
+    }
 
-	QuadTree* getParent()
-	{
-		return parent;
-	}
+    // void construct(Cell boundary);
 
-	//void construct(Cell boundary);
+    // Insert a point into the QuadTree
+    bool insert(int new_index)
+    {
+        // Ignore objects which do not belong in this quad tree
+        ScalarType *point = data + new_index * QT_NO_DIMS;
+        if (!boundary.containsPoint(point))
+            return false;
 
-	// Insert a point into the QuadTree
-	bool insert(int new_index)
-	{
-		// Ignore objects which do not belong in this quad tree
-		ScalarType* point = data + new_index * QT_NO_DIMS;
-		if(!boundary.containsPoint(point))
-			return false;
+        // Online update of cumulative size and center-of-mass
+        cum_size++;
+        ScalarType mult1 = (ScalarType)(cum_size - 1) / (ScalarType)cum_size;
+        ScalarType mult2 = 1.0 / (ScalarType)cum_size;
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            center_of_mass[d] *= mult1;
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            center_of_mass[d] += mult2 * point[d];
 
-		// Online update of cumulative size and center-of-mass
-		cum_size++;
-		ScalarType mult1 = (ScalarType) (cum_size - 1) / (ScalarType) cum_size;
-		ScalarType mult2 = 1.0 / (ScalarType) cum_size;
-		for(int d = 0; d < QT_NO_DIMS; d++) center_of_mass[d] *= mult1;
-		for(int d = 0; d < QT_NO_DIMS; d++) center_of_mass[d] += mult2 * point[d];
+        // If there is space in this quad tree and it is a leaf, add the object here
+        if (is_leaf && size < QT_NODE_CAPACITY)
+        {
+            index[size] = new_index;
+            size++;
+            return true;
+        }
 
-		// If there is space in this quad tree and it is a leaf, add the object here
-		if(is_leaf && size < QT_NODE_CAPACITY) {
-			index[size] = new_index;
-			size++;
-			return true;
-		}
+        // Don't add duplicates for now (this is not very nice)
+        bool any_duplicate = false;
+        for (int n = 0; n < size; n++)
+        {
+            bool duplicate = true;
+            for (int d = 0; d < QT_NO_DIMS; d++)
+            {
+                if (point[d] != data[index[n] * QT_NO_DIMS + d])
+                {
+                    duplicate = false;
+                    break;
+                }
+            }
+            any_duplicate = any_duplicate | duplicate;
+        }
+        if (any_duplicate)
+            return true;
 
-		// Don't add duplicates for now (this is not very nice)
-		bool any_duplicate = false;
-		for(int n = 0; n < size; n++) {
-			bool duplicate = true;
-			for(int d = 0; d < QT_NO_DIMS; d++) {
-				if(point[d] != data[index[n] * QT_NO_DIMS + d]) { duplicate = false; break; }
-			}
-			any_duplicate = any_duplicate | duplicate;
-		}
-		if(any_duplicate) return true;
+        // Otherwise, we need to subdivide the current cell
+        if (is_leaf)
+            subdivide();
 
-		// Otherwise, we need to subdivide the current cell
-		if(is_leaf) subdivide();
+        // Find out where the point can be inserted
+        if (northWest->insert(new_index))
+            return true;
+        if (northEast->insert(new_index))
+            return true;
+        if (southWest->insert(new_index))
+            return true;
+        if (southEast->insert(new_index))
+            return true;
 
-		// Find out where the point can be inserted
-		if(northWest->insert(new_index)) return true;
-		if(northEast->insert(new_index)) return true;
-		if(southWest->insert(new_index)) return true;
-		if(southEast->insert(new_index)) return true;
+        // Otherwise, the point cannot be inserted (this should never happen)
+        return false;
+    }
 
-		// Otherwise, the point cannot be inserted (this should never happen)
-		return false;
-	}
+    // Create four children which fully divide this cell into four quads of equal area
+    void subdivide()
+    {
+        // Create four children
+        northWest = new QuadTree(this, data, boundary.x - .5 * boundary.hw, boundary.y - .5 * boundary.hh,
+                                 .5 * boundary.hw, .5 * boundary.hh);
+        northEast = new QuadTree(this, data, boundary.x + .5 * boundary.hw, boundary.y - .5 * boundary.hh,
+                                 .5 * boundary.hw, .5 * boundary.hh);
+        southWest = new QuadTree(this, data, boundary.x - .5 * boundary.hw, boundary.y + .5 * boundary.hh,
+                                 .5 * boundary.hw, .5 * boundary.hh);
+        southEast = new QuadTree(this, data, boundary.x + .5 * boundary.hw, boundary.y + .5 * boundary.hh,
+                                 .5 * boundary.hw, .5 * boundary.hh);
 
-	// Create four children which fully divide this cell into four quads of equal area
-	void subdivide()
-	{
-		// Create four children
-		northWest = new QuadTree(this, data, boundary.x - .5 * boundary.hw, boundary.y - .5 * boundary.hh, .5 * boundary.hw, .5 * boundary.hh);
-		northEast = new QuadTree(this, data, boundary.x + .5 * boundary.hw, boundary.y - .5 * boundary.hh, .5 * boundary.hw, .5 * boundary.hh);
-		southWest = new QuadTree(this, data, boundary.x - .5 * boundary.hw, boundary.y + .5 * boundary.hh, .5 * boundary.hw, .5 * boundary.hh);
-		southEast = new QuadTree(this, data, boundary.x + .5 * boundary.hw, boundary.y + .5 * boundary.hh, .5 * boundary.hw, .5 * boundary.hh);
+        // Move existing points to correct children
+        for (int i = 0; i < size; i++)
+        {
+            bool success = false;
+            if (!success)
+                success = northWest->insert(index[i]);
+            if (!success)
+                success = northEast->insert(index[i]);
+            if (!success)
+                success = southWest->insert(index[i]);
+            if (!success)
+                success = southEast->insert(index[i]);
+            index[i] = -1;
+        }
 
-		// Move existing points to correct children
-		for(int i = 0; i < size; i++) {
-			bool success = false;
-			if(!success) success = northWest->insert(index[i]);
-			if(!success) success = northEast->insert(index[i]);
-			if(!success) success = southWest->insert(index[i]);
-			if(!success) success = southEast->insert(index[i]);
-			index[i] = -1;
-		}
+        // Empty parent node
+        size = 0;
+        is_leaf = false;
+    }
 
-		// Empty parent node
-		size = 0;
-		is_leaf = false;
-	}
+    // Checks whether the specified tree is correct
+    bool isCorrect()
+    {
+        for (int n = 0; n < size; n++)
+        {
+            ScalarType *point = data + index[n] * QT_NO_DIMS;
+            if (!boundary.containsPoint(point))
+                return false;
+        }
+        if (!is_leaf)
+            return northWest->isCorrect() && northEast->isCorrect() && southWest->isCorrect() && southEast->isCorrect();
+        else
+            return true;
+    }
 
-	// Checks whether the specified tree is correct
-	bool isCorrect()
-	{
-		for(int n = 0; n < size; n++) {
-			ScalarType* point = data + index[n] * QT_NO_DIMS;
-			if(!boundary.containsPoint(point)) return false;
-		}
-		if(!is_leaf) return northWest->isCorrect() &&
-							northEast->isCorrect() &&
-							southWest->isCorrect() &&
-							southEast->isCorrect();
-		else return true;
-	}
+    // Rebuilds a possibly incorrect tree (LAURENS: This function is not tested yet!)
+    void rebuildTree()
+    {
+        for (int n = 0; n < size; n++)
+        {
+            // Check whether point is erroneous
+            ScalarType *point = data + index[n] * QT_NO_DIMS;
+            if (!boundary.containsPoint(point))
+            {
 
-	// Rebuilds a possibly incorrect tree (LAURENS: This function is not tested yet!)
-	void rebuildTree()
-	{
-		for(int n = 0; n < size; n++) {
-			// Check whether point is erroneous
-			ScalarType* point = data + index[n] * QT_NO_DIMS;
-			if(!boundary.containsPoint(point)) {
+                // Remove erroneous point
+                int rem_index = index[n];
+                for (int m = n + 1; m < size; m++)
+                    index[m - 1] = index[m];
+                index[size - 1] = -1;
+                size--;
 
-				// Remove erroneous point
-				int rem_index = index[n];
-				for(int m = n + 1; m < size; m++) index[m - 1] = index[m];
-				index[size - 1] = -1;
-				size--;
+                // Update center-of-mass and counter in all parents
+                bool done = false;
+                QuadTree *node = this;
+                while (!done)
+                {
+                    for (int d = 0; d < QT_NO_DIMS; d++)
+                    {
+                        node->center_of_mass[d] = ((ScalarType)node->cum_size * node->center_of_mass[d] - point[d]) /
+                                                  (ScalarType)(node->cum_size - 1);
+                    }
+                    node->cum_size--;
+                    if (node->getParent() == NULL)
+                        done = true;
+                    else
+                        node = node->getParent();
+                }
 
-				// Update center-of-mass and counter in all parents
-				bool done = false;
-				QuadTree* node = this;
-				while(!done) {
-					for(int d = 0; d < QT_NO_DIMS; d++) {
-						node->center_of_mass[d] = ((ScalarType) node->cum_size * node->center_of_mass[d] - point[d]) / (ScalarType) (node->cum_size - 1);
-					}
-					node->cum_size--;
-					if(node->getParent() == NULL) done = true;
-					else node = node->getParent();
-				}
+                // Reinsert point in the root tree
+                node->insert(rem_index);
+            }
+        }
 
-				// Reinsert point in the root tree
-				node->insert(rem_index);
-			}
-		}
+        // Rebuild lower parts of the tree
+        northWest->rebuildTree();
+        northEast->rebuildTree();
+        southWest->rebuildTree();
+        southEast->rebuildTree();
+    }
 
-		// Rebuild lower parts of the tree
-		northWest->rebuildTree();
-		northEast->rebuildTree();
-		southWest->rebuildTree();
-		southEast->rebuildTree();
-	}
+    // Build a list of all indices in quadtree
+    void getAllIndices(int *indices)
+    {
+        getAllIndices(indices, 0);
+    }
 
-	// Build a list of all indices in quadtree
-	void getAllIndices(int* indices)
-	{
-		getAllIndices(indices, 0);
-	}
+    int getDepth()
+    {
+        if (is_leaf)
+            return 1;
+        return 1 + std::max(std::max(northWest->getDepth(), northEast->getDepth()),
+                            std::max(southWest->getDepth(), southEast->getDepth()));
+    }
 
-	int getDepth()
-	{
-		if(is_leaf) return 1;
-		return 1 + std::max(std::max(northWest->getDepth(),
-		                             northEast->getDepth()),
-		                    std::max(southWest->getDepth(),
-		                             southEast->getDepth()));
-	}
+    // Compute non-edge forces using Barnes-Hut algorithm
+    void computeNonEdgeForces(int point_index, ScalarType theta, ScalarType neg_f[], ScalarType *sum_Q)
+    {
 
-	// Compute non-edge forces using Barnes-Hut algorithm
-	void computeNonEdgeForces(int point_index, ScalarType theta, ScalarType neg_f[], ScalarType* sum_Q)
-	{
+        // Make sure that we spend no time on empty nodes or self-interactions
+        if (cum_size == 0 || (is_leaf && size == 1 && index[0] == point_index))
+            return;
 
-		// Make sure that we spend no time on empty nodes or self-interactions
-		if(cum_size == 0 || (is_leaf && size == 1 && index[0] == point_index)) return;
+        // Compute distance between point and center-of-mass
+        ScalarType D = .0;
+        int ind = point_index * QT_NO_DIMS;
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            buff[d] = data[ind + d];
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            buff[d] -= center_of_mass[d];
+        for (int d = 0; d < QT_NO_DIMS; d++)
+            D += buff[d] * buff[d];
 
-		// Compute distance between point and center-of-mass
-		ScalarType D = .0;
-		int ind = point_index * QT_NO_DIMS;
-		for(int d = 0; d < QT_NO_DIMS; d++) buff[d]  = data[ind + d];
-		for(int d = 0; d < QT_NO_DIMS; d++) buff[d] -= center_of_mass[d];
-		for(int d = 0; d < QT_NO_DIMS; d++) D += buff[d] * buff[d];
+        // Check whether we can use this node as a "summary"
+        if (is_leaf || std::max(boundary.hh, boundary.hw) / sqrt(D) < theta)
+        {
 
-		// Check whether we can use this node as a "summary"
-		if(is_leaf || std::max(boundary.hh, boundary.hw)/sqrt(D) < theta) {
+            // Compute and add t-SNE force between point and current node
+            ScalarType Q = 1.0 / (1.0 + D);
+            *sum_Q += cum_size * Q;
+            ScalarType mult = cum_size * Q * Q;
+            for (int d = 0; d < QT_NO_DIMS; d++)
+                neg_f[d] += mult * buff[d];
+        }
+        else
+        {
 
-			// Compute and add t-SNE force between point and current node
-			ScalarType Q = 1.0 / (1.0 + D);
-			*sum_Q += cum_size * Q;
-			ScalarType mult = cum_size * Q * Q;
-			for(int d = 0; d < QT_NO_DIMS; d++) neg_f[d] += mult * buff[d];
-		}
-		else {
+            // Recursively apply Barnes-Hut to children
+            northWest->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
+            northEast->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
+            southWest->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
+            southEast->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
+        }
+    }
 
-			// Recursively apply Barnes-Hut to children
-			northWest->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
-			northEast->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
-			southWest->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
-			southEast->computeNonEdgeForces(point_index, theta, neg_f, sum_Q);
-		}
-	}
+    // Computes edge forces
+    void computeEdgeForces(int *row_P, int *col_P, ScalarType *val_P, int N, ScalarType *pos_f)
+    {
+        // Loop over all edges in the graph
+        int ind1, ind2;
+        ScalarType D;
+        for (int n = 0; n < N; n++)
+        {
+            ind1 = n * QT_NO_DIMS;
+            for (int i = row_P[n]; i < row_P[n + 1]; i++)
+            {
 
-	// Computes edge forces
-	void computeEdgeForces(int* row_P, int* col_P, ScalarType* val_P, int N, ScalarType* pos_f)
-	{
-		// Loop over all edges in the graph
-		int ind1, ind2;
-		ScalarType D;
-		for(int n = 0; n < N; n++) {
-			ind1 = n * QT_NO_DIMS;
-			for(int i = row_P[n]; i < row_P[n + 1]; i++) {
+                // Compute pairwise distance and Q-value
+                D = .0;
+                ind2 = col_P[i] * QT_NO_DIMS;
+                for (int d = 0; d < QT_NO_DIMS; d++)
+                    buff[d] = data[ind1 + d];
+                for (int d = 0; d < QT_NO_DIMS; d++)
+                    buff[d] -= data[ind2 + d];
+                for (int d = 0; d < QT_NO_DIMS; d++)
+                    D += buff[d] * buff[d];
+                D = val_P[i] / (1.0 + D);
 
-				// Compute pairwise distance and Q-value
-				D = .0;
-				ind2 = col_P[i] * QT_NO_DIMS;
-				for(int d = 0; d < QT_NO_DIMS; d++) buff[d]  = data[ind1 + d];
-				for(int d = 0; d < QT_NO_DIMS; d++) buff[d] -= data[ind2 + d];
-				for(int d = 0; d < QT_NO_DIMS; d++) D += buff[d] * buff[d];
-				D = val_P[i] / (1.0 + D);
+                // Sum positive force
+                for (int d = 0; d < QT_NO_DIMS; d++)
+                    pos_f[ind1 + d] += D * buff[d];
+            }
+        }
+    }
 
-				// Sum positive force
-				for(int d = 0; d < QT_NO_DIMS; d++) pos_f[ind1 + d] += D * buff[d];
-			}
-		}
-	}
+    // Print out tree
+    void print()
+    {
+        if (cum_size == 0)
+        {
+            printf("Empty node\n");
+            return;
+        }
 
-	// Print out tree
-	void print()
-	{
-		if(cum_size == 0) {
-			printf("Empty node\n");
-			return;
-		}
+        if (is_leaf)
+        {
+            printf("Leaf node; data = [");
+            for (int i = 0; i < size; i++)
+            {
+                ScalarType *point = data + index[i] * QT_NO_DIMS;
+                for (int d = 0; d < QT_NO_DIMS; d++)
+                    printf("%f, ", point[d]);
+                printf(" (index = %d)", index[i]);
+                if (i < size - 1)
+                    printf("\n");
+                else
+                    printf("]\n");
+            }
+        }
+        else
+        {
+            printf("Intersection node with center-of-mass = [");
+            for (int d = 0; d < QT_NO_DIMS; d++)
+                printf("%f, ", center_of_mass[d]);
+            printf("]; children are:\n");
+            northEast->print();
+            northWest->print();
+            southEast->print();
+            southWest->print();
+        }
+    }
 
-		if(is_leaf) {
-			printf("Leaf node; data = [");
-			for(int i = 0; i < size; i++) {
-				ScalarType* point = data + index[i] * QT_NO_DIMS;
-				for(int d = 0; d < QT_NO_DIMS; d++) printf("%f, ", point[d]);
-				printf(" (index = %d)", index[i]);
-				if(i < size - 1) printf("\n");
-				else printf("]\n");
-			}
-		}
-		else {
-			printf("Intersection node with center-of-mass = [");
-			for(int d = 0; d < QT_NO_DIMS; d++) printf("%f, ", center_of_mass[d]);
-			printf("]; children are:\n");
-			northEast->print();
-			northWest->print();
-			southEast->print();
-			southWest->print();
-		}
-	}
+  private:
+    QuadTree(const QuadTree &);
+    QuadTree &operator=(const QuadTree &);
 
-private:
+    void init(QuadTree *inp_parent, ScalarType *inp_data, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw,
+              ScalarType inp_hh)
+    {
+        parent = inp_parent;
+        data = inp_data;
+        is_leaf = true;
+        size = 0;
+        cum_size = 0;
+        boundary.x = inp_x;
+        boundary.y = inp_y;
+        boundary.hw = inp_hw;
+        boundary.hh = inp_hh;
+        northWest = NULL;
+        northEast = NULL;
+        southWest = NULL;
+        southEast = NULL;
+        for (int i = 0; i < QT_NO_DIMS; i++)
+            center_of_mass[i] = .0;
+    }
 
-	QuadTree(const QuadTree&);
-	QuadTree& operator=(const QuadTree&);
+    // Build quadtree on dataset
+    void fill(int N)
+    {
+        for (int i = 0; i < N; i++)
+            insert(i);
+    }
 
-	void init(QuadTree* inp_parent, ScalarType* inp_data, ScalarType inp_x, ScalarType inp_y, ScalarType inp_hw, ScalarType inp_hh)
-	{
-		parent = inp_parent;
-		data = inp_data;
-		is_leaf = true;
-		size = 0;
-		cum_size = 0;
-		boundary.x  = inp_x;
-		boundary.y  = inp_y;
-		boundary.hw = inp_hw;
-		boundary.hh = inp_hh;
-		northWest = NULL;
-		northEast = NULL;
-		southWest = NULL;
-		southEast = NULL;
-		for(int i = 0; i < QT_NO_DIMS; i++) center_of_mass[i] = .0;
-	}
+    // Build a list of all indices in quadtree
+    int getAllIndices(int *indices, int loc)
+    {
 
-	// Build quadtree on dataset
-	void fill(int N)
-	{
-		for(int i = 0; i < N; i++) insert(i);
-	}
+        // Gather indices in current quadrant
+        for (int i = 0; i < size; i++)
+            indices[loc + i] = index[i];
+        loc += size;
 
-	// Build a list of all indices in quadtree
-	int getAllIndices(int* indices, int loc)
-	{
+        // Gather indices in children
+        if (!is_leaf)
+        {
+            loc = northWest->getAllIndices(indices, loc);
+            loc = northEast->getAllIndices(indices, loc);
+            loc = southWest->getAllIndices(indices, loc);
+            loc = southEast->getAllIndices(indices, loc);
+        }
+        return loc;
+    }
 
-		// Gather indices in current quadrant
-		for(int i = 0; i < size; i++) indices[loc + i] = index[i];
-		loc += size;
-
-		// Gather indices in children
-		if(!is_leaf) {
-			loc = northWest->getAllIndices(indices, loc);
-			loc = northEast->getAllIndices(indices, loc);
-			loc = southWest->getAllIndices(indices, loc);
-			loc = southEast->getAllIndices(indices, loc);
-		}
-		return loc;
-	}
-
-	//bool isChild(int test_index, int start, int end);
+    // bool isChild(int test_index, int start, int end);
 };
 
-}
+} // namespace tsne
 
 #endif

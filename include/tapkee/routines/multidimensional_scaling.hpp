@@ -19,118 +19,118 @@ namespace tapkee_internal
 template <class RandomAccessIterator>
 Landmarks select_landmarks_random(RandomAccessIterator begin, RandomAccessIterator end, ScalarType ratio)
 {
-	Landmarks landmarks;
-	landmarks.reserve(end-begin);
-	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-		landmarks.push_back(iter-begin);
-	tapkee::random_shuffle(landmarks.begin(),landmarks.end());
-	landmarks.erase(landmarks.begin() + static_cast<IndexType>(landmarks.size()*ratio),landmarks.end());
-	return landmarks;
+    Landmarks landmarks;
+    landmarks.reserve(end - begin);
+    for (RandomAccessIterator iter = begin; iter != end; ++iter)
+        landmarks.push_back(iter - begin);
+    tapkee::random_shuffle(landmarks.begin(), landmarks.end());
+    landmarks.erase(landmarks.begin() + static_cast<IndexType>(landmarks.size() * ratio), landmarks.end());
+    return landmarks;
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
 DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomAccessIterator /*end*/,
-                                             Landmarks& landmarks, PairwiseCallback callback)
+                                             Landmarks &landmarks, PairwiseCallback callback)
 {
-	timed_context context("Multidimensional scaling distance matrix computation");
+    timed_context context("Multidimensional scaling distance matrix computation");
 
-	const IndexType n_landmarks = landmarks.size();
-	DenseSymmetricMatrix distance_matrix(n_landmarks,n_landmarks);
+    const IndexType n_landmarks = landmarks.size();
+    DenseSymmetricMatrix distance_matrix(n_landmarks, n_landmarks);
 
 #pragma omp parallel
-	{
-		IndexType i_index_iter,j_index_iter;
+    {
+        IndexType i_index_iter, j_index_iter;
 #pragma omp for nowait
-		for (i_index_iter=0; i_index_iter<n_landmarks; ++i_index_iter)
-		{
-			for (j_index_iter=i_index_iter; j_index_iter<n_landmarks; ++j_index_iter)
-			{
-				ScalarType d = callback.distance(begin[landmarks[i_index_iter]],begin[landmarks[j_index_iter]]);
-				d *= d;
-				distance_matrix(i_index_iter,j_index_iter) = d;
-				distance_matrix(j_index_iter,i_index_iter) = d;
-			}
-		}
-	}
-	return distance_matrix;
+        for (i_index_iter = 0; i_index_iter < n_landmarks; ++i_index_iter)
+        {
+            for (j_index_iter = i_index_iter; j_index_iter < n_landmarks; ++j_index_iter)
+            {
+                ScalarType d = callback.distance(begin[landmarks[i_index_iter]], begin[landmarks[j_index_iter]]);
+                d *= d;
+                distance_matrix(i_index_iter, j_index_iter) = d;
+                distance_matrix(j_index_iter, i_index_iter) = d;
+            }
+        }
+    }
+    return distance_matrix;
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
 DenseMatrix triangulate(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback distance_callback,
-                        Landmarks& landmarks, DenseVector& landmark_distances_squared,
-                        EigendecompositionResult& landmarks_embedding, IndexType target_dimension)
+                        Landmarks &landmarks, DenseVector &landmark_distances_squared,
+                        EigendecompositionResult &landmarks_embedding, IndexType target_dimension)
 {
-	timed_context context("Landmark triangulation");
+    timed_context context("Landmark triangulation");
 
-	const IndexType n_vectors = end-begin;
-	const IndexType n_landmarks = landmarks.size();
+    const IndexType n_vectors = end - begin;
+    const IndexType n_landmarks = landmarks.size();
 
-	bool* to_process = new bool[n_vectors];
-	std::fill(to_process,to_process+n_vectors,true);
+    bool *to_process = new bool[n_vectors];
+    std::fill(to_process, to_process + n_vectors, true);
 
-	DenseMatrix embedding(n_vectors,target_dimension);
+    DenseMatrix embedding(n_vectors, target_dimension);
 
-	for (IndexType index_iter=0; index_iter<n_landmarks; ++index_iter)
-	{
-		to_process[landmarks[index_iter]] = false;
-		embedding.row(landmarks[index_iter]).noalias() = landmarks_embedding.first.row(index_iter);
-	}
+    for (IndexType index_iter = 0; index_iter < n_landmarks; ++index_iter)
+    {
+        to_process[landmarks[index_iter]] = false;
+        embedding.row(landmarks[index_iter]).noalias() = landmarks_embedding.first.row(index_iter);
+    }
 
-	for (IndexType i=0; i<target_dimension; ++i)
-		landmarks_embedding.first.col(i).array() /= landmarks_embedding.second(i);
+    for (IndexType i = 0; i < target_dimension; ++i)
+        landmarks_embedding.first.col(i).array() /= landmarks_embedding.second(i);
 
 #pragma omp parallel
-	{
-		DenseVector distances_to_landmarks(n_landmarks);
-		IndexType index_iter;
+    {
+        DenseVector distances_to_landmarks(n_landmarks);
+        IndexType index_iter;
 #pragma omp for nowait
-		for (index_iter=0; index_iter<n_vectors; ++index_iter)
-		{
-			if (!to_process[index_iter])
-				continue;
+        for (index_iter = 0; index_iter < n_vectors; ++index_iter)
+        {
+            if (!to_process[index_iter])
+                continue;
 
-			for (IndexType i=0; i<n_landmarks; ++i)
-			{
-				ScalarType d = distance_callback.distance(begin[index_iter],begin[landmarks[i]]);
-				distances_to_landmarks(i) = d*d;
-			}
-			//distances_to_landmarks.array().square();
+            for (IndexType i = 0; i < n_landmarks; ++i)
+            {
+                ScalarType d = distance_callback.distance(begin[index_iter], begin[landmarks[i]]);
+                distances_to_landmarks(i) = d * d;
+            }
+            // distances_to_landmarks.array().square();
 
-			distances_to_landmarks -= landmark_distances_squared;
-			embedding.row(index_iter).noalias() = -0.5*landmarks_embedding.first.transpose()*distances_to_landmarks;
-		}
-	}
+            distances_to_landmarks -= landmark_distances_squared;
+            embedding.row(index_iter).noalias() = -0.5 * landmarks_embedding.first.transpose() * distances_to_landmarks;
+        }
+    }
 
-	delete[] to_process;
+    delete[] to_process;
 
-	return embedding;
+    return embedding;
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
 DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomAccessIterator end,
                                              PairwiseCallback callback)
 {
-	timed_context context("Multidimensional scaling distance matrix computation");
+    timed_context context("Multidimensional scaling distance matrix computation");
 
-	const IndexType n_vectors = end-begin;
-	DenseSymmetricMatrix distance_matrix(n_vectors,n_vectors);
+    const IndexType n_vectors = end - begin;
+    DenseSymmetricMatrix distance_matrix(n_vectors, n_vectors);
 
 #pragma omp parallel
-	{
-		IndexType i_index_iter,j_index_iter;
+    {
+        IndexType i_index_iter, j_index_iter;
 #pragma omp for nowait
-		for (i_index_iter=0; i_index_iter<n_vectors; ++i_index_iter)
-		{
-			for (j_index_iter=i_index_iter; j_index_iter<n_vectors; ++j_index_iter)
-			{
-				ScalarType d = callback.distance(begin[i_index_iter],begin[j_index_iter]);
-				d *= d;
-				distance_matrix(i_index_iter,j_index_iter) = d;
-				distance_matrix(j_index_iter,i_index_iter) = d;
-			}
-		}
-	}
-	return distance_matrix;
+        for (i_index_iter = 0; i_index_iter < n_vectors; ++i_index_iter)
+        {
+            for (j_index_iter = i_index_iter; j_index_iter < n_vectors; ++j_index_iter)
+            {
+                ScalarType d = callback.distance(begin[i_index_iter], begin[j_index_iter]);
+                d *= d;
+                distance_matrix(i_index_iter, j_index_iter) = d;
+                distance_matrix(j_index_iter, i_index_iter) = d;
+            }
+        }
+    }
+    return distance_matrix;
 }
 
 } // End of namespace tapkee_internal

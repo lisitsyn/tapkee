@@ -11,15 +11,15 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-inline void centerMatrix(DenseMatrix& matrix)
+inline void centerMatrix(DenseMatrix &matrix)
 {
-	DenseVector col_means = matrix.colwise().mean().transpose();
-	DenseMatrix::Scalar grand_mean = matrix.mean();
-	matrix.array() += grand_mean;
-	matrix.rowwise() -= col_means.transpose();
-	matrix.colwise() -= col_means;
+    DenseVector col_means = matrix.colwise().mean().transpose();
+    DenseMatrix::Scalar grand_mean = matrix.mean();
+    matrix.array() += grand_mean;
+    matrix.rowwise() -= col_means.transpose();
+    matrix.colwise() -= col_means;
 }
 
-} // End of tapkee_internal
-} // End of tapkee
+} // namespace tapkee_internal
+} // namespace tapkee
 #endif

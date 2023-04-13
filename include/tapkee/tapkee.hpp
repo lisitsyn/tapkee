@@ -7,8 +7,8 @@
 #define TAPKEE_MAIN_H_
 
 /* Tapkee includes */
-#include <tapkee/embed.hpp>
 #include <tapkee/chain_interface.hpp>
+#include <tapkee/embed.hpp>
 /* End of Tapkee includes */
 
 #endif

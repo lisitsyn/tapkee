@@ -33,52 +33,52 @@ namespace tapkee_internal
 //! @param width width \f$ w \f$ of the gaussian kernel
 //!
 template <class RandomAccessIterator, class DistanceCallback>
-DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end, DistanceCallback callback,
-                                              const ScalarType width)
+DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, RandomAccessIterator end,
+                                              DistanceCallback callback, const ScalarType width)
 {
-	timed_context context("Diffusion map matrix computation");
+    timed_context context("Diffusion map matrix computation");
 
-	const IndexType n_vectors = end-begin;
-	DenseSymmetricMatrix diffusion_matrix(n_vectors,n_vectors);
-	DenseVector p = DenseVector::Zero(n_vectors);
+    const IndexType n_vectors = end - begin;
+    DenseSymmetricMatrix diffusion_matrix(n_vectors, n_vectors);
+    DenseVector p = DenseVector::Zero(n_vectors);
 
-	RESTRICT_ALLOC;
+    RESTRICT_ALLOC;
 
-	// compute gaussian kernel matrix
+    // compute gaussian kernel matrix
 #pragma omp parallel
-	{
-		IndexType i_index_iter, j_index_iter;
+    {
+        IndexType i_index_iter, j_index_iter;
 #pragma omp for nowait
-		for (i_index_iter=0; i_index_iter<n_vectors; ++i_index_iter)
-		{
-			for (j_index_iter=i_index_iter; j_index_iter<n_vectors; ++j_index_iter)
-			{
-				ScalarType k = callback.distance(begin[i_index_iter],begin[j_index_iter]);
-				ScalarType gk = exp(-(k*k)/width);
-				diffusion_matrix(i_index_iter,j_index_iter) = gk;
-				diffusion_matrix(j_index_iter,i_index_iter) = gk;
-			}
-		}
-	}
-	// compute column sum vector
-	p = diffusion_matrix.colwise().sum();
+        for (i_index_iter = 0; i_index_iter < n_vectors; ++i_index_iter)
+        {
+            for (j_index_iter = i_index_iter; j_index_iter < n_vectors; ++j_index_iter)
+            {
+                ScalarType k = callback.distance(begin[i_index_iter], begin[j_index_iter]);
+                ScalarType gk = exp(-(k * k) / width);
+                diffusion_matrix(i_index_iter, j_index_iter) = gk;
+                diffusion_matrix(j_index_iter, i_index_iter) = gk;
+            }
+        }
+    }
+    // compute column sum vector
+    p = diffusion_matrix.colwise().sum();
 
-	// compute full matrix as we need to compute sum later
-	// TODO add weighting alpha, use linear algebra to compute D^-alpha K D^-alpha
-	for (IndexType i=0; i<n_vectors; i++)
-		for (IndexType j=0; j<n_vectors; j++)
-			diffusion_matrix(i,j) /= p(i)*p(j);
+    // compute full matrix as we need to compute sum later
+    // TODO add weighting alpha, use linear algebra to compute D^-alpha K D^-alpha
+    for (IndexType i = 0; i < n_vectors; i++)
+        for (IndexType j = 0; j < n_vectors; j++)
+            diffusion_matrix(i, j) /= p(i) * p(j);
 
-	// compute sqrt of column sum vector
-	p = diffusion_matrix.colwise().sum().cwiseSqrt();
+    // compute sqrt of column sum vector
+    p = diffusion_matrix.colwise().sum().cwiseSqrt();
 
-	for (IndexType i=0; i<n_vectors; i++)
-		for (IndexType j=0; j<n_vectors; j++)
-			diffusion_matrix(i,j) /= p(i)*p(j);
+    for (IndexType i = 0; i < n_vectors; i++)
+        for (IndexType j = 0; j < n_vectors; j++)
+            diffusion_matrix(i, j) /= p(i) * p(j);
 
-	UNRESTRICT_ALLOC;
+    UNRESTRICT_ALLOC;
 
-	return diffusion_matrix;
+    return diffusion_matrix;
 }
 
 } // End of namespace tapkee_internal

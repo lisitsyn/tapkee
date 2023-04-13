@@ -8,32 +8,30 @@
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
- /* End of Tapkee includes */
+/* End of Tapkee includes */
 
 namespace tapkee
 {
 namespace tapkee_internal
 {
 
-template<class RandomAccessIterator, class FeaturesCallback>
-DenseMatrix dense_matrix_from_features(FeaturesCallback features,
-                                       IndexType dimension,
-                                       RandomAccessIterator begin,
+template <class RandomAccessIterator, class FeaturesCallback>
+DenseMatrix dense_matrix_from_features(FeaturesCallback features, IndexType dimension, RandomAccessIterator begin,
                                        RandomAccessIterator end)
 {
-	DenseMatrix matrix(dimension, end-begin);
-	DenseVector feature_vector(dimension);
+    DenseMatrix matrix(dimension, end - begin);
+    DenseVector feature_vector(dimension);
 
-	for (RandomAccessIterator iter=begin; iter!=end; ++iter)
-	{
-		features.vector(*iter,feature_vector);
-		matrix.col(iter-begin).array() = feature_vector;
-	}
+    for (RandomAccessIterator iter = begin; iter != end; ++iter)
+    {
+        features.vector(*iter, feature_vector);
+        matrix.col(iter - begin).array() = feature_vector;
+    }
 
-	return matrix;
+    return matrix;
 }
 
-}
-}
+} // namespace tapkee_internal
+} // namespace tapkee
 
 #endif
