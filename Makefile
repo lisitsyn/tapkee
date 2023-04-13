@@ -79,4 +79,7 @@ faces: default
 	  echo '--- Embedding and plotting (please wait, a window will appear in a few seconds) ---';    \
 	  python examples/faces/faces.py data/faces)
 
+format: default
+	@(find . -iname *.hpp -o -iname *.cpp -iname *.h | xargs clang-format -i)
+
 .PHONY: test minimal rna precomputed promoters mnist faces
