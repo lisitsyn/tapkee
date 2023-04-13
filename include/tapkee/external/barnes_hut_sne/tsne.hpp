@@ -60,7 +60,7 @@ static inline ScalarType sign(ScalarType x)
 class TSNE
 {
   public:
-    void run(tapkee::DenseMatrix &X, int N, int D, ScalarType *Y, int no_dims, ScalarType perplexity, ScalarType theta)
+    void run(tapkee::DenseMatrix& X, int N, int D, ScalarType* Y, int no_dims, ScalarType perplexity, ScalarType theta)
     {
         // Determine whether we are using an exact algorithm
         bool exact = (theta == .0) ? true : false;
@@ -82,9 +82,9 @@ class TSNE
         gains.setConstant(1.0);
 
         // Normalize input data (to prevent numerical problems)
-        int *row_P = NULL;
-        int *col_P = NULL;
-        ScalarType *val_P = NULL;
+        int* row_P = NULL;
+        int* col_P = NULL;
+        ScalarType* val_P = NULL;
         {
             tapkee::tapkee_internal::timed_context context("Input similarities computation");
             zeroMean(X.data(), N, D);
@@ -207,15 +207,15 @@ class TSNE
         }
     }
 
-    void symmetrizeMatrix(int **_row_P, int **_col_P, ScalarType **_val_P, int N)
+    void symmetrizeMatrix(int** _row_P, int** _col_P, ScalarType** _val_P, int N)
     {
         // Get sparse matrix
-        int *row_P = *_row_P;
-        int *col_P = *_col_P;
-        ScalarType *val_P = *_val_P;
+        int* row_P = *_row_P;
+        int* col_P = *_col_P;
+        ScalarType* val_P = *_val_P;
 
         // Count number of elements and row counts of symmetric matrix
-        int *row_counts = (int *)calloc(N, sizeof(int));
+        int* row_counts = (int*)calloc(N, sizeof(int));
         if (row_counts == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -246,9 +246,9 @@ class TSNE
             no_elem += row_counts[n];
 
         // Allocate memory for symmetrized matrix
-        int *sym_row_P = (int *)malloc((N + 1) * sizeof(int));
-        int *sym_col_P = (int *)malloc(no_elem * sizeof(int));
-        ScalarType *sym_val_P = (ScalarType *)malloc(no_elem * sizeof(ScalarType));
+        int* sym_row_P = (int*)malloc((N + 1) * sizeof(int));
+        int* sym_col_P = (int*)malloc(no_elem * sizeof(int));
+        ScalarType* sym_val_P = (ScalarType*)malloc(no_elem * sizeof(ScalarType));
         if (sym_row_P == NULL || sym_col_P == NULL || sym_val_P == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -261,7 +261,7 @@ class TSNE
             sym_row_P[n + 1] = sym_row_P[n] + row_counts[n];
 
         // Fill the result matrix
-        int *offset = (int *)calloc(N, sizeof(int));
+        int* offset = (int*)calloc(N, sizeof(int));
         if (offset == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -328,16 +328,16 @@ class TSNE
     }
 
   private:
-    void computeGradient(ScalarType * /*P*/, int *inp_row_P, int *inp_col_P, ScalarType *inp_val_P, ScalarType *Y,
-                         int N, int D, ScalarType *dC, ScalarType theta)
+    void computeGradient(ScalarType* /*P*/, int* inp_row_P, int* inp_col_P, ScalarType* inp_val_P, ScalarType* Y, int N,
+                         int D, ScalarType* dC, ScalarType theta)
     {
         // Construct quadtree on current map
-        QuadTree *tree = new QuadTree(Y, N);
+        QuadTree* tree = new QuadTree(Y, N);
 
         // Compute all terms required for t-SNE gradient
         ScalarType sum_Q = .0;
-        ScalarType *pos_f = (ScalarType *)calloc(N * D, sizeof(ScalarType));
-        ScalarType *neg_f = (ScalarType *)calloc(N * D, sizeof(ScalarType));
+        ScalarType* pos_f = (ScalarType*)calloc(N * D, sizeof(ScalarType));
+        ScalarType* neg_f = (ScalarType*)calloc(N * D, sizeof(ScalarType));
         if (pos_f == NULL || neg_f == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -357,14 +357,14 @@ class TSNE
         delete tree;
     }
 
-    void computeExactGradient(ScalarType *P, ScalarType *Y, int N, int D, ScalarType *dC)
+    void computeExactGradient(ScalarType* P, ScalarType* Y, int N, int D, ScalarType* dC)
     {
         // Make sure the current gradient contains zeros
         for (int i = 0; i < N * D; i++)
             dC[i] = 0.0;
 
         // Compute the squared Euclidean distance matrix
-        ScalarType *DD = (ScalarType *)malloc(N * N * sizeof(ScalarType));
+        ScalarType* DD = (ScalarType*)malloc(N * N * sizeof(ScalarType));
         if (DD == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -373,7 +373,7 @@ class TSNE
         computeSquaredEuclideanDistance(Y, N, D, DD);
 
         // Compute Q-matrix and normalization sum
-        ScalarType *Q = (ScalarType *)malloc(N * N * sizeof(ScalarType));
+        ScalarType* Q = (ScalarType*)malloc(N * N * sizeof(ScalarType));
         if (Q == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -415,11 +415,11 @@ class TSNE
         Q = NULL;
     }
 
-    ScalarType evaluateError(ScalarType *P, ScalarType *Y, int N)
+    ScalarType evaluateError(ScalarType* P, ScalarType* Y, int N)
     {
         // Compute the squared Euclidean distance matrix
-        ScalarType *DD = (ScalarType *)malloc(N * N * sizeof(ScalarType));
-        ScalarType *Q = (ScalarType *)malloc(N * N * sizeof(ScalarType));
+        ScalarType* DD = (ScalarType*)malloc(N * N * sizeof(ScalarType));
+        ScalarType* Q = (ScalarType*)malloc(N * N * sizeof(ScalarType));
         if (DD == NULL || Q == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -461,11 +461,11 @@ class TSNE
         return C;
     }
 
-    ScalarType evaluateError(int *row_P, int *col_P, ScalarType *val_P, ScalarType *Y, int N, ScalarType theta)
+    ScalarType evaluateError(int* row_P, int* col_P, ScalarType* val_P, ScalarType* Y, int N, ScalarType theta)
     {
         // Get estimate of normalization term
         const int QT_NO_DIMS = 2;
-        QuadTree *tree = new QuadTree(Y, N);
+        QuadTree* tree = new QuadTree(Y, N);
         ScalarType buff[QT_NO_DIMS] = {.0, .0};
         ScalarType sum_Q = .0;
         for (int n = 0; n < N; n++)
@@ -495,10 +495,10 @@ class TSNE
         return C;
     }
 
-    void zeroMean(ScalarType *X, int N, int D)
+    void zeroMean(ScalarType* X, int N, int D)
     {
         // Compute data mean
-        ScalarType *mean = (ScalarType *)calloc(D, sizeof(ScalarType));
+        ScalarType* mean = (ScalarType*)calloc(D, sizeof(ScalarType));
         if (mean == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -528,10 +528,10 @@ class TSNE
         mean = NULL;
     }
 
-    void computeGaussianPerplexity(ScalarType *X, int N, int D, ScalarType *P, ScalarType perplexity)
+    void computeGaussianPerplexity(ScalarType* X, int N, int D, ScalarType* P, ScalarType perplexity)
     {
         // Compute the squared Euclidean distance matrix
-        ScalarType *DD = (ScalarType *)malloc(N * N * sizeof(ScalarType));
+        ScalarType* DD = (ScalarType*)malloc(N * N * sizeof(ScalarType));
         if (DD == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -610,25 +610,25 @@ class TSNE
         DD = NULL;
     }
 
-    void computeGaussianPerplexity(ScalarType *X, int N, int D, int **_row_P, int **_col_P, ScalarType **_val_P,
+    void computeGaussianPerplexity(ScalarType* X, int N, int D, int** _row_P, int** _col_P, ScalarType** _val_P,
                                    ScalarType perplexity, int K)
     {
         if (perplexity > K)
             printf("Perplexity should be lower than K!\n");
 
         // Allocate the memory we need
-        *_row_P = (int *)malloc((N + 1) * sizeof(int));
-        *_col_P = (int *)calloc(N * K, sizeof(int));
-        *_val_P = (ScalarType *)calloc(N * K, sizeof(ScalarType));
+        *_row_P = (int*)malloc((N + 1) * sizeof(int));
+        *_col_P = (int*)calloc(N * K, sizeof(int));
+        *_val_P = (ScalarType*)calloc(N * K, sizeof(ScalarType));
         if (*_row_P == NULL || *_col_P == NULL || *_val_P == NULL)
         {
             printf("Memory allocation failed!\n");
             exit(1);
         }
-        int *row_P = *_row_P;
-        int *col_P = *_col_P;
-        ScalarType *val_P = *_val_P;
-        ScalarType *cur_P = (ScalarType *)malloc((N - 1) * sizeof(ScalarType));
+        int* row_P = *_row_P;
+        int* col_P = *_col_P;
+        ScalarType* val_P = *_val_P;
+        ScalarType* cur_P = (ScalarType*)malloc((N - 1) * sizeof(ScalarType));
         if (cur_P == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -639,7 +639,7 @@ class TSNE
             row_P[n + 1] = row_P[n] + K;
 
         // Build ball tree on data set
-        VpTree<DataPoint, euclidean_distance> *tree = new VpTree<DataPoint, euclidean_distance>();
+        VpTree<DataPoint, euclidean_distance>* tree = new VpTree<DataPoint, euclidean_distance>();
         std::vector<DataPoint> obj_X(N, DataPoint(D, -1, X));
         for (int n = 0; n < N; n++)
             obj_X[n] = DataPoint(D, n, X + n * D);
@@ -731,13 +731,13 @@ class TSNE
         delete tree;
     }
 
-    void computeGaussianPerplexity(ScalarType *X, int N, int D, int **_row_P, int **_col_P, ScalarType **_val_P,
+    void computeGaussianPerplexity(ScalarType* X, int N, int D, int** _row_P, int** _col_P, ScalarType** _val_P,
                                    ScalarType perplexity, ScalarType threshold)
     {
         // Allocate some memory we need for computations
-        ScalarType *buff = (ScalarType *)malloc(D * sizeof(ScalarType));
-        ScalarType *DD = (ScalarType *)malloc(N * sizeof(ScalarType));
-        ScalarType *cur_P = (ScalarType *)malloc(N * sizeof(ScalarType));
+        ScalarType* buff = (ScalarType*)malloc(D * sizeof(ScalarType));
+        ScalarType* DD = (ScalarType*)malloc(N * sizeof(ScalarType));
+        ScalarType* cur_P = (ScalarType*)malloc(N * sizeof(ScalarType));
         if (buff == NULL || DD == NULL || cur_P == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -829,12 +829,12 @@ class TSNE
         }
 
         // Allocate the memory we need
-        *_row_P = (int *)malloc((N + 1) * sizeof(int));
-        *_col_P = (int *)malloc(total_count * sizeof(int));
-        *_val_P = (ScalarType *)malloc(total_count * sizeof(ScalarType));
-        int *row_P = *_row_P;
-        int *col_P = *_col_P;
-        ScalarType *val_P = *_val_P;
+        *_row_P = (int*)malloc((N + 1) * sizeof(int));
+        *_col_P = (int*)malloc(total_count * sizeof(int));
+        *_val_P = (ScalarType*)malloc(total_count * sizeof(ScalarType));
+        int* row_P = *_row_P;
+        int* col_P = *_col_P;
+        ScalarType* val_P = *_val_P;
         if (row_P == NULL || col_P == NULL || val_P == NULL)
         {
             printf("Memory allocation failed!\n");
@@ -940,9 +940,9 @@ class TSNE
         cur_P = NULL;
     }
 
-    void computeSquaredEuclideanDistance(ScalarType *X, int N, int D, ScalarType *DD)
+    void computeSquaredEuclideanDistance(ScalarType* X, int N, int D, ScalarType* DD)
     {
-        ScalarType *dataSums = (ScalarType *)calloc(N, sizeof(ScalarType));
+        ScalarType* dataSums = (ScalarType*)calloc(N, sizeof(ScalarType));
         if (dataSums == NULL)
         {
             printf("Memory allocation failed!\n");

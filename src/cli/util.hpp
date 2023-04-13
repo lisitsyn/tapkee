@@ -24,7 +24,7 @@ inline bool is_wrong_char(char c)
     return false;
 }
 
-tapkee::DenseMatrix read_data(ifstream &ifs, char delimiter)
+tapkee::DenseMatrix read_data(ifstream& ifs, char delimiter)
 {
     string str;
     vector<vector<tapkee::ScalarType>> input_data;
@@ -75,7 +75,7 @@ tapkee::DenseMatrix read_data(ifstream &ifs, char delimiter)
     }
 }
 
-void write_matrix(tapkee::DenseMatrix *matrix, ofstream &of, char delimiter)
+void write_matrix(tapkee::DenseMatrix* matrix, ofstream& of, char delimiter)
 {
     for (int i = 0; i < matrix->rows(); i++)
     {
@@ -89,7 +89,7 @@ void write_matrix(tapkee::DenseMatrix *matrix, ofstream &of, char delimiter)
     }
 }
 
-void write_vector(tapkee::DenseVector *matrix, ofstream &of)
+void write_vector(tapkee::DenseVector* matrix, ofstream& of)
 {
     for (int i = 0; i < matrix->rows(); i++)
     {
@@ -163,7 +163,7 @@ bool method_needs_distance(tapkee::DimensionReductionMethod method)
     return false;
 }
 
-tapkee::DimensionReductionMethod parse_reduction_method(const char *str)
+tapkee::DimensionReductionMethod parse_reduction_method(const char* str)
 {
     if (!strcmp(str, "local_tangent_space_alignment") || !strcmp(str, "ltsa"))
         return tapkee::KernelLocalTangentSpaceAlignment;
@@ -210,7 +210,7 @@ tapkee::DimensionReductionMethod parse_reduction_method(const char *str)
     return tapkee::PassThru;
 }
 
-tapkee::NeighborsMethod parse_neighbors_method(const char *str)
+tapkee::NeighborsMethod parse_neighbors_method(const char* str)
 {
     if (!strcmp(str, "brute"))
         return tapkee::Brute;
@@ -225,7 +225,7 @@ tapkee::NeighborsMethod parse_neighbors_method(const char *str)
     return tapkee::Brute;
 }
 
-tapkee::EigenMethod parse_eigen_method(const char *str)
+tapkee::EigenMethod parse_eigen_method(const char* str)
 {
 #ifdef TAPKEE_WITH_ARPACK
     if (!strcmp(str, "arpack"))
@@ -240,7 +240,7 @@ tapkee::EigenMethod parse_eigen_method(const char *str)
     return tapkee::Dense;
 }
 
-tapkee::ComputationStrategy parse_computation_strategy(const char *str)
+tapkee::ComputationStrategy parse_computation_strategy(const char* str)
 {
     if (!strcmp(str, "cpu"))
         return tapkee::HomogeneousCPUStrategy;

@@ -25,7 +25,7 @@ typedef std::pair<IndexType, ScalarType> HeapElement;
 
 struct HeapElementComparator
 {
-    inline bool operator()(const HeapElement &l, const HeapElement &r) const
+    inline bool operator()(const HeapElement& l, const HeapElement& r) const
     {
         return l.second > r.second;
     }
@@ -42,7 +42,7 @@ struct HeapElementComparator
 //!
 template <class RandomAccessIterator, class DistanceCallback>
 DenseSymmetricMatrix compute_shortest_distances_matrix(RandomAccessIterator begin, RandomAccessIterator end,
-                                                       Neighbors &neighbors, DistanceCallback callback)
+                                                       Neighbors& neighbors, DistanceCallback callback)
 {
     timed_context context("Distances shortest path relaxing");
     const IndexType n_neighbors = neighbors[0].size();
@@ -52,8 +52,8 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(RandomAccessIterator begi
 
 #pragma omp parallel
     {
-        bool *f = new bool[N];
-        bool *s = new bool[N];
+        bool* f = new bool[N];
+        bool* s = new bool[N];
         IndexType k;
 
 #ifdef TAPKEE_USE_PRIORITY_QUEUE
@@ -160,7 +160,7 @@ DenseSymmetricMatrix compute_shortest_distances_matrix(RandomAccessIterator begi
 //!
 template <class RandomAccessIterator, class DistanceCallback>
 DenseMatrix compute_shortest_distances_matrix(RandomAccessIterator begin, RandomAccessIterator end,
-                                              Landmarks &landmarks, Neighbors &neighbors, DistanceCallback callback)
+                                              Landmarks& landmarks, Neighbors& neighbors, DistanceCallback callback)
 {
     timed_context context("Distances shortest path relaxing");
     const IndexType n_neighbors = neighbors[0].size();
@@ -171,8 +171,8 @@ DenseMatrix compute_shortest_distances_matrix(RandomAccessIterator begin, Random
 
 #pragma omp parallel
     {
-        bool *f = new bool[N];
-        bool *s = new bool[N];
+        bool* f = new bool[N];
+        bool* s = new bool[N];
         IndexType k;
 
 #ifdef TAPKEE_USE_PRIORITY_QUEUE

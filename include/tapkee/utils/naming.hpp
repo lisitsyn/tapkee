@@ -59,13 +59,13 @@ inline std::string get_method_name(DimensionReductionMethod m)
 }
 
 /** Returns the name of the provided neighbors method */
-inline std::string get_neighbors_method_name(const NeighborsMethod &m)
+inline std::string get_neighbors_method_name(const NeighborsMethod& m)
 {
     return m.name();
 }
 
 /** Returns the name of the provided eigen method */
-inline std::string get_eigen_method_name(const EigenMethod &m)
+inline std::string get_eigen_method_name(const EigenMethod& m)
 {
     return m.name();
 }

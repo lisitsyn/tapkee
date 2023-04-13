@@ -17,7 +17,7 @@ namespace tapkee_internal
 {
 
 template <class RandomAccessIterator, class FeatureVectorCallback>
-DenseMatrix project(const DenseMatrix &projection_matrix, const DenseVector &mean_vector, RandomAccessIterator begin,
+DenseMatrix project(const DenseMatrix& projection_matrix, const DenseVector& mean_vector, RandomAccessIterator begin,
                     RandomAccessIterator end, FeatureVectorCallback callback, IndexType dimension)
 {
     timed_context context("Data projection");
@@ -54,7 +54,7 @@ DenseVector compute_mean(RandomAccessIterator begin, RandomAccessIterator end, F
 
 template <class RandomAccessIterator, class FeatureVectorCallback>
 DenseSymmetricMatrix compute_covariance_matrix(RandomAccessIterator begin, RandomAccessIterator end,
-                                               const DenseVector &mean, FeatureVectorCallback callback,
+                                               const DenseVector& mean, FeatureVectorCallback callback,
                                                IndexType dimension)
 {
     timed_context context("Constructing PCA covariance matrix");

@@ -54,10 +54,10 @@ template <typename T> struct HexWrapper
     }
     const T value_;
 
-    template <typename U> friend std::ostream &operator<<(std::ostream &out, const HexWrapper<U> &h);
+    template <typename U> friend std::ostream& operator<<(std::ostream& out, const HexWrapper<U>& h);
 };
 
-template <typename T> std::ostream &operator<<(std::ostream &out, const HexWrapper<T> &h)
+template <typename T> std::ostream& operator<<(std::ostream& out, const HexWrapper<T>& h)
 {
     out << "0x" << std::hex << std::uppercase << h.value_;
     return out;
@@ -71,10 +71,10 @@ template <typename T> struct OctWrapper
     }
     const T value_;
 
-    template <typename U> friend std::ostream &operator<<(std::ostream &out, const HexWrapper<U> &h);
+    template <typename U> friend std::ostream& operator<<(std::ostream& out, const HexWrapper<U>& h);
 };
 
-template <typename T> std::ostream &operator<<(std::ostream &out, const OctWrapper<T> &h)
+template <typename T> std::ostream& operator<<(std::ostream& out, const OctWrapper<T>& h)
 {
     out << "0" << std::oct << std::uppercase << h.value_;
     return out;
@@ -88,10 +88,10 @@ template <typename T> struct WidthWrapper
     const T value_;
     const unsigned int width_;
 
-    template <typename U> friend std::ostream &operator<<(std::ostream &out, const WidthWrapper &h);
+    template <typename U> friend std::ostream& operator<<(std::ostream& out, const WidthWrapper& h);
 };
 
-template <typename T> std::ostream &operator<<(std::ostream &out, const WidthWrapper<T> &h)
+template <typename T> std::ostream& operator<<(std::ostream& out, const WidthWrapper<T>& h)
 {
     out << std::setw(h.width_) << h.value_;
     return out;
@@ -130,10 +130,10 @@ template <typename T> struct PrecisionWrapper
     const T value_;
     const unsigned int precision_;
 
-    template <typename U> friend std::ostream &operator<<(std::ostream &out, const PrecisionWrapper &h);
+    template <typename U> friend std::ostream& operator<<(std::ostream& out, const PrecisionWrapper& h);
 };
 
-template <typename T> std::ostream &operator<<(std::ostream &out, const PrecisionWrapper<T> &h)
+template <typename T> std::ostream& operator<<(std::ostream& out, const PrecisionWrapper<T>& h)
 {
     out << std::setprecision(h.precision_) << h.value_;
     return out;
@@ -194,7 +194,7 @@ template <typename T> inline wrappers::OctWrapper<T> oct(T value)
  *
  * @param value a pointer to be represented as hex
  */
-inline wrappers::HexWrapper<size_t> raw(void *value)
+inline wrappers::HexWrapper<size_t> raw(void* value)
 {
     size_t ptr = reinterpret_cast<size_t>(value);
     return wrappers::HexWrapper<size_t>(ptr);
@@ -205,7 +205,7 @@ inline wrappers::HexWrapper<size_t> raw(void *value)
  *
  * @param value a pointer to be represented as hex
  */
-inline wrappers::HexWrapper<size_t> raw(const void *value)
+inline wrappers::HexWrapper<size_t> raw(const void* value)
 {
     size_t ptr = reinterpret_cast<size_t>(value);
     return wrappers::HexWrapper<size_t>(ptr);

@@ -32,7 +32,7 @@ struct timed_context
 {
     CLOCK_TYPE start_clock;
     std::string operation_name;
-    timed_context(const std::string &name) : start_clock(CLOCK_GET), operation_name(name)
+    timed_context(const std::string& name) : start_clock(CLOCK_GET), operation_name(name)
     {
     }
     ~timed_context()

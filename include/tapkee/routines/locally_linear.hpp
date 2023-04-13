@@ -21,7 +21,7 @@ namespace tapkee_internal
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end,
-                                         const Neighbors &neighbors, PairwiseCallback callback,
+                                         const Neighbors& neighbors, PairwiseCallback callback,
                                          const IndexType target_dimension, const ScalarType shift)
 {
     timed_context context("KLTSA weight matrix computation");
@@ -44,7 +44,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 #pragma omp for nowait
         for (index_iter = 0; index_iter < static_cast<IndexType>(end - begin); index_iter++)
         {
-            const LocalNeighbors &current_neighbors = neighbors[index_iter];
+            const LocalNeighbors& current_neighbors = neighbors[index_iter];
 
             for (IndexType i = 0; i < k; ++i)
             {
@@ -90,8 +90,8 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
 }
 
 template <class RandomAccessIterator, class PairwiseCallback>
-SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator &begin, const RandomAccessIterator &end,
-                                        const Neighbors &neighbors, PairwiseCallback callback, const ScalarType shift,
+SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const RandomAccessIterator& end,
+                                        const Neighbors& neighbors, PairwiseCallback callback, const ScalarType shift,
                                         const ScalarType trace_shift)
 {
     timed_context context("KLLE weight computation");
@@ -115,7 +115,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator &begin, const
         for (index_iter = 0; index_iter < static_cast<IndexType>(end - begin); index_iter++)
         {
             ScalarType kernel_value = callback.kernel(begin[index_iter], begin[index_iter]);
-            const LocalNeighbors &current_neighbors = neighbors[index_iter];
+            const LocalNeighbors& current_neighbors = neighbors[index_iter];
 
             for (IndexType i = 0; i < k; ++i)
                 dots[i] = callback.kernel(begin[index_iter], begin[current_neighbors[i]]);
@@ -162,7 +162,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator &begin, const
 
 template <class RandomAccessIterator, class PairwiseCallback>
 SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAccessIterator end,
-                                         const Neighbors &neighbors, PairwiseCallback callback,
+                                         const Neighbors& neighbors, PairwiseCallback callback,
                                          const IndexType target_dimension)
 {
     timed_context context("Hessian weight matrix computation");
@@ -185,7 +185,7 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
 #pragma omp for nowait
         for (index_iter = 0; index_iter < static_cast<IndexType>(end - begin); index_iter++)
         {
-            const LocalNeighbors &current_neighbors = neighbors[index_iter];
+            const LocalNeighbors& current_neighbors = neighbors[index_iter];
 
             for (IndexType i = 0; i < k; ++i)
             {

@@ -26,10 +26,10 @@ template <class RandomAccessIterator, class DistanceCallback> struct DistanceCom
 {
     DistanceCallback callback;
     const RandomAccessIterator item;
-    DistanceComparator(const DistanceCallback &c, const RandomAccessIterator &i) : callback(c), item(i)
+    DistanceComparator(const DistanceCallback& c, const RandomAccessIterator& i) : callback(c), item(i)
     {
     }
-    inline bool operator()(const RandomAccessIterator &a, const RandomAccessIterator &b)
+    inline bool operator()(const RandomAccessIterator& a, const RandomAccessIterator& b)
     {
         return compare_impl<typename DistanceCallback::type, RandomAccessIterator, DistanceCallback>()(callback, item,
                                                                                                        a, b);
@@ -41,8 +41,8 @@ struct KernelType;
 template <class RandomAccessIterator, class DistanceCallback>
 struct compare_impl<KernelType, RandomAccessIterator, DistanceCallback>
 {
-    inline bool operator()(DistanceCallback &callback, const RandomAccessIterator &item, const RandomAccessIterator &a,
-                           const RandomAccessIterator &b)
+    inline bool operator()(DistanceCallback& callback, const RandomAccessIterator& item, const RandomAccessIterator& a,
+                           const RandomAccessIterator& b)
     {
         return (-2 * callback(item, a) + callback(a, a)) < (-2 * callback(item, b) + callback(b, b));
     }
@@ -53,8 +53,8 @@ struct DistanceType;
 template <class RandomAccessIterator, class DistanceCallback>
 struct compare_impl<DistanceType, RandomAccessIterator, DistanceCallback>
 {
-    inline bool operator()(DistanceCallback &callback, const RandomAccessIterator &item, const RandomAccessIterator &a,
-                           const RandomAccessIterator &b)
+    inline bool operator()(DistanceCallback& callback, const RandomAccessIterator& item, const RandomAccessIterator& a,
+                           const RandomAccessIterator& b)
     {
         return callback(item, a) < callback(item, b);
     }
@@ -80,7 +80,7 @@ template <class RandomAccessIterator, class DistanceCallback> class VantagePoint
     }
 
     // Function that uses the tree to find the k nearest neighbors of target
-    std::vector<IndexType> search(const RandomAccessIterator &target, int k)
+    std::vector<IndexType> search(const RandomAccessIterator& target, int k)
     {
         std::vector<IndexType> results;
         // Use a priority queue to store intermediate results on
@@ -103,8 +103,8 @@ template <class RandomAccessIterator, class DistanceCallback> class VantagePoint
     }
 
   private:
-    VantagePointTree(const VantagePointTree &);
-    VantagePointTree &operator=(const VantagePointTree &);
+    VantagePointTree(const VantagePointTree&);
+    VantagePointTree& operator=(const VantagePointTree&);
 
     RandomAccessIterator begin;
     std::vector<RandomAccessIterator> items;
@@ -115,8 +115,8 @@ template <class RandomAccessIterator, class DistanceCallback> class VantagePoint
     {
         int index;
         double threshold;
-        Node *left;
-        Node *right;
+        Node* left;
+        Node* right;
 
         Node() : index(0), threshold(0.), left(0), right(0)
         {
@@ -128,10 +128,10 @@ template <class RandomAccessIterator, class DistanceCallback> class VantagePoint
             delete right;
         }
 
-        Node(const Node &);
-        Node &operator=(const Node &);
+        Node(const Node&);
+        Node& operator=(const Node&);
 
-    } *root;
+    }* root;
 
     struct HeapItem
     {
@@ -140,20 +140,20 @@ template <class RandomAccessIterator, class DistanceCallback> class VantagePoint
         }
         int index;
         double distance;
-        bool operator<(const HeapItem &o) const
+        bool operator<(const HeapItem& o) const
         {
             return distance < o.distance;
         }
     };
 
-    Node *buildFromPoints(int lower, int upper)
+    Node* buildFromPoints(int lower, int upper)
     {
         if (upper == lower)
         {
             return NULL;
         }
 
-        Node *node = new Node();
+        Node* node = new Node();
         node->index = lower;
 
         if (upper - lower > 1)
@@ -174,7 +174,7 @@ template <class RandomAccessIterator, class DistanceCallback> class VantagePoint
         return node;
     }
 
-    void search(Node *node, const RandomAccessIterator &target, int k, std::priority_queue<HeapItem> &heap)
+    void search(Node* node, const RandomAccessIterator& target, int k, std::priority_queue<HeapItem>& heap)
     {
         if (node == NULL)
             return;

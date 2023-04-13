@@ -20,8 +20,8 @@ namespace tapkee_internal
 template <class KernelCallback, class DistanceCallback, class FeaturesCallback> class CallbacksInitializedState
 {
   public:
-    CallbacksInitializedState(const ParametersSet &params, const KernelCallback &k, const DistanceCallback &d,
-                              const FeaturesCallback &f)
+    CallbacksInitializedState(const ParametersSet& params, const KernelCallback& k, const DistanceCallback& d,
+                              const FeaturesCallback& f)
         : parameters(params), kernel(k), distance(d), features(f)
     {
     }
@@ -43,7 +43,7 @@ template <class KernelCallback, class DistanceCallback, class FeaturesCallback> 
      * @param container a container that supports begin() and end() methods
      *                  to get corresponding iterators
      */
-    template <class Container> TapkeeOutput embedUsing(const Container &container) const
+    template <class Container> TapkeeOutput embedUsing(const Container& container) const
     {
         return embedRange(container.begin(), container.end());
     }
@@ -58,7 +58,7 @@ template <class KernelCallback, class DistanceCallback, class FeaturesCallback> 
 template <class KernelCallback, class DistanceCallback> class KernelAndDistanceInitializedState
 {
   public:
-    KernelAndDistanceInitializedState(const ParametersSet &params, const KernelCallback &k, const DistanceCallback &d)
+    KernelAndDistanceInitializedState(const ParametersSet& params, const KernelCallback& k, const DistanceCallback& d)
         : parameters(params), kernel(k), distance(d)
     {
     }
@@ -72,7 +72,7 @@ template <class KernelCallback, class DistanceCallback> class KernelAndDistanceI
      */
     template <class FeaturesCallback>
     CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> withFeatures(
-        const FeaturesCallback &features) const
+        const FeaturesCallback& features) const
     {
         return CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback>(parameters, kernel,
                                                                                              distance, features);
@@ -97,7 +97,7 @@ template <class KernelCallback, class DistanceCallback> class KernelAndDistanceI
      * @param container a container that supports begin() and end() methods
      *                  to get corresponding iterators
      */
-    template <class Container> TapkeeOutput embedUsing(const Container &container) const
+    template <class Container> TapkeeOutput embedUsing(const Container& container) const
     {
         return embedRange(container.begin(), container.end());
     }
@@ -111,7 +111,7 @@ template <class KernelCallback, class DistanceCallback> class KernelAndDistanceI
 template <class KernelCallback, class FeaturesCallback> class KernelAndFeaturesInitializedState
 {
   public:
-    KernelAndFeaturesInitializedState(const ParametersSet &params, const KernelCallback &k, const FeaturesCallback &f)
+    KernelAndFeaturesInitializedState(const ParametersSet& params, const KernelCallback& k, const FeaturesCallback& f)
         : parameters(params), kernel(k), features(f)
     {
     }
@@ -125,7 +125,7 @@ template <class KernelCallback, class FeaturesCallback> class KernelAndFeaturesI
      */
     template <class DistanceCallback>
     CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> withDistance(
-        const DistanceCallback &distance) const
+        const DistanceCallback& distance) const
     {
         return CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback>(parameters, kernel,
                                                                                              distance, features);
@@ -150,7 +150,7 @@ template <class KernelCallback, class FeaturesCallback> class KernelAndFeaturesI
      * @param container a container that supports begin() and end() methods
      *                  to get corresponding iterators
      */
-    template <class Container> TapkeeOutput embedUsing(const Container &container) const
+    template <class Container> TapkeeOutput embedUsing(const Container& container) const
     {
         return embedRange(container.begin(), container.end());
     }
@@ -169,8 +169,8 @@ template <class KernelCallback, class FeaturesCallback> class KernelAndFeaturesI
 template <class DistanceCallback, class FeaturesCallback> class DistanceAndFeaturesInitializedState
 {
   public:
-    DistanceAndFeaturesInitializedState(const ParametersSet &params, const DistanceCallback &d,
-                                        const FeaturesCallback &f)
+    DistanceAndFeaturesInitializedState(const ParametersSet& params, const DistanceCallback& d,
+                                        const FeaturesCallback& f)
         : parameters(params), distance(d), features(f)
     {
     }
@@ -184,7 +184,7 @@ template <class DistanceCallback, class FeaturesCallback> class DistanceAndFeatu
      */
     template <class KernelCallback>
     CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> withKernel(
-        const KernelCallback &kernel) const
+        const KernelCallback& kernel) const
     {
         return CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback>(parameters, kernel,
                                                                                              distance, features);
@@ -209,7 +209,7 @@ template <class DistanceCallback, class FeaturesCallback> class DistanceAndFeatu
      * @param container a container that supports begin() and end() methods
      *                  to get corresponding iterators
      */
-    template <class Container> TapkeeOutput embedUsing(const Container &container) const
+    template <class Container> TapkeeOutput embedUsing(const Container& container) const
     {
         return embedRange(container.begin(), container.end());
     }
@@ -223,7 +223,7 @@ template <class DistanceCallback, class FeaturesCallback> class DistanceAndFeatu
 template <class KernelCallback> class KernelFirstInitializedState
 {
   public:
-    KernelFirstInitializedState(const ParametersSet &params, const KernelCallback &callback)
+    KernelFirstInitializedState(const ParametersSet& params, const KernelCallback& callback)
         : parameters(params), kernel(callback)
     {
     }
@@ -237,7 +237,7 @@ template <class KernelCallback> class KernelFirstInitializedState
      */
     template <class DistanceCallback>
     KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> withDistance(
-        const DistanceCallback &callback) const
+        const DistanceCallback& callback) const
     {
         return KernelAndDistanceInitializedState<KernelCallback, DistanceCallback>(parameters, kernel, callback);
     }
@@ -251,7 +251,7 @@ template <class KernelCallback> class KernelFirstInitializedState
      */
     template <class FeaturesCallback>
     KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback> withFeatures(
-        const FeaturesCallback &callback) const
+        const FeaturesCallback& callback) const
     {
         return KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback>(parameters, kernel, callback);
     }
@@ -276,7 +276,7 @@ template <class KernelCallback> class KernelFirstInitializedState
      * @param container a container that supports begin() and end() methods
      *                  to get corresponding iterators
      */
-    template <class Container> TapkeeOutput embedUsing(const Container &container) const
+    template <class Container> TapkeeOutput embedUsing(const Container& container) const
     {
         return embedRange(container.begin(), container.end());
     }
@@ -289,7 +289,7 @@ template <class KernelCallback> class KernelFirstInitializedState
 template <class DistanceCallback> class DistanceFirstInitializedState
 {
   public:
-    DistanceFirstInitializedState(const ParametersSet &params, const DistanceCallback &callback)
+    DistanceFirstInitializedState(const ParametersSet& params, const DistanceCallback& callback)
         : parameters(params), distance(callback)
     {
     }
@@ -302,7 +302,7 @@ template <class DistanceCallback> class DistanceFirstInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class KernelCallback>
-    KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> withKernel(const KernelCallback &callback) const
+    KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> withKernel(const KernelCallback& callback) const
     {
         return KernelAndDistanceInitializedState<KernelCallback, DistanceCallback>(parameters, callback, distance);
     }
@@ -316,7 +316,7 @@ template <class DistanceCallback> class DistanceFirstInitializedState
      */
     template <class FeaturesCallback>
     DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback> withFeatures(
-        const FeaturesCallback &callback) const
+        const FeaturesCallback& callback) const
     {
         return DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback>(parameters, distance, callback);
     }
@@ -341,7 +341,7 @@ template <class DistanceCallback> class DistanceFirstInitializedState
      * @param container a container that supports begin() and end() methods
      *                  to get corresponding iterators
      */
-    template <class Container> TapkeeOutput embedUsing(const Container &container) const
+    template <class Container> TapkeeOutput embedUsing(const Container& container) const
     {
         return embedRange(container.begin(), container.end());
     }
@@ -354,7 +354,7 @@ template <class DistanceCallback> class DistanceFirstInitializedState
 template <class FeaturesCallback> class FeaturesFirstInitializedState
 {
   public:
-    FeaturesFirstInitializedState(const ParametersSet &params, const FeaturesCallback &callback)
+    FeaturesFirstInitializedState(const ParametersSet& params, const FeaturesCallback& callback)
         : parameters(params), features(callback)
     {
     }
@@ -367,7 +367,7 @@ template <class FeaturesCallback> class FeaturesFirstInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class KernelCallback>
-    KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback> withKernel(const KernelCallback &callback) const
+    KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback> withKernel(const KernelCallback& callback) const
     {
         return KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback>(parameters, callback, features);
     }
@@ -381,7 +381,7 @@ template <class FeaturesCallback> class FeaturesFirstInitializedState
      */
     template <class DistanceCallback>
     DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback> withDistance(
-        const DistanceCallback &callback) const
+        const DistanceCallback& callback) const
     {
         return DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback>(parameters, callback, features);
     }
@@ -406,7 +406,7 @@ template <class FeaturesCallback> class FeaturesFirstInitializedState
      * @param container a container that supports begin() and end() methods
      *                  to get corresponding iterators
      */
-    template <class Container> TapkeeOutput embedUsing(const Container &container) const
+    template <class Container> TapkeeOutput embedUsing(const Container& container) const
     {
         return embedRange(container.begin(), container.end());
     }
@@ -419,11 +419,11 @@ template <class FeaturesCallback> class FeaturesFirstInitializedState
 class ParametersInitializedState
 {
   public:
-    ParametersInitializedState(const ParametersSet &that) : parameters(that)
+    ParametersInitializedState(const ParametersSet& that) : parameters(that)
     {
     }
-    ParametersInitializedState(const ParametersInitializedState &);
-    ParametersInitializedState &operator=(const ParametersInitializedState &);
+    ParametersInitializedState(const ParametersInitializedState&);
+    ParametersInitializedState& operator=(const ParametersInitializedState&);
 
     /** Sets kernel callback.
      *
@@ -433,7 +433,7 @@ class ParametersInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class KernelCallback>
-    KernelFirstInitializedState<KernelCallback> withKernel(const KernelCallback &callback) const
+    KernelFirstInitializedState<KernelCallback> withKernel(const KernelCallback& callback) const
     {
         return KernelFirstInitializedState<KernelCallback>(parameters, callback);
     }
@@ -446,7 +446,7 @@ class ParametersInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class DistanceCallback>
-    DistanceFirstInitializedState<DistanceCallback> withDistance(const DistanceCallback &callback) const
+    DistanceFirstInitializedState<DistanceCallback> withDistance(const DistanceCallback& callback) const
     {
         return DistanceFirstInitializedState<DistanceCallback>(parameters, callback);
     }
@@ -459,7 +459,7 @@ class ParametersInitializedState
      *        first argument.
      */
     template <class FeaturesCallback>
-    FeaturesFirstInitializedState<FeaturesCallback> withFeatures(const FeaturesCallback &callback) const
+    FeaturesFirstInitializedState<FeaturesCallback> withFeatures(const FeaturesCallback& callback) const
     {
         return FeaturesFirstInitializedState<FeaturesCallback>(parameters, callback);
     }
@@ -470,7 +470,7 @@ class ParametersInitializedState
      *
      * @param matrix matrix that contains feature vectors column-wise
      */
-    TapkeeOutput embedUsing(const DenseMatrix &matrix) const
+    TapkeeOutput embedUsing(const DenseMatrix& matrix) const
     {
         std::vector<IndexType> indices(matrix.cols());
         for (IndexType i = 0; i < matrix.cols(); i++)
@@ -507,7 +507,7 @@ struct initialize
      * @param parameters a set of parameters formed from keywords assigned
      *                   to values
      */
-    tapkee_internal::ParametersInitializedState withParameters(const ParametersSet &parameters) const
+    tapkee_internal::ParametersInitializedState withParameters(const ParametersSet& parameters) const
     {
         return tapkee_internal::ParametersInitializedState(parameters);
     }

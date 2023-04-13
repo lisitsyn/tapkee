@@ -46,15 +46,15 @@ struct TapkeeOutput
     {
     }
 
-    TapkeeOutput(const tapkee::DenseMatrix &e, const tapkee::ProjectingFunction &p) : embedding(e), projection(p)
+    TapkeeOutput(const tapkee::DenseMatrix& e, const tapkee::ProjectingFunction& p) : embedding(e), projection(p)
     {
     }
 
-    TapkeeOutput(const TapkeeOutput &that) : embedding(that.embedding), projection(that.projection)
+    TapkeeOutput(const TapkeeOutput& that) : embedding(that.embedding), projection(that.projection)
     {
     }
 
-    TapkeeOutput &operator=(const TapkeeOutput &that)
+    TapkeeOutput& operator=(const TapkeeOutput& that)
     {
         if (this == &that)
         {

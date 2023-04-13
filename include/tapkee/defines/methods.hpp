@@ -99,35 +99,35 @@ METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(ManifoldSculpting);
 
 template <typename M> struct Method
 {
-    Method(const char *n) : name_(n)
+    Method(const char* n) : name_(n)
     {
     }
-    Method(const M &m) : name_(m.name_)
+    Method(const M& m) : name_(m.name_)
     {
     }
-    Method &operator=(const Method &m)
+    Method& operator=(const Method& m)
     {
         this->name_ = m.name_;
         return *this;
     }
-    const char *name() const
+    const char* name() const
     {
         return name_;
     }
-    bool is(const M &m) const
+    bool is(const M& m) const
     {
         return this->name() == m.name();
     }
-    bool operator==(const M &m)
+    bool operator==(const M& m)
     {
         return this->name() == m.name();
     }
-    const char *name_;
+    const char* name_;
 };
 
 struct NeighborsMethod : public Method<NeighborsMethod>
 {
-    NeighborsMethod(const char *n) : Method<NeighborsMethod>(n)
+    NeighborsMethod(const char* n) : Method<NeighborsMethod>(n)
     {
     }
 };
@@ -152,7 +152,7 @@ static NeighborsMethod default_neighbors_method = Brute;
 
 struct EigenMethod : public Method<EigenMethod>
 {
-    EigenMethod(const char *n) : Method<EigenMethod>(n)
+    EigenMethod(const char* n) : Method<EigenMethod>(n)
     {
     }
 };
@@ -178,7 +178,7 @@ static EigenMethod default_eigen_method = Dense;
 
 struct ComputationStrategy : public Method<ComputationStrategy>
 {
-    ComputationStrategy(const char *n) : Method<ComputationStrategy>(n)
+    ComputationStrategy(const char* n) : Method<ComputationStrategy>(n)
     {
     }
 };
@@ -195,7 +195,7 @@ namespace tapkee_internal
 
 struct EigendecompositionStrategy : public Method<EigendecompositionStrategy>
 {
-    EigendecompositionStrategy(const char *n, IndexType skp) : Method<EigendecompositionStrategy>(n), skip_(skp)
+    EigendecompositionStrategy(const char* n, IndexType skp) : Method<EigendecompositionStrategy>(n), skip_(skp)
     {
     }
     IndexType skip() const

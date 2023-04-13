@@ -43,16 +43,16 @@ typedef long no;
 
 struct any_wrapper
 {
-    template <class T> any_wrapper(const T &);
+    template <class T> any_wrapper(const T&);
 };
-no operator<<(const any_wrapper &, const any_wrapper &);
-template <class T> yes check(T const &);
+no operator<<(const any_wrapper&, const any_wrapper&);
+template <class T> yes check(T const&);
 no check(no);
 
 template <typename S, typename T> struct supports_saving
 {
-    static S &s;
-    static T &x;
+    static S& s;
+    static T& x;
     static const bool value = sizeof(check(s << x)) == sizeof(yes);
 };
 } // namespace streams_sfinae
@@ -62,47 +62,47 @@ struct TypePolicyBase
     virtual ~TypePolicyBase()
     {
     }
-    virtual void copyFromValue(void const *, void **) const = 0;
-    virtual void *getValue(void **) const = 0;
-    virtual void free(void **) const = 0;
-    virtual void clone(void *const *, void **) const = 0;
-    virtual void move(void *const *, void **) const = 0;
-    virtual std::string repr(void **) const = 0;
+    virtual void copyFromValue(void const*, void**) const = 0;
+    virtual void* getValue(void**) const = 0;
+    virtual void free(void**) const = 0;
+    virtual void clone(void* const*, void**) const = 0;
+    virtual void move(void* const*, void**) const = 0;
+    virtual std::string repr(void**) const = 0;
 };
 
 template <typename T, bool> struct repr_impl_if_streaming_supported
 {
-    std::string operator()(const TypePolicyBase *const impl, void **src) const;
+    std::string operator()(const TypePolicyBase* const impl, void** src) const;
 };
 
 template <typename T> struct PointerTypePolicyImpl : public TypePolicyBase
 {
-    inline virtual void copyFromValue(void const *src, void **dest) const
+    inline virtual void copyFromValue(void const* src, void** dest) const
     {
-        *dest = new T(*reinterpret_cast<T const *>(src));
+        *dest = new T(*reinterpret_cast<T const*>(src));
     }
-    inline virtual void *getValue(void **src) const
+    inline virtual void* getValue(void** src) const
     {
         return *src;
     }
-    inline virtual void free(void **src) const
+    inline virtual void free(void** src) const
     {
         if (*src)
-            delete (*reinterpret_cast<T **>(src));
+            delete (*reinterpret_cast<T**>(src));
         *src = NULL;
     }
-    virtual void clone(void *const *src, void **dest) const
+    virtual void clone(void* const* src, void** dest) const
     {
         if (*dest)
-            (*reinterpret_cast<T **>(dest))->~T();
-        *dest = new T(**reinterpret_cast<T *const *>(src));
+            (*reinterpret_cast<T**>(dest))->~T();
+        *dest = new T(**reinterpret_cast<T* const*>(src));
     }
-    inline virtual void move(void *const *src, void **dest) const
+    inline virtual void move(void* const* src, void** dest) const
     {
-        (*reinterpret_cast<T **>(dest))->~T();
-        **reinterpret_cast<T **>(dest) = **reinterpret_cast<T *const *>(src);
+        (*reinterpret_cast<T**>(dest))->~T();
+        **reinterpret_cast<T**>(dest) = **reinterpret_cast<T* const*>(src);
     }
-    inline virtual std::string repr(void **src) const
+    inline virtual std::string repr(void** src) const
     {
         return repr_impl_if_streaming_supported<T, streams_sfinae::supports_saving<std::stringstream, T>::value>()(this,
                                                                                                                    src);
@@ -111,17 +111,17 @@ template <typename T> struct PointerTypePolicyImpl : public TypePolicyBase
 
 struct EmptyType;
 
-template <> inline std::string PointerTypePolicyImpl<EmptyType>::repr(void **) const
+template <> inline std::string PointerTypePolicyImpl<EmptyType>::repr(void**) const
 {
     return "uninitialized";
 }
 
 template <typename T> struct repr_impl_if_streaming_supported<T, true>
 {
-    std::string operator()(const TypePolicyBase *const impl, void **src) const
+    std::string operator()(const TypePolicyBase* const impl, void** src) const
     {
-        void *vv = impl->getValue(src);
-        T *vp = reinterpret_cast<T *>(vv);
+        void* vv = impl->getValue(src);
+        T* vp = reinterpret_cast<T*>(vv);
         T v = *vp;
         std::stringstream ss;
         ss << v;
@@ -131,13 +131,13 @@ template <typename T> struct repr_impl_if_streaming_supported<T, true>
 
 template <typename T> struct repr_impl_if_streaming_supported<T, false>
 {
-    std::string operator()(const TypePolicyBase *const, void **) const
+    std::string operator()(const TypePolicyBase* const, void**) const
     {
         return "(can't obtain value)";
     }
 };
 
-template <typename T> TypePolicyBase *getPolicy()
+template <typename T> TypePolicyBase* getPolicy()
 {
     static PointerTypePolicyImpl<T> policy;
     return &policy;

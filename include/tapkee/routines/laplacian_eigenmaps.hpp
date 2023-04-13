@@ -36,7 +36,7 @@ namespace tapkee_internal
 //! @param width width \f$ w \f$ of the gaussian kernel
 //!
 template <class RandomAccessIterator, class DistanceCallback>
-Laplacian compute_laplacian(RandomAccessIterator begin, RandomAccessIterator end, const Neighbors &neighbors,
+Laplacian compute_laplacian(RandomAccessIterator begin, RandomAccessIterator end, const Neighbors& neighbors,
                             DistanceCallback callback, ScalarType width)
 {
     SparseTriplets sparse_triplets;
@@ -48,7 +48,7 @@ Laplacian compute_laplacian(RandomAccessIterator begin, RandomAccessIterator end
     DenseVector D = DenseVector::Zero(end - begin);
     for (RandomAccessIterator iter = begin; iter != end; ++iter)
     {
-        const LocalNeighbors &current_neighbors = neighbors[iter - begin];
+        const LocalNeighbors& current_neighbors = neighbors[iter - begin];
 
         for (IndexType i = 0; i < k; ++i)
         {
@@ -78,7 +78,7 @@ Laplacian compute_laplacian(RandomAccessIterator begin, RandomAccessIterator end
 }
 
 template <class RandomAccessIterator, class FeatureVectorCallback>
-DenseSymmetricMatrixPair construct_locality_preserving_eigenproblem(SparseWeightMatrix &L, DenseDiagonalMatrix &D,
+DenseSymmetricMatrixPair construct_locality_preserving_eigenproblem(SparseWeightMatrix& L, DenseDiagonalMatrix& D,
                                                                     RandomAccessIterator begin,
                                                                     RandomAccessIterator end,
                                                                     FeatureVectorCallback feature_vector_callback,

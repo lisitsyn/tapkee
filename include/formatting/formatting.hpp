@@ -57,7 +57,7 @@ class ValueWrapper;
 class formatting_error : public std::logic_error
 {
   public:
-    explicit formatting_error(const std::string &reason) : std::logic_error(reason)
+    explicit formatting_error(const std::string& reason) : std::logic_error(reason)
     {
     }
 };
@@ -80,7 +80,7 @@ class formatting_error : public std::logic_error
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a);
+std::string format(const std::string& fmt, const ValueWrapper a);
 
 /** Constructs a string using the provided formatting string and
  * arguments. Essentially, replaces all placeholders ("{}") in the
@@ -102,7 +102,7 @@ std::string format(const std::string &fmt, const ValueWrapper a);
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b);
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b);
 
 /** Constructs a string using the provided formatting string and
  * arguments. Essentially, replaces all placeholders ("{}") in the
@@ -126,7 +126,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c);
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c);
 
 /** Constructs a string using the provided formatting string and
  * arguments. Essentially, replaces all placeholders ("{}") in the
@@ -152,7 +152,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                    const ValueWrapper d);
 
 /** Constructs a string using the provided formatting string and
@@ -181,7 +181,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                    const ValueWrapper d, const ValueWrapper e);
 
 /** Constructs a string using the provided formatting string and
@@ -212,7 +212,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                    const ValueWrapper d, const ValueWrapper e, const ValueWrapper f);
 
 /** Constructs a string using the provided formatting string and
@@ -245,7 +245,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                    const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g);
 
 /** Constructs a string using the provided formatting string and
@@ -280,7 +280,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                    const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g,
                    const ValueWrapper h);
 
@@ -318,7 +318,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                    const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g,
                    const ValueWrapper h, const ValueWrapper i);
 
@@ -358,7 +358,7 @@ std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrap
  * @throw formatting_error in case the number of placeholders doesn't match
  *        the number of provided parameters
  */
-std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                    const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g,
                    const ValueWrapper h, const ValueWrapper i, const ValueWrapper j);
 
@@ -370,7 +370,7 @@ namespace internal
 class ValueWrapperImplementationBase;
 
 /** Generic implementation of formatting. */
-std::string formatImplementation(const std::string &formatting, const ValueWrapper **handlers, std::size_t n_handlers);
+std::string formatImplementation(const std::string& formatting, const ValueWrapper** handlers, std::size_t n_handlers);
 } // namespace internal
 
 class ValueWrapper
@@ -378,87 +378,87 @@ class ValueWrapper
   public:
     template <typename T> ValueWrapper(T value);
     ValueWrapper();
-    ValueWrapper(const ValueWrapper &wrapper);
+    ValueWrapper(const ValueWrapper& wrapper);
     ~ValueWrapper();
     std::string representation() const;
 
   private:
-    formatting::internal::ValueWrapperImplementationBase *implementation_;
+    formatting::internal::ValueWrapperImplementationBase* implementation_;
 };
 
-inline std::string format(const std::string &fmt, const ValueWrapper a)
+inline std::string format(const std::string& fmt, const ValueWrapper a)
 {
-    const ValueWrapper *handlers[] = {&a};
+    const ValueWrapper* handlers[] = {&a};
     return formatting::internal::formatImplementation(fmt, handlers, 1);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b)
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b)
 {
-    const ValueWrapper *handlers[] = {&a, &b};
+    const ValueWrapper* handlers[] = {&a, &b};
     return formatting::internal::formatImplementation(fmt, handlers, 2);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c)
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c};
+    const ValueWrapper* handlers[] = {&a, &b, &c};
     return formatting::internal::formatImplementation(fmt, handlers, 3);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                           const ValueWrapper d)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c, &d};
+    const ValueWrapper* handlers[] = {&a, &b, &c, &d};
     return formatting::internal::formatImplementation(fmt, handlers, 4);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                           const ValueWrapper d, const ValueWrapper e)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c, &d, &e};
+    const ValueWrapper* handlers[] = {&a, &b, &c, &d, &e};
     return formatting::internal::formatImplementation(fmt, handlers, 5);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                           const ValueWrapper d, const ValueWrapper e, const ValueWrapper f)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c, &d, &e, &f};
+    const ValueWrapper* handlers[] = {&a, &b, &c, &d, &e, &f};
     return formatting::internal::formatImplementation(fmt, handlers, 6);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                           const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c, &d, &e, &f, &g};
+    const ValueWrapper* handlers[] = {&a, &b, &c, &d, &e, &f, &g};
     return formatting::internal::formatImplementation(fmt, handlers, 7);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                           const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g,
                           const ValueWrapper h)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c, &d, &e, &f, &g, &h};
+    const ValueWrapper* handlers[] = {&a, &b, &c, &d, &e, &f, &g, &h};
     return formatting::internal::formatImplementation(fmt, handlers, 8);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                           const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g,
                           const ValueWrapper h, const ValueWrapper i)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c, &d, &e, &f, &g, &h, &i};
+    const ValueWrapper* handlers[] = {&a, &b, &c, &d, &e, &f, &g, &h, &i};
     return formatting::internal::formatImplementation(fmt, handlers, 9);
 }
 
-inline std::string format(const std::string &fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
+inline std::string format(const std::string& fmt, const ValueWrapper a, const ValueWrapper b, const ValueWrapper c,
                           const ValueWrapper d, const ValueWrapper e, const ValueWrapper f, const ValueWrapper g,
                           const ValueWrapper h, const ValueWrapper i, const ValueWrapper j)
 {
-    const ValueWrapper *handlers[] = {&a, &b, &c, &d, &e, &f, &g, &h, &i, &j};
+    const ValueWrapper* handlers[] = {&a, &b, &c, &d, &e, &f, &g, &h, &i, &j};
     return formatting::internal::formatImplementation(fmt, handlers, 10);
 }
 
 namespace internal
 {
-inline std::string formatImplementation(const std::string &formatter_string, const ValueWrapper **handlers,
+inline std::string formatImplementation(const std::string& formatter_string, const ValueWrapper** handlers,
                                         std::size_t n_handlers)
 {
     std::string formatted = formatter_string;
@@ -485,11 +485,11 @@ ValueWrapper::ValueWrapper(T v) : implementation_(new formatting::internal::Valu
 }
 
 inline ValueWrapper::ValueWrapper()
-    : implementation_(new formatting::internal::ValueWrapperImplementation<const char *>("invalid argument"))
+    : implementation_(new formatting::internal::ValueWrapperImplementation<const char*>("invalid argument"))
 {
 }
 
-inline ValueWrapper::ValueWrapper(const ValueWrapper &wrapper) : implementation_(wrapper.implementation_)
+inline ValueWrapper::ValueWrapper(const ValueWrapper& wrapper) : implementation_(wrapper.implementation_)
 {
 }
 

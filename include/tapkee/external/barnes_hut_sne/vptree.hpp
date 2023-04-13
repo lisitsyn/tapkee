@@ -51,12 +51,12 @@ class DataPoint
     DataPoint() : _ind(-1), _x(0)
     {
     }
-    DataPoint(int Dv, int indv, ScalarType *xv) : _ind(indv), _x(Dv)
+    DataPoint(int Dv, int indv, ScalarType* xv) : _ind(indv), _x(Dv)
     {
         for (int d = 0; d < dimensionality(); d++)
             _x[d] = xv[d];
     }
-    DataPoint(const DataPoint &other) : _ind(0), _x(0) // this makes a deep copy -- should not free anything
+    DataPoint(const DataPoint& other) : _ind(0), _x(0) // this makes a deep copy -- should not free anything
     {
         if (this != &other)
         {
@@ -69,7 +69,7 @@ class DataPoint
     ~DataPoint()
     {
     }
-    DataPoint &operator=(const DataPoint &other)
+    DataPoint& operator=(const DataPoint& other)
     { // asignment should free old object
         if (this != &other)
         {
@@ -94,7 +94,7 @@ class DataPoint
     }
 };
 
-inline ScalarType euclidean_distance(const DataPoint &t1, const DataPoint &t2)
+inline ScalarType euclidean_distance(const DataPoint& t1, const DataPoint& t2)
 {
     ScalarType dd = .0;
     for (int d = 0; d < t1.dimensionality(); d++)
@@ -102,7 +102,7 @@ inline ScalarType euclidean_distance(const DataPoint &t1, const DataPoint &t2)
     return dd;
 }
 
-template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
+template <typename T, ScalarType (*distance)(const T&, const T&)> class VpTree
 {
   public:
     // Default constructor
@@ -117,7 +117,7 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
     }
 
     // Function to create a new VpTree from data
-    void create(const std::vector<T> &items)
+    void create(const std::vector<T>& items)
     {
         delete _root;
         _items = items;
@@ -125,7 +125,7 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
     }
 
     // Function that uses the tree to find the k nearest neighbors of target
-    void search(const T &target, int k, std::vector<T> *results, std::vector<ScalarType> *distances)
+    void search(const T& target, int k, std::vector<T>* results, std::vector<ScalarType>* distances)
     {
 
         // Use a priority queue to store intermediate results on
@@ -153,8 +153,8 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
     }
 
   private:
-    VpTree(const VpTree &);
-    VpTree &operator=(const VpTree &);
+    VpTree(const VpTree&);
+    VpTree& operator=(const VpTree&);
 
     std::vector<T> _items;
     ScalarType _tau;
@@ -164,8 +164,8 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
     {
         int index;            // index of point in node
         ScalarType threshold; // radius(?)
-        Node *left;           // points closer by than threshold
-        Node *right;          // points farther away than threshold
+        Node* left;           // points closer by than threshold
+        Node* right;          // points farther away than threshold
 
         Node() : index(0), threshold(0.), left(0), right(0)
         {
@@ -177,10 +177,10 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
             delete right;
         }
 
-        Node(const Node &);
-        Node &operator=(const Node &);
+        Node(const Node&);
+        Node& operator=(const Node&);
 
-    } *_root;
+    }* _root;
 
     // An item on the intermediate result queue
     struct HeapItem
@@ -190,7 +190,7 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
         }
         int index;
         ScalarType dist;
-        bool operator<(const HeapItem &o) const
+        bool operator<(const HeapItem& o) const
         {
             return dist < o.dist;
         }
@@ -199,18 +199,18 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
     // Distance comparator for use in std::nth_element
     struct DistanceComparator
     {
-        const T &item;
-        DistanceComparator(const T &itemv) : item(itemv)
+        const T& item;
+        DistanceComparator(const T& itemv) : item(itemv)
         {
         }
-        bool operator()(const T &a, const T &b)
+        bool operator()(const T& a, const T& b)
         {
             return distance(item, a) < distance(item, b);
         }
     };
 
     // Function that (recursively) fills the tree
-    Node *buildFromPoints(int lower, int upper)
+    Node* buildFromPoints(int lower, int upper)
     {
         if (upper == lower)
         { // indicates that we're done here!
@@ -218,7 +218,7 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
         }
 
         // Lower index is center of current node
-        Node *node = new Node();
+        Node* node = new Node();
         node->index = lower;
 
         if (upper - lower > 1)
@@ -247,7 +247,7 @@ template <typename T, ScalarType (*distance)(const T &, const T &)> class VpTree
     }
 
     // Helper function that searches the tree
-    void search(Node *node, const T &target, int k, std::priority_queue<HeapItem> &heap)
+    void search(Node* node, const T& target, int k, std::priority_queue<HeapItem>& heap)
     {
         if (node == NULL)
             return; // indicates that we're done here

@@ -28,7 +28,7 @@ namespace tapkee_internal
 #ifdef TAPKEE_WITH_ARPACK
 //! ARPACK implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixOperationType>
-EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType &wm, IndexType target_dimension,
+EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType& wm, IndexType target_dimension,
                                                         unsigned int skip)
 {
     timed_context context("ARPACK eigendecomposition");
@@ -53,7 +53,7 @@ EigendecompositionResult eigendecomposition_impl_arpack(const MatrixType &wm, In
 
 //! Eigen library dense implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixOperationType>
-EigendecompositionResult eigendecomposition_impl_dense(const MatrixType &wm, IndexType target_dimension,
+EigendecompositionResult eigendecomposition_impl_dense(const MatrixType& wm, IndexType target_dimension,
                                                        unsigned int skip)
 {
     timed_context context("Eigen library dense eigendecomposition");
@@ -88,7 +88,7 @@ EigendecompositionResult eigendecomposition_impl_dense(const MatrixType &wm, Ind
 
 //! Randomized redsvd-like implementation of eigendecomposition-based embedding
 template <class MatrixType, class MatrixOperationType>
-EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType &wm, IndexType target_dimension,
+EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType& wm, IndexType target_dimension,
                                                             unsigned int skip)
 {
     timed_context context("Randomized eigendecomposition");
@@ -149,20 +149,20 @@ EigendecompositionResult eigendecomposition_impl_randomized(const MatrixType &wm
 template <typename MatrixType> struct eigendecomposition_impl
 {
 #ifdef TAPKEE_WITH_ARPACK
-    EigendecompositionResult arpack(const MatrixType &m, const ComputationStrategy &strategy,
-                                    const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension);
+    EigendecompositionResult arpack(const MatrixType& m, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension);
 #endif
-    EigendecompositionResult dense(const MatrixType &m, const ComputationStrategy &strategy,
-                                   const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension);
-    EigendecompositionResult randomized(const MatrixType &m, const ComputationStrategy &strategy,
-                                        const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension);
+    EigendecompositionResult dense(const MatrixType& m, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension);
+    EigendecompositionResult randomized(const MatrixType& m, const ComputationStrategy& strategy,
+                                        const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension);
 };
 
 template <> struct eigendecomposition_impl<DenseMatrix>
 {
 #ifdef TAPKEE_WITH_ARPACK
-    EigendecompositionResult arpack(const DenseMatrix &m, const ComputationStrategy &strategy,
-                                    const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult arpack(const DenseMatrix& m, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -193,8 +193,8 @@ template <> struct eigendecomposition_impl<DenseMatrix>
         return EigendecompositionResult();
     }
 #endif
-    EigendecompositionResult dense(const DenseMatrix &m, const ComputationStrategy &strategy,
-                                   const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult dense(const DenseMatrix& m, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -212,8 +212,8 @@ template <> struct eigendecomposition_impl<DenseMatrix>
         unsupported();
         return EigendecompositionResult();
     }
-    EigendecompositionResult randomized(const DenseMatrix &m, const ComputationStrategy &strategy,
-                                        const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult randomized(const DenseMatrix& m, const ComputationStrategy& strategy,
+                                        const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -252,8 +252,8 @@ template <> struct eigendecomposition_impl<DenseMatrix>
 template <> struct eigendecomposition_impl<SparseWeightMatrix>
 {
 #ifdef TAPKEE_WITH_ARPACK
-    EigendecompositionResult arpack(const SparseWeightMatrix &m, const ComputationStrategy &strategy,
-                                    const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult arpack(const SparseWeightMatrix& m, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -266,8 +266,8 @@ template <> struct eigendecomposition_impl<SparseWeightMatrix>
         return EigendecompositionResult();
     }
 #endif
-    EigendecompositionResult dense(const SparseWeightMatrix &m, const ComputationStrategy &strategy,
-                                   const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult dense(const SparseWeightMatrix& m, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -279,8 +279,8 @@ template <> struct eigendecomposition_impl<SparseWeightMatrix>
         unsupported();
         return EigendecompositionResult();
     }
-    EigendecompositionResult randomized(const SparseWeightMatrix &m, const ComputationStrategy &strategy,
-                                        const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult randomized(const SparseWeightMatrix& m, const ComputationStrategy& strategy,
+                                        const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -327,8 +327,8 @@ template <> struct eigendecomposition_impl<SparseWeightMatrix>
 //! @param skip number of eigenvectors to skip (from either smallest or largest side)
 //!
 template <class MatrixType>
-EigendecompositionResult eigendecomposition(const EigenMethod &method, const ComputationStrategy &strategy,
-                                            const EigendecompositionStrategy &eigen_strategy, const MatrixType &m,
+EigendecompositionResult eigendecomposition(const EigenMethod& method, const ComputationStrategy& strategy,
+                                            const EigendecompositionStrategy& eigen_strategy, const MatrixType& m,
                                             IndexType target_dimension)
 {
     LoggingSingleton::instance().message_info(

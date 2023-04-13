@@ -51,7 +51,7 @@ class ValueWrapperImplementationBase
 template <typename T> class ValueWrapperImplementation : public ValueWrapperImplementationBase
 {
   public:
-    ValueWrapperImplementation(const T &value) : value_(value)
+    ValueWrapperImplementation(const T& value) : value_(value)
     {
     }
     virtual std::string representation() const
@@ -65,10 +65,10 @@ template <typename T> class ValueWrapperImplementation : public ValueWrapperImpl
     const T value_;
 };
 
-template <> class ValueWrapperImplementation<const char *> : public ValueWrapperImplementationBase
+template <> class ValueWrapperImplementation<const char*> : public ValueWrapperImplementationBase
 {
   public:
-    ValueWrapperImplementation(const char *value) : value_(value)
+    ValueWrapperImplementation(const char* value) : value_(value)
     {
     }
     virtual std::string representation() const
@@ -77,7 +77,7 @@ template <> class ValueWrapperImplementation<const char *> : public ValueWrapper
     }
 
   private:
-    const char *value_;
+    const char* value_;
 };
 
 template <> class ValueWrapperImplementation<bool> : public ValueWrapperImplementationBase
@@ -98,7 +98,7 @@ template <> class ValueWrapperImplementation<bool> : public ValueWrapperImplemen
 template <> class ValueWrapperImplementation<std::string> : public ValueWrapperImplementationBase
 {
   public:
-    ValueWrapperImplementation(const std::string &value) : value_(value)
+    ValueWrapperImplementation(const std::string& value) : value_(value)
     {
     }
     virtual std::string representation() const
@@ -110,10 +110,10 @@ template <> class ValueWrapperImplementation<std::string> : public ValueWrapperI
     const std::string value_;
 };
 
-template <typename T> class ValueWrapperImplementation<T *> : public ValueWrapperImplementationBase
+template <typename T> class ValueWrapperImplementation<T*> : public ValueWrapperImplementationBase
 {
   public:
-    ValueWrapperImplementation(const T *value) : value_(value)
+    ValueWrapperImplementation(const T* value) : value_(value)
     {
     }
     virtual std::string representation() const
@@ -124,7 +124,7 @@ template <typename T> class ValueWrapperImplementation<T *> : public ValueWrappe
     }
 
   private:
-    const T *value_;
+    const T* value_;
 };
 } // namespace internal
 } // namespace formatting

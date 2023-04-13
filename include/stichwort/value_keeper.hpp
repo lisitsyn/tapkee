@@ -45,7 +45,7 @@ class ValueKeeper
 {
 
   public:
-    template <typename T> explicit ValueKeeper(const T &value) : policy(getPolicy<T>()), value_ptr(NULL)
+    template <typename T> explicit ValueKeeper(const T& value) : policy(getPolicy<T>()), value_ptr(NULL)
     {
         policy->copyFromValue(&value, &value_ptr);
     }
@@ -59,12 +59,12 @@ class ValueKeeper
         policy->free(&value_ptr);
     }
 
-    ValueKeeper(const ValueKeeper &v) : policy(v.policy), value_ptr(NULL)
+    ValueKeeper(const ValueKeeper& v) : policy(v.policy), value_ptr(NULL)
     {
         policy->clone(&(v.value_ptr), &value_ptr);
     }
 
-    ValueKeeper &operator=(const ValueKeeper &v)
+    ValueKeeper& operator=(const ValueKeeper& v)
     {
         policy->free(&value_ptr);
         policy = v.policy;
@@ -74,14 +74,14 @@ class ValueKeeper
 
     template <typename T> inline T getValue() const
     {
-        T *v;
+        T* v;
         if (!isInitialized())
             throw missed_parameter_error("Parameter is missed");
 
         if (isTypeCorrect<T>())
         {
-            void *vv = policy->getValue(const_cast<void **>(&value_ptr));
-            v = reinterpret_cast<T *>(vv);
+            void* vv = policy->getValue(const_cast<void**>(&value_ptr));
+            v = reinterpret_cast<T*>(vv);
         }
         else
             throw wrong_parameter_type_error("Wrong value type");
@@ -106,12 +106,12 @@ class ValueKeeper
 
     inline std::string repr() const
     {
-        return policy->repr(const_cast<void **>(&value_ptr));
+        return policy->repr(const_cast<void**>(&value_ptr));
     }
 
   private:
-    TypePolicyBase *policy;
-    void *value_ptr;
+    TypePolicyBase* policy;
+    void* value_ptr;
 };
 
 } // namespace stichwort_internal

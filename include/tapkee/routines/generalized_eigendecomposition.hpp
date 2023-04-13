@@ -21,7 +21,7 @@ namespace tapkee_internal
 #ifdef TAPKEE_WITH_ARPACK
 //! ARPACK implementation of eigendecomposition-based embedding
 template <class LMatrixType, class RMatrixType, class MatrixOperationType>
-EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatrixType &lhs, const RMatrixType &rhs,
+EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatrixType& lhs, const RMatrixType& rhs,
                                                                     IndexType target_dimension, unsigned int skip)
 {
     timed_context context("ARPACK DSXUPD generalized eigendecomposition");
@@ -46,7 +46,7 @@ EigendecompositionResult generalized_eigendecomposition_impl_arpack(const LMatri
 
 //! Eigen library dense implementation of eigendecomposition
 template <class LMatrixType, class RMatrixType, class MatrixOperationType>
-EigendecompositionResult generalized_eigendecomposition_impl_dense(const LMatrixType &lhs, const RMatrixType &rhs,
+EigendecompositionResult generalized_eigendecomposition_impl_dense(const LMatrixType& lhs, const RMatrixType& rhs,
                                                                    IndexType target_dimension, unsigned int skip)
 {
     timed_context context("Eigen dense generalized eigendecomposition");
@@ -81,19 +81,19 @@ EigendecompositionResult generalized_eigendecomposition_impl_dense(const LMatrix
 template <typename LMatrixType, typename RMatrixType> struct generalized_eigendecomposition_impl
 {
 #ifdef TAPKEE_WITH_ARPACK
-    EigendecompositionResult arpack(const LMatrixType &lhs, const RMatrixType &rhs, const ComputationStrategy &strategy,
-                                    const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension);
+    EigendecompositionResult arpack(const LMatrixType& lhs, const RMatrixType& rhs, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension);
 #endif
-    EigendecompositionResult dense(const LMatrixType &lhs, const RMatrixType &rhs, const ComputationStrategy &strategy,
-                                   const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension);
+    EigendecompositionResult dense(const LMatrixType& lhs, const RMatrixType& rhs, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension);
 };
 
 template <> struct generalized_eigendecomposition_impl<SparseWeightMatrix, DenseDiagonalMatrix>
 {
 #ifdef TAPKEE_WITH_ARPACK
-    EigendecompositionResult arpack(const SparseWeightMatrix &lhs, const DenseDiagonalMatrix &rhs,
-                                    const ComputationStrategy &strategy,
-                                    const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult arpack(const SparseWeightMatrix& lhs, const DenseDiagonalMatrix& rhs,
+                                    const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -107,9 +107,9 @@ template <> struct generalized_eigendecomposition_impl<SparseWeightMatrix, Dense
         return EigendecompositionResult();
     }
 #endif
-    EigendecompositionResult dense(const SparseWeightMatrix &lhs, const DenseDiagonalMatrix &rhs,
-                                   const ComputationStrategy &strategy,
-                                   const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult dense(const SparseWeightMatrix& lhs, const DenseDiagonalMatrix& rhs,
+                                   const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -131,8 +131,8 @@ template <> struct generalized_eigendecomposition_impl<SparseWeightMatrix, Dense
 template <> struct generalized_eigendecomposition_impl<DenseMatrix, DenseMatrix>
 {
 #ifdef TAPKEE_WITH_ARPACK
-    EigendecompositionResult arpack(const DenseMatrix &lhs, const DenseMatrix &rhs, const ComputationStrategy &strategy,
-                                    const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult arpack(const DenseMatrix& lhs, const DenseMatrix& rhs, const ComputationStrategy& strategy,
+                                    const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -146,8 +146,8 @@ template <> struct generalized_eigendecomposition_impl<DenseMatrix, DenseMatrix>
         return EigendecompositionResult();
     }
 #endif
-    EigendecompositionResult dense(const DenseMatrix &lhs, const DenseMatrix &rhs, const ComputationStrategy &strategy,
-                                   const EigendecompositionStrategy &eigen_strategy, IndexType target_dimension)
+    EigendecompositionResult dense(const DenseMatrix& lhs, const DenseMatrix& rhs, const ComputationStrategy& strategy,
+                                   const EigendecompositionStrategy& eigen_strategy, IndexType target_dimension)
     {
         if (strategy.is(HomogeneousCPUStrategy))
         {
@@ -166,9 +166,9 @@ template <> struct generalized_eigendecomposition_impl<DenseMatrix, DenseMatrix>
 };
 
 template <class LMatrixType, class RMatrixType>
-EigendecompositionResult generalized_eigendecomposition(const EigenMethod &method, const ComputationStrategy &strategy,
-                                                        const EigendecompositionStrategy &eigen_strategy,
-                                                        const LMatrixType &lhs, const RMatrixType &rhs,
+EigendecompositionResult generalized_eigendecomposition(const EigenMethod& method, const ComputationStrategy& strategy,
+                                                        const EigendecompositionStrategy& eigen_strategy,
+                                                        const LMatrixType& lhs, const RMatrixType& rhs,
                                                         IndexType target_dimension)
 {
     LoggingSingleton::instance().message_info(

@@ -1,1 +1,3 @@
-BasedOnStyle: Microsoft
+BasedOnStyle:  Microsoft
+PointerAlignment: Left
+ReferenceAlignment: Left

@@ -15,16 +15,16 @@ namespace tapkee
 // vector to given DenseVector instance.
 struct eigen_features_callback
 {
-    eigen_features_callback(const tapkee::DenseMatrix &matrix) : feature_matrix(matrix){};
+    eigen_features_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix){};
     inline tapkee::IndexType dimension() const
     {
         return feature_matrix.rows();
     }
-    inline void vector(tapkee::IndexType i, tapkee::DenseVector &v) const
+    inline void vector(tapkee::IndexType i, tapkee::DenseVector& v) const
     {
         v = feature_matrix.col(i);
     }
-    const tapkee::DenseMatrix &feature_matrix;
+    const tapkee::DenseMatrix& feature_matrix;
 };
 
 // Kernel function callback that computes
@@ -33,7 +33,7 @@ struct eigen_features_callback
 // linear kernel i.e. dot product between two vectors.
 struct eigen_kernel_callback
 {
-    eigen_kernel_callback(const tapkee::DenseMatrix &matrix) : feature_matrix(matrix){};
+    eigen_kernel_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix){};
     inline tapkee::ScalarType kernel(tapkee::IndexType a, tapkee::IndexType b) const
     {
         return feature_matrix.col(a).dot(feature_matrix.col(b));
@@ -42,7 +42,7 @@ struct eigen_kernel_callback
     {
         return kernel(a, b);
     }
-    const tapkee::DenseMatrix &feature_matrix;
+    const tapkee::DenseMatrix& feature_matrix;
 };
 
 // Distance function callback that provides
@@ -51,7 +51,7 @@ struct eigen_kernel_callback
 // euclidean distance between two vectors.
 struct eigen_distance_callback
 {
-    eigen_distance_callback(const tapkee::DenseMatrix &matrix) : feature_matrix(matrix){};
+    eigen_distance_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix){};
     inline tapkee::ScalarType distance(tapkee::IndexType a, tapkee::IndexType b) const
     {
         return (feature_matrix.col(a) - feature_matrix.col(b)).norm();
@@ -60,7 +60,7 @@ struct eigen_distance_callback
     {
         return distance(a, b);
     }
-    const tapkee::DenseMatrix &feature_matrix;
+    const tapkee::DenseMatrix& feature_matrix;
 };
 
 } // namespace tapkee

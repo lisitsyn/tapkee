@@ -120,23 +120,23 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end, KernelC
                                              parameters, context)
                      .embedUsing(selected_method);
     }
-    catch (const std::bad_alloc &)
+    catch (const std::bad_alloc&)
     {
         throw tapkee::not_enough_memory_error("Not enough memory");
     }
-    catch (const stichwort::wrong_parameter_error &ex)
+    catch (const stichwort::wrong_parameter_error& ex)
     {
         throw tapkee::wrong_parameter_error(ex.what());
     }
-    catch (const stichwort::wrong_parameter_type_error &ex)
+    catch (const stichwort::wrong_parameter_type_error& ex)
     {
         throw tapkee::wrong_parameter_type_error(ex.what());
     }
-    catch (const stichwort::multiple_parameter_error &ex)
+    catch (const stichwort::multiple_parameter_error& ex)
     {
         throw tapkee::multiple_parameter_error(ex.what());
     }
-    catch (const stichwort::missed_parameter_error &ex)
+    catch (const stichwort::missed_parameter_error& ex)
     {
         throw tapkee::missed_parameter_error(ex.what());
     }

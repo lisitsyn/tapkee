@@ -36,7 +36,7 @@ const ScalarType learning_rate_shrink_factor = 0.9;
 struct DataForErrorFunc
 {
     /** contains distances between point and its neighbors */
-    const SparseMatrix &distance_matrix;
+    const SparseMatrix& distance_matrix;
     /** sparse matrix that contains
      * original angles between the point, its neighbor and
      * the most collinear neighbor of the neighbor. If
@@ -44,29 +44,29 @@ struct DataForErrorFunc
      * the index of neighbor's neighbor is N2, then the
      * angle between them should be stored at index (P, N2)
      */
-    const SparseMatrix &angles_matrix;
+    const SparseMatrix& angles_matrix;
     /** a vector of vectors, where I'th
      * vector contains indices of neighbors for I'th point
      */
-    const Neighbors &distance_neighbors;
+    const Neighbors& distance_neighbors;
     /** a vector of vectors,
      * where the vector at index I contains indices of
      * neighbor's neighbor of the I'th point (so that
      * we know, where to search for the angle value)
      */
-    const Neighbors &angle_neighbors;
+    const Neighbors& angle_neighbors;
     /** a set of indices of points, that have been
      * already adjusted
      */
-    const std::set<IndexType> &adjusted_points;
+    const std::set<IndexType>& adjusted_points;
     /** initial average distance between neighbors */
     const ScalarType average_distance;
 };
 
 template <class RandomAccessIterator, class DistanceCallback>
 SparseMatrix neighbors_distances_matrix(RandomAccessIterator begin, RandomAccessIterator end,
-                                        const Neighbors &neighbors, DistanceCallback callback,
-                                        ScalarType &average_distance)
+                                        const Neighbors& neighbors, DistanceCallback callback,
+                                        ScalarType& average_distance)
 {
     const IndexType k = neighbors[0].size();
     const IndexType n = neighbors.size();
@@ -79,7 +79,7 @@ SparseMatrix neighbors_distances_matrix(RandomAccessIterator begin, RandomAccess
 
     for (IndexType i = 0; i < n; ++i)
     {
-        const LocalNeighbors &current_neighbors = neighbors[i];
+        const LocalNeighbors& current_neighbors = neighbors[i];
         for (IndexType j = 0; j < k; ++j)
         {
             current_distance = callback.distance(begin[i], begin[current_neighbors[j]]);
@@ -92,7 +92,7 @@ SparseMatrix neighbors_distances_matrix(RandomAccessIterator begin, RandomAccess
     return sparse_matrix_from_triplets(sparse_triplets, n, n);
 }
 
-inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors &neighbors, const DenseMatrix &data)
+inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors& neighbors, const DenseMatrix& data)
 {
     const IndexType k = neighbors[0].size();
     const IndexType n_vectors = data.cols();
@@ -105,13 +105,13 @@ inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors &ne
 
     for (IndexType i = 0; i < n_vectors; ++i)
     {
-        const LocalNeighbors &current_neighbors = neighbors[i];
+        const LocalNeighbors& current_neighbors = neighbors[i];
         LocalNeighbors most_collinear_current_neighbors;
         most_collinear_current_neighbors.reserve(k);
 
         for (IndexType j = 0; j < k; ++j)
         {
-            const LocalNeighbors &neighbors_of_neighbor = neighbors[current_neighbors[j]];
+            const LocalNeighbors& neighbors_of_neighbor = neighbors[current_neighbors[j]];
             /* The closer the cos value to -1.0 - the closer the angle to 180.0 */
             ScalarType min_cos_value = 1.0, current_cos_value;
             /* This value will be updated during the seach for most collinear neighbor */
@@ -140,7 +140,7 @@ inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors &ne
                                      most_collinear_neighbors_of_neighbors);
 }
 
-inline ScalarType average_neighbor_distance(const DenseMatrix &data, const Neighbors &neighbors)
+inline ScalarType average_neighbor_distance(const DenseMatrix& data, const Neighbors& neighbors)
 {
     IndexType k = neighbors[0].size();
     ScalarType average_distance = 0;
@@ -155,8 +155,8 @@ inline ScalarType average_neighbor_distance(const DenseMatrix &data, const Neigh
     return average_distance / (k * data.cols());
 }
 
-inline ScalarType compute_error_for_point(const IndexType index, const DenseMatrix &data,
-                                          const DataForErrorFunc &error_func_data)
+inline ScalarType compute_error_for_point(const IndexType index, const DenseMatrix& data,
+                                          const DataForErrorFunc& error_func_data)
 {
     IndexType k = error_func_data.distance_neighbors[0].size();
     ScalarType error_value = 0;
@@ -205,9 +205,9 @@ inline ScalarType compute_error_for_point(const IndexType index, const DenseMatr
  * @return a number of steps it took to  adjust the
  * point
  */
-inline IndexType adjust_point_at_index(const IndexType index, DenseMatrix &data, const IndexType target_dimension,
-                                       const ScalarType learning_rate, const DataForErrorFunc &error_func_data,
-                                       ScalarType &point_error)
+inline IndexType adjust_point_at_index(const IndexType index, DenseMatrix& data, const IndexType target_dimension,
+                                       const ScalarType learning_rate, const DataForErrorFunc& error_func_data,
+                                       ScalarType& point_error)
 {
     IndexType n_steps = 0;
     ScalarType old_error, new_error;
@@ -245,8 +245,8 @@ inline IndexType adjust_point_at_index(const IndexType index, DenseMatrix &data,
 }
 
 template <class RandomAccessIterator, class DistanceCallback>
-void manifold_sculpting_embed(RandomAccessIterator begin, RandomAccessIterator end, DenseMatrix &data,
-                              IndexType target_dimension, const Neighbors &neighbors, DistanceCallback callback,
+void manifold_sculpting_embed(RandomAccessIterator begin, RandomAccessIterator end, DenseMatrix& data,
+                              IndexType target_dimension, const Neighbors& neighbors, DistanceCallback callback,
                               IndexType max_iteration, ScalarType squishing_rate)
 {
     /* Step 1: Get initial distances to each neighbor and initial

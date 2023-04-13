@@ -22,7 +22,7 @@ struct float_features_callback
     {
         return 1;
     }
-    void vector(float a, tapkee::DenseVector &v) const
+    void vector(float a, tapkee::DenseVector& v) const
     {
         v(0) = a;
     }

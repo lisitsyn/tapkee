@@ -14,7 +14,7 @@ namespace tapkee_internal
 template <class RandomAccessIterator, class FeatureVectorCallback>
 DenseMatrix project(RandomAccessIterator begin, RandomAccessIterator end, FeatureVectorCallback callback,
                     IndexType dimension, const IndexType max_iter, const ScalarType epsilon,
-                    const IndexType target_dimension, const DenseVector &mean_vector)
+                    const IndexType target_dimension, const DenseVector& mean_vector)
 {
     timed_context context("Data projection");
 

@@ -31,18 +31,18 @@ namespace tapkee_internal
 //!
 struct SparseInverseMatrixOperation
 {
-    SparseInverseMatrixOperation(const SparseWeightMatrix &matrix) : solver()
+    SparseInverseMatrixOperation(const SparseWeightMatrix& matrix) : solver()
     {
         solver.compute(matrix);
     }
     /** Solves linear system with provided right-hand size
      */
-    DenseMatrix operator()(const DenseMatrix &operatee)
+    DenseMatrix operator()(const DenseMatrix& operatee)
     {
         return solver.solve(operatee);
     }
     SparseSolver solver;
-    static const std::string &ARPACK_CODE()
+    static const std::string& ARPACK_CODE()
     {
         static std::string foo("SM");
         return foo;
@@ -58,18 +58,18 @@ struct SparseInverseMatrixOperation
 //!
 struct DenseInverseMatrixOperation
 {
-    DenseInverseMatrixOperation(const DenseMatrix &matrix) : solver()
+    DenseInverseMatrixOperation(const DenseMatrix& matrix) : solver()
     {
         solver.compute(matrix);
     }
     /** Solves linear system with provided right-hand size
      */
-    DenseMatrix operator()(const DenseMatrix &operatee)
+    DenseMatrix operator()(const DenseMatrix& operatee)
     {
         return solver.solve(operatee);
     }
     DenseSolver solver;
-    static const std::string &ARPACK_CODE()
+    static const std::string& ARPACK_CODE()
     {
         static std::string foo("SM");
         return foo;
@@ -85,7 +85,7 @@ struct DenseInverseMatrixOperation
 //!
 struct DenseMatrixOperation
 {
-    DenseMatrixOperation(const DenseMatrix &matrix) : _matrix(matrix)
+    DenseMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
     {
     }
     //! Computes matrix product of the matrix and provided right-hand
@@ -93,12 +93,12 @@ struct DenseMatrixOperation
     //!
     //! @param rhs right-hand size matrix
     //!
-    DenseMatrix operator()(const DenseMatrix &rhs)
+    DenseMatrix operator()(const DenseMatrix& rhs)
     {
         return _matrix.selfadjointView<Eigen::Upper>() * rhs;
     }
-    const DenseMatrix &_matrix;
-    static const std::string &ARPACK_CODE()
+    const DenseMatrix& _matrix;
+    static const std::string& ARPACK_CODE()
     {
         static std::string foo("LA");
         return foo;
@@ -115,7 +115,7 @@ struct DenseMatrixOperation
 //!
 struct DenseImplicitSquareSymmetricMatrixOperation
 {
-    DenseImplicitSquareSymmetricMatrixOperation(const DenseMatrix &matrix) : _matrix(matrix)
+    DenseImplicitSquareSymmetricMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
     {
     }
     //! Computes matrix product of the matrix and provided right-hand
@@ -123,12 +123,12 @@ struct DenseImplicitSquareSymmetricMatrixOperation
     //!
     //! @param rhs right-hand side matrix
     //!
-    DenseMatrix operator()(const DenseMatrix &rhs)
+    DenseMatrix operator()(const DenseMatrix& rhs)
     {
         return _matrix.selfadjointView<Eigen::Upper>() * (_matrix.selfadjointView<Eigen::Upper>() * rhs);
     }
-    const DenseMatrix &_matrix;
-    static const std::string &ARPACK_CODE()
+    const DenseMatrix& _matrix;
+    static const std::string& ARPACK_CODE()
     {
         static std::string foo("LA");
         return foo;
@@ -145,7 +145,7 @@ struct DenseImplicitSquareSymmetricMatrixOperation
 //!
 struct DenseImplicitSquareMatrixOperation
 {
-    DenseImplicitSquareMatrixOperation(const DenseMatrix &matrix) : _matrix(matrix)
+    DenseImplicitSquareMatrixOperation(const DenseMatrix& matrix) : _matrix(matrix)
     {
     }
     //! Computes matrix product of the matrix and provided right-hand
@@ -153,12 +153,12 @@ struct DenseImplicitSquareMatrixOperation
     //!
     //! @param rhs right-hand side matrix
     //!
-    DenseMatrix operator()(const DenseMatrix &rhs)
+    DenseMatrix operator()(const DenseMatrix& rhs)
     {
         return _matrix * (_matrix.transpose() * rhs);
     }
-    const DenseMatrix &_matrix;
-    static const std::string &ARPACK_CODE()
+    const DenseMatrix& _matrix;
+    static const std::string& ARPACK_CODE()
     {
         static std::string foo("LA");
         return foo;
@@ -169,7 +169,7 @@ struct DenseImplicitSquareMatrixOperation
 #ifdef TAPKEE_WITH_VIENNACL
 struct GPUDenseImplicitSquareMatrixOperation
 {
-    GPUDenseImplicitSquareMatrixOperation(const DenseMatrix &matrix)
+    GPUDenseImplicitSquareMatrixOperation(const DenseMatrix& matrix)
     {
         mat = viennacl::matrix<ScalarType>(matrix.cols(), matrix.rows());
         vec = viennacl::vector<ScalarType>(matrix.cols());
@@ -181,7 +181,7 @@ struct GPUDenseImplicitSquareMatrixOperation
     //!
     //! @param rhs right-hand side matrix
     //!
-    DenseVector operator()(const DenseVector &rhs)
+    DenseVector operator()(const DenseVector& rhs)
     {
         viennacl::copy(rhs, vec);
         res = viennacl::linalg::prod(mat, vec);
@@ -194,7 +194,7 @@ struct GPUDenseImplicitSquareMatrixOperation
     viennacl::matrix<ScalarType> mat;
     viennacl::vector<ScalarType> vec;
     viennacl::vector<ScalarType> res;
-    static const std::string &ARPACK_CODE()
+    static const std::string& ARPACK_CODE()
     {
         static std::string foo("LA");
         return foo;
@@ -204,7 +204,7 @@ struct GPUDenseImplicitSquareMatrixOperation
 
 struct GPUDenseMatrixOperation
 {
-    GPUDenseMatrixOperation(const DenseMatrix &matrix)
+    GPUDenseMatrixOperation(const DenseMatrix& matrix)
     {
         mat = viennacl::matrix<ScalarType>(matrix.cols(), matrix.rows());
         vec = viennacl::vector<ScalarType>(matrix.cols());
@@ -216,7 +216,7 @@ struct GPUDenseMatrixOperation
     //!
     //! @param rhs right-hand side matrix
     //!
-    DenseVector operator()(const DenseVector &rhs)
+    DenseVector operator()(const DenseVector& rhs)
     {
         viennacl::copy(rhs, vec);
         res = viennacl::linalg::prod(mat, vec);
@@ -227,7 +227,7 @@ struct GPUDenseMatrixOperation
     viennacl::matrix<ScalarType> mat;
     viennacl::vector<ScalarType> vec;
     viennacl::vector<ScalarType> res;
-    static const std::string &ARPACK_CODE()
+    static const std::string& ARPACK_CODE()
     {
         static std::string foo("LA");
         return foo;

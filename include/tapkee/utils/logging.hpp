@@ -25,14 +25,14 @@
     {                                                                                                                  \
         return LEVEL##_enabled;                                                                                        \
     };                                                                                                                 \
-    void message_##LEVEL(const std::string &msg)                                                                       \
+    void message_##LEVEL(const std::string& msg)                                                                       \
     {                                                                                                                  \
         if (LEVEL##_enabled)                                                                                           \
             impl->message_##LEVEL(msg);                                                                                \
     }
-#define LEVEL_HANDLERS_DECLARATION(LEVEL) virtual void message_##LEVEL(const std::string &msg) = 0
+#define LEVEL_HANDLERS_DECLARATION(LEVEL) virtual void message_##LEVEL(const std::string& msg) = 0
 #define LEVEL_HANDLERS_DEFAULT_IMPL(STREAM, LEVEL)                                                                     \
-    virtual void message_##LEVEL(const std::string &msg)                                                               \
+    virtual void message_##LEVEL(const std::string& msg)                                                               \
     {                                                                                                                  \
         if (STREAM && STREAM->good())                                                                                  \
             (*STREAM) << "[" #LEVEL "] " << msg << "\n";                                                               \
@@ -54,8 +54,8 @@ class LoggerImplementation
     LEVEL_HANDLERS_DECLARATION(benchmark);
 
   private:
-    LoggerImplementation &operator=(const LoggerImplementation &);
-    LoggerImplementation(const LoggerImplementation &);
+    LoggerImplementation& operator=(const LoggerImplementation&);
+    LoggerImplementation(const LoggerImplementation&);
 };
 
 //! Default std::cout implementation of @ref LoggerImplementation
@@ -74,11 +74,11 @@ class DefaultLoggerImplementation : public LoggerImplementation
     LEVEL_HANDLERS_DEFAULT_IMPL(serr, error);
     LEVEL_HANDLERS_DEFAULT_IMPL(serr, benchmark)
   private:
-    DefaultLoggerImplementation &operator=(const DefaultLoggerImplementation &);
-    DefaultLoggerImplementation(const DefaultLoggerImplementation &);
+    DefaultLoggerImplementation& operator=(const DefaultLoggerImplementation&);
+    DefaultLoggerImplementation(const DefaultLoggerImplementation&);
 
-    std::ostream *sout;
-    std::ostream *serr;
+    std::ostream* sout;
+    std::ostream* serr;
 };
 
 //! Main logging singleton used by the library. Can use provided
@@ -95,10 +95,10 @@ class LoggingSingleton
     {
         delete impl;
     }
-    LoggingSingleton(const LoggingSingleton &ls);
-    void operator=(const LoggingSingleton &ls);
+    LoggingSingleton(const LoggingSingleton& ls);
+    void operator=(const LoggingSingleton& ls);
 
-    LoggerImplementation *impl;
+    LoggerImplementation* impl;
 
     LEVEL_ENABLED_FIELD(info);
     LEVEL_ENABLED_FIELD(warning);
@@ -108,7 +108,7 @@ class LoggingSingleton
 
   public:
     //! @return instance of the singleton
-    static LoggingSingleton &instance()
+    static LoggingSingleton& instance()
     {
         static LoggingSingleton s;
         return s;
@@ -116,13 +116,13 @@ class LoggingSingleton
 
     //! getter for logger implementation
     //! @return current logger implementation
-    LoggerImplementation *get_logger_impl() const
+    LoggerImplementation* get_logger_impl() const
     {
         return impl;
     }
     //! setter for logger implementation
     //! @param i logger implementation to be set
-    void set_logger_impl(LoggerImplementation *i)
+    void set_logger_impl(LoggerImplementation* i)
     {
         delete impl;
         impl = i;

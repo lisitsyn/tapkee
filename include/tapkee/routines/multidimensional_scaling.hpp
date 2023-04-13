@@ -30,7 +30,7 @@ Landmarks select_landmarks_random(RandomAccessIterator begin, RandomAccessIterat
 
 template <class RandomAccessIterator, class PairwiseCallback>
 DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomAccessIterator /*end*/,
-                                             Landmarks &landmarks, PairwiseCallback callback)
+                                             Landmarks& landmarks, PairwiseCallback callback)
 {
     timed_context context("Multidimensional scaling distance matrix computation");
 
@@ -57,15 +57,15 @@ DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomA
 
 template <class RandomAccessIterator, class PairwiseCallback>
 DenseMatrix triangulate(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback distance_callback,
-                        Landmarks &landmarks, DenseVector &landmark_distances_squared,
-                        EigendecompositionResult &landmarks_embedding, IndexType target_dimension)
+                        Landmarks& landmarks, DenseVector& landmark_distances_squared,
+                        EigendecompositionResult& landmarks_embedding, IndexType target_dimension)
 {
     timed_context context("Landmark triangulation");
 
     const IndexType n_vectors = end - begin;
     const IndexType n_landmarks = landmarks.size();
 
-    bool *to_process = new bool[n_vectors];
+    bool* to_process = new bool[n_vectors];
     std::fill(to_process, to_process + n_vectors, true);
 
     DenseMatrix embedding(n_vectors, target_dimension);

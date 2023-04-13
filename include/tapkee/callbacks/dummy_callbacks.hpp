@@ -17,7 +17,7 @@ template <class Data> struct dummy_features_callback
     {
         throw tapkee::unsupported_method_error("Dummy feature vector callback is set");
     }
-    inline void vector(const Data &, tapkee::DenseVector &) const
+    inline void vector(const Data&, tapkee::DenseVector&) const
     {
         throw tapkee::unsupported_method_error("Dummy feature vector callback is set");
     }
@@ -26,7 +26,7 @@ template <class Data> struct dummy_features_callback
 template <class Data> struct dummy_kernel_callback
 {
     typedef int dummy;
-    inline tapkee::ScalarType kernel(const Data &, const Data &) const
+    inline tapkee::ScalarType kernel(const Data&, const Data&) const
     {
         throw tapkee::unsupported_method_error("Dummy kernel callback is set");
         return 0.0;
@@ -36,7 +36,7 @@ template <class Data> struct dummy_kernel_callback
 template <class Data> struct dummy_distance_callback
 {
     typedef int dummy;
-    inline tapkee::ScalarType distance(const Data &, const Data &) const
+    inline tapkee::ScalarType distance(const Data&, const Data&) const
     {
         throw tapkee::unsupported_method_error("Dummy distance callback is set");
         return 0.0;

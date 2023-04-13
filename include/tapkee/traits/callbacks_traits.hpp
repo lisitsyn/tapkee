@@ -20,7 +20,7 @@ template <class T> class is_dummy
     typedef char yes;
     typedef long no;
 
-    template <typename C> static yes dummy(typename C::dummy *);
+    template <typename C> static yes dummy(typename C::dummy*);
     template <typename C> static no dummy(...);
 
   public:

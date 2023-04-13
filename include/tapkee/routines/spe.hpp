@@ -18,7 +18,7 @@ namespace tapkee_internal
 
 template <class RandomAccessIterator, class PairwiseCallback>
 DenseMatrix spe_embedding(RandomAccessIterator begin, RandomAccessIterator end, PairwiseCallback callback,
-                          const Neighbors &neighbors, IndexType target_dimension, bool global_strategy,
+                          const Neighbors& neighbors, IndexType target_dimension, bool global_strategy,
                           ScalarType tolerance, int nupdates, IndexType max_iter)
 {
     timed_context context("SPE embedding computation");
@@ -97,7 +97,7 @@ DenseMatrix spe_embedding(RandomAccessIterator begin, RandomAccessIterator end, 
             // Neighbors of interest
             for (int j = 0; j < nupdates; ++j)
             {
-                const LocalNeighbors &current_neighbors = neighbors[*ind1++];
+                const LocalNeighbors& current_neighbors = neighbors[*ind1++];
 
                 for (IndexType kk = 0; kk < k; ++kk)
                     ind1Neighbors[kk + j * k] = current_neighbors[kk];

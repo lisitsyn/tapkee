@@ -15,7 +15,7 @@ namespace tapkee_internal
 {
 
 template <class RandomAccessIterator>
-bool is_connected(RandomAccessIterator begin, RandomAccessIterator end, const Neighbors &neighbors)
+bool is_connected(RandomAccessIterator begin, RandomAccessIterator end, const Neighbors& neighbors)
 {
     timed_context context("Checking if graph is connected");
 
@@ -46,7 +46,7 @@ bool is_connected(RandomAccessIterator begin, RandomAccessIterator end, const Ne
         if (nvisited == N)
             break;
 
-        const LocalNeighbors &current_neighbors = neighbors[current];
+        const LocalNeighbors& current_neighbors = neighbors[current];
 
         for (IndexType j = 0; j < k; ++j)
         {

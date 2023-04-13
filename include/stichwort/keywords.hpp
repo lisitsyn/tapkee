@@ -65,17 +65,17 @@ template <typename T> struct ParameterKeyword
     typedef std::string Name;
     typedef T Type;
 
-    ParameterKeyword(const Name &n, const T &dv) : name(n), default_value(dv)
+    ParameterKeyword(const Name& n, const T& dv) : name(n), default_value(dv)
     {
     }
-    ParameterKeyword(const ParameterKeyword &pk);
-    ParameterKeyword operator=(const ParameterKeyword &pk);
+    ParameterKeyword(const ParameterKeyword& pk);
+    ParameterKeyword operator=(const ParameterKeyword& pk);
 
-    Parameter operator=(const T &value) const
+    Parameter operator=(const T& value) const
     {
         return Parameter::create(name, value);
     }
-    Parameter operator=(const DefaultValue &) const
+    Parameter operator=(const DefaultValue&) const
     {
         return Parameter::create(name, default_value);
     }
@@ -93,8 +93,8 @@ struct ParametersForwarder
     ParametersForwarder()
     {
     }
-    ParametersForwarder(const ParametersForwarder &);
-    ParametersForwarder &operator=(const ParametersForwarder &);
+    ParametersForwarder(const ParametersForwarder&);
+    ParametersForwarder& operator=(const ParametersForwarder&);
     ParametersSet operator[](ParametersSet parameters) const
     {
         return parameters;

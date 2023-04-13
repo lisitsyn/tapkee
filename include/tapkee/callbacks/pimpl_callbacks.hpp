@@ -14,12 +14,12 @@
 // kernel i.e. dot product between two vectors.
 template <class Implementation> struct pimpl_kernel_callback
 {
-    pimpl_kernel_callback(Implementation *i) : impl(i){};
+    pimpl_kernel_callback(Implementation* i) : impl(i){};
     inline tapkee::ScalarType kernel(int a, int b) const
     {
         return impl->kernel(a, b);
     }
-    Implementation *impl;
+    Implementation* impl;
 };
 
 // Distance function callback that provides
@@ -28,12 +28,12 @@ template <class Implementation> struct pimpl_kernel_callback
 // euclidean distance between two vectors.
 template <class Implementation> struct pimpl_distance_callback
 {
-    pimpl_distance_callback(Implementation *i) : impl(i){};
+    pimpl_distance_callback(Implementation* i) : impl(i){};
     inline tapkee::ScalarType distance(int a, int b) const
     {
         return impl->distance(a, b);
     }
-    Implementation *impl;
+    Implementation* impl;
 };
 
 #endif

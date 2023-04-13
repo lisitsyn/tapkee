@@ -18,14 +18,14 @@ struct ProjectionImplementation
     //! Projects provided vector to new space
     //! @param vec vector to be projected
     //! @return projected vector
-    virtual DenseVector project(const DenseVector &vec) = 0;
+    virtual DenseVector project(const DenseVector& vec) = 0;
 };
 
 //! A pimpl wrapper for projecting function
 struct ProjectingFunction
 {
     ProjectingFunction() : implementation(NULL){};
-    ProjectingFunction(ProjectionImplementation *impl) : implementation(impl){};
+    ProjectingFunction(ProjectionImplementation* impl) : implementation(impl){};
     //! Destroys current implementation
     void clear()
     {
@@ -34,11 +34,11 @@ struct ProjectingFunction
     //! Projects provided vector to new space
     //! @param vec vector to be projected
     //! @return projected vector
-    inline DenseVector operator()(const DenseVector &vec)
+    inline DenseVector operator()(const DenseVector& vec)
     {
         return implementation->project(vec);
     }
-    ProjectionImplementation *implementation;
+    ProjectionImplementation* implementation;
 };
 
 //! Basic @ref ProjectionImplementation that subtracts mean from the vector
@@ -53,7 +53,7 @@ struct MatrixProjectionImplementation : public ProjectionImplementation
     {
     }
 
-    virtual DenseVector project(const DenseVector &vec)
+    virtual DenseVector project(const DenseVector& vec)
     {
         return proj_mat.transpose() * (vec - mean_vec);
     }

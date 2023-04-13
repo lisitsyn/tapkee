@@ -27,7 +27,7 @@ namespace tapkee_internal
 
 template <class DistanceRecord> struct distances_comparator
 {
-    inline bool operator()(const DistanceRecord &l, const DistanceRecord &r) const
+    inline bool operator()(const DistanceRecord& l, const DistanceRecord& r) const
     {
         return (l.second < r.second);
     }
@@ -39,14 +39,14 @@ struct KernelType
 
 template <class RandomAccessIterator, class Callback> struct KernelDistance
 {
-    KernelDistance(const Callback &cb) : callback(cb)
+    KernelDistance(const Callback& cb) : callback(cb)
     {
     }
-    inline ScalarType operator()(const RandomAccessIterator &l, const RandomAccessIterator &r)
+    inline ScalarType operator()(const RandomAccessIterator& l, const RandomAccessIterator& r)
     {
         return callback.kernel(*l, *r);
     }
-    inline ScalarType distance(const RandomAccessIterator &l, const RandomAccessIterator &r)
+    inline ScalarType distance(const RandomAccessIterator& l, const RandomAccessIterator& r)
     {
         return sqrt(callback.kernel(*l, *l) - 2 * callback.kernel(*l, *r) + callback.kernel(*r, *r));
     }
@@ -60,14 +60,14 @@ struct DistanceType
 
 template <class RandomAccessIterator, class Callback> struct PlainDistance
 {
-    PlainDistance(const Callback &cb) : callback(cb)
+    PlainDistance(const Callback& cb) : callback(cb)
     {
     }
-    inline ScalarType operator()(const RandomAccessIterator &l, const RandomAccessIterator &r)
+    inline ScalarType operator()(const RandomAccessIterator& l, const RandomAccessIterator& r)
     {
         return callback.distance(*l, *r);
     }
-    inline ScalarType distance(const RandomAccessIterator &l, const RandomAccessIterator &r)
+    inline ScalarType distance(const RandomAccessIterator& l, const RandomAccessIterator& r)
     {
         return callback.distance(*l, *r);
     }
@@ -119,7 +119,7 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
 #endif
 
 template <class RandomAccessIterator, class Callback>
-Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator &begin, const RandomAccessIterator &end,
+Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end,
                                          Callback callback, IndexType k)
 {
     timed_context context("Distance sorting based neighbors search");
@@ -151,7 +151,7 @@ Neighbors find_neighbors_bruteforce_impl(const RandomAccessIterator &begin, cons
 }
 
 template <class RandomAccessIterator, class Callback>
-Neighbors find_neighbors_vptree_impl(const RandomAccessIterator &begin, const RandomAccessIterator &end,
+Neighbors find_neighbors_vptree_impl(const RandomAccessIterator& begin, const RandomAccessIterator& end,
                                      Callback callback, IndexType k)
 {
     timed_context context("VP-Tree based neighbors search");
@@ -172,8 +172,8 @@ Neighbors find_neighbors_vptree_impl(const RandomAccessIterator &begin, const Ra
 }
 
 template <class RandomAccessIterator, class Callback>
-Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator &begin, const RandomAccessIterator &end,
-                         const Callback &callback, IndexType k, bool check_connectivity)
+Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& begin, const RandomAccessIterator& end,
+                         const Callback& callback, IndexType k, bool check_connectivity)
 {
     if (k > static_cast<IndexType>(end - begin - 1))
     {

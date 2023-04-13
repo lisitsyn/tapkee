@@ -42,7 +42,7 @@ template <typename T> struct Positivity
     {
         return v > 0;
     }
-    inline std::string failureMessage(const stichwort::Parameter &p) const
+    inline std::string failureMessage(const stichwort::Parameter& p) const
     {
         return formatting::format("Positivity check failed for {}, its value is {}", p.name(), p.repr());
     }
@@ -54,7 +54,7 @@ template <typename T> struct NonNegativity
     {
         return v >= 0;
     }
-    inline std::string failureMessage(const stichwort::Parameter &p) const
+    inline std::string failureMessage(const stichwort::Parameter& p) const
     {
         return formatting::format("Non-negativity check failed for {}, its value is {}", p.name(), p.repr());
     }
@@ -71,7 +71,7 @@ template <typename T> struct InRange
     }
     T lower;
     T upper;
-    inline std::string failureMessage(const stichwort::Parameter &p) const
+    inline std::string failureMessage(const stichwort::Parameter& p) const
     {
         return formatting::format("[{}, {}) range check failed for {}, its value is {}", lower, upper, p.name(),
                                   p.repr());
@@ -89,7 +89,7 @@ template <typename T> struct InClosedRange
     }
     T lower;
     T upper;
-    inline std::string failureMessage(const stichwort::Parameter &p) const
+    inline std::string failureMessage(const stichwort::Parameter& p) const
     {
         return formatting::format("[{}, {}] range check failed for {}, its value is {}", lower, upper, p.name(),
                                   p.repr());
@@ -101,7 +101,7 @@ class ImplementationBase
 {
   public:
     ImplementationBase(RandomAccessIterator b, RandomAccessIterator e, KernelCallback k, DistanceCallback d,
-                       FeaturesCallback f, ParametersSet &pmap, const Context &ctx)
+                       FeaturesCallback f, ParametersSet& pmap, const Context& ctx)
         : parameters(pmap), context(ctx), kernel(k), distance(d), features(f),
           plain_distance(PlainDistance<RandomAccessIterator, DistanceCallback>(distance)),
           kernel_distance(KernelDistance<RandomAccessIterator, KernelCallback>(kernel)), begin(b), end(e),
@@ -537,7 +537,7 @@ class ImplementationBase
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>
 ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback> initialize(
     RandomAccessIterator begin, RandomAccessIterator end, KernelCallback kernel, DistanceCallback distance,
-    FeaturesCallback features, stichwort::ParametersSet &pmap, const Context &ctx)
+    FeaturesCallback features, stichwort::ParametersSet& pmap, const Context& ctx)
 {
     return ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(
         begin, end, kernel, distance, features, pmap, ctx);

@@ -51,13 +51,13 @@ class Parameter
 
   private:
     template <typename T>
-    Parameter(const ParameterName &pname, const T &value)
+    Parameter(const ParameterName& pname, const T& value)
         : valid(true), invalidity_reasons(), parameter_name(pname), keeper(stichwort_internal::ValueKeeper(value))
     {
     }
 
   public:
-    template <typename T> static Parameter create(const std::string &name, const T &value)
+    template <typename T> static Parameter create(const std::string& name, const T& value)
     {
         return Parameter(name, value);
     }
@@ -67,7 +67,7 @@ class Parameter
     {
     }
 
-    Parameter(const Parameter &p)
+    Parameter(const Parameter& p)
         : valid(p.valid), invalidity_reasons(p.invalidity_reasons), parameter_name(p.name()), keeper(p.keeper)
     {
     }
@@ -76,7 +76,7 @@ class Parameter
     {
     }
 
-    Parameter &operator=(const Parameter &p)
+    Parameter& operator=(const Parameter& p)
     {
         if (this == &p)
         {
@@ -109,7 +109,7 @@ class Parameter
         {
             return getValue<T>();
         }
-        catch (const missed_parameter_error &)
+        catch (const missed_parameter_error&)
         {
             throw missed_parameter_error(parameter_name + " is missed");
         }
@@ -154,7 +154,7 @@ class Parameter
         return keeper.repr();
     }
 
-    ParametersSet operator,(const Parameter &p);
+    ParametersSet operator,(const Parameter& p);
 
   private:
     template <typename T> inline T getValue() const
@@ -167,7 +167,7 @@ class Parameter
         return keeper.isTypeCorrect<T>();
     }
 
-    inline void invalidate(const std::string &reason)
+    inline void invalidate(const std::string& reason)
     {
         if (valid)
             valid = false;
@@ -186,11 +186,11 @@ class CheckedParameter
 {
 
   public:
-    explicit CheckedParameter(Parameter &p) : parameter(p)
+    explicit CheckedParameter(Parameter& p) : parameter(p)
     {
     }
 
-    inline operator const Parameter &()
+    inline operator const Parameter&()
     {
         return parameter;
     }
@@ -200,7 +200,7 @@ class CheckedParameter
         return parameter.is<T>(v);
     }
 
-    template <template <class> class F, class Q> inline Parameter &satisfies(const F<Q> &cond) const
+    template <template <class> class F, class Q> inline Parameter& satisfies(const F<Q>& cond) const
     {
         if (!parameter.isCondition(cond))
             parameter.invalidate(cond.failureMessage(parameter));
@@ -214,7 +214,7 @@ class CheckedParameter
     }
 
   private:
-    Parameter &parameter;
+    Parameter& parameter;
 };
 
 inline CheckedParameter Parameter::checked()
@@ -231,10 +231,10 @@ class ParametersSet
     ParametersSet() : pmap(), dups()
     {
     }
-    ParametersSet(const ParametersSet &other) : pmap(other.pmap), dups(other.dups)
+    ParametersSet(const ParametersSet& other) : pmap(other.pmap), dups(other.dups)
     {
     }
-    ParametersSet &operator=(const ParametersSet &other)
+    ParametersSet& operator=(const ParametersSet& other)
     {
         this->pmap = other.pmap;
         this->dups = other.dups;
@@ -252,18 +252,18 @@ class ParametersSet
             throw multiple_parameter_error(ss.str());
         }
     }
-    void add(const Parameter &p)
+    void add(const Parameter& p)
     {
         if (pmap.count(p.name()))
             dups.push_back(p.name());
 
         pmap[p.name()] = p;
     }
-    bool contains(const std::string &name) const
+    bool contains(const std::string& name) const
     {
         return pmap.count(name) > 0;
     }
-    void merge(const ParametersSet &pg)
+    void merge(const ParametersSet& pg)
     {
         typedef ParametersMap::const_iterator MapIter;
         for (MapIter iter = pg.pmap.begin(); iter != pg.pmap.end(); ++iter)
@@ -274,7 +274,7 @@ class ParametersSet
             }
         }
     }
-    Parameter operator[](const std::string &name) const
+    Parameter operator[](const std::string& name) const
     {
         ParametersMap::const_iterator it = pmap.find(name);
         if (it != pmap.end())
@@ -286,7 +286,7 @@ class ParametersSet
             throw missed_parameter_error(name + " is missed");
         }
     }
-    ParametersSet &operator,(const Parameter &p)
+    ParametersSet& operator,(const Parameter& p)
     {
         add(p);
         return *this;
@@ -297,7 +297,7 @@ class ParametersSet
     DuplicatesList dups;
 };
 
-inline ParametersSet Parameter::operator,(const Parameter &p)
+inline ParametersSet Parameter::operator,(const Parameter& p)
 {
     ParametersSet pg;
     pg.add(*this);
