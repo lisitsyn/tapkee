@@ -1,121 +1,122 @@
 #include <gtest/gtest.h>
 
-#include <tapkee/tapkee.hpp>
-#include <tapkee/exceptions.hpp>
 #include <tapkee/callbacks/eigen_callbacks.hpp>
+#include <tapkee/exceptions.hpp>
+#include <tapkee/tapkee.hpp>
 
 #include "callbacks.hpp"
 #include "data.hpp"
 
-#include <vector>
 #include <algorithm>
 #include <set>
+#include <vector>
 
 using namespace tapkee;
 
 void smoketest(DimensionReductionMethod m)
 {
-	const int N = 50;
-	DenseMatrix X = swissroll(N);
-	tapkee::eigen_kernel_callback kcb(X);
-	tapkee::eigen_distance_callback dcb(X);
-	tapkee::eigen_features_callback fcb(X);
-	std::vector<int> data(N);
-	for (int i=0; i<N; ++i) data[i] = i;
-	TapkeeOutput result;
-	ASSERT_NO_THROW(result = embed(data.begin(), data.end(),
-		kcb, dcb, fcb, (method=m,target_dimension=2,num_neighbors=N/5,
-	                    gaussian_kernel_width=10.0,sne_perplexity=10.0)));
-	ASSERT_EQ(2,result.embedding.cols());
-	ASSERT_EQ(N,result.embedding.rows());
+    const int N = 50;
+    DenseMatrix X = swissroll(N);
+    tapkee::eigen_kernel_callback kcb(X);
+    tapkee::eigen_distance_callback dcb(X);
+    tapkee::eigen_features_callback fcb(X);
+    std::vector<int> data(N);
+    for (int i = 0; i < N; ++i)
+        data[i] = i;
+    TapkeeOutput result;
+    ASSERT_NO_THROW(result = embed(data.begin(), data.end(), kcb, dcb, fcb,
+                                   (method = m, target_dimension = 2, num_neighbors = N / 5,
+                                    gaussian_kernel_width = 10.0, sne_perplexity = 10.0)));
+    ASSERT_EQ(2, result.embedding.cols());
+    ASSERT_EQ(N, result.embedding.rows());
 }
 
-TEST(Methods,KernelLocallyLinearEmbeddingSmokeTest)
+TEST(Methods, KernelLocallyLinearEmbeddingSmokeTest)
 {
-	smoketest(KernelLocallyLinearEmbedding);
+    smoketest(KernelLocallyLinearEmbedding);
 }
 
-TEST(Methods,NeighborhoodPreservingEmbedding)
+TEST(Methods, NeighborhoodPreservingEmbedding)
 {
-	smoketest(NeighborhoodPreservingEmbedding);
+    smoketest(NeighborhoodPreservingEmbedding);
 }
 
-TEST(Methods,KernelLocalTangentSpaceAlignmentSmokeTest)
+TEST(Methods, KernelLocalTangentSpaceAlignmentSmokeTest)
 {
-	smoketest(KernelLocallyLinearEmbedding);
+    smoketest(KernelLocallyLinearEmbedding);
 }
 
-TEST(Methods,LinearLocalTangentSpaceAlignment)
+TEST(Methods, LinearLocalTangentSpaceAlignment)
 {
-	smoketest(LinearLocalTangentSpaceAlignment);
+    smoketest(LinearLocalTangentSpaceAlignment);
 }
 
-TEST(Methods,HessianLocallyLinearEmbeddingSmokeTest)
+TEST(Methods, HessianLocallyLinearEmbeddingSmokeTest)
 {
-	smoketest(HessianLocallyLinearEmbedding);
+    smoketest(HessianLocallyLinearEmbedding);
 }
 
-TEST(Methods,LaplacianEigenmapsSmokeTest)
+TEST(Methods, LaplacianEigenmapsSmokeTest)
 {
-	smoketest(LaplacianEigenmaps);
+    smoketest(LaplacianEigenmaps);
 }
 
-TEST(Methods,LocalityPreservingProjectionsSmokeTest)
+TEST(Methods, LocalityPreservingProjectionsSmokeTest)
 {
-	smoketest(LocalityPreservingProjections);
+    smoketest(LocalityPreservingProjections);
 }
 
-TEST(Methods,DiffusionMapSmokeTest)
+TEST(Methods, DiffusionMapSmokeTest)
 {
-	smoketest(DiffusionMap);
+    smoketest(DiffusionMap);
 }
 
-TEST(Methods,IsomapSmokeTest)
+TEST(Methods, IsomapSmokeTest)
 {
-	smoketest(Isomap);
+    smoketest(Isomap);
 }
 
-TEST(Methods,LandmarkIsomapSmokeTest)
+TEST(Methods, LandmarkIsomapSmokeTest)
 {
-	smoketest(LandmarkIsomap);
+    smoketest(LandmarkIsomap);
 }
 
-TEST(Methods,MultidimensionalScalingSmokeTest)
+TEST(Methods, MultidimensionalScalingSmokeTest)
 {
-	smoketest(MultidimensionalScaling);
+    smoketest(MultidimensionalScaling);
 }
 
-TEST(Methods,LandmarkMultidimensionalScalingSmokeTest)
+TEST(Methods, LandmarkMultidimensionalScalingSmokeTest)
 {
-	smoketest(LandmarkMultidimensionalScaling);
-}
-		
-TEST(Methods,StochasticProximityEmbeddingSmokeTest)
-{
-	smoketest(StochasticProximityEmbedding);
+    smoketest(LandmarkMultidimensionalScaling);
 }
 
-TEST(Methods,KernelPCASmokeTest)
+TEST(Methods, StochasticProximityEmbeddingSmokeTest)
 {
-	smoketest(KernelPCA);
+    smoketest(StochasticProximityEmbedding);
 }
 
-TEST(Methods,PCASmokeTest)
+TEST(Methods, KernelPCASmokeTest)
 {
-	smoketest(PCA);
+    smoketest(KernelPCA);
 }
 
-TEST(Methods,RandomProjectionSmokeTest)
+TEST(Methods, PCASmokeTest)
 {
-	smoketest(RandomProjection);
+    smoketest(PCA);
 }
 
-TEST(Methods,FactorAnalysisSmokeTest)
+TEST(Methods, RandomProjectionSmokeTest)
 {
-	smoketest(FactorAnalysis);
+    smoketest(RandomProjection);
 }
 
-TEST(Methods,tDistributedStochasticNeighborEmbeddingSmokeTest)
+TEST(Methods, FactorAnalysisSmokeTest)
 {
-	smoketest(tDistributedStochasticNeighborEmbedding);
+    smoketest(FactorAnalysis);
+}
+
+TEST(Methods, tDistributedStochasticNeighborEmbeddingSmokeTest)
+{
+    smoketest(tDistributedStochasticNeighborEmbedding);
 }

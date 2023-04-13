@@ -6,17 +6,15 @@
 
 using namespace tapkee;
 
-TEST(Projecting,PCA)
+TEST(Projecting, PCA)
 {
-	const int N = 50;
-	DenseMatrix X = swissroll(N);
+    const int N = 50;
+    DenseMatrix X = swissroll(N);
 
-	TapkeeOutput output;
+    TapkeeOutput output;
 
-	ASSERT_NO_THROW(output=tapkee::initialize()
-			.withParameters((method=PCA, target_dimension=2))
-			.embedUsing(X));
+    ASSERT_NO_THROW(output = tapkee::initialize().withParameters((method = PCA, target_dimension = 2)).embedUsing(X));
 
-	auto projected = output.projection(X.row(0));
-	ASSERT_EQ(2, projected.size());
+    auto projected = output.projection(X.row(0));
+    ASSERT_EQ(2, projected.size());
 }

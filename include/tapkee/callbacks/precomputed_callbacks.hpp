@@ -6,6 +6,8 @@
 #ifndef TAPKEE_PRECOMPUTED_CALLBACKS_H_
 #define TAPKEE_PRECOMPUTED_CALLBACKS_H_
 
+#include <tapkee/defines.hpp>
+
 namespace tapkee
 {
 // Here we provide basic but still full set of callbacks
@@ -17,12 +19,12 @@ namespace tapkee
 // linear kernel i.e. dot product between two vectors.
 struct precomputed_kernel_callback
 {
-	precomputed_kernel_callback(const tapkee::DenseMatrix& matrix) : kernel_matrix(matrix) {};
-	inline tapkee::ScalarType kernel(int a, int b) const
-	{
-		return kernel_matrix(a,b);
-	}
-	const tapkee::DenseMatrix& kernel_matrix;
+    precomputed_kernel_callback(const tapkee::DenseMatrix &matrix) : kernel_matrix(matrix){};
+    inline tapkee::ScalarType kernel(int a, int b) const
+    {
+        return kernel_matrix(a, b);
+    }
+    const tapkee::DenseMatrix &kernel_matrix;
 };
 
 // Distance function callback that provides
@@ -31,14 +33,13 @@ struct precomputed_kernel_callback
 // euclidean distance between two vectors.
 struct precomputed_distance_callback
 {
-	precomputed_distance_callback(const tapkee::DenseMatrix& matrix) : distance_matrix(matrix) {};
-	inline tapkee::ScalarType distance(int a, int b) const
-	{
-		return distance_matrix(a,b);
-	}
-	const tapkee::DenseMatrix& distance_matrix;
+    precomputed_distance_callback(const tapkee::DenseMatrix &matrix) : distance_matrix(matrix){};
+    inline tapkee::ScalarType distance(int a, int b) const
+    {
+        return distance_matrix(a, b);
+    }
+    const tapkee::DenseMatrix &distance_matrix;
 };
 
-}
+} // namespace tapkee
 #endif
-
