@@ -10,6 +10,9 @@ test:
 	@(mkdir -p build; cd build; cmake -DBUILD_TESTS=ON ..; make)
 	@(cd build; ctest -VV)
 
+codeql:
+	@(mkdir -p build; cd build; cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON ..; make)
+
 minimal: default
 	@(echo '--- Code ---';               \
 	  cat ./examples/minimal/minimal.cpp;\
