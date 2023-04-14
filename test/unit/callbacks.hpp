@@ -4,7 +4,7 @@ struct float_kernel_callback
 {
     tapkee::ScalarType kernel(float a, float b) const
     {
-        return a * b;
+        return tapkee::ScalarType(a) * b;
     }
 };
 
