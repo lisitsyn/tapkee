@@ -25,6 +25,11 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      
+    - name: Install dependencies
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+          packages: libeigen3-dev libarpack2-dev libgtest-dev
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
