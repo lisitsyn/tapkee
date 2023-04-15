@@ -80,7 +80,7 @@ DenseMatrix spe_embedding(RandomAccessIterator begin, RandomAccessIterator end, 
     // Helper used in local strategy
     Indices ind1Neighbors;
     if (!global_strategy)
-        ind1Neighbors.resize(k * nupdates);
+        ind1Neighbors.resize(static_cast<size_t>(k) * nupdates);
 
     for (IndexType i = 0; i < max_iter; ++i)
     {
