@@ -73,7 +73,7 @@ SparseMatrix neighbors_distances_matrix(RandomAccessIterator begin, RandomAccess
     if ((end - begin) != n)
         throw std::runtime_error("Wrong size");
     SparseTriplets sparse_triplets;
-    sparse_triplets.reserve(k * n);
+    sparse_triplets.reserve(static_cast<size_t>(k) * n);
     average_distance = 0;
     ScalarType current_distance;
 
@@ -98,7 +98,7 @@ inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors& ne
     const IndexType n_vectors = data.cols();
 
     SparseTriplets sparse_triplets;
-    sparse_triplets.reserve(k * n_vectors);
+    sparse_triplets.reserve(static_cast<size_t>(k) * n_vectors);
     /* I tried to find better naming, but... */
     Neighbors most_collinear_neighbors_of_neighbors;
     most_collinear_neighbors_of_neighbors.reserve(n_vectors);
