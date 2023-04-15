@@ -28,7 +28,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
     const IndexType k = neighbors[0].size();
 
     SparseTriplets sparse_triplets;
-    sparse_triplets.reserve((k * k + 2 * k + 1) * (end - begin));
+    sparse_triplets.reserve((static_cast<size_t>(k) * k + 2 * k + 1) * (end - begin));
 
 #pragma omp parallel
     {
@@ -39,7 +39,7 @@ SparseWeightMatrix tangent_weight_matrix(RandomAccessIterator begin, RandomAcces
         G.col(0).setConstant(1 / sqrt(static_cast<ScalarType>(k)));
         DenseSelfAdjointEigenSolver solver;
         SparseTriplets local_triplets;
-        local_triplets.reserve(k * k + 2 * k + 1);
+        local_triplets.reserve(static_cast<size_t>(k) * k + 2 * k + 1);
 
 #pragma omp for nowait
         for (index_iter = 0; index_iter < static_cast<IndexType>(end - begin); index_iter++)
@@ -98,7 +98,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
     const IndexType k = neighbors[0].size();
 
     SparseTriplets sparse_triplets;
-    sparse_triplets.reserve((k * k + 2 * k + 1) * (end - begin));
+    sparse_triplets.reserve((static_cast<size_t>(k) * k + 2 * k + 1) * (end - begin));
 
 #pragma omp parallel
     {
@@ -108,7 +108,7 @@ SparseWeightMatrix linear_weight_matrix(const RandomAccessIterator& begin, const
         DenseVector rhs = DenseVector::Ones(k);
         DenseVector weights;
         SparseTriplets local_triplets;
-        local_triplets.reserve(k * k + 2 * k + 1);
+        local_triplets.reserve(static_cast<size_t>(k) * k + 2 * k + 1);
 
         // RESTRICT_ALLOC;
 #pragma omp for nowait
@@ -169,7 +169,7 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
     const IndexType k = neighbors[0].size();
 
     SparseTriplets sparse_triplets;
-    sparse_triplets.reserve(k * k * (end - begin));
+    sparse_triplets.reserve(static_cast<size_t>(k) * k * (end - begin));
 
     const IndexType dp = target_dimension * (target_dimension + 1) / 2;
 
@@ -180,7 +180,7 @@ SparseWeightMatrix hessian_weight_matrix(RandomAccessIterator begin, RandomAcces
         DenseMatrix Yi(k, 1 + target_dimension + dp);
 
         SparseTriplets local_triplets;
-        local_triplets.reserve(k * k + 2 * k + 1);
+        local_triplets.reserve(static_cast<size_t>(k) * k + 2 * k + 1);
 
 #pragma omp for nowait
         for (index_iter = 0; index_iter < static_cast<IndexType>(end - begin); index_iter++)
