@@ -118,7 +118,7 @@ template <typename M> struct Method
     {
         return this->name() == m.name();
     }
-    bool operator==(const M& m)
+    bool operator==(const M& m) const
     {
         return this->name() == m.name();
     }
@@ -130,6 +130,7 @@ struct NeighborsMethod : public Method<NeighborsMethod>
     NeighborsMethod(const char* n) : Method<NeighborsMethod>(n)
     {
     }
+    using Method<NeighborsMethod>::operator==;
 };
 
 //! Brute force method with not least than
@@ -155,6 +156,7 @@ struct EigenMethod : public Method<EigenMethod>
     EigenMethod(const char* n) : Method<EigenMethod>(n)
     {
     }
+    using Method<EigenMethod>::operator==;
 };
 
 #ifdef TAPKEE_WITH_ARPACK
@@ -181,6 +183,7 @@ struct ComputationStrategy : public Method<ComputationStrategy>
     ComputationStrategy(const char* n) : Method<ComputationStrategy>(n)
     {
     }
+    using Method<ComputationStrategy>::operator==;
 };
 
 #ifdef TAPKEE_WITH_VIENNACL

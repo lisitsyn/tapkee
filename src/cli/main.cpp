@@ -386,16 +386,16 @@ int run(int argc, const char **argv)
     tapkee::TapkeeOutput output;
 
     tapkee::ParametersSet parameters =
-        tapkee::kwargs[tapkee::method = tapkee_method, tapkee::computation_strategy = tapkee_computation_strategy,
-                       tapkee::eigen_method = tapkee_eigen_method, tapkee::neighbors_method = tapkee_neighbors_method,
-                       tapkee::num_neighbors = k, tapkee::target_dimension = target_dim,
-                       tapkee::diffusion_map_timesteps = timesteps, tapkee::gaussian_kernel_width = width,
-                       tapkee::max_iteration = max_iters, tapkee::spe_global_strategy = spe_global,
-                       tapkee::spe_num_updates = spe_num_upd, tapkee::spe_tolerance = spe_tol,
-                       tapkee::landmark_ratio = landmark_rt, tapkee::nullspace_shift = eigenshift,
-                       tapkee::check_connectivity = true, tapkee::fa_epsilon = fa_eps,
-                       tapkee::sne_perplexity = perplexity, tapkee::sne_theta = theta,
-                       tapkee::squishing_rate = squishing];
+        tapkee::kwargs[(tapkee::method = tapkee_method, tapkee::computation_strategy = tapkee_computation_strategy,
+                        tapkee::eigen_method = tapkee_eigen_method, tapkee::neighbors_method = tapkee_neighbors_method,
+                        tapkee::num_neighbors = k, tapkee::target_dimension = target_dim,
+                        tapkee::diffusion_map_timesteps = timesteps, tapkee::gaussian_kernel_width = width,
+                        tapkee::max_iteration = max_iters, tapkee::spe_global_strategy = spe_global,
+                        tapkee::spe_num_updates = spe_num_upd, tapkee::spe_tolerance = spe_tol,
+                        tapkee::landmark_ratio = landmark_rt, tapkee::nullspace_shift = eigenshift,
+                        tapkee::check_connectivity = true, tapkee::fa_epsilon = fa_eps,
+                        tapkee::sne_perplexity = perplexity, tapkee::sne_theta = theta,
+                        tapkee::squishing_rate = squishing)];
 
 #ifdef USE_PRECOMPUTED
     vector<tapkee::IndexType> indices(input_data.cols());
