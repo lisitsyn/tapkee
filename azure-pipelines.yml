@@ -14,7 +14,7 @@ jobs:
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
-      - script: ctest
+      - script: ctest --output-on-failure
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
@@ -35,7 +35,7 @@ jobs:
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
-      - script: ctest
+      - script: ctest --output-on-failure
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
@@ -62,7 +62,7 @@ jobs:
       - script: cmake --build . --config Release
         displayName: 'Build with CMake'
         workingDirectory: build
-      - script: ctest -C Release
+      - script: ctest --output-on-failure -C Release
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
