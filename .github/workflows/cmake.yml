@@ -19,7 +19,7 @@ jobs:
           - name: Ubuntu
             host: ubuntu-latest
           - name: MacOS
-            host: macosx-latest
+            host: macos-latest
           - name: Windows
             host: windows-latest
             
