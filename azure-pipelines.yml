@@ -52,7 +52,7 @@ jobs:
         inputs:
           createCustomEnvironment: True
           environmentName: tapkee
-          packageSpecs: 'python=3.6.* eigen gtest'
+          packageSpecs: 'python=3.11.* eigen gtest'
           createOptions: '-c conda-forge'
           updateConda: false
       - task: CMake@1
