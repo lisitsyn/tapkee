@@ -9,16 +9,41 @@ on:
 env:
   BUILD_TYPE: Release
 
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os.host }}
+    strategy:
+      matrix:
+        os:
+          - name: Ubuntu
+            host: ubuntu-latest
+          - name: MacOS
+            host: macos-latest
+          - name: Windows
+            host: windows-latest
+            
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install dependencies
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os.name == 'Ubuntu'
       run: sudo apt-get install -y libeigen3-dev libarpack2-dev libgtest-dev
-
+      
+    - name: Install dependencies (MacOS)
+      if: matrix.os.name == 'MacOS'
+      run: brew update && brew install arpack eigen googletest
+      
+    - name: Install Miniconda (Windows)
+      if: matrix.os.name == 'Windows'
+      uses: conda-incubator/setup-miniconda@v2.2.0
+      with:
+         channels: conda-forge
+     
+    - name: Install conda packages (Windows)
+      if: matrix.os.name == 'Windows'
+      run: conda install gtest eigen
+      
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
