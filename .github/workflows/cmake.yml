@@ -26,23 +26,23 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install Ubuntu dependencies
+    - name: Install dependencies (Ubuntu)
       if: matrix.os.name == 'Ubuntu'
       run: sudo apt-get install -y libeigen3-dev libarpack2-dev libgtest-dev
       
-    - name: Install MacOS dependencies
+    - name: Install dependencies (MacOS)
       if: matrix.os.name == 'MacOS'
       run: brew update && brew install arpack eigen googletest
       
-    - name: Install Windows Miniconda
+    - name: Install Miniconda (Windows)
       if: matrix.os.name == 'Windows'
       uses: conda-incubator/setup-miniconda@v2.2.0
       with:
          channels: conda-forge
      
-    - name: Install Windows Packages
+    - name: Install conda packages (Windows)
       if: matrix.os.name == 'Windows'
-      run: conda install gtest eight
+      run: conda install gtest eigen
       
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
