@@ -1,9 +1,9 @@
-cmake_minimum_required (VERSION 3.5.1)
+cmake_minimum_required (VERSION 3.8)
 
 project (Tapkee  LANGUAGES CXX)
 
 # set paths
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 20)
 set (TAPKEE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set (TAPKEE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set (TAPKEE_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/unit")

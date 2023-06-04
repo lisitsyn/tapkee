@@ -184,7 +184,7 @@ TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding)
     tapkee::ParametersSet parameters;
     ASSERT_THROW((output = tapkee::embed(
                       data.begin(), data.end(), kcb, dcb, fcb,
-                      tapkee::kwargs[method = KernelLocallyLinearEmbedding, num_neighbors = 6, num_neighbors = 5])),
+                      tapkee::kwargs[(method = KernelLocallyLinearEmbedding, num_neighbors = 6, num_neighbors = 5)])),
                  multiple_parameter_error);
 }
 
