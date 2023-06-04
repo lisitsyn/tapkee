@@ -1,6 +1,6 @@
-project (Tapkee  LANGUAGES CXX)
-
 cmake_minimum_required (VERSION 3.8)
+
+project (Tapkee  LANGUAGES CXX)
 
 # set paths
 set (CMAKE_CXX_STANDARD 20)
