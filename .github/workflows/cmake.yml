@@ -34,14 +34,15 @@ jobs:
       if: matrix.os.name == 'MacOS'
       run: brew update && brew install arpack eigen googletest
       
-    - name: Install Windows dependencies
+    - name: Install Windows Miniconda
       if: matrix.os.name == 'Windows'
       uses: conda-incubator/setup-miniconda@v2.2.0
       with:
          channels: conda-forge
-      run: |
-        conda install eigen gtest
-
+     
+    - name: Install Windows Packages
+      run: conda install gtest eight
+      
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
