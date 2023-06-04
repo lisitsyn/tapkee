@@ -11,13 +11,22 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os.name }}
+    strategy:
+      matrix:
+        os:
+          - name: ubuntu-latest
+            dependencies: sudo apt-get install -y libeigen3-dev libarpack2-dev libgtest-dev
+          - name: macOS-latest
+            dependencies: brew update && brew install arpack eigen googletest
+          - name: windows-latest
+            dependencies: echo "NO"
+            
     steps:
     - uses: actions/checkout@v3
     
     - name: Install dependencies
-      run: sudo apt-get install -y libeigen3-dev libarpack2-dev libgtest-dev
+      run: ${{ matrix.os.dependencies }}
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
