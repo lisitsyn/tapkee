@@ -36,7 +36,11 @@ jobs:
       
     - name: Install Windows dependencies
       if: matrix.os.name == 'Windows'
-      run: echo "Fail"
+      uses: conda-incubator/setup-miniconda@v2.2.0
+      with:
+         channels: conda-forge
+      run: |
+        conda install eigen gtest
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
