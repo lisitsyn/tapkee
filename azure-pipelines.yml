@@ -55,7 +55,7 @@ jobs:
           packageSpecs: 'python=3.11.* eigen gtest'
           createOptions: '-c conda-forge'
           updateConda: false
-      - script: export PATH=$(CONDA_PREFIX)\Library:$PATH
+      - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Library"
         displayName: 'Set environment'
       - task: CMake@1
         displayName: 'Setup with CMake'
