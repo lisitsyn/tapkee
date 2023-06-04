@@ -41,6 +41,7 @@ jobs:
          channels: conda-forge
      
     - name: Install Windows Packages
+      if: matrix.os.name == 'Windows'
       run: conda install gtest eight
       
     - name: Configure CMake
