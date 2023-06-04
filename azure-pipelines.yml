@@ -10,11 +10,11 @@ jobs:
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
-          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $(cmakeOptions) ..
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON ..
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
-      - script: ctest
+      - script: ctest --output-on-failure
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
@@ -31,11 +31,11 @@ jobs:
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
-          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $(cmakeOptions) ..
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON ..
       - script: make
         displayName: 'Build with Make'
         workingDirectory: build
-      - script: ctest
+      - script: ctest --output-on-failure
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
@@ -58,11 +58,11 @@ jobs:
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
-          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library $(cmakeOptions) ..
+          cmakeArgs: -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library ..
       - script: cmake --build . --config Release
         displayName: 'Build with CMake'
         workingDirectory: build
-      - script: ctest -C Release
+      - script: ctest --output-on-failure -C Release
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
