@@ -59,10 +59,10 @@ jobs:
         displayName: 'Setup with CMake'
         inputs:
           cmakeArgs: -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX)\Library ..
-      - script: cmake --build . --config Release
+      - script: cmake --build . --config Debug
         displayName: 'Build with CMake'
         workingDirectory: build
-      - script: ctest --output-on-failure -C Release
+      - script: ctest --output-on-failure -C Debug
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
