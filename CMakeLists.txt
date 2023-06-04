@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.24)
 
 project (Tapkee  LANGUAGES CXX)
 
@@ -16,6 +16,18 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 # Eigen3 detection
 find_package(Eigen3 REQUIRED)
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
+
+# fmt
+include(FetchContent)
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG 10.0.0
+    OVERRIDE_FIND_PACKAGE
+)
+FetchContent_MakeAvailable(fmt)
+include_directories("${FMT_SOURCE_DIR}/include")
+set (FMT_LIBRARY_TO_LINK "fmt::fmt-header-only")
 
 # ARPACK detection
 find_package(Arpack)
@@ -70,6 +82,9 @@ if (VIENNACL_FOUND)
 	target_link_libraries(tapkee_library INTERFACE OpenCL)
 	add_definitions(-DTAPKEE_WITH_VIENNACL)
 endif()
+
+target_link_libraries(tapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
+# target_link_libraries(tapkee_library INTERFACE "${FMT_LIBRARY_TO_LINK}")
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
 	set (TAPKEE_INSTALL_DIR
@@ -150,6 +165,7 @@ if (BUILD_TESTS)
 		get_filename_component(exe ${i} NAME_WE)
 		add_executable(test_${exe} ${i})
 		target_link_libraries(test_${exe} GTest::gtest GTest::gtest_main)
+        target_link_libraries(test_${exe} fmt::fmt-header-only)
 		if (ARPACK_FOUND)
 			target_link_libraries(test_${exe} arpack)
 		endif()

@@ -6,7 +6,7 @@
 #ifndef TAPKEE_LOGGING_H_
 #define TAPKEE_LOGGING_H_
 
-#include <formatting/formatting.hpp>
+#include <fmt/core.h>
 #include <iostream>
 #include <string>
 

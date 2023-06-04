@@ -191,7 +191,7 @@ class TSNE
                     else
                         C = evaluateError(row_P, col_P, val_P, Y, N, theta); // doing approximate computation here!
                     tapkee::LoggingSingleton::instance().message_info(
-                        formatting::format("Iteration {}: error is {}", iter, C));
+                        fmt::format("Iteration {}: error is {}", iter, C));
                 }
             }
             // Clean up memory

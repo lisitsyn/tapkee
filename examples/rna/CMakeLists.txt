@@ -6,4 +6,4 @@ if (ARPACK_FOUND)
 	target_link_libraries(rna arpack)
 endif()
 
-
+target_link_libraries(rna PRIVATE "${FMT_LIBRARY_TO_LINK}")
