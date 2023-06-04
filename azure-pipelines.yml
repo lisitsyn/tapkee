@@ -55,6 +55,8 @@ jobs:
           packageSpecs: 'python=3.11.* eigen gtest'
           createOptions: '-c conda-forge'
           updateConda: false
+      - script: export PATH=$(CONDA_PREFIX)\Library:$PATH
+        displayName: 'Set environment'
       - task: CMake@1
         displayName: 'Setup with CMake'
         inputs:
@@ -62,7 +64,7 @@ jobs:
       - script: cmake --build . --config Release
         displayName: 'Build with CMake'
         workingDirectory: build
-      - script: set PATH=$(CONDA_PREFIX)\Library; ctest --output-on-failure -C Release
+      - script: ctest --output-on-failure -C Release
         displayName: 'Test'
         workingDirectory: build
       - task: PublishBuildArtifacts@1
