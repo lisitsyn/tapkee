@@ -38,7 +38,7 @@ struct timed_context
     ~timed_context()
     {
         std::string message =
-            formatting::format("{} took {} seconds.", operation_name, double(CLOCK_GET - start_clock) / CLOCK_DIVISOR);
+            fmt::format("{} took {} seconds.", operation_name, double(CLOCK_GET - start_clock) / CLOCK_DIVISOR);
         LoggingSingleton::instance().message_benchmark(message);
     }
 };

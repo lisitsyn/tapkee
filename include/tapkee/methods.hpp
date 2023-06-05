@@ -44,7 +44,7 @@ template <typename T> struct Positivity
     }
     inline std::string failureMessage(const stichwort::Parameter& p) const
     {
-        return formatting::format("Positivity check failed for {}, its value is {}", p.name(), p.repr());
+        return fmt::format("Positivity check failed for {}, its value is {}", p.name(), p.repr());
     }
 };
 
@@ -56,7 +56,7 @@ template <typename T> struct NonNegativity
     }
     inline std::string failureMessage(const stichwort::Parameter& p) const
     {
-        return formatting::format("Non-negativity check failed for {}, its value is {}", p.name(), p.repr());
+        return fmt::format("Non-negativity check failed for {}, its value is {}", p.name(), p.repr());
     }
 };
 
@@ -73,8 +73,7 @@ template <typename T> struct InRange
     T upper;
     inline std::string failureMessage(const stichwort::Parameter& p) const
     {
-        return formatting::format("[{}, {}) range check failed for {}, its value is {}", lower, upper, p.name(),
-                                  p.repr());
+        return fmt::format("[{}, {}) range check failed for {}, its value is {}", lower, upper, p.name(), p.repr());
     }
 };
 
@@ -91,8 +90,7 @@ template <typename T> struct InClosedRange
     T upper;
     inline std::string failureMessage(const stichwort::Parameter& p) const
     {
-        return formatting::format("[{}, {}] range check failed for {}, its value is {}", lower, upper, p.name(),
-                                  p.repr());
+        return fmt::format("[{}, {}] range check failed for {}, its value is {}", lower, upper, p.name(), p.repr());
     }
 };
 
