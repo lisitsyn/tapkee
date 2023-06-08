@@ -20,11 +20,11 @@ include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 # fmt
 include(FetchContent)
 FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 10.0.0
-    OVERRIDE_FIND_PACKAGE
-)
+	fmt
+	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+	GIT_TAG 10.0.0
+	OVERRIDE_FIND_PACKAGE
+	)
 FetchContent_MakeAvailable(fmt)
 include_directories("${FMT_SOURCE_DIR}/include")
 set (FMT_LIBRARY_TO_LINK "fmt::fmt-header-only")
@@ -72,14 +72,14 @@ add_library(tapkee_library INTERFACE)
 target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}" "${EIGEN3_INCLUDE_DIR}")
 
 if (ARPACK_FOUND)
-    target_link_libraries(tapkee PUBLIC arpack)
-    target_link_libraries(tapkee_library INTERFACE arpack)
+	target_link_libraries(tapkee PUBLIC arpack)
+	target_link_libraries(tapkee_library INTERFACE arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
 
 if (VIENNACL_FOUND)
-    target_link_libraries(tapkee PUBLIC OpenCL)
-    target_link_libraries(tapkee_library INTERFACE OpenCL)
+	target_link_libraries(tapkee PUBLIC OpenCL)
+	target_link_libraries(tapkee_library INTERFACE OpenCL)
 	add_definitions(-DTAPKEE_WITH_VIENNACL)
 endif()
 
@@ -164,13 +164,13 @@ if (BUILD_TESTS)
 	foreach(i ${TAPKEE_TESTS_SOURCES})
 		get_filename_component(exe ${i} NAME_WE)
 		add_executable(test_${exe} ${i})
-        target_link_libraries(test_${exe} PUBLIC GTest::gtest GTest::gtest_main)
-        target_link_libraries(test_${exe} PUBLIC fmt::fmt-header-only)
+		target_link_libraries(test_${exe} PUBLIC GTest::gtest GTest::gtest_main)
+		target_link_libraries(test_${exe} PUBLIC fmt::fmt-header-only)
 		if (ARPACK_FOUND)
-            target_link_libraries(test_${exe} PUBLIC arpack)
+			target_link_libraries(test_${exe} PUBLIC arpack)
 		endif()
 		if (VIENNACL_FOUND)
-            target_link_libraries(test_${exe} PUBLIC OpenCL)
+			target_link_libraries(test_${exe} PUBLIC OpenCL)
 		endif()
 		add_test(
 			NAME ${exe}
