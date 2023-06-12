@@ -179,3 +179,9 @@ if (BUILD_TESTS)
 			--gtest_color=yes)
 	endforeach()
 endif()
+
+export(
+    TARGETS tapkee_library
+    NAMESPACE tapkee::
+    FILE ${PROJECT_BINARY_DIR}/tapkee.cmake
+)
