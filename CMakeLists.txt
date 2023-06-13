@@ -18,15 +18,7 @@ find_package(Eigen3 REQUIRED)
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 
 # fmt
-include(FetchContent)
-FetchContent_Declare(
-	fmt
-	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG 10.0.0
-	OVERRIDE_FIND_PACKAGE
-	)
-FetchContent_MakeAvailable(fmt)
-include_directories("${FMT_SOURCE_DIR}/include")
+find_package(fmt REQUIRED)
 set (FMT_LIBRARY_TO_LINK "fmt::fmt-header-only")
 
 # ARPACK detection
@@ -83,7 +75,7 @@ if (VIENNACL_FOUND)
 	add_definitions(-DTAPKEE_WITH_VIENNACL)
 endif()
 
-target_link_libraries(tapkee PUBLIC "${FMT_LIBRARY_TO_LINK}")
+target_link_libraries(tapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
 target_link_libraries(tapkee_library INTERFACE "${FMT_LIBRARY_TO_LINK}")
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
@@ -94,25 +86,15 @@ else()
 		"${CMAKE_INSTALL_PREFIX}/include/tapkee")
 endif()
 
+install(
+	DIRECTORY "${TAPKEE_INCLUDE_DIR}/tapkee"
+	DESTINATION "${TAPKEE_INSTALL_DIR}"
+)
 
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/utils/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/utils")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/routines/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/routines")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/callbacks/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/callbacks")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/neighbors/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/neighbors")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/traits/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/traits")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/parameters/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/parameters")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/defines/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/defines")
-file(GLOB headers "${TAPKEE_INCLUDE_DIR}/tapkee/external/barnes_hut_sne/*.hpp")
-install(FILES ${headers} DESTINATION "${TAPKEE_INSTALL_DIR}/external/barnes_hut_sne/")
+install(
+	DIRECTORY "${TAPKEE_INCLUDE_DIR}/stichwort"
+	DESTINATION "${TAPKEE_INSTALL_DIR}"
+)
 
 # G++ specific flags
 option(USE_GCOV "Use gcov to analyze test coverage" OFF)
@@ -165,7 +147,7 @@ if (BUILD_TESTS)
 		get_filename_component(exe ${i} NAME_WE)
 		add_executable(test_${exe} ${i})
 		target_link_libraries(test_${exe} PUBLIC GTest::gtest GTest::gtest_main)
-		target_link_libraries(test_${exe} PUBLIC fmt::fmt-header-only)
+		target_link_libraries(test_${exe} PRIVATE ${FMT_LIBRARY_TO_LINK})
 		if (ARPACK_FOUND)
 			target_link_libraries(test_${exe} PUBLIC arpack)
 		endif()
@@ -181,7 +163,7 @@ if (BUILD_TESTS)
 endif()
 
 export(
-    TARGETS tapkee_library
-    NAMESPACE tapkee::
-    FILE ${PROJECT_BINARY_DIR}/tapkee.cmake
+	TARGETS tapkee_library
+	NAMESPACE tapkee::
+	FILE ${PROJECT_BINARY_DIR}/tapkee.cmake
 )

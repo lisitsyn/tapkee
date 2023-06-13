@@ -28,11 +28,11 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: matrix.os.name == 'Ubuntu'
-      run: sudo apt-get install -y libeigen3-dev libarpack2-dev libgtest-dev
+      run: sudo apt-get install -y libeigen3-dev libarpack2-dev libgtest-dev libfmt-dev
 
     - name: Install dependencies (MacOS)
       if: matrix.os.name == 'MacOS'
-      run: brew install arpack eigen googletest
+      run: brew install arpack eigen googletest fmt
 
     - name: Install Miniconda (Windows)
       if: matrix.os.name == 'Windows'
@@ -42,7 +42,7 @@ jobs:
 
     - name: Install conda packages (Windows)
       if: matrix.os.name == 'Windows'
-      run: conda install gtest eigen
+      run: conda install gtest eigen fmt
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
