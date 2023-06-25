@@ -50,7 +50,7 @@ def embed(data,method):
 	output_file = 'tapkee_output_data'
 	np.savetxt(input_file, data.T,delimiter=',')
 	tapkee_binary = 'bin/tapkee'
-	runner_string = '%s -i %s -o %s -m %s -k 20 --verbose --transpose-output --benchmark' % (tapkee_binary, input_file, output_file, method)
+	runner_string = '%s -i %s -o %s -m %s -k 20 --precompute --verbose --transpose-output --benchmark' % (tapkee_binary, input_file, output_file, method)
 	print('-- To reproduce this use the following command', runner_string)
 	output = subprocess.check_output(runner_string, shell=True)
 	embedded_data = np.loadtxt(output_file, delimiter=',')

@@ -124,12 +124,6 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions(-DTAPKEE_DEBUG)
 endif()
 
-option(PRECOMPUTED "Precompute kernel/distance matrices before reducing dimensionality" OFF)
-
-if (PRECOMPUTED)
-	add_definitions(-DUSE_PRECOMPUTED)
-endif()
-
 option(GPL_FREE "Build without GPL-licensed components" OFF)
 
 if (NOT GPL_FREE)

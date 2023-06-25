@@ -201,7 +201,7 @@ Tapkee comes with a sample application which can be used to construct
 low-dimensional representations of dense feature matrices. For more information on
 its usage please run:
 
-`./bin/tapkee_cli -h`
+`./bin/tapkee -h`
 
 The application takes plain ASCII file containing dense matrix (each vector is a column and each
 line contains values of some feature). The output of the application is stored into the provided
@@ -266,7 +266,7 @@ The repository of Tapkee contains the following directories:
   `doxygen doc/Doxyfile` will generate it in this folder.
 
 Once built, the root will also contain the following directories:
-- `bin` that contains binaries (`tapkee_cli` that is command line application
+- `bin` that contains binaries (`tapkee` that is command line application
   and various tests with common naming `test_*`)
 - `lib` that contains gtest shared libraries.
 

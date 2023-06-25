@@ -165,6 +165,9 @@ int run(int argc, const char **argv)
 #define MS_SQUISHING_RATE_KEYWORD "squishing-rate"
     opt.add("0.99", 0, 1, 0, "Squishing rate of the Manifold Sculpting algorithm (default 0.5)",
             OPT_LONG_PREFIXED(MS_SQUISHING_RATE_KEYWORD));
+#define PRECOMPUTE_KEYWORD "precompute"
+    opt.add("", 0, 0, 0, "Whether distance and kernel matrices should be precomputed (default false)",
+            OPT_LONG_PREFIXED(PRECOMPUTE_KEYWORD));
 
     opt.parse(argc, argv);
 
@@ -397,40 +400,43 @@ int run(int argc, const char **argv)
                         tapkee::sne_perplexity = perplexity, tapkee::sne_theta = theta,
                         tapkee::squishing_rate = squishing)];
 
-#ifdef USE_PRECOMPUTED
-    vector<tapkee::IndexType> indices(input_data.cols());
-    for (tapkee::IndexType i = 0; i < input_data.cols(); ++i)
-        indices[i] = i;
-
-    tapkee::DenseMatrix distance_matrix;
-    tapkee::DenseMatrix kernel_matrix;
+    if (opt.isSet(OPT_LONG_PREFIXED(PRECOMPUTE_KEYWORD)))
     {
-        if (method_needs_distance(tapkee_method))
-        {
-            tapkee::tapkee_internal::timed_context context("[+] Distance matrix computation");
-            distance_matrix = matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
-                                                   tapkee::eigen_distance_callback(input_data));
-        }
-        if (method_needs_kernel(tapkee_method))
-        {
-            tapkee::tapkee_internal::timed_context context("[+] Kernel matrix computation");
-            kernel_matrix = matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
-                                                 tapkee::eigen_kernel_callback(input_data));
-        }
-    }
-    tapkee::precomputed_distance_callback dcb(distance_matrix);
-    tapkee::precomputed_kernel_callback kcb(kernel_matrix);
-    tapkee::eigen_features_callback fcb(input_data);
+        vector<tapkee::IndexType> indices(input_data.cols());
+        for (tapkee::IndexType i = 0; i < input_data.cols(); ++i)
+            indices[i] = i;
 
-    output = tapkee::initialize()
-                 .withParameters(parameters)
-                 .withKernel(kcb)
-                 .withDistance(dcb)
-                 .withFeatures(fcb)
-                 .embedRange(indices.begin(), indices.end());
-#else
-    output = tapkee::initialize().withParameters(parameters).embedUsing(input_data);
-#endif
+        tapkee::DenseMatrix distance_matrix;
+        tapkee::DenseMatrix kernel_matrix;
+        {
+            if (method_needs_distance(tapkee_method))
+            {
+                tapkee::tapkee_internal::timed_context context("[+] Distance matrix computation");
+                distance_matrix = matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
+                                                    tapkee::eigen_distance_callback(input_data));
+            }
+            if (method_needs_kernel(tapkee_method))
+            {
+                tapkee::tapkee_internal::timed_context context("[+] Kernel matrix computation");
+                kernel_matrix = matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
+                                                    tapkee::eigen_kernel_callback(input_data));
+            }
+        }
+        tapkee::precomputed_distance_callback dcb(distance_matrix);
+        tapkee::precomputed_kernel_callback kcb(kernel_matrix);
+        tapkee::eigen_features_callback fcb(input_data);
+
+        output = tapkee::initialize()
+                    .withParameters(parameters)
+                    .withKernel(kcb)
+                    .withDistance(dcb)
+                    .withFeatures(fcb)
+                    .embedRange(indices.begin(), indices.end());
+    }
+    else
+    {
+        output = tapkee::initialize().withParameters(parameters).embedUsing(input_data);
+    }
     // Save obtained data
     if (opt.isSet(OPT_LONG_PREFIXED(TRANSPOSE_OUTPUT_KEYWORD)))
     {
