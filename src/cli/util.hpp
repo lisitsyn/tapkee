@@ -256,7 +256,7 @@ tapkee::DenseMatrix matrix_from_callback(const tapkee::IndexType N, PairwiseCall
 {
     tapkee::DenseMatrix result(N, N);
     tapkee::IndexType i, j;
-#pragma omp parallel for shared(callback, result) private(j) default(none)
+#pragma omp parallel for shared(callback, result, N) private(j) default(none)
     for (i = 0; i < N; ++i)
     {
         for (j = i; j < N; j++)
