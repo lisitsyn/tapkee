@@ -14,8 +14,7 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Eigen3 detection
-find_package(Eigen3 REQUIRED)
-include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 # fmt
 find_package(fmt REQUIRED)
@@ -61,7 +60,7 @@ option(USE_SLASH_CLI_WINDOWS "Whether to use slash command line parameters" OFF)
 # library interface
 file(GLOB_RECURSE headers_library "${TAPKEE_INCLUDE_DIR}/*.hpp")
 add_library(tapkee_library INTERFACE)
-target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}" "${EIGEN3_INCLUDE_DIR}")
+target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}")
 
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee PUBLIC arpack)
@@ -77,6 +76,8 @@ endif()
 
 target_link_libraries(tapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
 target_link_libraries(tapkee_library INTERFACE "${FMT_LIBRARY_TO_LINK}")
+target_link_libraries(tapkee PRIVATE Eigen3::Eigen)
+target_link_libraries(tapkee_library INTERFACE Eigen3::Eigen)
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
 	set (TAPKEE_INSTALL_DIR
