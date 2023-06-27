@@ -14,8 +14,8 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Eigen3 detection
-find_package(Eigen3 REQUIRED)
-include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+set (EIGEN3_LIBRARY_TO_LINK "Eigen3::Eigen")
 
 # fmt
 find_package(fmt REQUIRED)
@@ -61,7 +61,7 @@ option(USE_SLASH_CLI_WINDOWS "Whether to use slash command line parameters" OFF)
 # library interface
 file(GLOB_RECURSE headers_library "${TAPKEE_INCLUDE_DIR}/*.hpp")
 add_library(tapkee_library INTERFACE)
-target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}" "${EIGEN3_INCLUDE_DIR}")
+target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}")
 
 if (ARPACK_FOUND)
 	target_link_libraries(tapkee PUBLIC arpack)
@@ -77,6 +77,8 @@ endif()
 
 target_link_libraries(tapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
 target_link_libraries(tapkee_library INTERFACE "${FMT_LIBRARY_TO_LINK}")
+target_link_libraries(tapkee PRIVATE "${EIGEN3_LIBRARY_TO_LINK}")
+target_link_libraries(tapkee_library INTERFACE "${EIGEN3_LIBRARY_TO_LINK}")
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
 	set (TAPKEE_INSTALL_DIR
@@ -142,6 +144,7 @@ if (BUILD_TESTS)
 		add_executable(test_${exe} ${i})
 		target_link_libraries(test_${exe} PUBLIC GTest::gtest GTest::gtest_main)
 		target_link_libraries(test_${exe} PRIVATE ${FMT_LIBRARY_TO_LINK})
+		target_link_libraries(test_${exe} PRIVATE ${EIGEN3_LIBRARY_TO_LINK})
 		if (ARPACK_FOUND)
 			target_link_libraries(test_${exe} PUBLIC arpack)
 		endif()
