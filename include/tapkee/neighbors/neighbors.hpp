@@ -164,7 +164,7 @@ Neighbors find_neighbors_vptree_impl(const RandomAccessIterator& begin, const Ra
     for (RandomAccessIterator i = begin; i != end; ++i)
     {
         LocalNeighbors local_neighbors = tree.search(i, k + 1);
-        std::erase(local_neighbors, i - begin);
+        std::remove(local_neighbors.begin(), local_neighbors.end(), i - begin);
         neighbors.push_back(local_neighbors);
     }
 
