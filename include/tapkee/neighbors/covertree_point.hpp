@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <stdlib.h>
 
 namespace tapkee
 {
@@ -87,10 +88,15 @@ template <class T> void push(v_array<T>& v, const T& new_ele)
  * @param v vector
  * @param length the new length of the vector
  */
-template <class T> void alloc(v_array<T>& v, int length)
+template <class T> void alloc_array(v_array<T>& v, int length)
 {
     v.elements = (T*)realloc(v.elements, sizeof(T) * length);
     v.length = length;
+}
+
+template <class T> void free_array(v_array<T>& v)
+{
+    free(v.elements);
 }
 
 /**

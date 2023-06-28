@@ -212,7 +212,7 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
             node<P> n = new_node(p);
             n.scale = 100; // A magic number meant to be larger than all scales.
             n.max_dist = 0;
-            alloc(children, size(children));
+            alloc_array(children, size(children));
             n.num_children = size(children);
             n.children = children.elements;
             return n;
@@ -276,7 +276,7 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
                 point_set = far;
                 n.scale = top_scale - max_scale;
                 n.max_dist = max_set(consumed_set);
-                alloc(children, size(children));
+                alloc_array(children, size(children));
                 n.num_children = size(children);
                 n.children = children.elements;
                 return n;
@@ -306,12 +306,12 @@ template <class P, class DistanceCallback> node<P> batch_create(DistanceCallback
     node<P> top =
         batch_insert(dcb, points[0], get_scale(max_dist), get_scale(max_dist), point_set, consumed_set, stack);
     for (int i = 0; i < size(consumed_set); i++)
-        free(consumed_set[i].dist.elements);
-    free(consumed_set.elements);
+        free_array(consumed_set[i].dist);
+    free_array(consumed_set);
     for (int i = 0; i < size(stack); i++)
-        free(stack[i].elements);
-    free(stack.elements);
-    free(point_set.elements);
+        free_array(stack[i]);
+    free_array(stack);
+    free_array(point_set);
     return top;
 }
 
@@ -474,36 +474,14 @@ void update_k(ScalarType* k_upper_bound, ScalarType upper_bound)
     if (end == begin)
         *begin = upper_bound;
 }
-ScalarType* alloc_k()
-{
-    return (ScalarType*)malloc(sizeof(ScalarType) * internal_k);
-}
 void set_k(ScalarType* begin, ScalarType max)
 {
     for (ScalarType* end = begin + internal_k; end != begin; begin++)
         *begin = max;
 }
-
-ScalarType internal_epsilon = 0.;
-// void update_epsilon(ScalarType *upper_bound, ScalarType new_dist) {}
-ScalarType* alloc_epsilon()
+ScalarType* alloc_k()
 {
-    return (ScalarType*)malloc(sizeof(ScalarType));
-}
-void set_epsilon(ScalarType* begin)
-{
-    *begin = internal_epsilon;
-}
-
-void update_unequal(ScalarType* upper_bound, ScalarType new_dist)
-{
-    if (new_dist != 0.)
-        *upper_bound = new_dist;
-}
-ScalarType* (*alloc_unequal)() = alloc_epsilon;
-void set_unequal(ScalarType* begin, ScalarType max)
-{
-    *begin = max;
+    return (ScalarType*)malloc(sizeof(ScalarType) * internal_k);
 }
 
 void (*update)(ScalarType* foo, ScalarType bar) = update_k;
@@ -774,16 +752,16 @@ void batch_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, cons
     {
         v_array<v_array<d_node<P>>> cover_sets2 = spare_cover_sets[i];
         for (int j = 0; j < size(cover_sets2); j++)
-            free(cover_sets2[j].elements);
-        free(cover_sets2.elements);
+            free_array(cover_sets2[j]);
+        free_array(cover_sets2);
     }
-    free(spare_cover_sets.elements);
+    free_array(spare_cover_sets);
 
     push(spare_zero_sets, zero_set);
 
     for (int i = 0; i < size(spare_zero_sets); i++)
-        free(spare_zero_sets[i].elements);
-    free(spare_zero_sets.elements);
+        free_array(spare_zero_sets[i]);
+    free_array(spare_zero_sets);
 }
 
 template <class P, class DistanceCallback>
@@ -797,31 +775,6 @@ void k_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, const no
 
     batch_nearest_neighbor(dcb, top_node, query, results);
 }
-/*
-template <class P, class DistanceCallback>
-void epsilon_nearest_neighbor(DistanceCallback &dcb, const node<P> &top_node,
-        const node<P> &query, v_array<v_array<P> > &results,
-        ScalarType epsilon)
-{
-    internal_epsilon = epsilon;
-    //  update = update_epsilon;
-    setter = set_epsilon;
-    alloc_upper = alloc_epsilon;
-
-    batch_nearest_neighbor(dcb, top_node, query, results);
-}
-
-template <class P, class DistanceCallback>
-void unequal_nearest_neighbor(DistanceCallback &dcb, const node<P> &top_node,
-        const node<P> &query, v_array<v_array<P> > &results)
-{
-    update = update_unequal;
-    setter = set_unequal;
-    alloc_upper = alloc_unequal;
-
-    batch_nearest_neighbor(dcb, top_node, query, results);
-}
-*/
 
 } // namespace tapkee_internal
 } // namespace tapkee
