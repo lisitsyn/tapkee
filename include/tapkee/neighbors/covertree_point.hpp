@@ -122,6 +122,11 @@ template <class T> int resize(v_array<T>& v, int new_size)
     return old_size;
 }
 
+template <class T> T* begin(v_array<T>& v)
+{
+    return v.elements;
+}
+
 /** @brief Class Point to use with John Langford's CoverTree. This
  * class must have some associated functions defined (distance,
  * and print, see below) so it can be used with the CoverTree

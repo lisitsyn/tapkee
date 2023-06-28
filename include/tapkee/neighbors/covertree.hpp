@@ -387,7 +387,7 @@ template <class P> void halfsort(v_array<d_node<P>> cover_set)
 {
     if (size(cover_set) <= 1)
         return;
-    d_node<P>* base_ptr = cover_set.elements;
+    d_node<P>* base_ptr = begin(cover_set);
 
     d_node<P>* hi = &base_ptr[size(cover_set) - 1];
     d_node<P>* right_ptr = hi;
@@ -515,8 +515,8 @@ inline void copy_zero_set(DistanceCallback& dcb, node<P>* query_chi, ScalarType*
                           v_array<d_node<P>>& zero_set, v_array<d_node<P>>& new_zero_set)
 {
     resize(new_zero_set, 0);
-    d_node<P>* end = zero_set.elements + size(zero_set);
-    for (d_node<P>* ele = zero_set.elements; ele != end; ele++)
+    d_node<P>* end = begin(zero_set) + size(zero_set);
+    for (d_node<P>* ele = begin(zero_set); ele != end; ele++)
     {
         ScalarType upper_dist = *new_upper_bound + query_chi->max_dist;
         if (shell(ele->dist, query_chi->parent_dist, upper_dist))
@@ -541,8 +541,8 @@ inline void copy_cover_sets(DistanceCallback& dcb, node<P>* query_chi, ScalarTyp
 {
     for (; current_scale <= max_scale; current_scale++)
     {
-        d_node<P>* ele = cover_sets[current_scale].elements;
-        d_node<P>* end = cover_sets[current_scale].elements + size(cover_sets[current_scale]);
+        d_node<P>* ele = begin(cover_sets[current_scale]);
+        d_node<P>* end = begin(cover_sets[current_scale]) + size(cover_sets[current_scale]);
         for (; ele != end; ele++)
         {
             ScalarType upper_dist = *new_upper_bound + query_chi->max_dist + ele->n->max_dist;
@@ -581,8 +581,8 @@ void print_cover_sets(v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>
     printf("cover set = \n");
     for (; current_scale <= max_scale; current_scale++)
     {
-        d_node<P>* ele = cover_sets[current_scale].elements;
-        d_node<P>* end = cover_sets[current_scale].elements + size(cover_sets[current_scale]);
+        d_node<P>* ele = begin(cover_sets[current_scale]);
+        d_node<P>* end = begin(cover_sets[current_scale]) + size(cover_sets[current_scale]);
         printf("%i\n", current_scale);
         for (; ele != end; ele++)
         {
@@ -590,9 +590,9 @@ void print_cover_sets(v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>
             print(n->p);
         }
     }
-    d_node<P>* end = zero_set.elements + size(zero_set);
+    d_node<P>* end = begin(zero_set) + size(zero_set);
     printf("infinity\n");
-    for (d_node<P>* ele = zero_set.elements; ele != end; ele++)
+    for (d_node<P>* ele = begin(zero_set); ele != end; ele++)
     {
         node<P>* n = (node<P>*)ele->n;
         print(n->p);
@@ -614,8 +614,8 @@ template <class P, class DistanceCallback>
 inline void descend(DistanceCallback& dcb, const node<P>* query, ScalarType* upper_bound, int current_scale,
                     int& max_scale, v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set)
 {
-    d_node<P>* end = cover_sets[current_scale].elements + size(cover_sets[current_scale]);
-    for (d_node<P>* parent = cover_sets[current_scale].elements; parent != end; parent++)
+    d_node<P>* end = begin(cover_sets[current_scale]) + size(cover_sets[current_scale]);
+    for (d_node<P>* parent = begin(cover_sets[current_scale]); parent != end; parent++)
     {
         const node<P>* par = parent->n;
         ScalarType upper_dist = *upper_bound + query->max_dist + query->max_dist;
@@ -693,8 +693,8 @@ void brute_nearest(DistanceCallback& dcb, const node<P>* query, v_array<d_node<P
     {
         v_array<P> temp;
         push(temp, query->p);
-        d_node<P>* end = zero_set.elements + size(zero_set);
-        for (d_node<P>* ele = zero_set.elements; ele != end; ele++)
+        d_node<P>* end = begin(zero_set) + size(zero_set);
+        for (d_node<P>* ele = begin(zero_set); ele != end; ele++)
             if (ele->dist <= *upper_bound)
                 push(temp, ele->n->p);
         push(results, temp);
