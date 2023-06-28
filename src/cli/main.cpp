@@ -100,11 +100,11 @@ int run(int argc, const char **argv)
 #ifdef TAPKEE_USE_LGPL_COVERTREE
         "covertree",
 #else
-        "brute",
+        "vptree",
 #endif
         0, 1, 0,
-        "Neighbors search method (default is 'covertree' if available, 'brute' otherwise). One of the following: "
-        "brute"
+        "Neighbors search method (default is 'covertree' if available, 'vptree' otherwise). One of the following: "
+        "brute,vptree"
 #ifdef TAPKEE_USE_LGPL_COVERTREE
         ",covertree"
 #endif
