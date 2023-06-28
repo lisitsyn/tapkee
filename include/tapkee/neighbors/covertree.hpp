@@ -119,7 +119,7 @@ template <class P> node<P> new_leaf(const P& p)
 template <class P> ScalarType max_set(v_array<ds_node<P>>& v)
 {
     ScalarType max = 0.;
-    for (int i = 0; i < v.index; i++)
+    for (int i = 0; i < size(v); i++)
         if (max < v[i].dist.last())
             max = v[i].dist.last();
     return max;
@@ -152,7 +152,7 @@ template <class P> void split(v_array<ds_node<P>>& point_set, v_array<ds_node<P>
 {
     IndexType new_index = 0;
     ScalarType fmax = dist_of_scale(max_scale);
-    for (int i = 0; i < point_set.index; i++)
+    for (int i = 0; i < size(point_set); i++)
     {
         if (point_set[i].dist.last() <= fmax)
         {
@@ -161,7 +161,7 @@ template <class P> void split(v_array<ds_node<P>>& point_set, v_array<ds_node<P>
         else
             push(far_set, point_set[i]);
     }
-    point_set.index = new_index;
+    resize(point_set, new_index);
 }
 
 template <class P, class DistanceCallback>
@@ -170,7 +170,7 @@ void dist_split(DistanceCallback& dcb, v_array<ds_node<P>>& point_set, v_array<d
 {
     IndexType new_index = 0;
     ScalarType fmax = dist_of_scale(max_scale);
-    for (int i = 0; i < point_set.index; i++)
+    for (int i = 0; i < size(point_set); i++)
     {
         ScalarType new_d;
         new_d = distance(dcb, new_point, point_set[i].p, fmax);
@@ -182,7 +182,7 @@ void dist_split(DistanceCallback& dcb, v_array<ds_node<P>>& point_set, v_array<d
         else
             point_set[new_index++] = point_set[i];
     }
-    point_set.index = new_index;
+    resize(point_set, new_index);
 }
 
 /*
@@ -193,7 +193,7 @@ template <class P, class DistanceCallback>
 node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_scale, v_array<ds_node<P>>& point_set,
                      v_array<ds_node<P>>& consumed_set, v_array<v_array<ds_node<P>>>& stack)
 {
-    if (point_set.index == 0)
+    if (size(point_set) == 0)
         return new_leaf(p);
     else
     {
@@ -203,7 +203,7 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
         {
             v_array<node<P>> children;
             push(children, new_leaf(p));
-            while (point_set.index > 0)
+            while (size(point_set) > 0)
             {
                 push(children, new_leaf(point_set.last().p));
                 push(consumed_set, point_set.last());
@@ -212,8 +212,8 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
             node<P> n = new_node(p);
             n.scale = 100; // A magic number meant to be larger than all scales.
             n.max_dist = 0;
-            alloc(children, children.index);
-            n.num_children = children.index;
+            alloc(children, size(children));
+            n.num_children = size(children);
             n.children = children.elements;
             return n;
         }
@@ -224,7 +224,7 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
 
             node<P> child = batch_insert(dcb, p, next_scale, top_scale, point_set, consumed_set, stack);
 
-            if (point_set.index == 0)
+            if (size(point_set) == 0)
             {
                 push(stack, point_set);
                 point_set = far;
@@ -237,7 +237,7 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
                 push(children, child);
                 v_array<ds_node<P>> new_point_set = pop(stack);
                 v_array<ds_node<P>> new_consumed_set = pop(stack);
-                while (point_set.index != 0)
+                while (size(point_set) != 0)
                 { // O(|point_set| * num_children)
                     P new_point = point_set.last().p;
                     ScalarType new_dist = point_set.last().dist.last();
@@ -254,7 +254,7 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
                     push(children, new_child);
 
                     ScalarType fmax = dist_of_scale(max_scale);
-                    for (int i = 0; i < new_point_set.index; i++) // O(|new_point_set|)
+                    for (int i = 0; i < size(new_point_set); i++) // O(|new_point_set|)
                     {
                         new_point_set[i].dist.decr();
                         if (new_point_set[i].dist.last() <= fmax)
@@ -262,13 +262,13 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
                         else
                             push(far, new_point_set[i]);
                     }
-                    for (int i = 0; i < new_consumed_set.index; i++) // O(|new_point_set|)
+                    for (int i = 0; i < size(new_consumed_set); i++) // O(|new_point_set|)
                     {
                         new_consumed_set[i].dist.decr();
                         push(consumed_set, new_consumed_set[i]);
                     }
-                    new_point_set.index = 0;
-                    new_consumed_set.index = 0;
+                    resize(new_point_set, 0);
+                    resize(new_consumed_set, 0);
                 }
                 push(stack, new_point_set);
                 push(stack, new_consumed_set);
@@ -276,8 +276,8 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
                 point_set = far;
                 n.scale = top_scale - max_scale;
                 n.max_dist = max_set(consumed_set);
-                alloc(children, children.index);
-                n.num_children = children.index;
+                alloc(children, size(children));
+                n.num_children = size(children);
                 n.children = children.elements;
                 return n;
             }
@@ -287,11 +287,11 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
 
 template <class P, class DistanceCallback> node<P> batch_create(DistanceCallback& dcb, v_array<P> points)
 {
-    assert(points.index > 0);
+    assert(size(points) > 0);
     v_array<ds_node<P>> point_set;
     v_array<v_array<ds_node<P>>> stack;
 
-    for (int i = 1; i < points.index; i++)
+    for (int i = 1; i < size(points); i++)
     {
         ds_node<P> temp;
         push(temp.dist, distance(dcb, points[0], points[i], std::numeric_limits<ScalarType>::max()));
@@ -305,10 +305,10 @@ template <class P, class DistanceCallback> node<P> batch_create(DistanceCallback
 
     node<P> top =
         batch_insert(dcb, points[0], get_scale(max_dist), get_scale(max_dist), point_set, consumed_set, stack);
-    for (int i = 0; i < consumed_set.index; i++)
+    for (int i = 0; i < size(consumed_set); i++)
         free(consumed_set[i].dist.elements);
     free(consumed_set.elements);
-    for (int i = 0; i < stack.index; i++)
+    for (int i = 0; i < size(stack); i++)
         free(stack[i].elements);
     free(stack.elements);
     free(point_set.elements);
@@ -317,8 +317,8 @@ template <class P, class DistanceCallback> node<P> batch_create(DistanceCallback
 
 void add_height(int d, v_array<int>& heights)
 {
-    if (heights.index <= d)
-        for (; heights.index <= d;)
+    if (size(heights) <= d)
+        for (; size(heights) <= d;)
             push(heights, 0);
     heights[d] = heights[d] + 1;
 }
@@ -385,11 +385,11 @@ template <class P> inline ScalarType compare(const d_node<P>* p1, const d_node<P
 
 template <class P> void halfsort(v_array<d_node<P>> cover_set)
 {
-    if (cover_set.index <= 1)
+    if (size(cover_set) <= 1)
         return;
     d_node<P>* base_ptr = cover_set.elements;
 
-    d_node<P>* hi = &base_ptr[cover_set.index - 1];
+    d_node<P>* hi = &base_ptr[size(cover_set) - 1];
     d_node<P>* right_ptr = hi;
     d_node<P>* left_ptr;
 
@@ -442,7 +442,7 @@ template <class P> void halfsort(v_array<d_node<P>> cover_set)
 template <class P> v_array<v_array<d_node<P>>> get_cover_sets(v_array<v_array<v_array<d_node<P>>>>& spare_cover_sets)
 {
     v_array<v_array<d_node<P>>> ret = pop(spare_cover_sets);
-    while (ret.index < 101)
+    while (size(ret) < 101)
     {
         v_array<d_node<P>> temp;
         push(ret, temp);
@@ -514,8 +514,8 @@ template <class P, class DistanceCallback>
 inline void copy_zero_set(DistanceCallback& dcb, node<P>* query_chi, ScalarType* new_upper_bound,
                           v_array<d_node<P>>& zero_set, v_array<d_node<P>>& new_zero_set)
 {
-    new_zero_set.index = 0;
-    d_node<P>* end = zero_set.elements + zero_set.index;
+    resize(new_zero_set, 0);
+    d_node<P>* end = zero_set.elements + size(zero_set);
     for (d_node<P>* ele = zero_set.elements; ele != end; ele++)
     {
         ScalarType upper_dist = *new_upper_bound + query_chi->max_dist;
@@ -542,7 +542,7 @@ inline void copy_cover_sets(DistanceCallback& dcb, node<P>* query_chi, ScalarTyp
     for (; current_scale <= max_scale; current_scale++)
     {
         d_node<P>* ele = cover_sets[current_scale].elements;
-        d_node<P>* end = cover_sets[current_scale].elements + cover_sets[current_scale].index;
+        d_node<P>* end = cover_sets[current_scale].elements + size(cover_sets[current_scale]);
         for (; ele != end; ele++)
         {
             ScalarType upper_dist = *new_upper_bound + query_chi->max_dist + ele->n->max_dist;
@@ -582,7 +582,7 @@ void print_cover_sets(v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>
     for (; current_scale <= max_scale; current_scale++)
     {
         d_node<P>* ele = cover_sets[current_scale].elements;
-        d_node<P>* end = cover_sets[current_scale].elements + cover_sets[current_scale].index;
+        d_node<P>* end = cover_sets[current_scale].elements + size(cover_sets[current_scale]);
         printf("%i\n", current_scale);
         for (; ele != end; ele++)
         {
@@ -590,7 +590,7 @@ void print_cover_sets(v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>
             print(n->p);
         }
     }
-    d_node<P>* end = zero_set.elements + zero_set.index;
+    d_node<P>* end = zero_set.elements + size(zero_set);
     printf("infinity\n");
     for (d_node<P>* ele = zero_set.elements; ele != end; ele++)
     {
@@ -614,7 +614,7 @@ template <class P, class DistanceCallback>
 inline void descend(DistanceCallback& dcb, const node<P>* query, ScalarType* upper_bound, int current_scale,
                     int& max_scale, v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set)
 {
-    d_node<P>* end = cover_sets[current_scale].elements + cover_sets[current_scale].index;
+    d_node<P>* end = cover_sets[current_scale].elements + size(cover_sets[current_scale]);
     for (d_node<P>* parent = cover_sets[current_scale].elements; parent != end; parent++)
     {
         const node<P>* par = parent->n;
@@ -686,14 +686,14 @@ void brute_nearest(DistanceCallback& dcb, const node<P>* query, v_array<d_node<P
             brute_nearest(dcb, query_chi, new_zero_set, new_upper_bound, results, spare_zero_sets);
         }
         free(new_upper_bound);
-        new_zero_set.index = 0;
+        resize(new_zero_set, 0);
         push(spare_zero_sets, new_zero_set);
     }
     else
     {
         v_array<P> temp;
         push(temp, query->p);
-        d_node<P>* end = zero_set.elements + zero_set.index;
+        d_node<P>* end = zero_set.elements + size(zero_set);
         for (d_node<P>* ele = zero_set.elements; ele != end; ele++)
             if (ele->dist <= *upper_bound)
                 push(temp, ele->n->p);
@@ -729,7 +729,7 @@ void internal_batch_nearest_neighbor(DistanceCallback& dcb, const node<P>* query
                                             new_upper_bound, results, spare_cover_sets, spare_zero_sets);
         }
         free(new_upper_bound);
-        new_zero_set.index = 0;
+        resize(new_zero_set, 0);
         push(spare_zero_sets, new_zero_set);
         push(spare_cover_sets, new_cover_sets);
         internal_batch_nearest_neighbor(dcb, query->children, cover_sets, zero_set, current_scale, max_scale,
@@ -739,7 +739,7 @@ void internal_batch_nearest_neighbor(DistanceCallback& dcb, const node<P>* query
     {
         halfsort(cover_sets[current_scale]);
         descend(dcb, query, upper_bound, current_scale, max_scale, cover_sets, zero_set);
-        cover_sets[current_scale++].index = 0;
+        resize(cover_sets[current_scale++], 0);
         internal_batch_nearest_neighbor(dcb, query, cover_sets, zero_set, current_scale, max_scale, upper_bound,
                                         results, spare_cover_sets, spare_zero_sets);
     }
@@ -770,10 +770,10 @@ void batch_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, cons
     free(upper_bound);
     push(spare_cover_sets, cover_sets);
 
-    for (int i = 0; i < spare_cover_sets.index; i++)
+    for (int i = 0; i < size(spare_cover_sets); i++)
     {
         v_array<v_array<d_node<P>>> cover_sets2 = spare_cover_sets[i];
-        for (int j = 0; j < cover_sets2.index; j++)
+        for (int j = 0; j < size(cover_sets2); j++)
             free(cover_sets2[j].elements);
         free(cover_sets2.elements);
     }
@@ -781,7 +781,7 @@ void batch_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, cons
 
     push(spare_zero_sets, zero_set);
 
-    for (int i = 0; i < spare_zero_sets.index; i++)
+    for (int i = 0; i < size(spare_zero_sets); i++)
         free(spare_zero_sets[i].elements);
     free(spare_zero_sets.elements);
 }

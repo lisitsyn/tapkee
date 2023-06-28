@@ -110,6 +110,18 @@ template <class T> v_array<T> pop(v_array<v_array<T>>& stack)
         return v_array<T>();
 }
 
+template <class T> int size(v_array<T>& v)
+{
+    return v.index;
+}
+
+template <class T> int resize(v_array<T>& v, int new_size)
+{
+    int old_size = v.index;
+    v.index = new_size;
+    return old_size;
+}
+
 /** @brief Class Point to use with John Langford's CoverTree. This
  * class must have some associated functions defined (distance,
  * and print, see below) so it can be used with the CoverTree
