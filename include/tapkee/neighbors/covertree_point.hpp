@@ -94,10 +94,6 @@ template <class T> void alloc_array(v_array<T>& v, int length)
     v.length = length;
 }
 
-template <class T> void free_array(v_array<T>& v)
-{
-}
-
 /**
  * Returns the vector previous to the pointed one in the stack of
  * vectors and decrements the index of the stack. No memory is

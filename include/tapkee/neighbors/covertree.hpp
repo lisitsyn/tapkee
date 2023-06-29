@@ -63,10 +63,6 @@ template <class P> struct node
     short int scale;
 };
 
-template <class P> void free_children(const node<P>& n)
-{
-}
-
 /**
  * Cover tree node with an associated set of distances TODO better doc
  */
@@ -299,13 +295,6 @@ template <class P, class DistanceCallback> node<P> batch_create(DistanceCallback
 
     node<P> top =
         batch_insert(dcb, points[0], get_scale(max_dist), get_scale(max_dist), point_set, consumed_set, stack);
-    for (int i = 0; i < size(consumed_set); i++)
-        free_array(consumed_set[i].dist);
-    free_array(consumed_set);
-    for (int i = 0; i < size(stack); i++)
-        free_array(stack[i]);
-    free_array(stack);
-    free_array(point_set);
     return top;
 }
 
@@ -743,17 +732,9 @@ void batch_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, cons
     for (int i = 0; i < size(spare_cover_sets); i++)
     {
         v_array<v_array<d_node<P>>> cover_sets2 = spare_cover_sets[i];
-        for (int j = 0; j < size(cover_sets2); j++)
-            free_array(cover_sets2[j]);
-        free_array(cover_sets2);
     }
-    free_array(spare_cover_sets);
 
     push(spare_zero_sets, zero_set);
-
-    for (int i = 0; i < size(spare_zero_sets); i++)
-        free_array(spare_zero_sets[i]);
-    free_array(spare_zero_sets);
 }
 
 template <class P, class DistanceCallback>
