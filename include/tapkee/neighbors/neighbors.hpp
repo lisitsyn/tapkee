@@ -109,11 +109,11 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
             local_neighbors.push_back(res[i][j].iter_ - begin);
         }
         neighbors[res[i][0].iter_ - begin] = local_neighbors;
-        free(res[i].elements);
+        free_array(res[i]);
     };
-    free(res.elements);
+    free_array(res);
     free_children(ct);
-    free(points.elements);
+    free_array(points);
     return neighbors;
 }
 #endif
