@@ -8,6 +8,7 @@
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
+#include <tapkee/predicates.hpp>
 #include <tapkee/external/barnes_hut_sne/tsne.hpp>
 #include <tapkee/neighbors/neighbors.hpp>
 #include <tapkee/parameters/context.hpp>
@@ -36,63 +37,6 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-template <typename T> struct Positivity
-{
-    inline bool operator()(T v) const
-    {
-        return v > 0;
-    }
-    inline std::string failureMessage(const stichwort::Parameter& p) const
-    {
-        return fmt::format("Positivity check failed for {}, its value is {}", p.name(), p.repr());
-    }
-};
-
-template <typename T> struct NonNegativity
-{
-    inline bool operator()(T v) const
-    {
-        return v >= 0;
-    }
-    inline std::string failureMessage(const stichwort::Parameter& p) const
-    {
-        return fmt::format("Non-negativity check failed for {}, its value is {}", p.name(), p.repr());
-    }
-};
-
-template <typename T> struct InRange
-{
-    InRange(T l, T u) : lower(l), upper(u)
-    {
-    }
-    inline bool operator()(T v) const
-    {
-        return (v >= lower) && (v < upper);
-    }
-    T lower;
-    T upper;
-    inline std::string failureMessage(const stichwort::Parameter& p) const
-    {
-        return fmt::format("[{}, {}) range check failed for {}, its value is {}", lower, upper, p.name(), p.repr());
-    }
-};
-
-template <typename T> struct InClosedRange
-{
-    InClosedRange(T l, T u) : lower(l), upper(u)
-    {
-    }
-    inline bool operator()(T v) const
-    {
-        return (v >= lower) && (v <= upper);
-    }
-    T lower;
-    T upper;
-    inline std::string failureMessage(const stichwort::Parameter& p) const
-    {
-        return fmt::format("[{}, {}] range check failed for {}, its value is {}", lower, upper, p.name(), p.repr());
-    }
-};
 
 template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>
 class ImplementationBase
@@ -296,7 +240,6 @@ class ImplementationBase
         for (IndexType i = 0; i < static_cast<IndexType>(p_target_dimension); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));
         return TapkeeOutput(embedding.first, unimplementedProjectingFunction());
-#undef MDS_MATRIX_OP
     }
 
     TapkeeOutput embedLandmarkMultidimensionalScaling()

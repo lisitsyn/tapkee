@@ -30,6 +30,8 @@
 #include <tapkee/projection.hpp>
 /* End of Tapkee includes */
 
+#include <fmt/core.h>
+
 #ifdef TAPKEE_CUSTOM_PROPERTIES
 #include TAPKEE_CUSTOM_PROPERTIES
 #else
