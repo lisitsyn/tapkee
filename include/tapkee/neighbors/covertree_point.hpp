@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <stdlib.h>
 
 namespace tapkee
 {
@@ -42,7 +43,7 @@ template <class T> class v_array
     }
 
     /** Create an empty v_array */
-    v_array() : index(0), length(0), elements(NULL)
+    v_array() : index(0), length(0), elements()
     {
     }
 
@@ -62,7 +63,7 @@ template <class T> class v_array
     int length;
 
     /** Pointer to the beginning of the v_array elements */
-    T* elements;
+    std::vector<T> elements;
 };
 
 /**
@@ -76,7 +77,7 @@ template <class T> void push(v_array<T>& v, const T& new_ele)
     while (v.index >= v.length)
     {
         v.length = 2 * v.length + 3;
-        v.elements = (T*)realloc(v.elements, sizeof(T) * v.length);
+        v.elements.resize(v.length);
     }
     v[v.index++] = new_ele;
 }
@@ -87,9 +88,9 @@ template <class T> void push(v_array<T>& v, const T& new_ele)
  * @param v vector
  * @param length the new length of the vector
  */
-template <class T> void alloc(v_array<T>& v, int length)
+template <class T> void alloc_array(v_array<T>& v, int length)
 {
-    v.elements = (T*)realloc(v.elements, sizeof(T) * length);
+    v.elements.resize(length);
     v.length = length;
 }
 
@@ -108,6 +109,23 @@ template <class T> v_array<T> pop(v_array<v_array<T>>& stack)
         return stack[--stack.index];
     else
         return v_array<T>();
+}
+
+template <class T> int size(v_array<T>& v)
+{
+    return v.index;
+}
+
+template <class T> int resize(v_array<T>& v, int new_size)
+{
+    int old_size = v.index;
+    v.index = new_size;
+    return old_size;
+}
+
+template <class T> auto begin(v_array<T>& v)
+{
+    return v.elements.begin();
 }
 
 /** @brief Class Point to use with John Langford's CoverTree. This
