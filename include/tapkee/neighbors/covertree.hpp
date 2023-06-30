@@ -12,6 +12,7 @@
 
 /* Tapkee includes */
 #include <tapkee/neighbors/covertree_point.hpp>
+#include <tapkee/neighbors/covertree/structures.hpp>
 /* End of Tapkee includes */
 
 #include <assert.h>
@@ -28,83 +29,108 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-/**
- * Cover tree node TODO better doc
- */
-template <class P> struct node
+template <class P, class DistanceCallback>
+class CoverTreeWrapper
 {
-    node() : p(), max_dist(0.0), parent_dist(0.0), children(), num_children(0), scale(0)
-    {
-    }
+    public:
+        CoverTreeWrapper() :
+            base(COVERTREE_BASE),
+            il2(1. / log(base)),
+            internal_k(1)
+        {
 
-    node(P _p, ScalarType _max_dist, ScalarType _parent_dist, std::vector<node<P>> _children, unsigned short int _num_children,
-         short int _scale)
-        : p(_p), max_dist(_max_dist), parent_dist(_parent_dist), children(_children), num_children(_num_children),
-          scale(_scale)
-    {
-    }
+        }
 
-    /** Point */
-    P p;
+        void split(v_array<ds_node<P>>& point_set, v_array<ds_node<P>>& far_set, int max_scale);
 
-    /** The maximum distance to any grandchild */
-    ScalarType max_dist;
+        void dist_split(DistanceCallback& dcb, v_array<ds_node<P>>& point_set, v_array<ds_node<P>>& new_point_set, P new_point, int max_scale);
 
-    /** The distance to the parent */
-    ScalarType parent_dist;
+        node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_scale, v_array<ds_node<P>>& point_set,
+                     v_array<ds_node<P>>& consumed_set, v_array<v_array<ds_node<P>>>& stack);
 
-    /** Pointer to the list of children of this node */
-    std::vector<node<P>> children;
+        node<P> batch_create(DistanceCallback& dcb, v_array<P> points);
 
-    /** The number of children nodes of this node */
-    unsigned short int num_children;
+        void k_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, const node<P>& query, v_array<v_array<P>>& results, int k);
 
-    /** Essentially, an upper bound on the distance to any child */
-    short int scale;
+        void batch_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, const node<P>& query, v_array<v_array<P>>& results);
+
+        void internal_batch_nearest_neighbor(
+            DistanceCallback& dcb, const node<P>* query,
+            v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set,
+            int current_scale, int max_scale, std::vector<ScalarType>& upper_bound,
+            v_array<v_array<P>>& results,
+            v_array<v_array<v_array<d_node<P>>>>& spare_cover_sets,
+            v_array<v_array<d_node<P>>>& spare_zero_sets
+        );
+
+        void brute_nearest(
+            DistanceCallback& dcb, const node<P>* query, v_array<d_node<P>> zero_set, std::vector<ScalarType>& upper_bound,
+            v_array<v_array<P>>& results, v_array<v_array<d_node<P>>>& spare_zero_sets
+        );
+
+        void descend(
+            DistanceCallback& dcb, const node<P>* query, std::vector<ScalarType>& upper_bound, int current_scale,
+            int& max_scale, v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set
+        );
+
+        void copy_cover_sets(
+            DistanceCallback& dcb, const node<P>* query_chi, std::vector<ScalarType>& new_upper_bound,
+            v_array<v_array<d_node<P>>>& cover_sets, v_array<v_array<d_node<P>>>& new_cover_sets,
+            int current_scale, int max_scale
+        );
+
+        void copy_zero_set(
+            DistanceCallback& dcb, const node<P>* query_chi, std::vector<ScalarType>& new_upper_bound,
+            v_array<d_node<P>>& zero_set, v_array<d_node<P>>& new_zero_set
+        );
+
+        v_array<v_array<d_node<P>>> get_cover_sets(v_array<v_array<v_array<d_node<P>>>>& spare_cover_sets);
+
+        inline ScalarType dist_of_scale(int s)
+        {
+            return pow(base, s);
+        }
+
+        inline int get_scale(ScalarType d)
+        {
+            return (int)ceil(il2 * log(d));
+        }
+
+        void update(std::vector<ScalarType>& k_upper_bound, ScalarType upper_bound)
+        {
+            auto end = k_upper_bound.begin() + internal_k - 1;
+            auto begin = k_upper_bound.begin();
+            for (; end != begin; begin++)
+            {
+                if (upper_bound < *(begin + 1))
+                    *begin = *(begin + 1);
+                else
+                {
+                    *begin = upper_bound;
+                    break;
+                }
+            }
+            if (end == begin)
+                *begin = upper_bound;
+        }
+
+        void setter(std::vector<ScalarType>& vector, ScalarType max)
+        {
+            auto begin = vector.begin();
+            for (auto end = begin + internal_k; end != begin; begin++)
+                *begin = max;
+        }
+
+        std::vector<ScalarType> alloc_upper()
+        {
+            return std::vector<ScalarType>(internal_k);
+        }
+
+    private:
+        ScalarType base;
+        ScalarType il2;
+        int internal_k;
 };
-
-/**
- * Cover tree node with an associated set of distances TODO better doc
- */
-template <class P> struct ds_node
-{
-
-    ds_node() : dist(), p()
-    {
-    }
-
-    /** Vector of distances TODO better doc*/
-    v_array<ScalarType> dist;
-
-    /** Point TODO better doc */
-    P p;
-};
-
-static ScalarType base = COVERTREE_BASE;
-static ScalarType il2 = 1. / log(base);
-
-inline ScalarType dist_of_scale(int s)
-{
-    return pow(base, s);
-}
-
-inline int get_scale(ScalarType d)
-{
-    return (int)ceil(il2 * log(d));
-}
-
-template <class P> node<P> new_node(const P& p)
-{
-    node<P> new_node;
-    new_node.p = p;
-    return new_node;
-}
-
-template <class P> node<P> new_leaf(const P& p)
-{
-    node<P> new_leaf(p, 0., 0., {}, 0, 100);
-    return new_leaf;
-}
 
 template <class P> ScalarType max_set(v_array<ds_node<P>>& v)
 {
@@ -115,30 +141,8 @@ template <class P> ScalarType max_set(v_array<ds_node<P>>& v)
     return max;
 }
 
-void print_space(int s)
-{
-    for (int i = 0; i < s; i++)
-        printf(" ");
-}
-
-template <class P> void print(int depth, node<P>& top_node)
-{
-    print_space(depth);
-    print(top_node.p);
-    if (top_node.num_children > 0)
-    {
-        print_space(depth);
-        printf("scale = %i\n", top_node.scale);
-        print_space(depth);
-        printf("max_dist = %f\n", top_node.max_dist);
-        print_space(depth);
-        printf("num children = %i\n", top_node.num_children);
-        for (int i = 0; i < top_node.num_children; i++)
-            print(depth + 1, top_node.children[i]);
-    }
-}
-
-template <class P> void split(v_array<ds_node<P>>& point_set, v_array<ds_node<P>>& far_set, int max_scale)
+template <class P, class D>
+void CoverTreeWrapper<P, D>::split(v_array<ds_node<P>>& point_set, v_array<ds_node<P>>& far_set, int max_scale)
 {
     IndexType new_index = 0;
     ScalarType fmax = dist_of_scale(max_scale);
@@ -155,8 +159,9 @@ template <class P> void split(v_array<ds_node<P>>& point_set, v_array<ds_node<P>
 }
 
 template <class P, class DistanceCallback>
-void dist_split(DistanceCallback& dcb, v_array<ds_node<P>>& point_set, v_array<ds_node<P>>& new_point_set, P new_point,
-                int max_scale)
+void CoverTreeWrapper<P, DistanceCallback>::dist_split(
+    DistanceCallback& dcb, v_array<ds_node<P>>& point_set, v_array<ds_node<P>>& new_point_set, P new_point, int max_scale
+)
 {
     IndexType new_index = 0;
     ScalarType fmax = dist_of_scale(max_scale);
@@ -180,8 +185,10 @@ void dist_split(DistanceCallback& dcb, v_array<ds_node<P>>& point_set, v_array<d
    point_set contains points which are 2*max_scale or less away.
    */
 template <class P, class DistanceCallback>
-node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_scale, v_array<ds_node<P>>& point_set,
-                     v_array<ds_node<P>>& consumed_set, v_array<v_array<ds_node<P>>>& stack)
+node<P> CoverTreeWrapper<P, DistanceCallback>::batch_insert(
+    DistanceCallback& dcb, const P& p, int max_scale, int top_scale, v_array<ds_node<P>>& point_set,
+    v_array<ds_node<P>>& consumed_set, v_array<v_array<ds_node<P>>>& stack
+)
 {
     if (size(point_set) == 0)
         return new_leaf(p);
@@ -275,7 +282,8 @@ node<P> batch_insert(DistanceCallback& dcb, const P& p, int max_scale, int top_s
     }
 }
 
-template <class P, class DistanceCallback> node<P> batch_create(DistanceCallback& dcb, v_array<P> points)
+template <class P, class DistanceCallback>
+node<P> CoverTreeWrapper<P, DistanceCallback>::batch_create(DistanceCallback& dcb, v_array<P> points)
 {
     assert(size(points) > 0);
     v_array<ds_node<P>> point_set;
@@ -349,23 +357,6 @@ template <class P> void breadth_dist(const node<P> top_node, v_array<int>& bread
     }
 }
 
-/**
- * List of cover tree nodes associated to a distance TODO better doc
- */
-template <class P> struct d_node
-{
-    /** Distance TODO better doc*/
-    ScalarType dist;
-
-    /** List of nodes TODO better doc*/
-    const node<P>* n;
-};
-
-template <class P> inline ScalarType compare(const d_node<P>& p1, const d_node<P>& p2)
-{
-    return p1.dist - p2.dist;
-}
-
 template <class P> void halfsort(v_array<d_node<P>> cover_set)
 {
     if (size(cover_set) <= 1)
@@ -422,7 +413,8 @@ template <class P> void halfsort(v_array<d_node<P>> cover_set)
     }
 }
 
-template <class P> v_array<v_array<d_node<P>>> get_cover_sets(v_array<v_array<v_array<d_node<P>>>>& spare_cover_sets)
+template <class P, class D>
+v_array<v_array<d_node<P>>> CoverTreeWrapper<P, D>::get_cover_sets(v_array<v_array<v_array<d_node<P>>>>& spare_cover_sets)
 {
     v_array<v_array<d_node<P>>> ret = pop(spare_cover_sets);
     while (size(ret) < 101)
@@ -439,42 +431,11 @@ inline bool shell(ScalarType parent_query_dist, ScalarType child_parent_dist, Sc
     //    && child_parent_dist - parent_query_dist <= upper_bound;
 }
 
-int internal_k = 1;
-void update_k(std::vector<ScalarType>& k_upper_bound, ScalarType upper_bound)
-{
-    auto end = k_upper_bound.begin() + internal_k - 1;
-    auto begin = k_upper_bound.begin();
-    for (; end != begin; begin++)
-    {
-        if (upper_bound < *(begin + 1))
-            *begin = *(begin + 1);
-        else
-        {
-            *begin = upper_bound;
-            break;
-        }
-    }
-    if (end == begin)
-        *begin = upper_bound;
-}
-void set_k(std::vector<ScalarType>& vector, ScalarType max)
-{
-    auto begin = vector.begin();
-    for (auto end = begin + internal_k; end != begin; begin++)
-        *begin = max;
-}
-std::vector<ScalarType> alloc_k()
-{
-    return std::vector<ScalarType>(internal_k);
-}
-
-void (*update)(std::vector<ScalarType>& foo, ScalarType bar) = update_k;
-void (*setter)(std::vector<ScalarType>& foo, ScalarType bar) = set_k;
-std::vector<ScalarType> (*alloc_upper)() = alloc_k;
-
 template <class P, class DistanceCallback>
-inline void copy_zero_set(DistanceCallback& dcb, const node<P>* query_chi, std::vector<ScalarType>& new_upper_bound,
-                          v_array<d_node<P>>& zero_set, v_array<d_node<P>>& new_zero_set)
+void CoverTreeWrapper<P, DistanceCallback>::copy_zero_set(
+    DistanceCallback& dcb, const node<P>* query_chi, std::vector<ScalarType>& new_upper_bound,
+    v_array<d_node<P>>& zero_set, v_array<d_node<P>>& new_zero_set
+)
 {
     resize(new_zero_set, 0);
     auto end = begin(zero_set) + size(zero_set);
@@ -497,9 +458,11 @@ inline void copy_zero_set(DistanceCallback& dcb, const node<P>* query_chi, std::
 }
 
 template <class P, class DistanceCallback>
-inline void copy_cover_sets(DistanceCallback& dcb, const node<P>* query_chi, std::vector<ScalarType>& new_upper_bound,
-                            v_array<v_array<d_node<P>>>& cover_sets, v_array<v_array<d_node<P>>>& new_cover_sets,
-                            int current_scale, int max_scale)
+void CoverTreeWrapper<P, DistanceCallback>::copy_cover_sets(
+    DistanceCallback& dcb, const node<P>* query_chi, std::vector<ScalarType>& new_upper_bound,
+    v_array<v_array<d_node<P>>>& cover_sets, v_array<v_array<d_node<P>>>& new_cover_sets,
+    int current_scale, int max_scale
+)
 {
     for (; current_scale <= max_scale; current_scale++)
     {
@@ -524,43 +487,6 @@ inline void copy_cover_sets(DistanceCallback& dcb, const node<P>* query_chi, std
     }
 }
 
-template <class P> void print_query(const node<P>* top_node)
-{
-    printf("query = \n");
-    print(top_node->p);
-    if (top_node->num_children > 0)
-    {
-        printf("scale = %i\n", top_node->scale);
-        printf("max_dist = %f\n", top_node->max_dist);
-        printf("num children = %i\n", top_node->num_children);
-    }
-}
-
-template <class P>
-void print_cover_sets(v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set, int current_scale,
-                      int max_scale)
-{
-    printf("cover set = \n");
-    for (; current_scale <= max_scale; current_scale++)
-    {
-        d_node<P>* ele = begin(cover_sets[current_scale]);
-        d_node<P>* end = begin(cover_sets[current_scale]) + size(cover_sets[current_scale]);
-        printf("%i\n", current_scale);
-        for (; ele != end; ele++)
-        {
-            node<P>* n = (node<P>*)ele->n;
-            print(n->p);
-        }
-    }
-    d_node<P>* end = begin(zero_set) + size(zero_set);
-    printf("infinity\n");
-    for (d_node<P>* ele = begin(zero_set); ele != end; ele++)
-    {
-        node<P>* n = (node<P>*)ele->n;
-        print(n->p);
-    }
-}
-
 /*
    An optimization to consider:
    Make all distance evaluations occur in descend.
@@ -573,8 +499,10 @@ void print_cover_sets(v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>
    Compute distances in the presence of the tighter upper bound.
    */
 template <class P, class DistanceCallback>
-inline void descend(DistanceCallback& dcb, const node<P>* query, std::vector<ScalarType>& upper_bound, int current_scale,
-                    int& max_scale, v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set)
+void CoverTreeWrapper<P, DistanceCallback>::descend(
+    DistanceCallback& dcb, const node<P>* query, std::vector<ScalarType>& upper_bound, int current_scale,
+    int& max_scale, v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set
+)
 {
     auto end = begin(cover_sets[current_scale]) + size(cover_sets[current_scale]);
     for (auto parent = begin(cover_sets[current_scale]); parent != end; parent++)
@@ -630,8 +558,10 @@ inline void descend(DistanceCallback& dcb, const node<P>* query, std::vector<Sca
 }
 
 template <class P, class DistanceCallback>
-void brute_nearest(DistanceCallback& dcb, const node<P>* query, v_array<d_node<P>> zero_set, std::vector<ScalarType>& upper_bound,
-                   v_array<v_array<P>>& results, v_array<v_array<d_node<P>>>& spare_zero_sets)
+void CoverTreeWrapper<P, DistanceCallback>::brute_nearest(
+    DistanceCallback& dcb, const node<P>* query, v_array<d_node<P>> zero_set, std::vector<ScalarType>& upper_bound,
+    v_array<v_array<P>>& results, v_array<v_array<d_node<P>>>& spare_zero_sets
+)
 {
     if (query->num_children > 0)
     {
@@ -663,12 +593,14 @@ void brute_nearest(DistanceCallback& dcb, const node<P>* query, v_array<d_node<P
 }
 
 template <class P, class DistanceCallback>
-void internal_batch_nearest_neighbor(DistanceCallback& dcb, const node<P>* query,
-                                     v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set,
-                                     int current_scale, int max_scale, std::vector<ScalarType>& upper_bound,
-                                     v_array<v_array<P>>& results,
-                                     v_array<v_array<v_array<d_node<P>>>>& spare_cover_sets,
-                                     v_array<v_array<d_node<P>>>& spare_zero_sets)
+void CoverTreeWrapper<P, DistanceCallback>::internal_batch_nearest_neighbor(
+    DistanceCallback& dcb, const node<P>* query,
+    v_array<v_array<d_node<P>>>& cover_sets, v_array<d_node<P>>& zero_set,
+    int current_scale, int max_scale, std::vector<ScalarType>& upper_bound,
+    v_array<v_array<P>>& results,
+    v_array<v_array<v_array<d_node<P>>>>& spare_cover_sets,
+    v_array<v_array<d_node<P>>>& spare_zero_sets
+)
 {
     if (current_scale > max_scale) // All remaining points are in the zero set.
         brute_nearest(dcb, query, zero_set, upper_bound, results, spare_zero_sets);
@@ -706,8 +638,9 @@ void internal_batch_nearest_neighbor(DistanceCallback& dcb, const node<P>* query
 }
 
 template <class P, class DistanceCallback>
-void batch_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, const node<P>& query,
-                            v_array<v_array<P>>& results)
+void CoverTreeWrapper<P, DistanceCallback>::batch_nearest_neighbor(
+    DistanceCallback& dcb, const node<P>& top_node, const node<P>& query, v_array<v_array<P>>& results
+)
 {
     v_array<v_array<v_array<d_node<P>>>> spare_cover_sets;
     v_array<v_array<d_node<P>>> spare_zero_sets;
@@ -738,14 +671,11 @@ void batch_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, cons
 }
 
 template <class P, class DistanceCallback>
-void k_nearest_neighbor(DistanceCallback& dcb, const node<P>& top_node, const node<P>& query,
-                        v_array<v_array<P>>& results, int k)
+void CoverTreeWrapper<P, DistanceCallback>::k_nearest_neighbor(
+    DistanceCallback& dcb, const node<P>& top_node, const node<P>& query, v_array<v_array<P>>& results, int k
+)
 {
     internal_k = k;
-    update = update_k;
-    setter = set_k;
-    alloc_upper = alloc_k;
-
     batch_nearest_neighbor(dcb, top_node, query, results);
 }
 

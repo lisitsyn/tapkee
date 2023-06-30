@@ -87,11 +87,13 @@ Neighbors find_neighbors_covertree_impl(RandomAccessIterator begin, RandomAccess
     for (RandomAccessIterator iter = begin; iter != end; ++iter)
         push(points, TreePoint(iter, callback(iter, iter)));
 
-    node<TreePoint> ct = batch_create(callback, points);
+    CoverTreeWrapper<TreePoint, Callback> cover_tree;
+
+    node<TreePoint> ct = cover_tree.batch_create(callback, points);
 
     v_array<v_array<TreePoint>> res;
     ++k; // because one of the neighbors will be the actual query point
-    k_nearest_neighbor(callback, ct, ct, res, k);
+    cover_tree.k_nearest_neighbor(callback, ct, ct, res, k);
 
     Neighbors neighbors;
     neighbors.resize(end - begin);
