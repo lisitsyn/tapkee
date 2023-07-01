@@ -101,10 +101,7 @@ class Parameter
 
     template <typename T> inline operator T()
     {
-        if (!valid)
-        {
-            throw wrong_parameter_error(invalidity_reasons);
-        }
+        throwIfInvalid();
         try
         {
             return getValue<T>();
@@ -112,6 +109,13 @@ class Parameter
         catch (const missed_parameter_error&)
         {
             throw missed_parameter_error(parameter_name + " is missed");
+        }
+    }
+
+    void throwIfInvalid() {
+        if (!valid)
+        {
+            throw wrong_parameter_error(invalidity_reasons);
         }
     }
 
@@ -169,9 +173,7 @@ class Parameter
 
     inline void invalidate(const std::string& reason)
     {
-        if (valid)
-            valid = false;
-
+        valid = false;
         invalidity_reasons += reason;
     }
 
@@ -200,17 +202,23 @@ class CheckedParameter
         return parameter.is<T>(v);
     }
 
-    template <template <class> class F, class Q> inline Parameter& satisfies(const F<Q>& cond) const
+    template <template <class> class F, class Q>
+    inline const CheckedParameter& satisfies(const F<Q>& cond) const
     {
         if (!parameter.isCondition(cond))
             parameter.invalidate(cond.failureMessage(parameter));
 
-        return parameter;
+        return *this;
     }
 
     template <typename T> bool operator==(T v)
     {
         return is<T>(v);
+    }
+
+    void orThrow() const
+    {
+        parameter.throwIfInvalid();
     }
 
   private:

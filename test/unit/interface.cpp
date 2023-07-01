@@ -197,6 +197,8 @@ TEST(Interface, CancellationPassThru)
 {
     std::vector<int> data;
     data.push_back(0);
+    data.push_back(0);
+    data.push_back(0);
     tapkee::dummy_kernel_callback<int> kcb;
     tapkee::dummy_distance_callback<int> dcb;
     tapkee::dummy_features_callback<int> fcb;
