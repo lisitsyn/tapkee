@@ -2,11 +2,11 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
+#pragma once
 
-#ifndef TAPKEE_PRECOMPUTED_CALLBACKS_H_
-#define TAPKEE_PRECOMPUTED_CALLBACKS_H_
-
+/* Tapkee includes */
 #include <tapkee/defines.hpp>
+/* End of Tapkee includes */
 
 namespace tapkee
 {
@@ -42,4 +42,3 @@ struct precomputed_distance_callback
 };
 
 } // namespace tapkee
-#endif

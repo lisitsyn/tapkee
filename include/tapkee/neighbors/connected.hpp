@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Fernando J. Iglesias Garcia
  */
-
-#ifndef TAPKEE_CONNECTED_H_
-#define TAPKEE_CONNECTED_H_
+#pragma once
 
 #include <stack>
 #include <vector>
@@ -61,5 +59,3 @@ bool is_connected(RandomAccessIterator begin, RandomAccessIterator end, const Ne
 
 } /* namespace tapkee_internal */
 } /* namespace tapkee */
-
-#endif /* TAPKEE_CONNECTED_H_ */

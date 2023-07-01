@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
-
-#ifndef TAPKEE_METHOD_TRAITS_H_
-#define TAPKEE_METHOD_TRAITS_H_
+#pragma once
 
 namespace tapkee
 {
@@ -28,5 +26,3 @@ template <int method, typename Enable = void> struct MethodTraits;
 #define METHOD_THAT_NEEDS_ONLY_FEATURES_IS(X) METHOD_TRAIT(X, false, false, true)
 #define METHOD_THAT_NEEDS_NOTHING_IS(X) METHOD_TRAIT(X, false, false, false)
 } // namespace tapkee
-
-#endif

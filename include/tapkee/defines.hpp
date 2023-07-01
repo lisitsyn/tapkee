@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DEFINES_H_
-#define TAPKEE_DEFINES_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/exceptions.hpp>
@@ -77,5 +75,3 @@ const stichwort::ParametersForwarder kwargs;
 typedef stichwort::ParametersSet ParametersSet;
 typedef stichwort::Parameter Parameter;
 } // namespace tapkee
-
-#endif // TAPKEE_DEFINES_H_

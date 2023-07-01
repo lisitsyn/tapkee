@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Laurens van der Maaten, Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_VPTREE_H_
-#define TAPKEE_VPTREE_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -218,4 +216,3 @@ template <class RandomAccessIterator, class DistanceCallback> class VantagePoint
 
 } // namespace tapkee_internal
 } // namespace tapkee
-#endif

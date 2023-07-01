@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Vladyslav Gorbatiuk
  */
-
-#ifndef TAPKEE_MANIFOLD_SCULPTING_H_
-#define TAPKEE_MANIFOLD_SCULPTING_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -331,5 +329,3 @@ void manifold_sculpting_embed(RandomAccessIterator begin, RandomAccessIterator e
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

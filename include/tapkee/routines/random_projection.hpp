@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_RandomProjection_H_
-#define TAPKEE_RandomProjection_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -33,5 +31,3 @@ inline DenseMatrix gaussian_projection_matrix(IndexType target_dimension, IndexT
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

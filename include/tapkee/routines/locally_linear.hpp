@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_LOCALLY_LINEAR_H_
-#define TAPKEE_LOCALLY_LINEAR_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -341,5 +339,3 @@ DenseSymmetricMatrixPair construct_lltsa_eigenproblem(SparseWeightMatrix W, Rand
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif

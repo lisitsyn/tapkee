@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DEFINES_SYNONYMS_H_
-#define TAPKEE_DEFINES_SYNONYMS_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines/stdtypes.hpp>
@@ -62,5 +60,3 @@ typedef TAPKEE_INTERNAL_PAIR<tapkee::SparseMatrix, tapkee::tapkee_internal::Neig
 } // End of namespace tapkee_internal
 
 } // namespace tapkee
-
-#endif

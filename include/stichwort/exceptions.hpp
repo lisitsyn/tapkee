@@ -25,9 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef STICHWORT_EXCEPTIONS_H_
-#define STICHWORT_EXCEPTIONS_H_
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -71,4 +69,3 @@ class multiple_parameter_error : public std::runtime_error
 };
 
 } // namespace stichwort
-#endif

@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_NAMING_H_
-#define TAPKEE_NAMING_H_
+#pragma once
 
 namespace tapkee
 {
@@ -71,4 +69,3 @@ inline std::string get_eigen_method_name(const EigenMethod& m)
 }
 
 } // namespace tapkee
-#endif

@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
-
-#ifndef TAPKEE_DEFAULTS_H_
-#define TAPKEE_DEFAULTS_H_
+#pragma once
 
 namespace tapkee
 {
@@ -29,5 +27,3 @@ const stichwort::ParametersSet defaults =
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

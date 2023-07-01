@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
-
-#ifndef TAPKEE_APP_UTIL_H_
-#define TAPKEE_APP_UTIL_H_
+#pragma once
 
 #include <fstream>
 #include <istream>
@@ -268,5 +266,3 @@ tapkee::DenseMatrix matrix_from_callback(const tapkee::IndexType N, PairwiseCall
     }
     return result;
 }
-
-#endif

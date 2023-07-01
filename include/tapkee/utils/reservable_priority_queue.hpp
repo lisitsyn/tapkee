@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef RESERVABLE_PRIORITY_QUEUE_H_
-#define RESERVABLE_PRIORITY_QUEUE_H_
+#pragma once
 
 #include <queue>
 #include <vector>
@@ -41,5 +39,3 @@ class reservable_priority_queue : public std::priority_queue<T, std::vector<T>, 
 
 } /* End of namespace tapkee_internal */
 } /* End of namespace tapkee */
-
-#endif

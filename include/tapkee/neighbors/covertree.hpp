@@ -6,9 +6,7 @@
  *
  * Copyright (c) 2009-2013 John Langford, Dinoj Surendran, Fernando José Iglesias García
  */
-
-#ifndef COVERTREE_H_
-#define COVERTREE_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/neighbors/covertree_point.hpp>
@@ -681,4 +679,3 @@ void CoverTreeWrapper<P, DistanceCallback>::k_nearest_neighbor(
 
 } // namespace tapkee_internal
 } // namespace tapkee
-#endif

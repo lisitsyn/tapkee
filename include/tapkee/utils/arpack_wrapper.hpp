@@ -6,9 +6,7 @@
  * The code is relicensed under BSD 3-clause with the permission of its
  * original author. Some changes were made afterwards by Sergey Lisitsyn.
  */
-
-#ifndef EIGEN_ARPACKGENERALIZEDSELFADJOINTEIGENSOLVER_H
-#define EIGEN_ARPACKGENERALIZEDSELFADJOINTEIGENSOLVER_H
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -633,5 +631,3 @@ template <> struct arpack_wrapper<double, double>
 };
 
 } // namespace arpack_internal
-
-#endif // EIGEN_ARPACKSELFADJOINTEIGENSOLVER_H

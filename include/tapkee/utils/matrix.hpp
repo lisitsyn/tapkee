@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_MATRIX_H_
-#define TAPKEE_MATRIX_H_
+#pragma once
 
 namespace tapkee
 {
@@ -22,4 +20,3 @@ inline void centerMatrix(DenseMatrix& matrix)
 
 } // namespace tapkee_internal
 } // namespace tapkee
-#endif

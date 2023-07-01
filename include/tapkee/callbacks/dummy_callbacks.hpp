@@ -2,11 +2,11 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
+#pragma once
 
-#ifndef TAPKEE_DUMMY_CALLBACKS_H_
-#define TAPKEE_DUMMY_CALLBACKS_H_
-
+/* Tapkee includes */
 #include <tapkee/defines.hpp>
+/* End of Tapkee includes */
 
 namespace tapkee
 {
@@ -43,5 +43,3 @@ template <class Data> struct dummy_distance_callback
     }
 };
 } // namespace tapkee
-
-#endif

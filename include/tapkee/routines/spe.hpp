@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando J. Iglesias Garcia
  */
-
-#ifndef TAPKEE_SPE_H_
-#define TAPKEE_SPE_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -168,5 +166,3 @@ DenseMatrix spe_embedding(RandomAccessIterator begin, RandomAccessIterator end, 
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif /* TAPKEE_SPE_H_ */

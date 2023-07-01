@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2011-2013 Evgeniy Andreev
  */
-
-#ifndef TAPKEE_FIBONACCI_H_
-#define TAPKEE_FIBONACCI_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -452,5 +450,3 @@ class fibonacci_heap
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif /* FIBONACCI_H_ */

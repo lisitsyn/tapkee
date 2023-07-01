@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DEFINES_METHODS_H_
-#define TAPKEE_DEFINES_METHODS_H_
+#pragma once
 
 #include <tapkee/defines/types.hpp>
 
@@ -215,5 +213,3 @@ static const EigendecompositionStrategy SmallestEigenvalues("Smallest eigenvalue
 } // namespace tapkee_internal
 
 } // namespace tapkee
-
-#endif

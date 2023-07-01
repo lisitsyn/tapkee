@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando J. Iglesias Garcia
  */
-
-#ifndef TAPKEE_NEIGHBORS_H_
-#define TAPKEE_NEIGHBORS_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -202,5 +200,3 @@ Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& beg
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

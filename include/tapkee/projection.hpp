@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
-
-#ifndef TAPKEE_PROJECTION_H_
-#define TAPKEE_PROJECTION_H_
+#pragma once
 
 namespace tapkee
 {
@@ -63,4 +61,3 @@ struct MatrixProjectionImplementation : public ProjectionImplementation
 };
 
 } // namespace tapkee
-#endif

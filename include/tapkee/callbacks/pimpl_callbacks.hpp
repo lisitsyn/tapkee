@@ -2,11 +2,11 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
+#pragma once
 
-#ifndef TAPKEE_PIMPL_CALLBACKS_H_
-#define TAPKEE_PIMPL_CALLBACKS_H_
-
+/* Tapkee includes */
 #include <tapkee/defines.hpp>
+/* End of Tapkee includes */
 
 // Kernel function callback that computes
 // similarity function values on vectors
@@ -35,5 +35,3 @@ template <class Implementation> struct pimpl_distance_callback
     }
     Implementation* impl;
 };
-
-#endif

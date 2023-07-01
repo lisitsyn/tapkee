@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Vladyslav Gorbatiuk
  */
-
-#ifndef TAPKEE_FEATURES_H_
-#define TAPKEE_FEATURES_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -33,5 +31,3 @@ DenseMatrix dense_matrix_from_features(FeaturesCallback features, IndexType dime
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

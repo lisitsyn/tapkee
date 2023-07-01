@@ -28,9 +28,7 @@
  * OF SUCH DAMAGE.
  *
  */
-
-#ifndef TSNE_H
-#define TSNE_H
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/external/barnes_hut_sne/quadtree.hpp>
@@ -973,5 +971,3 @@ class TSNE
 };
 
 } // namespace tsne
-
-#endif

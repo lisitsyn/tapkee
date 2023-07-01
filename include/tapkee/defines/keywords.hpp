@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DEFINES_KEYWORDS_H_
-#define TAPKEE_DEFINES_KEYWORDS_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines/methods.hpp>
@@ -350,5 +348,3 @@ const stichwort::ParameterKeyword<ScalarType> sne_theta("SNE theta", 0.5);
 const stichwort::ParameterKeyword<ScalarType> squishing_rate("squishing rate", 0.99);
 } // namespace
 } // namespace tapkee
-
-#endif

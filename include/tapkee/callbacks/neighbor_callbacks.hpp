@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_NEIGHBOR_CALLBACK_H_
-#define TAPKEE_NEIGHBOR_CALLBACK_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/tapkee_defines.hpp>
@@ -14,5 +12,3 @@ template <class RandomAccessIterator> struct neighbors_finder
 {
     virtual Neighbors find_neighbors(RandomAccessIterator begin, RandomAccessIterator end, IndexType k);
 };
-
-#endif

@@ -25,9 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef STICHWORT_KEYWORDS_H_
-#define STICHWORT_KEYWORDS_H_
+#pragma once
 
 #include <stichwort/parameter.hpp>
 
@@ -111,4 +109,3 @@ const DefaultValue by_default;
 const ParametersForwarder kwargs;
 } // namespace
 } // namespace stichwort
-#endif

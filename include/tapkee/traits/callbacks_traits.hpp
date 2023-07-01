@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_CALLBACK_TRAITS_H_
-#define TAPKEE_CALLBACK_TRAITS_H_
+#pragma once
 
 namespace tapkee
 {
@@ -28,5 +26,3 @@ template <class T> class is_dummy
 };
 
 } // namespace tapkee
-
-#endif

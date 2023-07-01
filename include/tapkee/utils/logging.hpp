@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_LOGGING_H_
-#define TAPKEE_LOGGING_H_
+#pragma once
 
 #include <fmt/core.h>
 #include <iostream>
@@ -141,5 +139,3 @@ class LoggingSingleton
 #undef LEVEL_ENABLED_FIELD
 #undef LEVEL_ENABLED_FIELD_INITIALIZER
 } // namespace tapkee
-
-#endif
