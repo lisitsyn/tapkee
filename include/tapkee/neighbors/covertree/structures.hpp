@@ -6,9 +6,7 @@
  *
  * Copyright (c) 2009-2013 John Langford, Dinoj Surendran, Fernando José Iglesias García
  */
-
-#ifndef COVERTREE_STRUCTURES_H_
-#define COVERTREE_STRUCTURES_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -108,5 +106,3 @@ template <class P> node<P> new_leaf(const P& p)
 
 }
 }
-
-#endif

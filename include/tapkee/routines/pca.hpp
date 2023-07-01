@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_PCA_H_
-#define TAPKEE_PCA_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -98,5 +96,3 @@ DenseSymmetricMatrix compute_centered_kernel_matrix(RandomAccessIterator begin, 
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif

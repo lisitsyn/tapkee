@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_Isomap_H_
-#define TAPKEE_Isomap_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -270,5 +268,3 @@ DenseMatrix compute_shortest_distances_matrix(RandomAccessIterator begin, Random
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

@@ -25,9 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef STICHWORT_PARAMETER_H_
-#define STICHWORT_PARAMETER_H_
+#pragma once
 
 #include <stichwort/value_keeper.hpp>
 
@@ -321,5 +319,3 @@ inline Parameter::operator ParametersSet()
 }
 
 } // namespace stichwort
-
-#endif

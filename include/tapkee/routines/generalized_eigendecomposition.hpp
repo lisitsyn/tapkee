@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_GENERALIZED_EIGENDECOMPOSITION_H_
-#define TAPKEE_GENERALIZED_EIGENDECOMPOSITION_H_
+#pragma once
 
 /* Tapkee includes */
 #ifdef TAPKEE_WITH_ARPACK
@@ -188,5 +186,3 @@ EigendecompositionResult generalized_eigendecomposition(const EigenMethod& metho
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif

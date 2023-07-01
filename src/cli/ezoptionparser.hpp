@@ -14,8 +14,7 @@
    compiler and avoid multiple def errors. v0.1.4 20120629 Enforced MIT license on all files. v0.2.0 20121120 Added
    parseIndex to OptionGroup.
    */
-#ifndef EZ_OPTION_PARSER_H
-#define EZ_OPTION_PARSER_H
+#pragma once
 
 #include <algorithm>
 #include <cstring>
@@ -2755,5 +2754,3 @@ void ezOptionParser::prettyPrint(std::string& out)
     }
 }
 } // namespace ez
-/* ################################################################### */
-#endif /* EZ_OPTION_PARSER_H */

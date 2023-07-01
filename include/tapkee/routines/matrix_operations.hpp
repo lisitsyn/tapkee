@@ -3,9 +3,7 @@
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  *
  */
-
-#ifndef TAPKEE_MATRIX_OPS_H_
-#define TAPKEE_MATRIX_OPS_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -238,5 +236,3 @@ struct GPUDenseMatrixOperation
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_MDS_H_
-#define TAPKEE_MDS_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -135,5 +133,3 @@ DenseSymmetricMatrix compute_distance_matrix(RandomAccessIterator begin, RandomA
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif

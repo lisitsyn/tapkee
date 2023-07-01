@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Vladyslav Gorbatiuk
  */
-
-#ifndef TAPKEE_SPARSE_H_
-#define TAPKEE_SPARSE_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -32,5 +30,3 @@ inline SparseMatrix sparse_matrix_from_triplets(const SparseTriplets& sparse_tri
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

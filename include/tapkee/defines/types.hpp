@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DEFINES_TYPES_H_
-#define TAPKEE_DEFINES_TYPES_H_
+#pragma once
 
 namespace tapkee
 {
@@ -46,5 +44,3 @@ typedef Eigen::SimplicialLDLT<tapkee::SparseWeightMatrix> SparseSolver;
 #endif
 #endif
 } // namespace tapkee
-
-#endif

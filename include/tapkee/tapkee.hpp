@@ -2,13 +2,9 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_MAIN_H_
-#define TAPKEE_MAIN_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/chain_interface.hpp>
 #include <tapkee/embed.hpp>
 /* End of Tapkee includes */
-
-#endif

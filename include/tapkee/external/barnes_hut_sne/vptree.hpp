@@ -28,6 +28,7 @@
  * OF SUCH DAMAGE.
  *
  */
+#pragma once
 
 #include <algorithm>
 #include <limits>
@@ -35,9 +36,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-
-#ifndef VPTREE_H
-#define VPTREE_H
 
 namespace tsne
 {
@@ -296,5 +294,3 @@ template <typename T, ScalarType (*distance)(const T&, const T&)> class VpTree
 };
 
 } // namespace tsne
-
-#endif

@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2023 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_PREDICATES_H_
-#define TAPKEE_PREDICATES_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -75,5 +73,3 @@ template <typename T> struct InClosedRange
 
 }
 }
-
-#endif

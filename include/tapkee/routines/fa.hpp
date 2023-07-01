@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2013 Sergey Lisitsyn, Fernando J. Iglesias Garcia
  */
-
-#ifndef TAPKEE_FA_H_
-#define TAPKEE_FA_H_
+#pragma once
 
 namespace tapkee
 {
@@ -75,5 +73,3 @@ DenseMatrix project(RandomAccessIterator begin, RandomAccessIterator end, Featur
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif /* TAPKEE_FA_H_ */

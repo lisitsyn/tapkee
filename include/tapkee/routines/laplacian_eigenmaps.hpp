@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_LaplacianEigenmaps_H_
-#define TAPKEE_LaplacianEigenmaps_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -112,5 +110,3 @@ DenseSymmetricMatrixPair construct_locality_preserving_eigenproblem(SparseWeight
 
 } // namespace tapkee_internal
 } // namespace tapkee
-
-#endif

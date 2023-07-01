@@ -7,9 +7,7 @@
  * Written (W) John Langford and Dinoj Surendran, v_array and its templatization
  * Copyright (C) 2012 Fernando José Iglesias García
  */
-
-#ifndef _JL_COVERTREE_POINT_H_
-#define _JL_COVERTREE_POINT_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -187,4 +185,3 @@ template <class RandomAccessIterator> void print(const CoverTreePoint<RandomAcce
 
 } // namespace tapkee_internal
 } // namespace tapkee
-#endif /* _JL_COVERTREE_POINT_H_*/

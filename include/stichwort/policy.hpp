@@ -25,9 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef STICHWORT_POLICY_H_
-#define STICHWORT_POLICY_H_
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -145,4 +143,3 @@ template <typename T> TypePolicyBase* getPolicy()
 
 } // namespace stichwort_internal
 } // namespace stichwort
-#endif

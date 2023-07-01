@@ -28,15 +28,13 @@
  * OF SUCH DAMAGE.
  *
  */
+#pragma once
 
 #include <algorithm>
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifndef QUADTREE_H
-#define QUADTREE_H
 
 namespace tsne
 {
@@ -523,5 +521,3 @@ class QuadTree
 };
 
 } // namespace tsne
-
-#endif

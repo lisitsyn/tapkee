@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_TIME_H_
-#define TAPKEE_TIME_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/utils/logging.hpp>
@@ -48,5 +46,3 @@ struct timed_context
 #undef CLOCK_TYPE
 #undef CLOCK_GET
 #undef CLOCK_DIVISOR
-
-#endif

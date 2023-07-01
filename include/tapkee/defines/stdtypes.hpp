@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DEFINES_STDTYPES_H_
-#define TAPKEE_DEFINES_STDTYPES_H_
+#pragma once
 
 #ifndef TAPKEE_INTERNAL_VECTOR
 #include <vector>
@@ -17,6 +15,4 @@
 #ifndef TAPKEE_INTERNAL_MAP
 #include <map>
 #define TAPKEE_INTERNAL_MAP std::map
-#endif
-
 #endif

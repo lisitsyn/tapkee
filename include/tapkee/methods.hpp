@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn, Fernando Iglesias
  */
-
-#ifndef TAPKEE_METHODS_H_
-#define TAPKEE_METHODS_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -449,5 +447,3 @@ ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, Featu
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif

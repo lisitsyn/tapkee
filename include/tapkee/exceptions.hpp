@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_EXCEPTIONS_H_
-#define TAPKEE_EXCEPTIONS_H_
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -92,4 +90,3 @@ class multiple_parameter_error : public std::runtime_error
 };
 
 } // namespace tapkee
-#endif

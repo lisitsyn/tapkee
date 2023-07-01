@@ -25,9 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef STICHWORT_KEEPER_H_
-#define STICHWORT_KEEPER_H_
+#pragma once
 
 #include <stichwort/exceptions.hpp>
 #include <stichwort/policy.hpp>
@@ -116,4 +114,3 @@ class ValueKeeper
 
 } // namespace stichwort_internal
 } // namespace stichwort
-#endif

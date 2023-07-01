@@ -1,5 +1,4 @@
-#ifndef TAPKEE_DEFINES_EIGEN3_H_
-#define TAPKEE_DEFINES_EIGEN3_H_
+#pragma once
 
 //// Eigen 3 library includes
 #ifdef TAPKEE_EIGEN_INCLUDE_FILE
@@ -30,5 +29,3 @@
 #define UNRESTRICT_ALLOC
 #endif
 //// end of Eigen 3 library includes
-
-#endif

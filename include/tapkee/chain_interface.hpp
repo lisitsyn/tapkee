@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_CHAIN_H_
-#define TAPKEE_CHAIN_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/callbacks/dummy_callbacks.hpp>
@@ -514,5 +512,3 @@ struct initialize
 };
 
 } /* End of namespace tapkee */
-
-#endif

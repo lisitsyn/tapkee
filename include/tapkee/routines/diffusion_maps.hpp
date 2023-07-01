@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DIFFUSIONMAP_H_
-#define TAPKEE_DIFFUSIONMAP_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -83,5 +81,3 @@ DenseSymmetricMatrix compute_diffusion_matrix(RandomAccessIterator begin, Random
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif

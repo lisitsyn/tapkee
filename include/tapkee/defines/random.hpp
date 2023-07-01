@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_DEFINES_RANDOM_H_
-#define TAPKEE_DEFINES_RANDOM_H_
+#pragma once
 
 #include <algorithm>
 #include <cstdlib>
@@ -64,5 +62,3 @@ template <class RAI> inline void random_shuffle(RAI first, RAI last)
 }
 
 } // namespace tapkee
-
-#endif

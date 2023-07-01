@@ -8,9 +8,7 @@
  * Copyright (c) 2010-2013 Daisuke Okanohara
  *
  */
-
-#ifndef TAPKEE_EIGENDECOMPOSITION_H_
-#define TAPKEE_EIGENDECOMPOSITION_H_
+#pragma once
 
 /* Tapkee includes */
 #ifdef TAPKEE_WITH_ARPACK
@@ -346,5 +344,3 @@ EigendecompositionResult eigendecomposition(const EigenMethod& method, const Com
 
 } // End of namespace tapkee_internal
 } // End of namespace tapkee
-
-#endif

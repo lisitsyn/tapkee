@@ -2,9 +2,7 @@
  *
  * Copyright (c) 2012-2013 Sergey Lisitsyn
  */
-
-#ifndef TAPKEE_EMBED_H_
-#define TAPKEE_EMBED_H_
+#pragma once
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
@@ -144,4 +142,3 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end, KernelC
     return output;
 }
 } // namespace tapkee
-#endif
