@@ -23,7 +23,7 @@ jobs:
          channels: conda-forge
 
     - name: Install conda packages
-      run: conda install gtest eigen fmt cxxopts
+      run: conda install gtest eigen fmt cxxopts cython
 
     - name: Configure
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.build_type}}

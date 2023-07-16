@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: brew install arpack eigen googletest fmt cxxopts
+      run: brew install arpack eigen googletest fmt cxxopts cython
 
     - name: Configure
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.build_type}}

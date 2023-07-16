@@ -59,6 +59,57 @@ if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()
 
+# Define the macro add_cython_target
+macro(add_cython_target _targetName _sourceFile _outputLang)
+    # Define the output file based on the desired language
+    set(_outputExt "cpp")
+    if("${_outputLang}" STREQUAL "C")
+        set(_outputExt "c")
+    endif()
+
+    # Set the output source file name
+    set(_generatedSource "${CMAKE_CURRENT_BINARY_DIR}/${_targetName}.${_outputExt}")
+
+    # Add a custom command to generate the C/C++ file from the Cython .pyx file
+    add_custom_command(
+        OUTPUT ${_generatedSource}
+        COMMAND ${CYTHON_EXECUTABLE} -${_outputLang} -o ${_generatedSource} ${_sourceFile}
+        DEPENDS ${_sourceFile}
+        COMMENT "Cythonizing ${_sourceFile} to ${_generatedSource}"
+    )
+
+    # Add the generated source file to the target
+    add_library(${_targetName} SHARED ${_generatedSource})
+endmacro()
+
+option(BUILD_PYTHON "Whether to build Python interface" ON)
+if (BUILD_PYTHON)
+	find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+	set(_pyx_compiled_source "${CMAKE_CURRENT_BINARY_DIR}/pytapkee.c")
+	set(_pyx_source "${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee.pyx")
+	add_custom_command(
+	    OUTPUT ${_pyx_compiled_source}
+	    COMMAND ${Python3_EXECUTABLE} -m cython --cplus -o ${_pyx_compiled_source} ${_pyx_source}
+	    DEPENDS ${_pyx_source}
+	    COMMENT "Generating Cython files ${_pyx_compiled_source}"
+	)
+	set_source_files_properties(${_pyx_compiled_source} PROPERTIES LANGUAGE CXX)
+	add_library(pytapkee
+	    SHARED
+	    ${_pyx_compiled_source}
+	)
+	set_target_properties(pytapkee PROPERTIES LINKER_LANGUAGE CXX)
+	set_target_properties(pytapkee PROPERTIES POSITION_INDEPENDENT_CODE ON)
+	target_link_libraries(pytapkee PUBLIC Python3::Python)
+	target_include_directories(pytapkee
+	    PUBLIC
+	    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	    $<INSTALL_INTERFACE:include>
+	    PRIVATE
+	    ${CMAKE_CURRENT_SOURCE_DIR}/src/python
+	)
+endif()
+
 # library interface
 file(GLOB_RECURSE headers_library "${TAPKEE_INCLUDE_DIR}/*.hpp")
 add_library(tapkee_library INTERFACE)
