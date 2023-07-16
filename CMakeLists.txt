@@ -56,6 +56,34 @@ if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 endif()
 
+option(BUILD_PYTHON "Whether to build Python interface" ON)
+if (BUILD_PYTHON)
+	find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+	add_custom_command(
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee_pyx.c ${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee_pyx.h
+		COMMAND ${Python3_EXECUTABLE} -m cython ${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee.pyx
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/python
+		DEPENDS
+		${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee.pyx
+		${CMAKE_CURRENT_SOURCE_DIR}/include/tapkee/tapkee.hpp
+	)
+	add_library(pytapkee
+		${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee_pyx.c
+		${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee_pyx.h
+	)
+	set_target_properties(pytapkee PROPERTIES LINKER_LANGUAGE CXX)
+	set_target_properties(pytapkee PROPERTIES POSITION_INDEPENDENT_CODE ON)
+	target_link_libraries(pytapkee PUBLIC Python3::Python)
+	target_include_directories(pytapkee
+		PUBLIC
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+			$<INSTALL_INTERFACE:include>
+		PRIVATE
+			${CMAKE_CURRENT_SOURCE_DIR}/src/python
+	)
+endif()
+
 option(USE_SLASH_CLI_WINDOWS "Whether to use slash command line parameters" OFF)
 
 # library interface
