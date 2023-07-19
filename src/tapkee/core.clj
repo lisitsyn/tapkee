@@ -27,11 +27,11 @@
   ])
 
 (def all-graphical-examples [
-  {:shortname "promoters" :longname "Promoters embedding" :script "js/promoters.js" :description "code/promoters.md"}                        
-  {:shortname "words" :longname "Words embedding" :script "js/words.js" :description "code/words.md"}                        
-  {:shortname "cbcl" :longname "MIT-CBCL faces embedding" :script "js/cbcl.js" :description "code/cbcl.md"}                        
-  {:shortname "mnist" :longname "MNIST digits embedding" :script "js/mnist.js" :description "code/mnist.md"}                        
-  {:shortname "faces" :longname "Faces embedding" :script "js/faces.js" :description "code/faces.md"}                        
+  {:shortname "promoters" :longname "Promoters embedding" :script "js/promoters.js" :description "code/promoters.md"}
+  {:shortname "words" :longname "Words embedding" :script "js/words.js" :description "code/words.md"}
+  {:shortname "cbcl" :longname "MIT-CBCL faces embedding" :script "js/cbcl.js" :description "code/cbcl.md"}
+  {:shortname "mnist" :longname "MNIST digits embedding" :script "js/mnist.js" :description "code/mnist.md"}
+  {:shortname "faces" :longname "Faces embedding" :script "js/faces.js" :description "code/faces.md"}
   ])
 
 (def all-usage-examples [
@@ -76,6 +76,18 @@
       var pageTracker = _gat._getTracker(\"UA-37814556-1\");
       pageTracker._trackPageview();                                                                                                                                                            } catch(err) {}
   """])
+
+(defn varioqub []
+  [:script """
+    <!-- Varioqub experiments -->
+  <script type=\"text/javascript\">
+  (function(e, x, pe, r, i, me, nt){
+  e[i]=e[i]||function(){(e[i].a=e[i].a||[]).push(arguments)},
+  me=x.createElement(pe),me.async=1,me.src=r,nt=x.getElementsByTagName(pe)[0],nt.parentNode.insertBefore(me,nt)})
+  (window, document, 'script', 'https://abt.s3.yandex.net/expjs/latest/exp.js', 'ymab');
+  ymab('metrika.64440154', 'init'/*, {clientFeatures}, {callback}*/);
+  </script>
+   """])
 
 (defn forkme []
   [:a {:href "https://github.com/lisitsyn/tapkee"}
@@ -250,7 +262,8 @@
               all-usage-examples))
     ]
     (yandex-metrica)
-    (google-analytics)))
+    (google-analytics)
+    (varioqub)))
 
 (defroutes routes
   (GET "/" [] (index))
