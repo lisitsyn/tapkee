@@ -53,44 +53,19 @@
    };
   """])
 
-(defn yandex-metrica []
+(defn tag-manager-head []
   [:script """
-    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-    var z = null;m[i].l=1*new Date();
-    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-    (window, document, \"script\", \"https://mc.yandex.ru/metrika/tag.js\", \"ym\");
-
-    ym(64440154, \"init\", {
-         clickmap:true,
-         trackLinks:true,
-         accurateTrackBounce:true
-    });
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KNTD3JMZ');
    """])
 
-(defn google-analytics []
-  [:script """
-    var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
-    document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));
-    try {
-      var pageTracker = _gat._getTracker(\"UA-37814556-1\");
-      pageTracker._trackPageview();                                                                                                                                                            } catch(err) {}
-  """])
-
-(defn varioqub []
-  [:script """
-  (function(e, x, pe, r, i, me, nt){
-  e[i]=e[i]||function(){(e[i].a=e[i].a||[]).push(arguments)},
-  me=x.createElement(pe),me.async=1,me.src=r,nt=x.getElementsByTagName(pe)[0],nt.parentNode.insertBefore(me,nt)})
-  (window, document, 'script', 'https://abt.s3.yandex.net/expjs/latest/exp.js', 'ymab');
-  ymab('metrika.64440154', 'init'/*, {clientFeatures}, {callback}*/);
-   """])
-
-(defn forkme []
-  [:a {:href "https://github.com/lisitsyn/tapkee"}
-   [:img {:style "position: fixed; top: 0; right: 0; border: 0; z-index: 10000; margin: 0;" 
-          :src "https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"
-          :alt "Fork me on GitHub"}]])
+(defn tag-manager-body []
+  [:noscript
+   [:iframe {:src "https://www.googletagmanager.com/ns.html?id=GTM-KNTD3JMZ" :height 0 :width 0 :style "display:none;visibility:hidden"}]
+  ])
 
 (defn navbar [& elements]
   [:div {:class "navbar navbar-inverse navbar-fixed-top"}
@@ -202,6 +177,7 @@
 (defn index []
   (html5
     [:head
+      (tag-manager-head)
       [:title "Tapkee"]
       ;;;
       (include-css "css/bootstrap.min.css") (include-css "css/bootstrap-modal.css")
@@ -221,8 +197,9 @@
       (mathjax-config)
       (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
       ;;;
-      (forkme)]
+    ]
     [:body
+     (tag-manager-body)
      [:div {:class "page-container"}
       (navbar
          (techniques-dropdown)
@@ -258,9 +235,7 @@
                        ""))
               all-usage-examples))
     ]
-    (yandex-metrica)
-    (google-analytics)
-    (varioqub)))
+  ))
 
 (defroutes routes
   (GET "/" [] (index))
