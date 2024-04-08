@@ -2,6 +2,9 @@
 
 #include <tapkee/exceptions.hpp>
 #include <tapkee/tapkee.hpp>
+#ifdef TAPKEE_USE_LGPL_COVERTREE
+#include <tapkee/neighbors/covertree.hpp>
+#endif
 
 #include "callbacks.hpp"
 
@@ -48,6 +51,7 @@ TEST(Neighbors, BruteDistanceNeighbors)
     }
 }
 
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 TEST(Neighbors, CoverTreeDistanceNeighbors)
 {
     typedef std::vector<float> Floats;
@@ -83,6 +87,7 @@ TEST(Neighbors, CoverTreeDistanceNeighbors)
             ASSERT_NE(neighbors_set.find(floats[i + j + 1]), neighbors_set.end());
     }
 }
+#endif
 
 TEST(Neighbors, BruteKernelNeighbors)
 {
@@ -121,6 +126,7 @@ TEST(Neighbors, BruteKernelNeighbors)
     }
 }
 
+#ifdef TAPKEE_USE_LGPL_COVERTREE
 TEST(Neighbors, CoverTreeKernelNeighbors)
 {
     typedef std::vector<float> Floats;
@@ -156,3 +162,4 @@ TEST(Neighbors, CoverTreeKernelNeighbors)
             ASSERT_NE(neighbors_set.find(floats[i + j + 1]), neighbors_set.end());
     }
 }
+#endif
