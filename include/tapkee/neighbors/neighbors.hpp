@@ -6,6 +6,7 @@
 
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
+#include <tapkee/utils/logging.hpp>
 #include <tapkee/utils/naming.hpp>
 #ifdef TAPKEE_USE_LGPL_COVERTREE
 #include <tapkee/neighbors/covertree.hpp>
@@ -15,6 +16,7 @@
 /* End of Tapkee includes */
 
 #include <algorithm>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -190,10 +192,19 @@ Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& beg
         neighbors = find_neighbors_covertree_impl(begin, end, callback, k);
 #endif
 
-    if (check_connectivity)
+    if (check_connectivity && !is_connected(begin, end, neighbors))
     {
-        if (!is_connected(begin, end, neighbors))
-            LoggingSingleton::instance().message_warning("The neighborhood graph is not connected.");
+        const std::string message = fmt::format("The neighborhood graph with {} neighbors "
+                                                "is not connected. Recomputing with a "
+                                                "larger number of neighbors {}.", k, 2 *k);
+        LoggingSingleton::instance().message_warning(message);
+        neighbors = find_neighbors(method, begin, end, callback, 2 * k, check_connectivity);
+    }
+    else
+    {
+        const std::string message = fmt::format("The neighborhood graph with {} neighbors "
+                                                "is connected.", k);
+        LoggingSingleton::instance().message_info(message);
     }
     return neighbors;
 }
