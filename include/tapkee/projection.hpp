@@ -24,13 +24,10 @@ struct ProjectionImplementation
 //! A pimpl wrapper for projecting function
 struct ProjectingFunction
 {
-    ProjectingFunction() : implementation(NULL)
+    ProjectingFunction() : implementation()
     {
     }
     ProjectingFunction(ProjectionImplementation* impl) : implementation(impl)
-    {
-    }
-    ProjectingFunction(const ProjectingFunction& other) : implementation(other.implementation)
     {
     }
     //! Projects provided vector to new space
