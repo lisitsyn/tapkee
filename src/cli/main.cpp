@@ -448,11 +448,10 @@ int run(int argc, const char **argv)
     if (output_projection && output.projection.implementation)
     {
         tapkee::MatrixProjectionImplementation *matrix_projection =
-            dynamic_cast<tapkee::MatrixProjectionImplementation *>(output.projection.implementation);
+            dynamic_cast<tapkee::MatrixProjectionImplementation *>(output.projection.implementation.get());
         write_matrix(&matrix_projection->proj_mat, ofs_matrix, delimiter[0]);
         write_vector(&matrix_projection->mean_vec, ofs_mean);
     }
-    output.projection.clear();
     ofs_matrix.close();
     ofs_mean.close();
     return 0;
