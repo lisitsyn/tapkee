@@ -196,14 +196,16 @@ Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& beg
     {
         const std::string message = fmt::format("The neighborhood graph with {} neighbors "
                                                 "is not connected. Recomputing with a "
-                                                "larger number of neighbors {}.", k, 2 *k);
+                                                "larger number of neighbors {}.",
+                                                k, 2 * k);
         LoggingSingleton::instance().message_warning(message);
         neighbors = find_neighbors(method, begin, end, callback, 2 * k, check_connectivity);
     }
     else
     {
         const std::string message = fmt::format("The neighborhood graph with {} neighbors "
-                                                "is connected.", k);
+                                                "is connected.",
+                                                k);
         LoggingSingleton::instance().message_info(message);
     }
     return neighbors;

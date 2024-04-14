@@ -31,8 +31,8 @@ template <class P> struct node
     {
     }
 
-    node(P _p, ScalarType _max_dist, ScalarType _parent_dist, std::vector<node<P>> _children, unsigned short int _num_children,
-         short int _scale)
+    node(P _p, ScalarType _max_dist, ScalarType _parent_dist, std::vector<node<P>> _children,
+         unsigned short int _num_children, short int _scale)
         : p(_p), max_dist(_max_dist), parent_dist(_parent_dist), children(_children), num_children(_num_children),
           scale(_scale)
     {
@@ -104,5 +104,5 @@ template <class P> node<P> new_leaf(const P& p)
     return new_leaf;
 }
 
-}
-}
+} // namespace tapkee_internal
+} // namespace tapkee

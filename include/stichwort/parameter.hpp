@@ -110,7 +110,8 @@ class Parameter
         }
     }
 
-    void throwIfInvalid() {
+    void throwIfInvalid()
+    {
         if (!valid)
         {
             throw wrong_parameter_error(invalidity_reasons);
@@ -200,8 +201,7 @@ class CheckedParameter
         return parameter.is<T>(v);
     }
 
-    template <template <class> class F, class Q>
-    inline const CheckedParameter& satisfies(const F<Q>& cond) const
+    template <template <class> class F, class Q> inline const CheckedParameter& satisfies(const F<Q>& cond) const
     {
         if (!parameter.isCondition(cond))
             parameter.invalidate(cond.failureMessage(parameter));

@@ -71,5 +71,5 @@ template <typename T> struct InClosedRange
     }
 };
 
-}
-}
+} // namespace tapkee_internal
+} // namespace tapkee
