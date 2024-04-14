@@ -321,6 +321,3 @@ Exceptions are:
 
 - [Covertree code](https://github.com/lisitsyn/tapkee/blob/master/include/neighbors/covertree.hpp) by John Langford and Dinoj Surendran
   which is distributed under the [LGPLv3 license](https://github.com/lisitsyn/tapkee/blob/master/LGPL-LICENSE).
-
-- [EZOptionsParser](https://github.com/lisitsyn/tapkee/blob/master/src/ezoptionparser.hpp) by Remik Ziemlinski which is distributed
-  under the [MIT license](https://github.com/lisitsyn/tapkee/blob/master/MIT-LICENSE).
