@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include <cxxopts.hpp>
 
@@ -36,10 +37,12 @@ std::string shorter(const char* shorter)
     return std::string(shorter) + ",";
 }
 
-template<typename T>
-auto with_default(const char* defs)
+template<typename T> auto with_default(T defs)
 {
-    return cxxopts::value<T>()->default_value(defs);
+    if constexpr (std::is_same_v<std::string, T>)
+        return cxxopts::value<T>()->default_value(defs);
+    else
+        return cxxopts::value<T>()->default_value(std::to_string(defs));
 }
 
 std::vector<const char*> process_argv(int argc, const char** argv)
@@ -93,6 +96,8 @@ int run(int argc, const char **argv)
     cxxopts::Options options("tapkee", "Tapkee: a tool for dimension reduction");
     auto processed_argv = process_argv(argc, argv);
 
+    using namespace std::string_literals;
+
     options
       .set_width(70)
       .set_tab_expansion()
@@ -100,7 +105,7 @@ int run(int argc, const char **argv)
     (
      shorter("i") + INPUT_FILE_KEYWORD,
      "Input file",
-     with_default<std::string>("/dev/stdin")
+     with_default("/dev/stdin"s)
     )
     (
      TRANSPOSE_INPUT_KEYWORD,
@@ -113,22 +118,22 @@ int run(int argc, const char **argv)
     (
      shorter("o") + OUTPUT_FILE_KEYWORD,
      "Output file",
-     with_default<std::string>("/dev/stdout")
+     with_default("/dev/stdout"s)
     )
     (
      shorter("opmat") + OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD,
      "Output file for the projection matrix",
-     with_default<std::string>("/dev/null")
+     with_default("/dev/null"s)
     )
     (
      shorter("opmean") + OUTPUT_PROJECTION_MEAN_FILE_KEYWORD,
      "Output file for the mean of data",
-     with_default<std::string>("/dev/null")
+     with_default("/dev/null"s)
     )
     (
      shorter("d") + DELIMITER_KEYWORD,
      "Delimiter",
-     with_default<std::string>(",")
+     with_default(","s)
     )
     (
      shorter("h") + HELP_KEYWORD,
@@ -156,7 +161,7 @@ int run(int argc, const char **argv)
      "landmark_multidimensional_scaling (l-mds), stochastic_proximity_embedding (spe), \n"
      "kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), \n"
      "t-stochastic_neighborhood_embedding (t-sne), manifold_sculpting (ms).",
-     with_default<std::string>("locally_linear_embedding")
+     with_default("locally_linear_embedding"s)
     )
     (
      shorter("nm") + NEIGHBORS_METHOD_KEYWORD,
@@ -167,9 +172,9 @@ int run(int argc, const char **argv)
 #endif
      ".",
 #ifdef TAPKEE_USE_LGPL_COVERTREE
-     with_default<std::string>("covertree")
+     with_default("covertree"s)
 #else
-     with_default<std::string>("vptree")
+     with_default("vptree"s)
 #endif
     )
     (
@@ -180,9 +185,9 @@ int run(int argc, const char **argv)
 #endif
      "randomized, dense.",
 #ifdef TAPKEE_WITH_ARPACK
-     with_default<std::string>("arpack")
+     with_default("arpack"s)
 #else
-     with_default<std::string>("dense")
+     with_default("dense"s)
 #endif
     )
     (
@@ -192,37 +197,37 @@ int run(int argc, const char **argv)
      "opencl, "
 #endif
      "cpu.",
-     with_default<std::string>("cpu")
+     with_default("cpu"s)
     )
     (
      shorter("td") + TARGET_DIMENSION_KEYWORD,
      "Target dimension",
-     with_default<int>("2")
+     with_default(2)
     )
     (
      shorter("k") + NUM_NEIGHBORS_KEYWORD,
      "Number of neighbors",
-     with_default<int>("10")
+     with_default(10)
     )
     (
      shorter("gw") + GAUSSIAN_WIDTH_KEYWORD,
      "Width of gaussian kernel",
-     with_default<double>("1.0")
+     with_default(1.0)
     )
     (
      TIMESTEPS_KEYWORD,
      "Number of timesteps for diffusion map",
-     with_default<int>("1")
+     with_default(1)
     )
     (
      EIGENSHIFT_KEYWORD,
      "Regularization diagonal shift for weight matrix",
-     with_default<double>("1e-9")
+     with_default(1e-9)
     )
     (
      LANDMARK_RATIO_KEYWORD,
      "Ratio of landmarks. Should be in (0,1) range (0.2 means 20%)",
-     with_default<double>("0.2")
+     with_default(0.2)
     )
     (
      SPE_LOCAL_KEYWORD,
@@ -231,37 +236,37 @@ int run(int argc, const char **argv)
     (
      SPE_TOLERANCE_KEYWORD,
      "Tolerance for SPE",
-     with_default<double>("1e-5")
+     with_default(1e-5)
     )
     (
      SPE_NUM_UPDATES_KEYWORD,
      "Number of SPE updates",
-     with_default<int>("100")
+     with_default(100)
     )
     (
      MAX_ITERS_KEYWORD,
      "Maximum number of iterations",
-     with_default<int>("1000")
+     with_default(1000)
     )
     (
      FA_EPSILON_KEYWORD,
      "FA convergence threshold",
-     with_default<double>("1e-5")
+     with_default(1e-5)
     )
     (
      SNE_PERPLEXITY_KEYWORD,
      "Perplexity for the t-SNE algorithm",
-     with_default<double>("30.0")
+     with_default(30.0)
     )
     (
      SNE_THETA_KEYWORD,
      "Theta for the t-SNE algorithm",
-     with_default<double>("0.5")
+     with_default(0.5)
     )
     (
      MS_SQUISHING_RATE_KEYWORD,
      "Squishing rate of the Manifold Sculpting algorithm",
-     with_default<double>("0.99")
+     with_default(0.99)
     )
     (
      PRECOMPUTE_KEYWORD,
