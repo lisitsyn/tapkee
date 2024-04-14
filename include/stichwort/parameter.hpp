@@ -271,13 +271,19 @@ class ParametersSet
     }
     void merge(const ParametersSet& pg)
     {
-        typedef ParametersMap::const_iterator MapIter;
-        for (MapIter iter = pg.pmap.begin(); iter != pg.pmap.end(); ++iter)
+        for (auto each : pg.pmap)
         {
-            if (!pmap.count(iter->first))
+            if (!pmap.count(each.first))
             {
-                pmap[iter->first] = iter->second;
+                pmap[each.first] = each.second;
             }
+        }
+    }
+    void visit(std::function<void(const Parameter&)> visitor)
+    {
+        for (auto each : pmap)
+        {
+            visitor(each.second);
         }
     }
     Parameter operator[](const std::string& name) const
