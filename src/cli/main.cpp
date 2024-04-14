@@ -514,11 +514,6 @@ int main(int argc, const char **argv)
     {
         return run(argc, argv);
     }
-    catch (const cxxopts::exceptions::exception& e)
-    {
-        std::cerr << "Failed to parse arguments: " << e.what() << std::endl;
-        return 1;
-    }
     catch (const std::exception &exc)
     {
         std::cerr << "Some error occured: " << exc.what() << std::endl;
