@@ -1,20 +1,21 @@
 /* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * Copyright (c) 2012-2022 Sergey Lisitsyn, Fernando Iglesias
+ * Copyright (c) 2012-2024 Sergey Lisitsyn, Fernando Iglesias
  */
 
-#include "ezoptionparser.hpp"
 #include "util.hpp"
 #include <algorithm>
 #include <iterator>
 #include <string>
+#include <vector>
+#include <cxxopts.hpp>
+
 #include <tapkee/callbacks/eigen_callbacks.hpp>
 #include <tapkee/callbacks/precomputed_callbacks.hpp>
 #include <tapkee/defines.hpp>
 #include <tapkee/projection.hpp>
 #include <tapkee/tapkee.hpp>
 #include <tapkee/utils/logging.hpp>
-#include <vector>
 
 #ifdef GIT_INFO
 #define TAPKEE_CURRENT_GIT_INFO GIT_INFO
@@ -22,7 +23,6 @@
 #define TAPKEE_CURRENT_GIT_INFO "unknown"
 #endif
 
-using namespace ez;
 using namespace Eigen;
 using namespace std;
 
@@ -31,165 +31,281 @@ bool cancel()
     return false;
 }
 
+std::string shorter(const char* shorter)
+{
+    return std::string(shorter) + ",";
+}
+
+auto string_with_default(const char* defs) -> decltype(cxxopts::value<std::string>()->default_value(""))
+{
+    return cxxopts::value<std::string>()->default_value(defs);
+}
+
+auto double_with_default(const char* defs) -> decltype(cxxopts::value<double>()->default_value(""))
+{
+    return cxxopts::value<double>()->default_value(defs);
+}
+
+auto int_with_default(const char* defs) -> decltype(cxxopts::value<int>()->default_value(""))
+{
+    return cxxopts::value<int>()->default_value(defs);
+}
+
+std::vector<const char*> process_argv(int argc, const char** argv)
+{
+    std::vector<const char*> processed;
+    for (int i=0; i<argc; ++i)
+    {
+        processed.push_back(argv[i]);
+        #if defined(USE_SLASH_CLI_WINDOWS) && (defined(_WIN32) || defined(_WIN64))
+        // rpplace -- and - with /
+        #endif
+    }
+    return processed;
+}
+
+static const char* INPUT_FILE_KEYWORD = "input-file";
+static const char* TRANSPOSE_INPUT_KEYWORD = "transpose-input";
+static const char* TRANSPOSE_OUTPUT_KEYWORD = "transpose-output";
+static const char* OUTPUT_FILE_KEYWORD = "output-file";
+static const char* OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD = "output-projection-matrix-file";
+static const char* OUTPUT_PROJECTION_MEAN_FILE_KEYWORD = "output-projection-mean-file";
+static const char* DELIMITER_KEYWORD = "delimiter";
+static const char* HELP_KEYWORD = "help";
+static const char* BENCHMARK_KEYWORD = "benchmark";
+static const char* VERBOSE_KEYWORD = "verbose";
+static const char* DEBUG_KEYWORD = "debug";
+static const char* METHOD_KEYWORD = "method";
+static const char* NEIGHBORS_METHOD_KEYWORD = "neighbors-method";
+static const char* EIGEN_METHOD_KEYWORD = "eigen-method";
+static const char* COMPUTATION_STRATEGY_KEYWORD = "computation-strategy";
+static const char* TARGET_DIMENSION_KEYWORD = "target-dimension";
+static const char* NUM_NEIGHBORS_KEYWORD = "num-neighbors";
+static const char* GAUSSIAN_WIDTH_KEYWORD = "gaussian-width";
+static const char* TIMESTEPS_KEYWORD = "timesteps";
+static const char* SPE_LOCAL_KEYWORD = "spe-local";
+static const char* EIGENSHIFT_KEYWORD = "eigenshift";;
+static const char* LANDMARK_RATIO_KEYWORD = "landmark-ratio";
+static const char* SPE_TOLERANCE_KEYWORD = "spe-tolerance";
+static const char* SPE_NUM_UPDATES_KEYWORD = "spe-num-updates";
+static const char* MAX_ITERS_KEYWORD = "max-iters";
+static const char* FA_EPSILON_KEYWORD = "fa-epsilon";
+static const char* SNE_PERPLEXITY_KEYWORD = "sne-perplexity";
+static const char* SNE_THETA_KEYWORD = "sne-theta";
+static const char* MS_SQUISHING_RATE_KEYWORD = "squishing-rate";
+static const char* PRECOMPUTE_KEYWORD = "precompute";
+
 int run(int argc, const char **argv)
 {
     srand(static_cast<unsigned int>(time(NULL)));
 
-    ezOptionParser opt;
-    opt.footer =
-        "Copyright (C) 2012-2022 Sergey Lisitsyn <lisitsyn@hey.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>\n"
-        "This is free software: you are free to change and redistribute it.\n"
-        "There is NO WARRANTY, to the extent permitted by law.";
-    opt.overview = "Tapkee library application for reduction dimensions of dense matrices.\n"
-                   "Git " TAPKEE_CURRENT_GIT_INFO;
-    opt.example = "Run locally linear embedding with k=10 with arpack "
-                  "eigensolver on data from input.dat saving embedding to output.dat \n\n"
-                  "tapkee -i input.dat -o output.dat --method lle --eigen-method arpack -k 10\n\n";
-    opt.syntax = "tapkee [options]\n";
+    cxxopts::Options options("tapkee", "Tapkee: a tool for dimension reduction");
+    auto processed_argv = process_argv(argc, argv);
 
-#if defined(USE_SLASH_CLI_WINDOWS) && (defined(_WIN32) || defined(_WIN64))
-#define __OPT_PREFIX "/"
-#define __OPT_LONG_PREFIX "/"
-#else
-#define __OPT_PREFIX "-"
-#define __OPT_LONG_PREFIX "--"
-#endif
-#define OPT_PREFIXED(X) \
-    __OPT_PREFIX X
-#define OPT_LONG_PREFIXED(X) \
-    __OPT_LONG_PREFIX X
-
-#define INPUT_FILE_KEYWORD "input-file"
-    opt.add("", 0, 1, 0, "Input file", OPT_PREFIXED("i"), OPT_LONG_PREFIXED(INPUT_FILE_KEYWORD));
-#define TRANSPOSE_INPUT_KEYWORD "transpose-input"
-    opt.add("", 0, 0, 0, "Transpose input file if set", OPT_LONG_PREFIXED(TRANSPOSE_INPUT_KEYWORD));
-#define TRANSPOSE_OUTPUT_KEYWORD "transpose-output"
-    opt.add("", 0, 0, 0, "Transpose output file if set", OPT_LONG_PREFIXED(TRANSPOSE_OUTPUT_KEYWORD));
-#define OUTPUT_FILE_KEYWORD "output-file"
-    opt.add("", 0, 1, 0, "Output file", OPT_PREFIXED("o"), OPT_LONG_PREFIXED(OUTPUT_FILE_KEYWORD));
-#define OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD "output-projection-matrix-file"
-    opt.add("", 0, 1, 0, "Output file for projection matrix", OPT_PREFIXED("opmat"),
-            OPT_LONG_PREFIXED(OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD));
-#define OUTPUT_PROJECTION_MEAN_FILE_KEYWORD "output-projection-mean-file"
-    opt.add("", 0, 1, 0, "Output file for mean of data", OPT_PREFIXED("opmean"),
-            OPT_LONG_PREFIXED(OUTPUT_PROJECTION_MEAN_FILE_KEYWORD));
-#define DELIMITER_KEYWORD "delimiter"
-    opt.add("", 0, 1, 0, "Delimiter", OPT_PREFIXED("d"), OPT_LONG_PREFIXED(DELIMITER_KEYWORD));
-#define HELP_KEYWORD "help"
-    opt.add("", 0, 0, 0, "Display help", OPT_PREFIXED("h"), OPT_LONG_PREFIXED(HELP_KEYWORD));
-#define BENCHMARK_KEYWORD "benchmark"
-    opt.add("", 0, 0, 0, "Output benchmark information", OPT_LONG_PREFIXED(BENCHMARK_KEYWORD));
-#define VERBOSE_KEYWORD "verbose"
-    opt.add("", 0, 0, 0, "Output more information", OPT_LONG_PREFIXED(VERBOSE_KEYWORD));
-#define DEBUG_KEYWORD "debug"
-    opt.add("", 0, 0, 0, "Output debug information", OPT_LONG_PREFIXED(DEBUG_KEYWORD));
-#define METHOD_KEYWORD "method"
-    opt.add(
-        "locally_linear_embedding", 0, 1, 0,
-        "Dimension reduction method (default locally_linear_embedding). \n One of the following: \n"
-        "locally_linear_embedding (lle), neighborhood_preserving_embedding (npe), \n"
-        "local_tangent_space_alignment (ltsa), linear_local_tangent_space_alignment (lltsa), \n"
-        "hessian_locally_linear_embedding (hlle), laplacian_eigenmaps (la), locality_preserving_projections (lpp), \n"
-        "diffusion_map (dm), isomap, landmark_isomap (l-isomap), multidimensional_scaling (mds), \n"
-        "landmark_multidimensional_scaling (l-mds), stochastic_proximity_embedding (spe), \n"
-        "kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), \n"
-        "t-stochastic_neighborhood_embedding (t-sne), manifold_sculpting (ms).",
-        OPT_PREFIXED("m"), OPT_LONG_PREFIXED(METHOD_KEYWORD));
-#define NEIGHBORS_METHOD_KEYWORD "neighbors-method"
-    opt.add(
+    options
+      .set_width(70)
+      .set_tab_expansion()
+      .add_options()
+    (
+     shorter("i") + INPUT_FILE_KEYWORD,
+     "Input file",
+     string_with_default("/dev/stdin")
+    )
+    (
+     TRANSPOSE_INPUT_KEYWORD,
+     "Transpose input file if set"
+    )
+    (
+     TRANSPOSE_OUTPUT_KEYWORD,
+     "Transpose output file if set"
+    )
+    (
+     shorter("o") + OUTPUT_FILE_KEYWORD,
+     "Output file",
+     string_with_default("/dev/stdout")
+    )
+    (
+     shorter("opmat") + OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD,
+     "Output file for the projection matrix",
+     string_with_default("/dev/null")
+    )
+    (
+     shorter("opmean") + OUTPUT_PROJECTION_MEAN_FILE_KEYWORD,
+     "Output file for the mean of data",
+     string_with_default("/dev/null")
+    )
+    (
+     shorter("d") + DELIMITER_KEYWORD,
+     "Delimiter",
+     string_with_default(",")
+    )
+    (
+     shorter("h") + HELP_KEYWORD,
+     "Print usage"
+    )
+    (
+     BENCHMARK_KEYWORD,
+     "Output benchmark information"
+    )
+    (
+     VERBOSE_KEYWORD,
+     "Output more information"
+    )
+    (
+     DEBUG_KEYWORD,
+     "Output debug information"
+    )
+    (
+     shorter("m") + METHOD_KEYWORD,
+     "Dimension reduction method (default locally_linear_embedding). \n One of the following: \n"
+     "locally_linear_embedding (lle), neighborhood_preserving_embedding (npe), \n"
+     "local_tangent_space_alignment (ltsa), linear_local_tangent_space_alignment (lltsa), \n"
+     "hessian_locally_linear_embedding (hlle), laplacian_eigenmaps (la), locality_preserving_projections (lpp), \n"
+     "diffusion_map (dm), isomap, landmark_isomap (l-isomap), multidimensional_scaling (mds), \n"
+     "landmark_multidimensional_scaling (l-mds), stochastic_proximity_embedding (spe), \n"
+     "kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), \n"
+     "t-stochastic_neighborhood_embedding (t-sne), manifold_sculpting (ms).",
+     string_with_default("locally_linear_embedding")
+    )
+    (
+     shorter("nm") + NEIGHBORS_METHOD_KEYWORD,
+     "Neighbors search method (default is 'covertree' if available, 'vptree' otherwise). One of the following: "
+     "brute,vptree"
 #ifdef TAPKEE_USE_LGPL_COVERTREE
-        "covertree",
-#else
-        "vptree",
+     ",covertree"
 #endif
-        0, 1, 0,
-        "Neighbors search method (default is 'covertree' if available, 'vptree' otherwise). One of the following: "
-        "brute,vptree"
+     ".",
 #ifdef TAPKEE_USE_LGPL_COVERTREE
-        ",covertree"
-#endif
-        ".",
-        OPT_PREFIXED("nm"), OPT_LONG_PREFIXED(NEIGHBORS_METHOD_KEYWORD));
-#define EIGEN_METHOD_KEYWORD "eigen-method"
-    opt.add(
-#ifdef TAPKEE_WITH_ARPACK
-        "arpack",
+     string_with_default("covertree")
 #else
-        "dense",
+     string_with_default("vptree")
 #endif
-        0, 1, 0,
-        "Eigendecomposition method (default is 'arpack' if available, 'dense' otherwise). One of the following: "
+    )
+    (
+     shorter("em") + EIGEN_METHOD_KEYWORD,
+     "Eigendecomposition method (default is 'arpack' if available, 'dense' otherwise). One of the following: "
 #ifdef TAPKEE_WITH_ARPACK
-        "arpack, "
+     "arpack, "
 #endif
-        "randomized, dense.",
-        OPT_PREFIXED("em"), OPT_LONG_PREFIXED(EIGEN_METHOD_KEYWORD));
-#define COMPUTATION_STRATEGY_KEYWORD "computation-strategy"
-    opt.add("cpu", 0, 1, 0,
-            "Computation strategy (default is 'cpu'). One of the following: "
+     "randomized, dense.",
+#ifdef TAPKEE_WITH_ARPACK
+     string_with_default("arpack")
+#else
+     string_with_default("dense")
+#endif
+    )
+    (
+     shorter("cs") + COMPUTATION_STRATEGY_KEYWORD,
+     "Computation strategy (default is 'cpu'). One of the following: "
 #ifdef TAPKEE_WITH_VIENNACL
-            "opencl, "
+     "opencl, "
 #endif
-            "cpu.",
-            OPT_PREFIXED("cs"), OPT_LONG_PREFIXED(COMPUTATION_STRATEGY_KEYWORD));
-#define TARGET_DIMENSION_KEYWORD "target-dimension"
-    opt.add("2", 0, 1, 0, "Target dimension (default 2)", OPT_PREFIXED("td"), OPT_LONG_PREFIXED(TARGET_DIMENSION_KEYWORD));
-#define NUM_NEIGHBORS_KEYWORD "num-neighbors"
-    opt.add("10", 0, 1, 0, "Number of neighbors (default 10)", OPT_PREFIXED("k"), OPT_LONG_PREFIXED(NUM_NEIGHBORS_KEYWORD));
-#define GAUSSIAN_WIDTH_KEYWORD "gaussian-width"
-    opt.add("1.0", 0, 1, 0, "Width of gaussian kernel (default 1.0)", OPT_PREFIXED("gw"),
-            OPT_LONG_PREFIXED(GAUSSIAN_WIDTH_KEYWORD));
-#define TIMESTEPS_KEYWORD "timesteps"
-    opt.add("1", 0, 1, 0, "Number of timesteps for diffusion map (default 1)", OPT_LONG_PREFIXED(TIMESTEPS_KEYWORD));
-#define SPE_LOCAL_KEYWORD "spe-local"
-    opt.add("0", 0, 0, 0, "Local strategy in SPE (default global)", OPT_LONG_PREFIXED(SPE_LOCAL_KEYWORD));
-#define EIGENSHIFT_KEYWORD "eigenshift"
-    opt.add("1e-9", 0, 1, 0, "Regularization diagonal shift for weight matrix (default 1e-9)",
-            OPT_LONG_PREFIXED(EIGENSHIFT_KEYWORD));
-#define LANDMARK_RATIO_KEYWORD "landmark-ratio"
-    opt.add("0.2", 0, 1, 0, "Ratio of landmarks. Should be in (0,1) range (default 0.2, i.e. 20%)",
-            OPT_LONG_PREFIXED(LANDMARK_RATIO_KEYWORD));
-#define SPE_TOLERANCE_KEYWORD "spe-tolerance"
-    opt.add("1e-5", 0, 1, 0, "Tolerance for SPE (default 1e-5)", OPT_LONG_PREFIXED(SPE_TOLERANCE_KEYWORD));
-#define SPE_NUM_UPDATES_KEYWORD "spe-num-updates"
-    opt.add("100", 0, 1, 0, "Number of SPE updates (default 100)", OPT_LONG_PREFIXED(SPE_NUM_UPDATES_KEYWORD));
-#define MAX_ITERS_KEYWORD "max-iters"
-    opt.add("1000", 0, 1, 0, "Maximum number of iterations (default 1000)", OPT_LONG_PREFIXED(MAX_ITERS_KEYWORD));
-#define FA_EPSILON_KEYWORD "fa-epsilon"
-    opt.add("1e-5", 0, 1, 0, "FA convergence criterion (default 1e-5)", OPT_LONG_PREFIXED(FA_EPSILON_KEYWORD));
-#define SNE_PERPLEXITY_KEYWORD "sne-perplexity"
-    opt.add("30.0", 0, 1, 0, "Perplexity for the t-SNE algorithm (default 30.0)",
-            OPT_LONG_PREFIXED(SNE_PERPLEXITY_KEYWORD));
-#define SNE_THETA_KEYWORD "sne-theta"
-    opt.add("0.5", 0, 1, 0, "Theta for the t-SNE algorithm (default 0.5)", OPT_LONG_PREFIXED(SNE_THETA_KEYWORD));
-#define MS_SQUISHING_RATE_KEYWORD "squishing-rate"
-    opt.add("0.99", 0, 1, 0, "Squishing rate of the Manifold Sculpting algorithm (default 0.5)",
-            OPT_LONG_PREFIXED(MS_SQUISHING_RATE_KEYWORD));
-#define PRECOMPUTE_KEYWORD "precompute"
-    opt.add("", 0, 0, 0, "Whether distance and kernel matrices should be precomputed (default false)",
-            OPT_LONG_PREFIXED(PRECOMPUTE_KEYWORD));
+     "cpu.",
+     string_with_default("cpu")
+    )
+    (
+     shorter("td") + TARGET_DIMENSION_KEYWORD,
+     "Target dimension",
+     int_with_default("2")
+    )
+    (
+     shorter("k") + NUM_NEIGHBORS_KEYWORD,
+     "Number of neighbors",
+     int_with_default("10")
+    )
+    (
+     shorter("gw") + GAUSSIAN_WIDTH_KEYWORD,
+     "Width of gaussian kernel",
+     double_with_default("1.0")
+    )
+    (
+     TIMESTEPS_KEYWORD,
+     "Number of timesteps for diffusion map",
+     int_with_default("1")
+    )
+    (
+     EIGENSHIFT_KEYWORD,
+     "Regularization diagonal shift for weight matrix",
+     double_with_default("1e-9")
+    )
+    (
+     LANDMARK_RATIO_KEYWORD,
+     "Ratio of landmarks. Should be in (0,1) range (0.2 means 20%)",
+     double_with_default("0.2")
+    )
+    (
+     SPE_LOCAL_KEYWORD,
+     "Local strategy in SPE (default is global)"
+    )
+    (
+     SPE_TOLERANCE_KEYWORD,
+     "Tolerance for SPE",
+     double_with_default("1e-5")
+    )
+    (
+     SPE_NUM_UPDATES_KEYWORD,
+     "Number of SPE updates",
+     int_with_default("100")
+    )
+    (
+     MAX_ITERS_KEYWORD,
+     "Maximum number of iterations",
+     int_with_default("1000")
+    )
+    (
+     FA_EPSILON_KEYWORD,
+     "FA convergence threshold",
+     double_with_default("1e-5")
+    )
+    (
+     SNE_PERPLEXITY_KEYWORD,
+     "Perplexity for the t-SNE algorithm",
+     double_with_default("30.0")
+    )
+    (
+     SNE_THETA_KEYWORD,
+     "Theta for the t-SNE algorithm",
+     double_with_default("0.5")
+    )
+    (
+     MS_SQUISHING_RATE_KEYWORD,
+     "Squishing rate of the Manifold Sculpting algorithm",
+     double_with_default("0.99")
+    )
+    (
+     PRECOMPUTE_KEYWORD,
+     "Whether distance and kernel matrices should be precomputed (default false)"
+    )
+    ;
 
-    opt.parse(argc, argv);
+    auto opt = options.parse(processed_argv.size(), &processed_argv[0]);
 
-    if (opt.isSet(OPT_LONG_PREFIXED(HELP_KEYWORD)))
+    if (opt.count(HELP_KEYWORD))
     {
-        string usage;
-        opt.getUsage(usage);
-        std::cout << usage << std::endl;
+        std::cout << options.help() << std::endl << std::endl;
+        std::cout << "Git version " TAPKEE_CURRENT_GIT_INFO << std::endl << std::endl;
+        std::cout << "Example: " << std::endl <<
+            "Run locally linear embedding with k=10 with arpack " << std::endl <<
+            "eigensolver on data from input.dat saving embedding to output.dat" << std::endl << std::endl <<
+            "tapkee -i input.dat -o output.dat --method lle --eigen-method arpack -k 10" << std::endl << std::endl;
+
+        std::cout <<
+            "Copyright (C) 2012-2024 Sergey Lisitsyn <lisitsyn@hey.com>, Fernando Iglesias <fernando.iglesiasg@gmail.com>" << std::endl <<
+            "This is free software: you are free to change and redistribute it" << std::endl <<
+            "There is NO WARRANTY, to the extent permitted by law." << std::endl;
         return 1;
     }
-
-    if (opt.isSet(OPT_LONG_PREFIXED(VERBOSE_KEYWORD)))
+    if (opt.count(VERBOSE_KEYWORD))
     {
         tapkee::LoggingSingleton::instance().enable_info();
     }
-    if (opt.isSet(OPT_LONG_PREFIXED(DEBUG_KEYWORD)))
+    if (opt.count(DEBUG_KEYWORD))
     {
         tapkee::LoggingSingleton::instance().enable_debug();
         tapkee::LoggingSingleton::instance().message_info("Debug messages enabled");
     }
 
-    if (opt.isSet(OPT_LONG_PREFIXED(BENCHMARK_KEYWORD)))
+    if (opt.count(BENCHMARK_KEYWORD))
     {
         tapkee::LoggingSingleton::instance().enable_benchmark();
         tapkee::LoggingSingleton::instance().message_info("Benchmarking enabled");
@@ -197,8 +313,7 @@ int run(int argc, const char **argv)
 
     tapkee::DimensionReductionMethod tapkee_method;
     {
-        string method;
-        opt.get(OPT_LONG_PREFIXED(METHOD_KEYWORD))->getString(method);
+        string method = opt[METHOD_KEYWORD].as<std::string>();
         try
         {
             tapkee_method = parse_reduction_method(method.c_str());
@@ -212,8 +327,7 @@ int run(int argc, const char **argv)
 
     tapkee::NeighborsMethod tapkee_neighbors_method = tapkee::Brute;
     {
-        string method;
-        opt.get(OPT_LONG_PREFIXED(NEIGHBORS_METHOD_KEYWORD))->getString(method);
+        string method = opt[NEIGHBORS_METHOD_KEYWORD].as<std::string>();
         try
         {
             tapkee_neighbors_method = parse_neighbors_method(method.c_str());
@@ -226,8 +340,7 @@ int run(int argc, const char **argv)
     }
     tapkee::EigenMethod tapkee_eigen_method = tapkee::Dense;
     {
-        string method;
-        opt.get(OPT_LONG_PREFIXED(EIGEN_METHOD_KEYWORD))->getString(method);
+        string method = opt[EIGEN_METHOD_KEYWORD].as<std::string>();
         try
         {
             tapkee_eigen_method = parse_eigen_method(method.c_str());
@@ -240,8 +353,7 @@ int run(int argc, const char **argv)
     }
     tapkee::ComputationStrategy tapkee_computation_strategy = tapkee::HomogeneousCPUStrategy;
     {
-        string method;
-        opt.get(OPT_LONG_PREFIXED(COMPUTATION_STRATEGY_KEYWORD))->getString(method);
+        string method = opt[COMPUTATION_STRATEGY_KEYWORD].as<std::string>();
         try
         {
             tapkee_computation_strategy = parse_computation_strategy(method.c_str());
@@ -252,121 +364,57 @@ int run(int argc, const char **argv)
             return 1;
         }
     }
-    int target_dim = 1;
+
+    int target_dim = opt[TARGET_DIMENSION_KEYWORD].as<int>();
+    if (target_dim < 0)
     {
-        opt.get(OPT_LONG_PREFIXED(TARGET_DIMENSION_KEYWORD))->getInt(target_dim);
-        if (target_dim < 0)
-        {
-            tapkee::LoggingSingleton::instance().message_error(
-                "Negative target dimensionality is not possible in current circumstances. "
-                "Please visit other universe");
-            return 1;
-        }
+        tapkee::LoggingSingleton::instance().message_error(
+            "Negative target dimensionality is not possible in current circumstances. "
+            "Please visit other universe");
+        return 1;
     }
-    int k = 1;
+
+    int k = opt[NUM_NEIGHBORS_KEYWORD].as<int>();
+    if (k < 3)
     {
-        opt.get(OPT_LONG_PREFIXED(NUM_NEIGHBORS_KEYWORD))->getInt(k);
-        if (k < 3)
-        {
-            tapkee::LoggingSingleton::instance().message_error(
-                "The provided number of neighbors is too small, consider at least 3.");
-            return 1;
-        }
+        tapkee::LoggingSingleton::instance().message_error(
+            "The provided number of neighbors is too small, consider at least 3.");
+        return 1;
     }
-    double width = 1.0;
+    double width = opt[GAUSSIAN_WIDTH_KEYWORD].as<double>();
+    if (width < 0.0)
     {
-        opt.get(OPT_LONG_PREFIXED(GAUSSIAN_WIDTH_KEYWORD))->getDouble(width);
-        if (width < 0.0)
-        {
-            tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
-            return 1;
-        }
+        tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
+        return 1;
     }
-    int timesteps = 1;
+    int timesteps = opt[TIMESTEPS_KEYWORD].as<int>();
+    if (timesteps < 0)
     {
-        opt.get(OPT_LONG_PREFIXED(TIMESTEPS_KEYWORD))->getInt(timesteps);
-        if (timesteps < 0)
-        {
-            tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
-            return 1;
-        }
+        tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
+        return 1;
     }
-    double eigenshift = 1e-9;
-    {
-        opt.get(OPT_LONG_PREFIXED(EIGENSHIFT_KEYWORD))->getDouble(eigenshift);
-    }
-    double landmark_rt = 0.0;
-    {
-        opt.get(OPT_LONG_PREFIXED(LANDMARK_RATIO_KEYWORD))->getDouble(landmark_rt);
-    }
-    bool spe_global = false;
-    {
-        if (opt.isSet(OPT_LONG_PREFIXED(SPE_LOCAL_KEYWORD)))
-            spe_global = false;
-        else
-            spe_global = true;
-    }
-    double spe_tol = 1e-5;
-    {
-        opt.get(OPT_LONG_PREFIXED(SPE_TOLERANCE_KEYWORD))->getDouble(spe_tol);
-    }
-    int spe_num_upd = 100;
-    {
-        opt.get(OPT_LONG_PREFIXED(SPE_NUM_UPDATES_KEYWORD))->getInt(spe_num_upd);
-    }
-    int max_iters = 1000;
-    {
-        opt.get(OPT_LONG_PREFIXED(MAX_ITERS_KEYWORD))->getInt(max_iters);
-    }
-    double fa_eps = 1e-5;
-    {
-        opt.get(OPT_LONG_PREFIXED(FA_EPSILON_KEYWORD))->getDouble(fa_eps);
-    }
-    double perplexity = 30.0;
-    {
-        opt.get(OPT_LONG_PREFIXED(SNE_PERPLEXITY_KEYWORD))->getDouble(perplexity);
-    }
-    double theta = 0.5;
-    {
-        opt.get(OPT_LONG_PREFIXED(SNE_THETA_KEYWORD))->getDouble(theta);
-    }
-    double squishing = 0.99;
-    {
-        opt.get(OPT_LONG_PREFIXED(MS_SQUISHING_RATE_KEYWORD))->getDouble(squishing);
-    }
+    double eigenshift = opt[EIGENSHIFT_KEYWORD].as<double>();
+    double landmark_rt = opt[LANDMARK_RATIO_KEYWORD].as<double>();
+    bool spe_global = opt.count(SPE_LOCAL_KEYWORD);
+    double spe_tol = opt[SPE_TOLERANCE_KEYWORD].as<double>();
+    int spe_num_upd = opt[SPE_NUM_UPDATES_KEYWORD].as<int>();
+    int max_iters = opt[MAX_ITERS_KEYWORD].as<int>();
+    double fa_eps = opt[FA_EPSILON_KEYWORD].as<double>();
+    double perplexity = opt[SNE_PERPLEXITY_KEYWORD].as<double>();
+    double theta = opt[SNE_THETA_KEYWORD].as<double>();
+    double squishing = opt[MS_SQUISHING_RATE_KEYWORD].as<double>();
 
     // Load data
-    string input_filename;
-    string output_filename;
-    if (!opt.isSet(OPT_LONG_PREFIXED(INPUT_FILE_KEYWORD)))
-    {
-        // tapkee::LoggingSingleton::instance().message_warning("No input file specified, using stdin");
-        input_filename = "/dev/stdin";
-    }
-    else
-    {
-        opt.get(OPT_LONG_PREFIXED(INPUT_FILE_KEYWORD))->getString(input_filename);
-    }
-
-    if (!opt.isSet(OPT_LONG_PREFIXED(OUTPUT_FILE_KEYWORD)))
-    {
-        // tapkee::LoggingSingleton::instance().message_warning("No output file specified, using stdout");
-        output_filename = "/dev/stdout";
-    }
-    else
-    {
-        opt.get(OPT_LONG_PREFIXED(OUTPUT_FILE_KEYWORD))->getString(output_filename);
-    }
+    string input_filename = opt[INPUT_FILE_KEYWORD].as<std::string>();
+    string output_filename = opt[OUTPUT_FILE_KEYWORD].as<std::string>();
 
     bool output_projection = false;
-    std::string output_matrix_filename = "/dev/null";
-    std::string output_mean_filename = "/dev/null";
-    if (opt.isSet(OPT_LONG_PREFIXED(OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD)) &&
-        opt.isSet(OPT_LONG_PREFIXED(OUTPUT_PROJECTION_MEAN_FILE_KEYWORD)))
+    std::string output_matrix_filename = opt[OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD].as<std::string>();
+    std::string output_mean_filename = opt[OUTPUT_PROJECTION_MEAN_FILE_KEYWORD].as<std::string>();
+    if (opt.count(OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD) &&
+        opt.count(OUTPUT_PROJECTION_MEAN_FILE_KEYWORD))
     {
         output_projection = true;
-        opt.get(OPT_LONG_PREFIXED(OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD))->getString(output_matrix_filename);
-        opt.get(OPT_LONG_PREFIXED(OUTPUT_PROJECTION_MEAN_FILE_KEYWORD))->getString(output_mean_filename);
     }
 
     ifstream ifs(input_filename.c_str());
@@ -374,13 +422,13 @@ int run(int argc, const char **argv)
     ofstream ofs_matrix(output_matrix_filename.c_str());
     ofstream ofs_mean(output_mean_filename.c_str());
 
-    std::string delimiter = ",";
-    if (opt.isSet(OPT_LONG_PREFIXED(DELIMITER_KEYWORD)))
-        opt.get(OPT_LONG_PREFIXED(DELIMITER_KEYWORD))->getString(delimiter);
+    std::string delimiter = opt[DELIMITER_KEYWORD].as<std::string>();
 
     tapkee::DenseMatrix input_data = read_data(ifs, delimiter[0]);
-    if (!opt.isSet(OPT_LONG_PREFIXED(TRANSPOSE_INPUT_KEYWORD)))
+    if (!opt.count(TRANSPOSE_INPUT_KEYWORD))
+    {
         input_data.transposeInPlace();
+    }
 
     std::stringstream ss;
     ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
@@ -400,7 +448,7 @@ int run(int argc, const char **argv)
                         tapkee::sne_perplexity = perplexity, tapkee::sne_theta = theta,
                         tapkee::squishing_rate = squishing)];
 
-    if (opt.isSet(OPT_LONG_PREFIXED(PRECOMPUTE_KEYWORD)))
+    if (opt.count(PRECOMPUTE_KEYWORD))
     {
         vector<tapkee::IndexType> indices(input_data.cols());
         for (tapkee::IndexType i = 0; i < input_data.cols(); ++i)
@@ -438,7 +486,7 @@ int run(int argc, const char **argv)
         output = tapkee::initialize().withParameters(parameters).embedUsing(input_data);
     }
     // Save obtained data
-    if (opt.isSet(OPT_LONG_PREFIXED(TRANSPOSE_OUTPUT_KEYWORD)))
+    if (opt.count(TRANSPOSE_OUTPUT_KEYWORD))
     {
         output.embedding.transposeInPlace();
     }
@@ -447,18 +495,19 @@ int run(int argc, const char **argv)
 
     if (output_projection && output.projection.implementation)
     {
-        tapkee::MatrixProjectionImplementation *matrix_projection =
+        tapkee::MatrixProjectionImplementation* matrix_projection =
             dynamic_cast<tapkee::MatrixProjectionImplementation *>(output.projection.implementation.get());
+        if (!matrix_projection)
+        {
+            tapkee::LoggingSingleton::instance().message_error("Projection function unavailable");
+            return 1;
+        }
         write_matrix(&matrix_projection->proj_mat, ofs_matrix, delimiter[0]);
         write_vector(&matrix_projection->mean_vec, ofs_mean);
     }
     ofs_matrix.close();
     ofs_mean.close();
     return 0;
-#undef __OPT_PREFIX
-#undef __OPT_LONG_PREFIX
-#undef OPT_PREFIXED
-#undef OPT_LONG_PREFIXED
 }
 
 int main(int argc, const char **argv)
@@ -466,6 +515,11 @@ int main(int argc, const char **argv)
     try
     {
         return run(argc, argv);
+    }
+    catch (const cxxopts::exceptions::exception& e)
+    {
+        std::cerr << "Failed to parse arguments: " << e.what() << std::endl;
+        return 1;
     }
     catch (const std::exception &exc)
     {
