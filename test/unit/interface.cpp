@@ -130,7 +130,7 @@ TEST(Interface, NoDataPassThru)
     // that's normal
     ASSERT_EQ(0, output.embedding.rows());
     // that's normal
-    ASSERT_EQ(NULL, output.projection.implementation);
+    ASSERT_EQ(nullptr, output.projection.implementation.get());
 }
 
 TEST(Interface, ParameterTargetDimension)

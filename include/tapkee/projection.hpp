@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include <memory>
+
 namespace tapkee
 {
 
@@ -22,12 +24,11 @@ struct ProjectionImplementation
 //! A pimpl wrapper for projecting function
 struct ProjectingFunction
 {
-    ProjectingFunction() : implementation(NULL){};
-    ProjectingFunction(ProjectionImplementation* impl) : implementation(impl){};
-    //! Destroys current implementation
-    void clear()
+    ProjectingFunction() : implementation()
     {
-        delete implementation;
+    }
+    ProjectingFunction(ProjectionImplementation* impl) : implementation(impl)
+    {
     }
     //! Projects provided vector to new space
     //! @param vec vector to be projected
@@ -36,7 +37,7 @@ struct ProjectingFunction
     {
         return implementation->project(vec);
     }
-    ProjectionImplementation* implementation;
+    std::shared_ptr<ProjectionImplementation> implementation;
 };
 
 //! Basic @ref ProjectionImplementation that subtracts mean from the vector
