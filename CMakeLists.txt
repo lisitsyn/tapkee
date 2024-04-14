@@ -21,6 +21,9 @@ set (EIGEN3_LIBRARY_TO_LINK "Eigen3::Eigen")
 find_package(fmt REQUIRED)
 set (FMT_LIBRARY_TO_LINK "fmt::fmt-header-only")
 
+# cxxopts
+find_package(cxxopts REQUIRED)
+
 # ARPACK detection
 find_package(Arpack)
 if (ARPACK_FOUND)
