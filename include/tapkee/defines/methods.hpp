@@ -103,14 +103,6 @@ template <typename M> struct Method
     Method(const M& m) : name_(m.name_)
     {
     }
-    Method& operator=(const Method& m)
-    {
-        this->name_ = m.name_;
-        return *this;
-    }
-    Method(const Method& m) = default;
-    Method(Method&& m) = delete;
-    Method& operator=(Method&& m) = delete;
     const char* name() const
     {
         return name_;
