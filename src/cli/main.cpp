@@ -45,19 +45,6 @@ template<typename T> auto with_default(T defs)
         return cxxopts::value<T>()->default_value(std::to_string(defs));
 }
 
-std::vector<const char*> process_argv(int argc, const char** argv)
-{
-    std::vector<const char*> processed;
-    for (int i=0; i<argc; ++i)
-    {
-        processed.push_back(argv[i]);
-        #if defined(USE_SLASH_CLI_WINDOWS) && (defined(_WIN32) || defined(_WIN64))
-        // rpplace -- and - with /
-        #endif
-    }
-    return processed;
-}
-
 static const char* INPUT_FILE_KEYWORD = "input-file";
 static const char* TRANSPOSE_INPUT_KEYWORD = "transpose-input";
 static const char* TRANSPOSE_OUTPUT_KEYWORD = "transpose-output";
@@ -94,7 +81,6 @@ int run(int argc, const char **argv)
     srand(static_cast<unsigned int>(time(NULL)));
 
     cxxopts::Options options("tapkee", "Tapkee: a tool for dimension reduction");
-    auto processed_argv = process_argv(argc, argv);
 
     using namespace std::string_literals;
 
@@ -274,7 +260,7 @@ int run(int argc, const char **argv)
     )
     ;
 
-    auto opt = options.parse(processed_argv.size(), &processed_argv[0]);
+    auto opt = options.parse(argc, argv);
 
     if (opt.count(HELP_KEYWORD))
     {
