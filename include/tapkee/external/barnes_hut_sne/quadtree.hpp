@@ -299,52 +299,6 @@ class QuadTree
             return true;
     }
 
-    // Rebuilds a possibly incorrect tree (LAURENS: This function is not tested yet!)
-    void rebuildTree()
-    {
-        for (int n = 0; n < size; n++)
-        {
-            // Check whether point is erroneous
-            ScalarType* point = data + index[n] * QT_NO_DIMS;
-            if (!boundary.containsPoint(point))
-            {
-
-                // Remove erroneous point
-                int rem_index = index[n];
-                for (int m = n + 1; m < size; m++)
-                    index[m - 1] = index[m];
-                index[size - 1] = -1;
-                size--;
-
-                // Update center-of-mass and counter in all parents
-                bool done = false;
-                QuadTree* node = this;
-                while (!done)
-                {
-                    for (int d = 0; d < QT_NO_DIMS; d++)
-                    {
-                        node->center_of_mass[d] = ((ScalarType)node->cum_size * node->center_of_mass[d] - point[d]) /
-                                                  (ScalarType)(node->cum_size - 1);
-                    }
-                    node->cum_size--;
-                    if (node->getParent() == NULL)
-                        done = true;
-                    else
-                        node = node->getParent();
-                }
-
-                // Reinsert point in the root tree
-                node->insert(rem_index);
-            }
-        }
-
-        // Rebuild lower parts of the tree
-        northWest->rebuildTree();
-        northEast->rebuildTree();
-        southWest->rebuildTree();
-        southEast->rebuildTree();
-    }
-
     // Build a list of all indices in quadtree
     void getAllIndices(int* indices)
     {
