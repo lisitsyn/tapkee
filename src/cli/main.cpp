@@ -32,9 +32,9 @@ bool cancel()
     return false;
 }
 
-std::string shorter(const char* shorter)
+std::string either(const char* shorter_keyword, const char* keyword)
 {
-    return std::string(shorter) + ",";
+    return std::string(shorter_keyword) + "," + keyword;
 }
 
 template<typename T> auto with_default(T defs)
@@ -103,7 +103,7 @@ int run(int argc, const char **argv)
       .set_tab_expansion()
       .add_options()
     (
-     shorter("i") + INPUT_FILE_KEYWORD,
+     either("i", INPUT_FILE_KEYWORD),
      "Input file",
      with_default("/dev/stdin"s)
     )
@@ -116,27 +116,27 @@ int run(int argc, const char **argv)
      "Transpose output file if set"
     )
     (
-     shorter("o") + OUTPUT_FILE_KEYWORD,
+     either("o", OUTPUT_FILE_KEYWORD),
      "Output file",
      with_default("/dev/stdout"s)
     )
     (
-     shorter("opmat") + OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD,
+     either("opmat", OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD),
      "Output file for the projection matrix",
      with_default("/dev/null"s)
     )
     (
-     shorter("opmean") + OUTPUT_PROJECTION_MEAN_FILE_KEYWORD,
+     either("opmean", OUTPUT_PROJECTION_MEAN_FILE_KEYWORD),
      "Output file for the mean of data",
      with_default("/dev/null"s)
     )
     (
-     shorter("d") + DELIMITER_KEYWORD,
+     either("d", DELIMITER_KEYWORD),
      "Delimiter",
      with_default(","s)
     )
     (
-     shorter("h") + HELP_KEYWORD,
+     either("h", HELP_KEYWORD),
      "Print usage"
     )
     (
@@ -152,7 +152,7 @@ int run(int argc, const char **argv)
      "Output debug information"
     )
     (
-     shorter("m") + METHOD_KEYWORD,
+     either("m", METHOD_KEYWORD),
      "Dimension reduction method (default locally_linear_embedding). \n One of the following: \n"
      "locally_linear_embedding (lle), neighborhood_preserving_embedding (npe), \n"
      "local_tangent_space_alignment (ltsa), linear_local_tangent_space_alignment (lltsa), \n"
@@ -164,7 +164,7 @@ int run(int argc, const char **argv)
      with_default("locally_linear_embedding"s)
     )
     (
-     shorter("nm") + NEIGHBORS_METHOD_KEYWORD,
+     either("nm", NEIGHBORS_METHOD_KEYWORD),
      "Neighbors search method (default is 'covertree' if available, 'vptree' otherwise). One of the following: "
      "brute,vptree"
 #ifdef TAPKEE_USE_LGPL_COVERTREE
@@ -178,7 +178,7 @@ int run(int argc, const char **argv)
 #endif
     )
     (
-     shorter("em") + EIGEN_METHOD_KEYWORD,
+     either("em", EIGEN_METHOD_KEYWORD),
      "Eigendecomposition method (default is 'arpack' if available, 'dense' otherwise). One of the following: "
 #ifdef TAPKEE_WITH_ARPACK
      "arpack, "
@@ -191,7 +191,7 @@ int run(int argc, const char **argv)
 #endif
     )
     (
-     shorter("cs") + COMPUTATION_STRATEGY_KEYWORD,
+     either("cs", COMPUTATION_STRATEGY_KEYWORD),
      "Computation strategy (default is 'cpu'). One of the following: "
 #ifdef TAPKEE_WITH_VIENNACL
      "opencl, "
@@ -200,17 +200,17 @@ int run(int argc, const char **argv)
      with_default("cpu"s)
     )
     (
-     shorter("td") + TARGET_DIMENSION_KEYWORD,
+     either("td", TARGET_DIMENSION_KEYWORD),
      "Target dimension",
      with_default(2)
     )
     (
-     shorter("k") + NUM_NEIGHBORS_KEYWORD,
+     either("k", NUM_NEIGHBORS_KEYWORD),
      "Number of neighbors",
      with_default(10)
     )
     (
-     shorter("gw") + GAUSSIAN_WIDTH_KEYWORD,
+     either("gw", GAUSSIAN_WIDTH_KEYWORD),
      "Width of gaussian kernel",
      with_default(1.0)
     )
