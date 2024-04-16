@@ -6,6 +6,8 @@
 
 #include <tapkee/defines/methods.hpp>
 
+#include <string>
+
 namespace tapkee
 {
 
