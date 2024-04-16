@@ -5,6 +5,7 @@
 #pragma once
 
 #include <tapkee/defines/types.hpp>
+#include <tapkee/traits/methods_traits.hpp>
 
 namespace tapkee
 {
