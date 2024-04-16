@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include <tapkee/defines/eigen3.hpp>
+
 namespace tapkee
 {
 #ifdef TAPKEE_CUSTOM_INTERNAL_NUMTYPE
