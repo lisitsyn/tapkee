@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include <tapkee/defines/types.hpp>
+
 #include <memory>
 
 namespace tapkee
