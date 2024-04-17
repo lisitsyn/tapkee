@@ -85,8 +85,8 @@ endmacro()
 option(BUILD_PYTHON "Whether to build Python interface" ON)
 if (BUILD_PYTHON)
 	find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-	set(_pyx_compiled_source "${CMAKE_CURRENT_BINARY_DIR}/pytapkee.c")
 	set(_pyx_source "${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee.pyx")
+	set(_pyx_compiled_source "${CMAKE_CURRENT_BINARY_DIR}/pytapkee.c")
 	add_custom_command(
 	    OUTPUT ${_pyx_compiled_source}
 	    COMMAND ${Python3_EXECUTABLE} -m cython --cplus -o ${_pyx_compiled_source} ${_pyx_source}
@@ -94,12 +94,11 @@ if (BUILD_PYTHON)
 	    COMMENT "Generating Cython files ${_pyx_compiled_source}"
 	)
 	set_source_files_properties(${_pyx_compiled_source} PROPERTIES LANGUAGE CXX)
-	add_library(pytapkee
-	    SHARED
-	    ${_pyx_compiled_source}
-	)
+	add_library(pytapkee MODULE ${_pyx_compiled_source})
 	set_target_properties(pytapkee PROPERTIES LINKER_LANGUAGE CXX)
 	set_target_properties(pytapkee PROPERTIES POSITION_INDEPENDENT_CODE ON)
+	include_directories(${Python3_INCLUDE_DIRS})
+	target_sources(pytapkee PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/python/tapkee_module.cpp")
 	target_link_libraries(pytapkee PUBLIC Python3::Python)
 	target_include_directories(pytapkee
 	    PUBLIC
@@ -107,6 +106,19 @@ if (BUILD_PYTHON)
 	    $<INSTALL_INTERFACE:include>
 	    PRIVATE
 	    ${CMAKE_CURRENT_SOURCE_DIR}/src/python
+	)
+	# Install the Python module
+	install(
+	TARGETS pytapkee
+	    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+	    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+	    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+	)
+	# Install the header files
+	install(
+	    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+	    DESTINATION ${CMAKE_INSTALL_PREFIX}/include
+	    FILES_MATCHING PATTERN "*.h"
 	)
 endif()
 
