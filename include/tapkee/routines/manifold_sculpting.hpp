@@ -92,8 +92,8 @@ SparseMatrix neighbors_distances_matrix(RandomAccessIterator begin, RandomAccess
 
 inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors& neighbors, const DenseMatrix& data)
 {
-    const IndexType k = neighbors[0].size();
-    const IndexType n_vectors = data.cols();
+    const IndexType k = static_cast<IndexType>(neighbors[0].size());
+    const IndexType n_vectors = static_cast<IndexType>(data.cols());
 
     SparseTriplets sparse_triplets;
     sparse_triplets.reserve(static_cast<size_t>(k) * n_vectors);

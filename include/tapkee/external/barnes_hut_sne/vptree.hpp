@@ -84,7 +84,7 @@ class DataPoint
     }
     int dimensionality() const
     {
-        return _x.size();
+        return static_cast<int>(_x.size());
     }
     ScalarType x(int d) const
     {
