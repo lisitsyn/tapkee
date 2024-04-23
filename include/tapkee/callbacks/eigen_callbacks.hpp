@@ -18,7 +18,7 @@ struct eigen_features_callback
     eigen_features_callback(const tapkee::DenseMatrix& matrix) : feature_matrix(matrix){};
     inline tapkee::IndexType dimension() const
     {
-        return feature_matrix.rows();
+        return static_cast<tapkee::IndexType>(feature_matrix.rows());
     }
     inline void vector(tapkee::IndexType i, tapkee::DenseVector& v) const
     {

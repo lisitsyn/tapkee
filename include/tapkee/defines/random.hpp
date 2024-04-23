@@ -49,7 +49,6 @@ inline ScalarType gaussian_random()
     } while ((radius >= 1.0) || (radius == 0.0));
     radius = std::sqrt(-2 * std::log(radius) / radius);
     x *= radius;
-    y *= radius;
     return x;
 #endif
 }
