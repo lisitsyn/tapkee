@@ -15,7 +15,7 @@ using namespace tapkee;
 
 void smoketest(DimensionReductionMethod m)
 {
-    const int N = 50;
+    const int N = 100;
     DenseMatrix X = swissroll(N);
     tapkee::eigen_kernel_callback kcb(X);
     tapkee::eigen_distance_callback dcb(X);
