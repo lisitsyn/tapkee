@@ -66,6 +66,9 @@ END_IMPLEMENTATION()
 IMPLEMENTATION(DiffusionMap)
     TapkeeOutput embed()
     {
+        this->parameters[diffusion_map_timesteps].checked().satisfies(Positivity<IndexType>()).orThrow();
+        this->parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>()).orThrow();
+
         IndexType target_dimension_value = static_cast<IndexType>(this->parameters[target_dimension]);
         Parameter target_dimension_add = Parameter::create("target_dimension", target_dimension_value + 1);
         DenseSymmetricMatrix diffusion_matrix =
@@ -219,6 +222,8 @@ END_IMPLEMENTATION()
 IMPLEMENTATION(LaplacianEigenmaps)
     TapkeeOutput embed()
     {
+        this->parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>()).orThrow();
+
         Neighbors neighbors = this->findNeighborsWith(this->plain_distance);
         Laplacian laplacian = compute_laplacian(this->begin, this->end, neighbors, this->distance, this->parameters[gaussian_kernel_width]);
         return TapkeeOutput(generalized_eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy],
@@ -231,6 +236,8 @@ END_IMPLEMENTATION()
 IMPLEMENTATION(LocalityPreservingProjections)
     TapkeeOutput embed()
     {
+        this->parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>()).orThrow();
+
         Neighbors neighbors = this->findNeighborsWith(this->plain_distance);
         Laplacian laplacian = compute_laplacian(this->begin, this->end, neighbors, this->distance, this->parameters[gaussian_kernel_width]);
         DenseSymmetricMatrixPair eigenproblem_matrices = construct_locality_preserving_eigenproblem(
@@ -310,6 +317,8 @@ END_IMPLEMENTATION()
 IMPLEMENTATION(StochasticProximityEmbedding)
     TapkeeOutput embed()
     {
+        this->parameters[spe_tolerance].checked().satisfies(Positivity<ScalarType>()).orThrow();
+        this->parameters[spe_num_updates].checked().satisfies(Positivity<IndexType>()).orThrow();
         Neighbors neighbors;
         if (this->parameters[spe_global_strategy].is(false))
         {
@@ -334,6 +343,8 @@ END_IMPLEMENTATION()
 IMPLEMENTATION(FactorAnalysis)
     TapkeeOutput embed()
     {
+        this->parameters[fa_epsilon].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
+
         DenseVector mean_vector = compute_mean(this->begin, this->end, this->features, this->current_dimension);
         return TapkeeOutput(project(this->begin, this->end, this->features, this->current_dimension, this->parameters[max_iteration],
                                     this->parameters[fa_epsilon], this->parameters[target_dimension], mean_vector),
@@ -345,6 +356,7 @@ IMPLEMENTATION(tDistributedStochasticNeighborEmbedding)
     TapkeeOutput embed()
     {
         this->parameters[sne_perplexity].checked().satisfies(InClosedRange<ScalarType>(0.0, (this->n_vectors - 1) / 3.0)).orThrow();
+        this->parameters[sne_theta].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
 
         DenseMatrix data = dense_matrix_from_features(this->features, this->current_dimension, this->begin, this->end);
 

@@ -38,7 +38,7 @@ class ImplementationBase
         if (n_vectors == 0)
             throw no_data_error();
 
-        validateParameters();
+        parameters[target_dimension].checked().satisfies(InRange<IndexType>(1, n_vectors)).orThrow();
 
         if (!is_dummy<FeaturesCallback>::value)
             current_dimension = features.dimension();
@@ -59,18 +59,6 @@ class ImplementationBase
         , current_dimension(other.current_dimension)
     {
 
-    }
-
-    void validateParameters() const
-    {
-        parameters[target_dimension].checked().satisfies(InRange<IndexType>(1, n_vectors)).orThrow();
-        parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>()).orThrow();
-        parameters[diffusion_map_timesteps].checked().satisfies(Positivity<IndexType>()).orThrow();
-        parameters[spe_tolerance].checked().satisfies(Positivity<ScalarType>()).orThrow();
-        parameters[spe_num_updates].checked().satisfies(Positivity<IndexType>()).orThrow();
-        parameters[sne_theta].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
-        parameters[fa_epsilon].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
-        parameters[sne_perplexity].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
     }
 
   public:
