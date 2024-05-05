@@ -11,6 +11,7 @@
 #include <tapkee/parameters/context.hpp>
 #include <tapkee/parameters/defaults.hpp>
 #include <tapkee/predicates.hpp>
+#include <tapkee/projection.hpp>
 #include <tapkee/utils/features.hpp>
 #include <tapkee/utils/logging.hpp>
 #include <tapkee/utils/naming.hpp>
@@ -82,11 +83,6 @@ class ImplementationBase
         parameters[num_neighbors].checked().satisfies(InRange<IndexType>(3, n_vectors)).orThrow();
         return find_neighbors(parameters[neighbors_method], begin, end, d, parameters[num_neighbors],
                               parameters[check_connectivity]);
-    }
-
-    static tapkee::ProjectingFunction unimplementedProjectingFunction()
-    {
-        return tapkee::ProjectingFunction();
     }
 
 };

@@ -46,7 +46,7 @@ IMPLEMENTATION(KernelLocallyLinearEmbedding)
         DenseMatrix embedding = eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy],
                                                     SmallestEigenvalues, weight_matrix, this->parameters[target_dimension]).first;
 
-        return TapkeeOutput(embedding, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -59,7 +59,7 @@ IMPLEMENTATION(KernelLocalTangentSpaceAlignment)
         DenseMatrix embedding = eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy],
                                                     SmallestEigenvalues, weight_matrix, this->parameters[target_dimension]).first;
 
-        return TapkeeOutput(embedding, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -84,7 +84,7 @@ IMPLEMENTATION(DiffusionMap)
         // scaling by eigenvector to largest eigenvalue 1
         for (IndexType i = 0; i < target_dimension_value; i++)
             embedding.col(i).array() /= decomposition_result.first.col(target_dimension_value).array();
-        return TapkeeOutput(embedding, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -100,7 +100,7 @@ IMPLEMENTATION(MultidimensionalScaling)
 
         for (IndexType i = 0; i < static_cast<IndexType>(this->parameters[target_dimension]); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));
-        return TapkeeOutput(embedding.first, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding.first, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -121,7 +121,7 @@ IMPLEMENTATION(LandmarkMultidimensionalScaling)
             landmarks_embedding.first.col(i).array() *= sqrt(landmarks_embedding.second(i));
         return TapkeeOutput(triangulate(this->begin, this->end, this->distance, landmarks, landmark_distances_squared,
                                         landmarks_embedding, this->parameters[target_dimension]),
-                            this->unimplementedProjectingFunction());
+                            unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -142,7 +142,7 @@ IMPLEMENTATION(Isomap)
         for (IndexType i = 0; i < static_cast<IndexType>(this->parameters[target_dimension]); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));
 
-        return TapkeeOutput(embedding.first, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding.first, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -184,7 +184,7 @@ IMPLEMENTATION(LandmarkIsomap)
 
         for (IndexType i = 0; i < static_cast<IndexType>(this->parameters[target_dimension]); i++)
             embedding.col(i).array() /= sqrt(sqrt(landmarks_embedding.second(i)));
-        return TapkeeOutput(embedding, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -215,7 +215,7 @@ IMPLEMENTATION(HessianLocallyLinearEmbedding)
             hessian_weight_matrix(this->begin, this->end, neighbors, this->kernel, this->parameters[target_dimension]);
         return TapkeeOutput(eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy],
                                                 SmallestEigenvalues, weight_matrix, this->parameters[target_dimension]).first,
-                            this->unimplementedProjectingFunction());
+                            unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -229,7 +229,7 @@ IMPLEMENTATION(LaplacianEigenmaps)
         return TapkeeOutput(generalized_eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy],
                                                            SmallestEigenvalues, laplacian.first, laplacian.second,
                                                            this->parameters[target_dimension]).first,
-                            this->unimplementedProjectingFunction());
+                            unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -291,7 +291,7 @@ IMPLEMENTATION(KernelPCA)
                                centered_kernel_matrix, this->parameters[target_dimension]);
         for (IndexType i = 0; i < static_cast<IndexType>(this->parameters[target_dimension]); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));
-        return TapkeeOutput(embedding.first, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding.first, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -328,7 +328,7 @@ IMPLEMENTATION(StochasticProximityEmbedding)
         return TapkeeOutput(spe_embedding(this->begin, this->end, this->distance, neighbors, this->parameters[target_dimension],
                                           this->parameters[spe_global_strategy], this->parameters[spe_tolerance],
                                           this->parameters[spe_num_updates], this->parameters[max_iteration]),
-                            this->unimplementedProjectingFunction());
+                            unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -336,7 +336,7 @@ IMPLEMENTATION(PassThru)
     TapkeeOutput embed()
     {
         DenseMatrix feature_matrix = dense_matrix_from_features(this->features, this->current_dimension, this->begin, this->end);
-        return TapkeeOutput(feature_matrix.transpose(), this->unimplementedProjectingFunction());
+        return TapkeeOutput(feature_matrix.transpose(), unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -348,7 +348,7 @@ IMPLEMENTATION(FactorAnalysis)
         DenseVector mean_vector = compute_mean(this->begin, this->end, this->features, this->current_dimension);
         return TapkeeOutput(project(this->begin, this->end, this->features, this->current_dimension, this->parameters[max_iteration],
                                     this->parameters[fa_epsilon], this->parameters[target_dimension], mean_vector),
-                            this->unimplementedProjectingFunction());
+                            unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -365,7 +365,7 @@ IMPLEMENTATION(tDistributedStochasticNeighborEmbedding)
         tsne.run(data, data.cols(), data.rows(), embedding.data(), this->parameters[target_dimension],
                  this->parameters[sne_perplexity], this->parameters[sne_theta]);
 
-        return TapkeeOutput(embedding.transpose(), this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding.transpose(), unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 
@@ -381,7 +381,7 @@ IMPLEMENTATION(ManifoldSculpting)
         manifold_sculpting_embed(this->begin, this->end, embedding, this->parameters[target_dimension], neighbors, this->distance,
                                  this->parameters[max_iteration], this->parameters[squishing_rate]);
 
-        return TapkeeOutput(embedding, this->unimplementedProjectingFunction());
+        return TapkeeOutput(embedding, unimplementedProjectingFunction());
     }
 END_IMPLEMENTATION()
 

@@ -63,4 +63,9 @@ struct MatrixProjectionImplementation : public ProjectionImplementation
     DenseVector mean_vec;
 };
 
+static ProjectingFunction unimplementedProjectingFunction()
+{
+    return tapkee::ProjectingFunction();
+}
+
 } // namespace tapkee
