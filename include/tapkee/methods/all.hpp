@@ -6,20 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/diffusion_maps.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
-#include <tapkee/routines/fa.hpp>
-#include <tapkee/routines/generalized_eigendecomposition.hpp>
-#include <tapkee/routines/isomap.hpp>
-#include <tapkee/routines/laplacian_eigenmaps.hpp>
-#include <tapkee/routines/locally_linear.hpp>
-#include <tapkee/routines/manifold_sculpting.hpp>
-#include <tapkee/routines/multidimensional_scaling.hpp>
-#include <tapkee/routines/pca.hpp>
-#include <tapkee/routines/random_projection.hpp>
-#include <tapkee/routines/spe.hpp>
-#include <tapkee/external/barnes_hut_sne/tsne.hpp>
-
 #include <tapkee/methods/kernel_locally_linear_embedding.hpp>
 #include <tapkee/methods/kernel_local_tangent_space_alignment.hpp>
 #include <tapkee/methods/diffusion_map.hpp>

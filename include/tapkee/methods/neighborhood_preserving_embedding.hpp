@@ -9,6 +9,7 @@
 #include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/generalized_eigendecomposition.hpp>
 #include <tapkee/routines/locally_linear.hpp>
+#include <tapkee/routines/pca.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee
