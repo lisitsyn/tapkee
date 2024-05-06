@@ -25,6 +25,7 @@
 #include <tapkee/methods/factor_analysis.hpp>
 #include <tapkee/methods/manifold_sculpting.hpp>
 #include <tapkee/methods/tsne.hpp>
+#include <tapkee/methods/umap.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee

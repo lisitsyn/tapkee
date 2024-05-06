@@ -146,7 +146,7 @@ int run(int argc, const char **argv)
      "diffusion_map (dm), isomap, landmark_isomap (l-isomap), multidimensional_scaling (mds), \n"
      "landmark_multidimensional_scaling (l-mds), stochastic_proximity_embedding (spe), \n"
      "kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), \n"
-     "t-stochastic_neighborhood_embedding (t-sne), manifold_sculpting (ms).",
+     "t-stochastic_neighborhood_embedding (t-sne), manifold_sculpting (ms), umap.",
      with_default("locally_linear_embedding"s)
     )
     (

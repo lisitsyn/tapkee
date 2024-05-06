@@ -137,6 +137,8 @@ tapkee::DimensionReductionMethod parse_reduction_method(const char* str)
         return tapkee::tDistributedStochasticNeighborEmbedding;
     if (!strcmp(str, "manifold_sculpting") || !strcmp(str, "ms"))
         return tapkee::ManifoldSculpting;
+    if (!strcmp(str, "umap"))
+        return tapkee::UniformManifoldApproximationAndProjection;
 
     throw std::exception();
     return tapkee::PassThru;

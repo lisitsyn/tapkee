@@ -120,3 +120,8 @@ TEST(Methods, tDistributedStochasticNeighborEmbeddingSmokeTest)
 {
     smoketest(tDistributedStochasticNeighborEmbedding);
 }
+
+TEST(Methods, UniformManifoldApproximationAndProjection)
+{
+    smoketest(UniformManifoldApproximationAndProjection);
+}
