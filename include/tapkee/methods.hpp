@@ -42,9 +42,10 @@ public:
             throw unsupported_method_error("Features callback is missed");
         }
 
+        const auto& self = static_cast<ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>>(*this);
+
 #define tapkee_method_handle(X)                                                                                        \
-    if (method.is(X)) {                                                                                                \
-        auto self = static_cast<ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>>(*this); \
+    if (method == X) {                                                                                                 \
         auto implementation =                                                                                          \
                 X ## Implementation<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(self);   \
         return implementation.embed();                                                                                 \
