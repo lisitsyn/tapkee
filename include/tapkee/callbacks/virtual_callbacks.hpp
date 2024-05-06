@@ -12,9 +12,9 @@
 // similarity function values on vectors
 // given by their indices. This impl. computes
 // kernel i.e. dot product between two vectors.
-template <class Implementation> struct pimpl_kernel_callback
+template <class Implementation> struct virtual_kernel_callback
 {
-    pimpl_kernel_callback(Implementation* i) : impl(i){};
+    virtual_kernel_callback(Implementation* i) : impl(i){};
     inline tapkee::ScalarType kernel(int a, int b) const
     {
         return impl->kernel(a, b);
@@ -26,9 +26,9 @@ template <class Implementation> struct pimpl_kernel_callback
 // dissimilarity function values on vectors
 // given by their indices. This impl. computes
 // euclidean distance between two vectors.
-template <class Implementation> struct pimpl_distance_callback
+template <class Implementation> struct virtual_distance_callback
 {
-    pimpl_distance_callback(Implementation* i) : impl(i){};
+    virtual_distance_callback(Implementation* i) : impl(i){};
     inline tapkee::ScalarType distance(int a, int b) const
     {
         return impl->distance(a, b);
