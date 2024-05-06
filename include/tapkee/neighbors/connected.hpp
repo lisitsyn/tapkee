@@ -7,6 +7,10 @@
 #include <stack>
 #include <vector>
 
+/* Tapkee includes */
+#include <tapkee/utils/time.hpp>
+/* End of Tapkee includes */
+
 namespace tapkee
 {
 namespace tapkee_internal
