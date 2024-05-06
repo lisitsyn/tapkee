@@ -34,15 +34,20 @@ template <typename M> struct Method
     const char* name_;
 };
 
-typedef std::tuple<bool, bool, bool> KFDTraits;
+struct DimensionReductionTraits
+{
+    const bool needs_kernel;
+    const bool needs_distance;
+    const bool needs_features;
+};
 
 struct DimensionReductionMethod : public Method<DimensionReductionMethod>
 {
-    DimensionReductionMethod(const char* n, const KFDTraits& traits)
+    DimensionReductionMethod(const char* n, const DimensionReductionTraits& traits)
         : Method<DimensionReductionMethod>(n)
-        , needs_kernel(std::get<0>(traits))
-        , needs_distance(std::get<1>(traits))
-        , needs_features(std::get<2>(traits))
+        , needs_kernel(traits.needs_kernel)
+        , needs_distance(traits.needs_distance)
+        , needs_features(traits.needs_features)
     {
     }
     using Method<DimensionReductionMethod>::operator==;
@@ -51,11 +56,11 @@ struct DimensionReductionMethod : public Method<DimensionReductionMethod>
     bool needs_features;
 };
 
-static const KFDTraits RequiresKernel{true, false, false};
-static const KFDTraits RequiresKernelAndFeatures{true, false, true};
-static const KFDTraits RequiresDistance{false, true, false};
-static const KFDTraits RequiresDistanceAndFeatures{false, true, true};
-static const KFDTraits RequiresFeatures{false, false, true};
+static const DimensionReductionTraits RequiresKernel{true, false, false};
+static const DimensionReductionTraits RequiresKernelAndFeatures{true, false, true};
+static const DimensionReductionTraits RequiresDistance{false, true, false};
+static const DimensionReductionTraits RequiresDistanceAndFeatures{false, true, true};
+static const DimensionReductionTraits RequiresFeatures{false, false, true};
 
 /** Kernel Locally Linear Embedding as described
  * in @cite Decoste2001 */
@@ -215,7 +220,7 @@ struct EigendecompositionStrategy : public Method<EigendecompositionStrategy>
     {
         return skip_;
     }
-    IndexType skip_;
+    const IndexType skip_;
 };
 
 static const EigendecompositionStrategy LargestEigenvalues("Largest eigenvalues", 0);
