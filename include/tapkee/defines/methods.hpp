@@ -4,97 +4,12 @@
  */
 #pragma once
 
+/* Tapkee includes */
 #include <tapkee/defines/types.hpp>
-#include <tapkee/traits/methods_traits.hpp>
+/* End of Tapkee includes */
 
 namespace tapkee
 {
-//! Dimension reduction methods
-enum DimensionReductionMethod
-{
-    /** Kernel Locally Linear Embedding as described
-     * in @cite Decoste2001 */
-    KernelLocallyLinearEmbedding,
-    /** Neighborhood Preserving Embedding as described
-     * in @cite He2005 */
-    NeighborhoodPreservingEmbedding,
-    /** Local Tangent Space Alignment as described
-     * in @cite Zhang2002 */
-    KernelLocalTangentSpaceAlignment,
-    /** Linear Local Tangent Space Alignment as described
-     * in @cite Zhang2007 */
-    LinearLocalTangentSpaceAlignment,
-    /** Hessian Locally Linear Embedding as described in
-     * @cite Donoho2003 */
-    HessianLocallyLinearEmbedding,
-    /** Laplacian Eigenmaps as described in
-     * @cite Belkin2002 */
-    LaplacianEigenmaps,
-    /** Locality Preserving Projections as described in
-     * @cite He2003 */
-    LocalityPreservingProjections,
-    /** Diffusion map as described in
-     * @cite Coifman2006 */
-    DiffusionMap,
-    /** Isomap as described in
-     * @cite Tenenbaum2000 */
-    Isomap,
-    /** Landmark Isomap as described in
-     * @cite deSilva2002 */
-    LandmarkIsomap,
-    /** Multidimensional scaling as described in
-     * @cite Cox2000 */
-    MultidimensionalScaling,
-    /** Landmark multidimensional scaling as described in
-     * @cite deSilva2004 */
-    LandmarkMultidimensionalScaling,
-    /** Stochastic Proximity Embedding as described in
-     * @cite Agrafiotis2003 */
-    StochasticProximityEmbedding,
-    /** Kernel PCA as described in
-     * @cite Scholkopf1997 */
-    KernelPCA,
-    /** Principal Component Analysis */
-    PCA,
-    /** Random Projection as described in
-     * @cite Kaski1998*/
-    RandomProjection,
-    /** Factor Analysis */
-    FactorAnalysis,
-    /** t-SNE and Barnes-Hut-SNE as described in
-     * @cite vanDerMaaten2008 and @cite vanDerMaaten2013 */
-    tDistributedStochasticNeighborEmbedding,
-    /** Manifold Sculpting as described in
-     * @cite Gashler2007 */
-    ManifoldSculpting,
-    /** Passing through (doing nothing just passes the
-     * data through) */
-    PassThru
-};
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-// Methods identification
-METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KernelLocallyLinearEmbedding);
-METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(NeighborhoodPreservingEmbedding);
-METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KernelLocalTangentSpaceAlignment);
-METHOD_THAT_NEEDS_KERNEL_AND_FEATURES_IS(LinearLocalTangentSpaceAlignment);
-METHOD_THAT_NEEDS_ONLY_KERNEL_IS(HessianLocallyLinearEmbedding);
-METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LaplacianEigenmaps);
-METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(LocalityPreservingProjections);
-METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(DiffusionMap);
-METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(Isomap);
-METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LandmarkIsomap);
-METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(MultidimensionalScaling);
-METHOD_THAT_NEEDS_ONLY_DISTANCE_IS(LandmarkMultidimensionalScaling);
-METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(StochasticProximityEmbedding);
-METHOD_THAT_NEEDS_ONLY_KERNEL_IS(KernelPCA);
-METHOD_THAT_NEEDS_ONLY_FEATURES_IS(PCA);
-METHOD_THAT_NEEDS_ONLY_FEATURES_IS(RandomProjection);
-METHOD_THAT_NEEDS_NOTHING_IS(PassThru);
-METHOD_THAT_NEEDS_ONLY_FEATURES_IS(FactorAnalysis);
-METHOD_THAT_NEEDS_ONLY_FEATURES_IS(tDistributedStochasticNeighborEmbedding);
-METHOD_THAT_NEEDS_DISTANCE_AND_FEATURES_IS(ManifoldSculpting);
-#endif // DOXYGEN_SHOULD_SKIP_THS
 
 template <typename M> struct Method
 {
@@ -118,6 +33,107 @@ template <typename M> struct Method
     }
     const char* name_;
 };
+
+typedef std::tuple<bool, bool, bool> KFDTraits;
+
+struct DimensionReductionMethod : public Method<DimensionReductionMethod>
+{
+    DimensionReductionMethod(const char* n, const KFDTraits& traits)
+        : Method<DimensionReductionMethod>(n)
+        , needs_kernel(std::get<0>(traits))
+        , needs_distance(std::get<1>(traits))
+        , needs_features(std::get<2>(traits))
+    {
+    }
+    using Method<DimensionReductionMethod>::operator==;
+    bool needs_kernel;
+    bool needs_distance;
+    bool needs_features;
+};
+
+static const KFDTraits RequiresKernel{true, false, false};
+static const KFDTraits RequiresKernelAndFeatures{true, false, true};
+static const KFDTraits RequiresDistance{false, true, false};
+static const KFDTraits RequiresDistanceAndFeatures{false, true, true};
+static const KFDTraits RequiresFeatures{false, false, true};
+
+/** Kernel Locally Linear Embedding as described
+ * in @cite Decoste2001 */
+static const DimensionReductionMethod KernelLocallyLinearEmbedding("Kernel Locally Linear Embedding (KLLE)", RequiresKernel);
+
+/** Neighborhood Preserving Embedding as described
+ * in @cite He2005 */
+static const DimensionReductionMethod NeighborhoodPreservingEmbedding("Neighborhood Preserving Embedding (NPE)", RequiresKernelAndFeatures);
+
+/** Local Tangent Space Alignment as described
+ * in @cite Zhang2002 */
+static const DimensionReductionMethod KernelLocalTangentSpaceAlignment("Kernel Local Tangent Space Alignment (KLTSA)", RequiresKernel);
+
+/** Linear Local Tangent Space Alignment as described
+ * in @cite Zhang2007 */
+static const DimensionReductionMethod LinearLocalTangentSpaceAlignment("Linear Local Tangent Space Alignment (LLTSA)", RequiresKernelAndFeatures);
+
+/** Hessian Locally Linear Embedding as described in
+ * @cite Donoho2003 */
+static const DimensionReductionMethod HessianLocallyLinearEmbedding("Hessian Locally Linear Embedding (HLLE)", RequiresKernel);
+
+/** Laplacian Eigenmaps as described in
+ * @cite Belkin2002 */
+static const DimensionReductionMethod LaplacianEigenmaps("Laplacian Eigenmaps", RequiresDistance);
+
+/** Locality Preserving Projections as described in
+ * @cite He2003 */
+static const DimensionReductionMethod LocalityPreservingProjections("Locality Preserving Projections (LPP)", RequiresDistanceAndFeatures);
+
+/** Diffusion map as described in
+ * @cite Coifman2006 */
+static const DimensionReductionMethod DiffusionMap("Diffusion Map", RequiresDistance);
+
+/** Isomap as described in
+ * @cite Tenenbaum2000 */
+static const DimensionReductionMethod Isomap("Isomap", RequiresDistance);
+
+/** Landmark Isomap as described in
+ * @cite deSilva2002 */
+static const DimensionReductionMethod LandmarkIsomap("Landmark Isomap", RequiresDistance);
+
+/** Multidimensional scaling as described in
+ * @cite Cox2000 */
+static const DimensionReductionMethod MultidimensionalScaling("Multidimensional Scaling (MDS)", RequiresDistance);
+
+/** Landmark multidimensional scaling as described in
+ * @cite deSilva2004 */
+static const DimensionReductionMethod LandmarkMultidimensionalScaling("Landmark Multidimensional Scaling (LMDS)", RequiresDistance);
+
+/** Stochastic Proximity Embedding as described in
+ * @cite Agrafiotis2003 */
+static const DimensionReductionMethod StochasticProximityEmbedding("Stochastic Proximity Embedding (SPE)", RequiresDistanceAndFeatures);
+
+/** Kernel PCA as described in
+ * @cite Scholkopf1997 */
+static const DimensionReductionMethod KernelPCA("Kernel Principal Component Analysis (KPCA)", RequiresKernel);
+
+/** Principal Component Analysis */
+static const DimensionReductionMethod PCA("Principal Component Analysis (PCA)", RequiresFeatures);
+
+/** Random Projection as described in
+ * @cite Kaski1998*/
+static const DimensionReductionMethod RandomProjection("Random Projection", RequiresFeatures);
+
+/** Factor Analysis */
+static const DimensionReductionMethod FactorAnalysis("Factor Analysis", RequiresFeatures);
+
+/** t-SNE and Barnes-Hut-SNE as described in
+ * @cite vanDerMaaten2008 and @cite vanDerMaaten2013 */
+static const DimensionReductionMethod tDistributedStochasticNeighborEmbedding("t-distributed Stochastic Neighbor Embedding (t-SNE)", RequiresFeatures);
+
+/** Manifold Sculpting as described in
+ * @cite Gashler2007 */
+static const DimensionReductionMethod ManifoldSculpting("Manifold Sculpting", RequiresFeatures);
+
+/** Passing through (doing nothing just passes the
+ * data through) */
+static const DimensionReductionMethod PassThru("Pass-through", RequiresFeatures);
 
 struct NeighborsMethod : public Method<NeighborsMethod>
 {

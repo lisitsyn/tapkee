@@ -293,7 +293,7 @@ int run(int argc, const char **argv)
         tapkee::LoggingSingleton::instance().message_info("Benchmarking enabled");
     }
 
-    tapkee::DimensionReductionMethod tapkee_method;
+    tapkee::DimensionReductionMethod tapkee_method = tapkee::PassThru;
     {
         string method = opt[METHOD_KEYWORD].as<std::string>();
         try
@@ -439,13 +439,13 @@ int run(int argc, const char **argv)
         tapkee::DenseMatrix distance_matrix;
         tapkee::DenseMatrix kernel_matrix;
         {
-            if (method_needs_distance(tapkee_method))
+            if (tapkee_method.needs_distance)
             {
                 tapkee::tapkee_internal::timed_context context("[+] Distance matrix computation");
                 distance_matrix = matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),
                                                     tapkee::eigen_distance_callback(input_data));
             }
-            if (method_needs_kernel(tapkee_method))
+            if (tapkee_method.needs_kernel)
             {
                 tapkee::tapkee_internal::timed_context context("[+] Kernel matrix computation");
                 kernel_matrix = matrix_from_callback(static_cast<tapkee::IndexType>(input_data.cols()),

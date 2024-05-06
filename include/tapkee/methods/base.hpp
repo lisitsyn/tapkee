@@ -87,14 +87,14 @@ class ImplementationBase
 
 };
 
-#define __TAPKEE_IMPLEMENTATION(Method)                                                                                                     \
-    template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>                             \
-    class Method ## Implementation : public ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>    \
-    {                                                                                                                                       \
-    public:                                                                                                                                 \
-        Method ## Implementation(const ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>& other) : \
-            ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(other)                               \
-        {                                                                                                                                     \
+#define __TAPKEE_IMPLEMENTATION(Method)                                                                                                           \
+    template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>                                   \
+    class Method ## Implementation : public ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>          \
+    {                                                                                                                                             \
+    public:                                                                                                                                       \
+        Method ## Implementation(const ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>& other) :     \
+            ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(other)                                   \
+        {                                                                                                                                         \
         }
 #define __TAPKEE_END_IMPLEMENTATION() };
 

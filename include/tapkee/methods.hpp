@@ -22,58 +22,53 @@ class DynamicImplementation : public ImplementationBase<RandomAccessIterator, Ke
 {
 public:
     using ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>::ImplementationBase;
-    TapkeeOutput embedUsing(DimensionReductionMethod method)
+    TapkeeOutput embedUsing(const DimensionReductionMethod& method)
     {
+        timed_context tctx__(fmt::format("[+] embedding with {}", method.name()));
+
         if (this->context.is_cancelled())
             throw cancelled_exception();
 
+        if (method.needs_kernel && is_dummy<KernelCallback>::value)
+        {
+            throw unsupported_method_error("Kernel callback is missed");
+        }
+        if (method.needs_distance && is_dummy<DistanceCallback>::value)
+        {
+            throw unsupported_method_error("Distance callback is missed");
+        }
+        if (method.needs_features && is_dummy<FeaturesCallback>::value)
+        {
+            throw unsupported_method_error("Features callback is missed");
+        }
+
 #define tapkee_method_handle(X)                                                                                        \
-    case X: {                                                                                                          \
-        timed_context tctx__("[+] embedding with " #X);                                                                \
-        if (MethodTraits<X>::needs_kernel && is_dummy<KernelCallback>::value)                                          \
-        {                                                                                                              \
-            throw unsupported_method_error("Kernel callback is missed");                                               \
-        }                                                                                                              \
-        if (MethodTraits<X>::needs_distance && is_dummy<DistanceCallback>::value)                                      \
-        {                                                                                                              \
-            throw unsupported_method_error("Distance callback is missed");                                             \
-        }                                                                                                              \
-        if (MethodTraits<X>::needs_features && is_dummy<FeaturesCallback>::value)                                      \
-        {                                                                                                              \
-            throw unsupported_method_error("Features callback is missed");                                             \
-        }                                                                                                              \
+    if (method.is(X)) {                                                                                                \
         auto self = static_cast<ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>>(*this); \
         auto implementation =                                                                                          \
                 X ## Implementation<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(self);   \
         return implementation.embed();                                                                                 \
-    }                                                                                                                  \
-    break;
-
-        switch (method)
-        {
-            tapkee_method_handle(KernelLocallyLinearEmbedding);
-            tapkee_method_handle(KernelLocalTangentSpaceAlignment);
-            tapkee_method_handle(DiffusionMap);
-            tapkee_method_handle(MultidimensionalScaling);
-            tapkee_method_handle(LandmarkMultidimensionalScaling);
-            tapkee_method_handle(Isomap);
-            tapkee_method_handle(LandmarkIsomap);
-            tapkee_method_handle(NeighborhoodPreservingEmbedding);
-            tapkee_method_handle(LinearLocalTangentSpaceAlignment);
-            tapkee_method_handle(HessianLocallyLinearEmbedding);
-            tapkee_method_handle(LaplacianEigenmaps);
-            tapkee_method_handle(LocalityPreservingProjections);
-            tapkee_method_handle(PCA);
-            tapkee_method_handle(KernelPCA);
-            tapkee_method_handle(RandomProjection);
-            tapkee_method_handle(StochasticProximityEmbedding);
-            tapkee_method_handle(PassThru);
-            tapkee_method_handle(FactorAnalysis);
-            tapkee_method_handle(tDistributedStochasticNeighborEmbedding);
-            tapkee_method_handle(ManifoldSculpting);
-            default:
-                break;
-        }
+    }
+        tapkee_method_handle(KernelLocallyLinearEmbedding);
+        tapkee_method_handle(KernelLocalTangentSpaceAlignment);
+        tapkee_method_handle(DiffusionMap);
+        tapkee_method_handle(MultidimensionalScaling);
+        tapkee_method_handle(LandmarkMultidimensionalScaling);
+        tapkee_method_handle(Isomap);
+        tapkee_method_handle(LandmarkIsomap);
+        tapkee_method_handle(NeighborhoodPreservingEmbedding);
+        tapkee_method_handle(LinearLocalTangentSpaceAlignment);
+        tapkee_method_handle(HessianLocallyLinearEmbedding);
+        tapkee_method_handle(LaplacianEigenmaps);
+        tapkee_method_handle(LocalityPreservingProjections);
+        tapkee_method_handle(PCA);
+        tapkee_method_handle(KernelPCA);
+        tapkee_method_handle(RandomProjection);
+        tapkee_method_handle(StochasticProximityEmbedding);
+        tapkee_method_handle(PassThru);
+        tapkee_method_handle(FactorAnalysis);
+        tapkee_method_handle(tDistributedStochasticNeighborEmbedding);
+        tapkee_method_handle(ManifoldSculpting);
 #undef tapkee_method_handle
         return TapkeeOutput();
     }
