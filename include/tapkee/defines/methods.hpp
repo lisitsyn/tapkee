@@ -34,6 +34,13 @@ template <typename M> struct Method
     const char* name_;
 };
 
+template <typename M>
+std::ostream& operator<<(std::ostream& os, const Method<M>& method)
+{
+    os << method.name();
+    return os;
+}
+
 struct DimensionReductionTraits
 {
     const bool needs_kernel;
