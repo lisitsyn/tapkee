@@ -7,12 +7,6 @@
 namespace tapkee
 {
 
-template <class Callback> struct BatchCallbackTraits
-{
-    static const bool supports_batch;
-};
-#define TAPKEE_CALLBACK_SUPPORTS_BATCH(X) template <> const bool BatchCallbackTraits<X>::supports_batch = true;
-
 template <class T> class is_dummy
 {
     typedef char yes;

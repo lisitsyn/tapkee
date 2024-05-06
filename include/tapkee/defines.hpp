@@ -7,7 +7,6 @@
 /* Tapkee includes */
 #include <tapkee/exceptions.hpp>
 #include <tapkee/traits/callbacks_traits.hpp>
-#include <tapkee/traits/methods_traits.hpp>
 /* End of Tapkee includes */
 
 #include <iterator>
