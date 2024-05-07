@@ -114,9 +114,9 @@ tapkee::DimensionReductionMethod parse_reduction_method(const char* str)
     if (!strcmp(str, "diffusion_map") || !strcmp(str, "dm"))
         return tapkee::DiffusionMap;
     if (!strcmp(str, "kernel_pca") || !strcmp(str, "kpca"))
-        return tapkee::KernelPCA;
+        return tapkee::KernelPrincipalComponentAnalysis;
     if (!strcmp(str, "pca"))
-        return tapkee::PCA;
+        return tapkee::PrincipalComponentAnalysis;
     if (!strcmp(str, "random_projection") || !strcmp(str, "ra"))
         return tapkee::RandomProjection;
     if (!strcmp(str, "laplacian_eigenmaps") || !strcmp(str, "la"))

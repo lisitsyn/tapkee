@@ -15,7 +15,7 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-__TAPKEE_IMPLEMENTATION(PCA)
+__TAPKEE_IMPLEMENTATION(PrincipalComponentAnalysis)
     TapkeeOutput embed()
     {
         DenseVector mean_vector = compute_mean(this->begin, this->end, this->features, this->current_dimension);

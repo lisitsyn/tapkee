@@ -62,8 +62,8 @@ public:
         tapkee_method_handle(HessianLocallyLinearEmbedding);
         tapkee_method_handle(LaplacianEigenmaps);
         tapkee_method_handle(LocalityPreservingProjections);
-        tapkee_method_handle(PCA);
-        tapkee_method_handle(KernelPCA);
+        tapkee_method_handle(PrincipalComponentAnalysis);
+        tapkee_method_handle(KernelPrincipalComponentAnalysis);
         tapkee_method_handle(RandomProjection);
         tapkee_method_handle(StochasticProximityEmbedding);
         tapkee_method_handle(PassThru);
