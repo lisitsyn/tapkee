@@ -51,8 +51,8 @@ const stichwort::ParameterKeyword<DimensionReductionMethod> method("dimension re
  * - @ref tapkee::LandmarkIsomap
  * - @ref tapkee::MultidimensionalScaling
  * - @ref tapkee::LandmarkMultidimensionalScaling
- * - @ref tapkee::KernelPCA
- * - @ref tapkee::PCA
+ * - @ref tapkee::KernelPrincipalComponentAnalysis
+ * - @ref tapkee::PrincipalComponentAnalysis
  *
  * Default value is @ref tapkee::Arpack if available, @ref tapkee::Dense otherwise.
  *

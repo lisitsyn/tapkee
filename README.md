@@ -302,8 +302,8 @@ Tapkee provides implementations of the following dimension reduction methods (ur
 * Isomap and landmark Isomap
 * Multidimensional scaling and landmark Multidimensional scaling (MDS/lMDS)
 * Stochastic Proximity Embedding (SPE)
-* PCA and randomized PCA
-* Kernel PCA (kPCA)
+* Principal Component Analysis (PCA)
+* Kernel Principal Component Analysis (PCA)
 * Random projection
 * Factor analysis
 * t-SNE

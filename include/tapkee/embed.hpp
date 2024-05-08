@@ -50,7 +50,7 @@ namespace tapkee
  * - @ref tapkee::KernelLocalTangentSpaceAlignment
  * - @ref tapkee::LinearLocalTangentSpaceAlignment
  * - @ref tapkee::HessianLocallyLinearEmbedding
- * - @ref tapkee::KernelPCA
+ * - @ref tapkee::KernelPrincipalComponentAnalysis
  *
  * @param distance_callback the distance callback implementing
  * @code ScalarType distance(const RandomAccessIterator::value_type&, const RandomAccessIterator::value_type&) @endcode
@@ -71,7 +71,7 @@ namespace tapkee
  * - @ref tapkee::NeighborhoodPreservingEmbedding
  * - @ref tapkee::LinearLocalTangentSpaceAlignment
  * - @ref tapkee::LocalityPreservingProjections
- * - @ref tapkee::PCA
+ * - @ref tapkee::PrincipalComponentAnalysis
  * - @ref tapkee::RandomProjection
  * - @ref tapkee::FactorAnalysis
  * - @ref tapkee::tDistributedStochasticNeighborEmbedding
