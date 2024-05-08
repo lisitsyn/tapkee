@@ -35,7 +35,7 @@ TEST(Interface, ChainInterfaceOrder)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPCA))
+                                 .withParameters((method = KernelPrincipalComponentAnalysis))
                                  .withDistance(dcb)
                                  .withKernel(kcb)
                                  .withFeatures(fcb)
@@ -75,13 +75,13 @@ TEST(Interface, ChainInterfaceOrder)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPCA))
+                                 .withParameters((method = KernelPrincipalComponentAnalysis))
                                  .withKernel(kcb)
                                  .withDistance(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPCA))
+                                 .withParameters((method = KernelPrincipalComponentAnalysis))
                                  .withKernel(kcb)
                                  .withFeatures(fcb)
                                  .embedRange(indices.begin(), indices.end()));
@@ -99,7 +99,7 @@ TEST(Interface, ChainInterfaceOrder)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPCA))
+                                 .withParameters((method = KernelPrincipalComponentAnalysis))
                                  .withKernel(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 

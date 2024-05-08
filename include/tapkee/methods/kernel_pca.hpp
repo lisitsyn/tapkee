@@ -15,7 +15,7 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-__TAPKEE_IMPLEMENTATION(KernelPCA)
+__TAPKEE_IMPLEMENTATION(KernelPrincipalComponentAnalysis)
     TapkeeOutput embed()
     {
         DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(this->begin, this->end, this->kernel);

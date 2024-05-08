@@ -123,10 +123,10 @@ static const DimensionReductionMethod StochasticProximityEmbedding("Stochastic P
 
 /** Kernel PCA as described in
  * @cite Scholkopf1997 */
-static const DimensionReductionMethod KernelPCA("Kernel Principal Component Analysis (KPCA)", RequiresKernel);
+static const DimensionReductionMethod KernelPrincipalComponentAnalysis("Kernel Principal Component Analysis (KPCA)", RequiresKernel);
 
 /** Principal Component Analysis */
-static const DimensionReductionMethod PCA("Principal Component Analysis (PCA)", RequiresFeatures);
+static const DimensionReductionMethod PrincipalComponentAnalysis("Principal Component Analysis (PCA)", RequiresFeatures);
 
 /** Random Projection as described in
  * @cite Kaski1998*/

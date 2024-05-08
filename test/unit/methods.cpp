@@ -96,14 +96,14 @@ TEST(Methods, StochasticProximityEmbeddingSmokeTest)
     smoketest(StochasticProximityEmbedding);
 }
 
-TEST(Methods, KernelPCASmokeTest)
+TEST(Methods, KernelPrincipalComponentAnalysisSmokeTest)
 {
-    smoketest(KernelPCA);
+    smoketest(KernelPrincipalComponentAnalysis);
 }
 
-TEST(Methods, PCASmokeTest)
+TEST(Methods, PrincipalComponentAnalysisSmokeTest)
 {
-    smoketest(PCA);
+    smoketest(PrincipalComponentAnalysis);
 }
 
 TEST(Methods, RandomProjectionSmokeTest)
