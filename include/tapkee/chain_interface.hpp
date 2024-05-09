@@ -420,8 +420,8 @@ class ParametersInitializedState
     ParametersInitializedState(const ParametersSet& that) : parameters(that)
     {
     }
-    ParametersInitializedState(const ParametersInitializedState&);
-    ParametersInitializedState& operator=(const ParametersInitializedState&);
+    ParametersInitializedState(const ParametersInitializedState&) = default;
+    ParametersInitializedState& operator=(const ParametersInitializedState&) = default;
 
     /** Sets kernel callback.
      *
