@@ -29,6 +29,7 @@
 
 #include <stichwort/value_keeper.hpp>
 
+#include <functional>
 #include <iostream>
 #include <list>
 #include <map>
