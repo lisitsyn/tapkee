@@ -19,7 +19,8 @@ if __name__=='__main__':
     method = parse_reduction_method('ra')
     assert(method.name == 'Random Projection')
     parameters.add(tapkee.Parameter.create('dimension reduction method', method))
-    tapkee_input  = np.array([[0,2,4],[3,1,9],[5,7,6]])
+    # tapkee_input  = np.array([[0,2,4],[3,1,9],[5,7,6]])
+    tapkee_input  = np.loadtxt('../tapkee_jmlr_benchmarks/data/aviris.dat')
     tapkee_output = tapkee.initialize().withParameters(parameters).embedUsing(tapkee_input)
     print('>> From:\n', tapkee_input);
     print('<< To:\n', tapkee_output.embedding)
