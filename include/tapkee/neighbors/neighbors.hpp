@@ -176,11 +176,11 @@ Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& beg
 {
     if (k > static_cast<IndexType>(end - begin - 1))
     {
-        LoggingSingleton::instance().message_warning("Number of neighbors is greater than number of objects to embed. "
+        Logging::instance().message_warning("Number of neighbors is greater than number of objects to embed. "
                                                      "Using greatest possible number of neighbors.");
         k = static_cast<IndexType>(end - begin - 1);
     }
-    LoggingSingleton::instance().message_info("Using the " + get_neighbors_method_name(method) +
+    Logging::instance().message_info("Using the " + get_neighbors_method_name(method) +
                                               " neighbors computation method.");
 
     Neighbors neighbors;
@@ -199,7 +199,7 @@ Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& beg
                                                 "is not connected. Recomputing with a "
                                                 "larger number of neighbors {}.",
                                                 k, 2 * k);
-        LoggingSingleton::instance().message_warning(message);
+        Logging::instance().message_warning(message);
         neighbors = find_neighbors(method, begin, end, callback, 2 * k, check_connectivity);
     }
     else
@@ -207,7 +207,7 @@ Neighbors find_neighbors(NeighborsMethod method, const RandomAccessIterator& beg
         const std::string message = fmt::format("The neighborhood graph with {} neighbors "
                                                 "is connected.",
                                                 k);
-        LoggingSingleton::instance().message_info(message);
+        Logging::instance().message_info(message);
     }
     return neighbors;
 }
