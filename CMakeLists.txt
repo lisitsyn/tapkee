@@ -123,8 +123,12 @@ if (MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
+# Part of nanobind's setting up the build system, configuring optimized build
+# unless otherwise specified, to avoid slow binding code and large binaries.
+# https://nanobind.readthedocs.io/en/latest/building.html#preliminaries
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
@@ -162,6 +166,29 @@ if (BUILD_TESTS)
 			COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_${exe}"
 			--gtest_color=yes)
 	endforeach()
+endif()
+
+option(BUILD_NANOBIND "Build nanobind Python extension" OFF)
+
+if (BUILD_NANOBIND)
+	###  Initial attempt: https://nanobind.readthedocs.io/en/latest/building.html
+
+	###  # Search for Python >= 3.8 and its development module.
+	###  # find_package(Python3.8 COMPONENTS Interpreter Development.Module REQUIRED)
+	###  find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+	###  # Detect the installed nanobind package and import it into CMake
+	###  execute_process(
+	###  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+	###  OUTPUT_VARIABLE NB_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+	###  message(STATUS "NB_DIR: ${NB_DIR}")
+	###  list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
+	###  set(CMAKE_PREFIX_PATH execute_process(
+	###  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+	###  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE NB_DIR))
+	###  find_package(nanobind CONFIG REQUIRED)
+	###  nanobind_add_module(tapkee src/python/nanobind_extension.cpp) # TODO fix paths.
+
+	set(BUILD_NANOBIND_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build_nanobind.sh")
 endif()
 
 export(
