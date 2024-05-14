@@ -82,19 +82,19 @@ class DefaultLoggerImplementation : public LoggerImplementation
 //! Main logging singleton used by the library. Can use provided
 //! @ref LoggerImplementation if necessary. By default uses
 //! @ref DefaultLoggerImplementation.
-class LoggingSingleton
+class Logging
 {
   private:
-    LoggingSingleton()
+    Logging()
         : impl(new DefaultLoggerImplementation), LEVEL_ENABLED_FIELD_INITIALIZER(info, false),
           LEVEL_ENABLED_FIELD_INITIALIZER(warning, true), LEVEL_ENABLED_FIELD_INITIALIZER(debug, false),
           LEVEL_ENABLED_FIELD_INITIALIZER(error, true), LEVEL_ENABLED_FIELD_INITIALIZER(benchmark, false){};
-    ~LoggingSingleton()
+    ~Logging()
     {
         delete impl;
     }
-    LoggingSingleton(const LoggingSingleton& ls);
-    void operator=(const LoggingSingleton& ls);
+    Logging(const Logging& ls) = delete;
+    void operator=(const Logging& ls) = delete;
 
     LoggerImplementation* impl;
 
@@ -106,9 +106,9 @@ class LoggingSingleton
 
   public:
     //! @return instance of the singleton
-    static LoggingSingleton& instance()
+    static Logging& instance()
     {
-        static LoggingSingleton s;
+        static Logging s;
         return s;
     }
 

@@ -63,9 +63,9 @@ class TSNE
         // Determine whether we are using an exact algorithm
         bool exact = (theta == .0) ? true : false;
         if (exact)
-            tapkee::LoggingSingleton::instance().message_info("Using exact t-SNE algorithm");
+            tapkee::Logging::instance().message_info("Using exact t-SNE algorithm");
         else
-            tapkee::LoggingSingleton::instance().message_info("Using Barnes-Hut-SNE algorithm");
+            tapkee::Logging::instance().message_info("Using Barnes-Hut-SNE algorithm");
 
         // Set learning parameters
         int max_iter = 1000, stop_lying_iter = 250, mom_switch_iter = 250;
@@ -188,8 +188,7 @@ class TSNE
                         C = evaluateError(P.data(), Y, N);
                     else
                         C = evaluateError(row_P, col_P, val_P, Y, N, theta); // doing approximate computation here!
-                    tapkee::LoggingSingleton::instance().message_info(
-                        fmt::format("Iteration {}: error is {}", iter, C));
+                    tapkee::Logging::instance().message_info(fmt::format("Iteration {}: error is {}", iter, C));
                 }
             }
             // Clean up memory

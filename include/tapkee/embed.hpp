@@ -104,7 +104,7 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end, KernelC
         parameters.check();
         parameters.merge(tapkee_internal::defaults);
         parameters.visit([] (const stichwort::Parameter& p) {
-            tapkee::LoggingSingleton::instance().message_debug(fmt::format("Parameter {} = [{}]", p.name(), p.repr()));
+            tapkee::Logging::instance().message_debug(fmt::format("Parameter {} = [{}]", p.name(), p.repr()));
         });
 
         DimensionReductionMethod selected_method = parameters[method];
@@ -114,8 +114,7 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end, KernelC
 
         tapkee_internal::Context context(progress_function_ptr, cancel_function_ptr);
 
-        LoggingSingleton::instance().message_info(
-            fmt::format("Using the {} method.", get_method_name(selected_method)));
+        Logging::instance().message_info(fmt::format("Using the {} method.", get_method_name(selected_method)));
 
         output = tapkee_internal::initialize(begin, end, kernel_callback, distance_callback, features_callback,
                                              parameters, context)

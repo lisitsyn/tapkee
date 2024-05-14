@@ -279,18 +279,18 @@ int run(int argc, const char **argv)
     }
     if (opt.count(VERBOSE_KEYWORD))
     {
-        tapkee::LoggingSingleton::instance().enable_info();
+        tapkee::Logging::instance().enable_info();
     }
     if (opt.count(DEBUG_KEYWORD))
     {
-        tapkee::LoggingSingleton::instance().enable_debug();
-        tapkee::LoggingSingleton::instance().message_info("Debug messages enabled");
+        tapkee::Logging::instance().enable_debug();
+        tapkee::Logging::instance().message_info("Debug messages enabled");
     }
 
     if (opt.count(BENCHMARK_KEYWORD))
     {
-        tapkee::LoggingSingleton::instance().enable_benchmark();
-        tapkee::LoggingSingleton::instance().message_info("Benchmarking enabled");
+        tapkee::Logging::instance().enable_benchmark();
+        tapkee::Logging::instance().message_info("Benchmarking enabled");
     }
 
     tapkee::DimensionReductionMethod tapkee_method = tapkee::PassThru;
@@ -302,7 +302,7 @@ int run(int argc, const char **argv)
         }
         catch (const std::exception &)
         {
-            tapkee::LoggingSingleton::instance().message_error(string("Unknown method ") + method);
+            tapkee::Logging::instance().message_error(string("Unknown method ") + method);
             return 1;
         }
     }
@@ -316,7 +316,7 @@ int run(int argc, const char **argv)
         }
         catch (const std::exception &)
         {
-            tapkee::LoggingSingleton::instance().message_error(string("Unknown neighbors method ") + method);
+            tapkee::Logging::instance().message_error(string("Unknown neighbors method ") + method);
             return 1;
         }
     }
@@ -329,7 +329,7 @@ int run(int argc, const char **argv)
         }
         catch (const std::exception &)
         {
-            tapkee::LoggingSingleton::instance().message_error(string("Unknown eigendecomposition method ") + method);
+            tapkee::Logging::instance().message_error(string("Unknown eigendecomposition method ") + method);
             return 1;
         }
     }
@@ -342,7 +342,7 @@ int run(int argc, const char **argv)
         }
         catch (const std::exception &)
         {
-            tapkee::LoggingSingleton::instance().message_error(string("Unknown computation strategy ") + method);
+            tapkee::Logging::instance().message_error(string("Unknown computation strategy ") + method);
             return 1;
         }
     }
@@ -350,7 +350,7 @@ int run(int argc, const char **argv)
     int target_dim = opt[TARGET_DIMENSION_KEYWORD].as<int>();
     if (target_dim < 0)
     {
-        tapkee::LoggingSingleton::instance().message_error(
+        tapkee::Logging::instance().message_error(
             "Negative target dimensionality is not possible in current circumstances. "
             "Please visit other universe");
         return 1;
@@ -359,20 +359,20 @@ int run(int argc, const char **argv)
     int k = opt[NUM_NEIGHBORS_KEYWORD].as<int>();
     if (k < 3)
     {
-        tapkee::LoggingSingleton::instance().message_error(
+        tapkee::Logging::instance().message_error(
             "The provided number of neighbors is too small, consider at least 3.");
         return 1;
     }
     double width = opt[GAUSSIAN_WIDTH_KEYWORD].as<double>();
     if (width < 0.0)
     {
-        tapkee::LoggingSingleton::instance().message_error("Width of the gaussian kernel is negative.");
+        tapkee::Logging::instance().message_error("Width of the gaussian kernel is negative.");
         return 1;
     }
     int timesteps = opt[TIMESTEPS_KEYWORD].as<int>();
     if (timesteps < 0)
     {
-        tapkee::LoggingSingleton::instance().message_error("Number of timesteps is negative.");
+        tapkee::Logging::instance().message_error("Number of timesteps is negative.");
         return 1;
     }
     double eigenshift = opt[EIGENSHIFT_KEYWORD].as<double>();
@@ -414,7 +414,7 @@ int run(int argc, const char **argv)
 
     std::stringstream ss;
     ss << "Data contains " << input_data.cols() << " feature vectors with dimension of " << input_data.rows();
-    tapkee::LoggingSingleton::instance().message_info(ss.str());
+    tapkee::Logging::instance().message_info(ss.str());
 
     tapkee::TapkeeOutput output;
 
@@ -481,7 +481,7 @@ int run(int argc, const char **argv)
             dynamic_cast<tapkee::MatrixProjectionImplementation *>(output.projection.implementation.get());
         if (!matrix_projection)
         {
-            tapkee::LoggingSingleton::instance().message_error("Projection function unavailable");
+            tapkee::Logging::instance().message_error("Projection function unavailable");
             return 1;
         }
         write_matrix(&matrix_projection->proj_mat, ofs_matrix, delimiter[0]);
