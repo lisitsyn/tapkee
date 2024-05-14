@@ -8,8 +8,7 @@ import re
 import tempfile
 
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from utils import generate_data, plot
 
 def generate_data(type, N=1000, random_state=None):
 	rng = np.random.RandomState(random_state)
@@ -51,6 +50,17 @@ def generate_data(type, N=1000, random_state=None):
 
 	raise Exception('Dataset is not supported')
 
+=======
+supported_methods = {
+	'lle': 'Locally Linear Embedding',
+	'ltsa': 'Local Tangent Space Alignment',
+	'isomap': 'Isomap',
+	'mds': 'Multidimensional Scaling',
+	'pca': 'Principal Component Analysis',
+	'kpca': 'Kernel Principal Component Analysis',
+	't-sne': 't-distributed Stochastic Neighborhood Embedding',
+	'dm': 'Diffusion Map',
+}
 
 def embed(data,method):
 	input_file = tempfile.NamedTemporaryFile(prefix='tapkee_input')
@@ -70,7 +80,6 @@ def embed(data,method):
 		used_method = match.group(1)
 	else:
 		used_method = ''
-
 
 	embedded_data = np.loadtxt(output_file, delimiter=',')
 	return embedded_data, used_method

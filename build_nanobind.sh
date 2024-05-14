@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 mkdir -p build/src/python  # for the couple of .o files
 
@@ -12,4 +12,4 @@ g++ ~/coding-challenges/ext/nanobind/src/nb_combined.cpp -std=c++17 -fvisibility
 
 g++ -shared -Wl,-s -Wl,--gc-sections build/src/python/nanobind_extension.o build/src/python/libnanobind.o -lfmt -o lib/tapkee.cpython-312-x86_64-linux-gnu.so
 
-python nanobind.py
+PYTHONPATH=. python examples/nanobind.py
