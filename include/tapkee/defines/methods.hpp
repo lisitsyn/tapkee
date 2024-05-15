@@ -143,6 +143,9 @@ static const DimensionReductionMethod tDistributedStochasticNeighborEmbedding("t
  * @cite Gashler2007 */
 static const DimensionReductionMethod ManifoldSculpting("Manifold Sculpting", RequiresFeatures);
 
+/** Uniform Manifold Approximation and Projection (UMAP) */
+static const DimensionReductionMethod UniformManifoldApproximationAndProjection("Uniform Manifold Approximation and Projection", RequiresFeatures);
+
 /** Passing through (doing nothing just passes the
  * data through) */
 static const DimensionReductionMethod PassThru("Pass-through", RequiresFeatures);

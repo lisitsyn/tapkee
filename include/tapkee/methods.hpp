@@ -70,6 +70,7 @@ public:
         tapkee_method_handle(FactorAnalysis);
         tapkee_method_handle(tDistributedStochasticNeighborEmbedding);
         tapkee_method_handle(ManifoldSculpting);
+        tapkee_method_handle(UniformManifoldApproximationAndProjection);
 #undef tapkee_method_handle
         return TapkeeOutput();
     }
