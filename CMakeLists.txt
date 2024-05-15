@@ -170,25 +170,59 @@ endif()
 
 option(BUILD_NANOBIND "Build nanobind Python extension" OFF)
 
+# https://nanobind.readthedocs.io/en/latest/building.html
 if (BUILD_NANOBIND)
-	###  Initial attempt: https://nanobind.readthedocs.io/en/latest/building.html
+  message(STATUS "Detecting and configuring nanobind")
+	find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+	# Detect the installed nanobind package and import it into CMake
+	execute_process(
+		COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+		OUTPUT_VARIABLE NB_DIR OUTPUT_STRIP_TRAILING_WHITESPACE
+		ERROR_VARIABLE NB_DIR)
+	list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
+	find_package(nanobind CONFIG REQUIRED)
 
-	###  # Search for Python >= 3.8 and its development module.
-	###  # find_package(Python3.8 COMPONENTS Interpreter Development.Module REQUIRED)
-	###  find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
-	###  # Detect the installed nanobind package and import it into CMake
-	###  execute_process(
-	###  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
-	###  OUTPUT_VARIABLE NB_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-	###  message(STATUS "NB_DIR: ${NB_DIR}")
-	###  list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
-	###  set(CMAKE_PREFIX_PATH execute_process(
-	###  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
-	###  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE NB_DIR))
-	###  find_package(nanobind CONFIG REQUIRED)
-	###  nanobind_add_module(tapkee src/python/nanobind_extension.cpp) # TODO fix paths.
+	# Build extension (the library that'll be imported from the Python interpreter)
+	include_directories("${TAPKEE_SRC_DIR}") # about TODO in nanobind_extension.cpp including src/utils.hpp
+	nanobind_add_module(pytapkee src/python/nanobind_extension.cpp) # TODO fix paths.
+	target_link_libraries(pytapkee PUBLIC Eigen3::Eigen)
 
-	set(BUILD_NANOBIND_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build_nanobind.sh")
+	# Rename so that it can be imported as tapkee iso pytapkee.
+	add_custom_command(TARGET pytapkee POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/rename_pytapkee.cmake
+		COMMENT "Renaming nanobind's extension pytapkee*.so to tapkee*.so")
+	# Create the custom script to rename the file
+	file(WRITE ${CMAKE_BINARY_DIR}/rename_pytapkee.cmake
+		" # Find the file that starts with 'pytapkee' and ends with '.so' in the lib directory
+file(GLOB PYLIBRARY_FILE \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pytapkee*.so\")
+
+# Ensure exactly one file is found
+list(LENGTH PYLIBRARY_FILE FILE_COUNT)
+if(NOT FILE_COUNT EQUAL 1)
+	message(FATAL_ERROR \"Expected exactly one file starting with 'pytapkee' in lib, but found \${FILE_COUNT}\")
+endif()
+
+# Get the first (and only) matched file
+list(GET PYLIBRARY_FILE 0 SOURCE_FILE)
+
+# Extract the filename from the full path
+get_filename_component(FILENAME \${SOURCE_FILE} NAME)
+
+string(REPLACE \"pytapkee\" \"tapkee\" DEST_FILENAME \${FILENAME})
+
+# Construct the full destination path
+set(DEST_FILE \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/\${DEST_FILENAME}\")
+
+# Perform the renaming
+file(RENAME \${SOURCE_FILE} \${DEST_FILE})
+
+# Check if the renaming was successful
+if(EXISTS \${DEST_FILE} AND NOT EXISTS \${SOURCE_FILE})
+	message(STATUS \"File renamed successfully from \${SOURCE_FILE} to \${DEST_FILE}\")
+else()
+	message(FATAL_ERROR \"Error renaming file from \${SOURCE_FILE} to \${DEST_FILE}\")
+endif()")
+  message(STATUS "Detecting and configuring nanobind - done")
 endif()
 
 export(
