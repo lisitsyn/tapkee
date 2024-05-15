@@ -62,7 +62,7 @@ class ImplementationBase
 
     }
 
-  public:
+  protected:
     ParametersSet parameters;
     Context context;
     KernelCallback kernel;
@@ -87,11 +87,25 @@ class ImplementationBase
 
 };
 
+// TODO can we avoid these using things?
 #define __TAPKEE_IMPLEMENTATION(Method)                                                                                                           \
     template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>                                   \
     class Method ## Implementation : public ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>          \
     {                                                                                                                                             \
     public:                                                                                                                                       \
+        typedef ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback> Base;                                \
+        using Base::parameters;                                                                                                                   \
+        using Base::context;                                                                                                                      \
+        using Base::kernel;                                                                                                                       \
+        using Base::distance;                                                                                                                     \
+        using Base::features;                                                                                                                     \
+        using Base::plain_distance;                                                                                                               \
+        using Base::kernel_distance;                                                                                                              \
+        using Base::begin;                                                                                                                        \
+        using Base::end;                                                                                                                          \
+        using Base::n_vectors;                                                                                                                    \
+        using Base::current_dimension;                                                                                                            \
+        using Base::findNeighborsWith;                                                                                                            \
         Method ## Implementation(const ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>& other) :     \
             ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(other)                                   \
         {                                                                                                                                         \

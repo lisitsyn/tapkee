@@ -18,11 +18,11 @@ namespace tapkee_internal
 __TAPKEE_IMPLEMENTATION(KernelLocallyLinearEmbedding)
     TapkeeOutput embed()
     {
-        Neighbors neighbors = this->findNeighborsWith(this->kernel_distance);
+        Neighbors neighbors = findNeighborsWith(kernel_distance);
         SparseWeightMatrix weight_matrix =
-            linear_weight_matrix(this->begin, this->end, neighbors, this->kernel, this->parameters[nullspace_shift], this->parameters[klle_shift]);
-        DenseMatrix embedding = eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy],
-                                                    SmallestEigenvalues, weight_matrix, this->parameters[target_dimension]).first;
+            linear_weight_matrix(begin, end, neighbors, kernel, parameters[nullspace_shift], parameters[klle_shift]);
+        DenseMatrix embedding = eigendecomposition(parameters[eigen_method], parameters[computation_strategy],
+                                                   SmallestEigenvalues, weight_matrix, parameters[target_dimension]).first;
 
         return TapkeeOutput(embedding, unimplementedProjectingFunction());
     }

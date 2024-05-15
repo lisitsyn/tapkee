@@ -18,11 +18,11 @@ namespace tapkee_internal
 __TAPKEE_IMPLEMENTATION(KernelPrincipalComponentAnalysis)
     TapkeeOutput embed()
     {
-        DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(this->begin, this->end, this->kernel);
+        DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(begin, end, kernel);
         EigendecompositionResult embedding =
-            eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy], LargestEigenvalues,
-                               centered_kernel_matrix, this->parameters[target_dimension]);
-        for (IndexType i = 0; i < static_cast<IndexType>(this->parameters[target_dimension]); i++)
+            eigendecomposition(parameters[eigen_method], parameters[computation_strategy], LargestEigenvalues,
+                               centered_kernel_matrix, parameters[target_dimension]);
+        for (IndexType i = 0; i < static_cast<IndexType>(parameters[target_dimension]); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));
         return TapkeeOutput(embedding.first, unimplementedProjectingFunction());
     }
