@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/generalized_eigendecomposition.hpp>
 #include <tapkee/routines/locally_linear.hpp>
 #include <tapkee/routines/pca.hpp>
@@ -20,7 +19,7 @@ namespace tapkee_internal
 __TAPKEE_IMPLEMENTATION(NeighborhoodPreservingEmbedding)
     TapkeeOutput embed()
     {
-        Neighbors neighbors = findNeighborsWith(kernel_distance);
+        Neighbors neighbors = find_neighbors_with(kernel_distance);
         SparseWeightMatrix weight_matrix =
             linear_weight_matrix(begin, end, neighbors, kernel, parameters[nullspace_shift], parameters[klle_shift]);
         DenseSymmetricMatrixPair eig_matrices =

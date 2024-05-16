@@ -22,7 +22,7 @@ __TAPKEE_IMPLEMENTATION(StochasticProximityEmbedding)
         Neighbors neighbors;
         if (parameters[spe_global_strategy].is(false))
         {
-            neighbors = findNeighborsWith(plain_distance);
+            neighbors = find_neighbors_with(plain_distance);
         }
 
         return TapkeeOutput(spe_embedding(begin, end, distance, neighbors, parameters[target_dimension],

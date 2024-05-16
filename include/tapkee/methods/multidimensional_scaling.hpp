@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/multidimensional_scaling.hpp>
 /* End of Tapkee includes */
 
@@ -22,8 +21,7 @@ __TAPKEE_IMPLEMENTATION(MultidimensionalScaling)
         centerMatrix(distance_matrix);
         distance_matrix.array() *= -0.5;
         EigendecompositionResult embedding =
-            eigendecomposition(parameters[eigen_method], parameters[computation_strategy], LargestEigenvalues,
-                               distance_matrix, parameters[target_dimension]);
+            eigendecomposition_via(LargestEigenvalues, distance_matrix, parameters[target_dimension]);
 
         for (IndexType i = 0; i < static_cast<IndexType>(parameters[target_dimension]); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));

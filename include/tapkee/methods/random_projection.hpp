@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/random_projection.hpp>
 /* End of Tapkee includes */
 

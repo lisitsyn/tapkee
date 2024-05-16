@@ -78,12 +78,26 @@ class ImplementationBase
     IndexType current_dimension;
 
   protected:
-    template <class Distance> Neighbors findNeighborsWith(Distance d)
+    template <class Distance>
+    Neighbors find_neighbors_with(Distance d)
     {
         parameters[num_neighbors].checked().satisfies(InRange<IndexType>(3, n_vectors)).orThrow();
         return find_neighbors(parameters[neighbors_method], begin, end, d, parameters[num_neighbors],
                               parameters[check_connectivity]);
     }
+
+    template <class MatrixType>
+    EigendecompositionResult eigendecomposition_via(const EigendecompositionStrategy& eigen_strategy, const MatrixType& m, IndexType target_dimension)
+    {
+        return eigendecomposition(
+            parameters[eigen_method],
+            parameters[computation_strategy],
+            eigen_strategy,
+            m,
+            target_dimension
+        );
+    }
+
 
 };
 
@@ -105,7 +119,8 @@ class ImplementationBase
         using Base::end;                                                                                                                          \
         using Base::n_vectors;                                                                                                                    \
         using Base::current_dimension;                                                                                                            \
-        using Base::findNeighborsWith;                                                                                                            \
+        using Base::find_neighbors_with;                                                                                                          \
+        using Base::eigendecomposition_via;                                                                                                       \
         Method ## Implementation(const ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>& other) :     \
             ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(other)                                   \
         {                                                                                                                                         \

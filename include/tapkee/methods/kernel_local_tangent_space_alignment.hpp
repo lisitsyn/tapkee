@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/locally_linear.hpp>
 /* End of Tapkee includes */
 
@@ -18,11 +17,10 @@ namespace tapkee_internal
 __TAPKEE_IMPLEMENTATION(KernelLocalTangentSpaceAlignment)
     TapkeeOutput embed()
     {
-        Neighbors neighbors = findNeighborsWith(kernel_distance);
+        Neighbors neighbors = find_neighbors_with(kernel_distance);
         SparseWeightMatrix weight_matrix = tangent_weight_matrix(
             begin, end, neighbors, kernel, parameters[target_dimension], parameters[nullspace_shift]);
-        DenseMatrix embedding = eigendecomposition(parameters[eigen_method], parameters[computation_strategy],
-                                                   SmallestEigenvalues, weight_matrix, parameters[target_dimension]).first;
+        DenseMatrix embedding = eigendecomposition_via(SmallestEigenvalues, weight_matrix, parameters[target_dimension]).first;
 
         return TapkeeOutput(embedding, unimplementedProjectingFunction());
     }

@@ -18,7 +18,7 @@ namespace tapkee_internal
 __TAPKEE_IMPLEMENTATION(LinearLocalTangentSpaceAlignment)
     TapkeeOutput embed()
     {
-        Neighbors neighbors = findNeighborsWith(kernel_distance);
+        Neighbors neighbors = find_neighbors_with(kernel_distance);
         SparseWeightMatrix weight_matrix = tangent_weight_matrix(
             begin, end, neighbors, kernel, parameters[target_dimension], parameters[nullspace_shift]);
         DenseSymmetricMatrixPair eig_matrices =

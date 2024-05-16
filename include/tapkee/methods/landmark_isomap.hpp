@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/isomap.hpp>
 #include <tapkee/routines/multidimensional_scaling.hpp>
 /* End of Tapkee includes */
@@ -21,7 +20,7 @@ __TAPKEE_IMPLEMENTATION(LandmarkIsomap)
     {
         parameters[landmark_ratio].checked().satisfies(InClosedRange<ScalarType>(3.0 / n_vectors, 1.0)).orThrow();
 
-        Neighbors neighbors = findNeighborsWith(plain_distance);
+        Neighbors neighbors = find_neighbors_with(plain_distance);
         Landmarks landmarks = select_landmarks_random(begin, end, parameters[landmark_ratio]);
         DenseMatrix distance_matrix = compute_shortest_distances_matrix(begin, end, landmarks, neighbors, distance);
         distance_matrix = distance_matrix.array().square();
@@ -40,14 +39,12 @@ __TAPKEE_IMPLEMENTATION(LandmarkIsomap)
         {
             DenseMatrix distance_matrix_sym = distance_matrix * distance_matrix.transpose();
             landmarks_embedding =
-                eigendecomposition(parameters[eigen_method], parameters[computation_strategy], LargestEigenvalues,
-                                   distance_matrix_sym, parameters[target_dimension]);
+                eigendecomposition_via(LargestEigenvalues, distance_matrix_sym, parameters[target_dimension]);
         }
         else
         {
             landmarks_embedding =
-                eigendecomposition(parameters[eigen_method], parameters[computation_strategy],
-                                   SquaredLargestEigenvalues, distance_matrix, parameters[target_dimension]);
+                eigendecomposition_via(SquaredLargestEigenvalues, distance_matrix, parameters[target_dimension]);
         }
 
         DenseMatrix embedding = distance_matrix.transpose() * landmarks_embedding.first;

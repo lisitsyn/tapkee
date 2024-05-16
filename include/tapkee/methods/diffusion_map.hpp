@@ -7,7 +7,6 @@
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
 #include <tapkee/routines/diffusion_maps.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee
@@ -26,8 +25,7 @@ __TAPKEE_IMPLEMENTATION(DiffusionMap)
         DenseSymmetricMatrix diffusion_matrix =
             compute_diffusion_matrix(begin, end, distance, parameters[gaussian_kernel_width]);
         EigendecompositionResult decomposition_result =
-            eigendecomposition(parameters[eigen_method], parameters[computation_strategy], LargestEigenvalues,
-                               diffusion_matrix, target_dimension_add);
+            eigendecomposition_via(LargestEigenvalues, diffusion_matrix, target_dimension_add);
         DenseMatrix embedding = (decomposition_result.first).leftCols(target_dimension_value);
         // scaling with lambda_i^t
         for (IndexType i = 0; i < target_dimension_value; i++)

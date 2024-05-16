@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/pca.hpp>
 /* End of Tapkee includes */
 
@@ -20,8 +19,7 @@ __TAPKEE_IMPLEMENTATION(KernelPrincipalComponentAnalysis)
     {
         DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(begin, end, kernel);
         EigendecompositionResult embedding =
-            eigendecomposition(parameters[eigen_method], parameters[computation_strategy], LargestEigenvalues,
-                               centered_kernel_matrix, parameters[target_dimension]);
+            eigendecomposition_via(LargestEigenvalues, centered_kernel_matrix, parameters[target_dimension]);
         for (IndexType i = 0; i < static_cast<IndexType>(parameters[target_dimension]); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));
         return TapkeeOutput(embedding.first, unimplementedProjectingFunction());

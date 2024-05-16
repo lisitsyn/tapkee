@@ -21,7 +21,7 @@ __TAPKEE_IMPLEMENTATION(ManifoldSculpting)
 
         DenseMatrix embedding = dense_matrix_from_features(features, current_dimension, begin, end);
 
-        Neighbors neighbors = findNeighborsWith(plain_distance);
+        Neighbors neighbors = find_neighbors_with(plain_distance);
 
         manifold_sculpting_embed(begin, end, embedding, parameters[target_dimension], neighbors, distance,
                                  parameters[max_iteration], parameters[squishing_rate]);

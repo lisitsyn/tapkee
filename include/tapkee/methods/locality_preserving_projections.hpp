@@ -7,7 +7,6 @@
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
 #include <tapkee/routines/diffusion_maps.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/generalized_eigendecomposition.hpp>
 #include <tapkee/routines/laplacian_eigenmaps.hpp>
 /* End of Tapkee includes */
@@ -22,7 +21,7 @@ __TAPKEE_IMPLEMENTATION(LocalityPreservingProjections)
     {
         parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>()).orThrow();
 
-        Neighbors neighbors = findNeighborsWith(plain_distance);
+        Neighbors neighbors = find_neighbors_with(plain_distance);
         Laplacian laplacian = compute_laplacian(begin, end, neighbors, distance, parameters[gaussian_kernel_width]);
         DenseSymmetricMatrixPair eigenproblem_matrices = construct_locality_preserving_eigenproblem(
             laplacian.first, laplacian.second, begin, end, features, current_dimension);
