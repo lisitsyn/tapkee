@@ -171,6 +171,11 @@ endif()
 option(BUILD_NANOBIND "Build nanobind Python extension" OFF)
 
 # https://nanobind.readthedocs.io/en/latest/building.html
+# TODO for faster nanobind build, I tried removing the
+# add_executable tapkee and that quickly didn't work. It would
+# be nice if it could be done without requiring a new option
+# BUILD_CLI, or so, maybe if there's a CMake command to
+# configure not building tapkee inside the if BUILD_NANOBIND.
 if (BUILD_NANOBIND)
   message(STATUS "Detecting and configuring nanobind")
 	find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
@@ -190,6 +195,7 @@ if (BUILD_NANOBIND)
 	target_link_libraries(pytapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
 
 	# Rename so that it can be imported as tapkee iso pytapkee.
+	# TODO can this go into a separate CMake file?
 	add_custom_command(TARGET pytapkee POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/rename_pytapkee.cmake
 		COMMENT "Renaming nanobind's extension pytapkee*.so to tapkee*.so")
