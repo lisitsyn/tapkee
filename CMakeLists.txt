@@ -185,7 +185,9 @@ if (BUILD_NANOBIND)
 	# Build extension (the library that'll be imported from the Python interpreter)
 	include_directories("${TAPKEE_SRC_DIR}") # about TODO in nanobind_extension.cpp including src/utils.hpp
 	nanobind_add_module(pytapkee src/python/nanobind_extension.cpp) # TODO fix paths.
-	target_link_libraries(pytapkee PUBLIC Eigen3::Eigen)
+	target_link_libraries(pytapkee PRIVATE "${EIGEN3_LIBRARY_TO_LINK}")
+	target_link_libraries(pytapkee PRIVATE arpack) # TODO ARPACK guard; TODO without ARPACK(?)
+	target_link_libraries(pytapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
 
 	# Rename so that it can be imported as tapkee iso pytapkee.
 	add_custom_command(TARGET pytapkee POST_BUILD
@@ -213,12 +215,10 @@ string(REPLACE \"pytapkee\" \"tapkee\" DEST_FILENAME \${FILENAME})
 # Construct the full destination path
 set(DEST_FILE \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/\${DEST_FILENAME}\")
 
-# Perform the renaming
 file(RENAME \${SOURCE_FILE} \${DEST_FILE})
 
-# Check if the renaming was successful
 if(EXISTS \${DEST_FILE} AND NOT EXISTS \${SOURCE_FILE})
-	message(STATUS \"File renamed successfully from \${SOURCE_FILE} to \${DEST_FILE}\")
+	message(STATUS \"File renamed from \${SOURCE_FILE} to \${DEST_FILE}\")
 else()
 	message(FATAL_ERROR \"Error renaming file from \${SOURCE_FILE} to \${DEST_FILE}\")
 endif()")
