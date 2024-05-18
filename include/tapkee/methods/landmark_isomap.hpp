@@ -8,6 +8,7 @@
 #include <tapkee/methods/base.hpp>
 #include <tapkee/routines/isomap.hpp>
 #include <tapkee/routines/multidimensional_scaling.hpp>
+#include <tapkee/routines/landmarks.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee
