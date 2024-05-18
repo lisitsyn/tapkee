@@ -139,24 +139,14 @@ int run(int argc, const char **argv)
     )
     (
      either("m", METHOD_KEYWORD),
-     "Dimension reduction method (default locally_linear_embedding). \n One of the following: \n"
-     "locally_linear_embedding (lle), neighborhood_preserving_embedding (npe), \n"
-     "local_tangent_space_alignment (ltsa), linear_local_tangent_space_alignment (lltsa), \n"
-     "hessian_locally_linear_embedding (hlle), laplacian_eigenmaps (la), locality_preserving_projections (lpp), \n"
-     "diffusion_map (dm), isomap, landmark_isomap (l-isomap), multidimensional_scaling (mds), \n"
-     "landmark_multidimensional_scaling (l-mds), stochastic_proximity_embedding (spe), \n"
-     "kernel_pca (kpca), pca, random_projection (ra), factor_analysis (fa), \n"
-     "t-stochastic_neighborhood_embedding (t-sne), manifold_sculpting (ms).",
+     "Dimension reduction method. One of the following: " +
+     comma_separated_keys(DIMENSION_REDUCTION_METHODS.begin(), DIMENSION_REDUCTION_METHODS.end()),
      with_default("locally_linear_embedding"s)
     )
     (
      either("nm", NEIGHBORS_METHOD_KEYWORD),
-     "Neighbors search method (default is 'covertree' if available, 'vptree' otherwise). One of the following: "
-     "brute,vptree"
-#ifdef TAPKEE_USE_LGPL_COVERTREE
-     ",covertree"
-#endif
-     ".",
+     "Neighbors search method. One of the following: " +
+     comma_separated_keys(NEIGHBORS_METHODS.begin(), NEIGHBORS_METHODS.end()),
 #ifdef TAPKEE_USE_LGPL_COVERTREE
      with_default("covertree"s)
 #else
@@ -165,11 +155,8 @@ int run(int argc, const char **argv)
     )
     (
      either("em", EIGEN_METHOD_KEYWORD),
-     "Eigendecomposition method (default is 'arpack' if available, 'dense' otherwise). One of the following: "
-#ifdef TAPKEE_WITH_ARPACK
-     "arpack, "
-#endif
-     "randomized, dense.",
+     "Eigendecomposition method. One of the following: " +
+     comma_separated_keys(EIGEN_METHODS.begin(), EIGEN_METHODS.end()),
 #ifdef TAPKEE_WITH_ARPACK
      with_default("arpack"s)
 #else
@@ -178,11 +165,8 @@ int run(int argc, const char **argv)
     )
     (
      either("cs", COMPUTATION_STRATEGY_KEYWORD),
-     "Computation strategy (default is 'cpu'). One of the following: "
-#ifdef TAPKEE_WITH_VIENNACL
-     "opencl, "
-#endif
-     "cpu.",
+     "Computation strategy. One of the following: " +
+     comma_separated_keys(COMPUTATION_STRATEGIES.begin(), COMPUTATION_STRATEGIES.end()),
      with_default("cpu"s)
     )
     (
