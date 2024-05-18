@@ -17,17 +17,17 @@ namespace tapkee_internal
 __TAPKEE_IMPLEMENTATION(StochasticProximityEmbedding)
     TapkeeOutput embed()
     {
-        this->parameters[spe_tolerance].checked().satisfies(Positivity<ScalarType>()).orThrow();
-        this->parameters[spe_num_updates].checked().satisfies(Positivity<IndexType>()).orThrow();
+        parameters[spe_tolerance].checked().satisfies(Positivity<ScalarType>()).orThrow();
+        parameters[spe_num_updates].checked().satisfies(Positivity<IndexType>()).orThrow();
         Neighbors neighbors;
-        if (this->parameters[spe_global_strategy].is(false))
+        if (parameters[spe_global_strategy].is(false))
         {
-            neighbors = this->findNeighborsWith(this->plain_distance);
+            neighbors = find_neighbors_with(plain_distance);
         }
 
-        return TapkeeOutput(spe_embedding(this->begin, this->end, this->distance, neighbors, this->parameters[target_dimension],
-                                          this->parameters[spe_global_strategy], this->parameters[spe_tolerance],
-                                          this->parameters[spe_num_updates], this->parameters[max_iteration]),
+        return TapkeeOutput(spe_embedding(begin, end, distance, neighbors, parameters[target_dimension],
+                                          parameters[spe_global_strategy], parameters[spe_tolerance],
+                                          parameters[spe_num_updates], parameters[max_iteration]),
                             unimplementedProjectingFunction());
     }
 __TAPKEE_END_IMPLEMENTATION()
