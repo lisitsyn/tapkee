@@ -46,16 +46,38 @@ template<typename T> auto with_default(T defs)
 }
 
 static const char* INPUT_FILE_KEYWORD = "input-file";
+static const char* INPUT_FILE_DESCRIPTION = "Input filename to be used. Can be any file that can be opened for reading by the program. Expects delimiter-separated matrix of real values. See transposing options for more details on rows and columns.";
+
 static const char* TRANSPOSE_INPUT_KEYWORD = "transpose-input";
+static const char* TRANSPOSE_INPUT_DESCRIPTION = "Whether input file should be considered transposed. By default a line means a row in a matrix (a single vector to be embedded).";
+
 static const char* TRANSPOSE_OUTPUT_KEYWORD = "transpose-output";
+static const char* TRANSPOSE_OUTPUT_DESCRIPTION = "Whether output file should be transposed. By default a line would be a row of embedding matrix (a single embedding vector)";
+
 static const char* OUTPUT_FILE_KEYWORD = "output-file";
+static const char* OUTPUT_FILE_DESCRIPTION = "Output filename to be used. Can be any file that can be opened for writing by the program";
+
 static const char* OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD = "output-projection-matrix-file";
+static const char* OUTPUT_PROJECTION_MATRIX_FILE_DESCRIPTION = "Filename to store the projection matrix calculated by the selected algorithm. Usually supported by linear algorithms such as PCA.";
+
 static const char* OUTPUT_PROJECTION_MEAN_FILE_KEYWORD = "output-projection-mean-file";
+static const char* OUTPUT_PROJECTION_MEAN_FILE_DESCRIPTION = "Filename to store the mean vector calculated by the selected algorithm. Usually supported by linear algorithms such as PCA";
+
 static const char* DELIMITER_KEYWORD = "delimiter";
+static const char* DELIMITER_DESCRIPTION = "Delimiter to be used in reading and writing matrices";
+
 static const char* HELP_KEYWORD = "help";
+static const char* HELP_DESCRIPTION = "Print usage of the program";
+
 static const char* BENCHMARK_KEYWORD = "benchmark";
+static const char* BENCHMARK_DESCRIPTION = "Output benchmarking information about the time of algorithm steps";
+
 static const char* VERBOSE_KEYWORD = "verbose";
+static const char* VERBOSE_DESCRIPTION = "Be more verbose in logging";
+
 static const char* DEBUG_KEYWORD = "debug";
+static const char* DEBUG_DESCRIPTION = "Output debugging information such as intermediary steps, parameters, and other internals";
+
 static const char* METHOD_KEYWORD = "method";
 static const char* NEIGHBORS_METHOD_KEYWORD = "neighbors-method";
 static const char* EIGEN_METHOD_KEYWORD = "eigen-method";
@@ -80,7 +102,7 @@ int run(int argc, const char **argv)
 {
     srand(static_cast<unsigned int>(time(NULL)));
 
-    cxxopts::Options options("tapkee", "Tapkee: a tool for dimension reduction");
+    cxxopts::Options options("tapkee", "Tapkee: a tool for dimensionality reduction.");
 
     using namespace std::string_literals;
 
@@ -90,52 +112,52 @@ int run(int argc, const char **argv)
       .add_options()
     (
      either("i", INPUT_FILE_KEYWORD),
-     "Input file",
+     INPUT_FILE_DESCRIPTION,
      with_default("/dev/stdin"s)
     )
     (
      TRANSPOSE_INPUT_KEYWORD,
-     "Transpose input file if set"
+     TRANSPOSE_INPUT_DESCRIPTION
     )
     (
      TRANSPOSE_OUTPUT_KEYWORD,
-     "Transpose output file if set"
+     TRANSPOSE_OUTPUT_DESCRIPTION
     )
     (
      either("o", OUTPUT_FILE_KEYWORD),
-     "Output file",
+     OUTPUT_FILE_DESCRIPTION,
      with_default("/dev/stdout"s)
     )
     (
      either("opmat", OUTPUT_PROJECTION_MATRIX_FILE_KEYWORD),
-     "Output file for the projection matrix",
+     OUTPUT_PROJECTION_MATRIX_FILE_DESCRIPTION,
      with_default("/dev/null"s)
     )
     (
      either("opmean", OUTPUT_PROJECTION_MEAN_FILE_KEYWORD),
-     "Output file for the mean of data",
+     OUTPUT_PROJECTION_MEAN_FILE_DESCRIPTION,
      with_default("/dev/null"s)
     )
     (
      either("d", DELIMITER_KEYWORD),
-     "Delimiter",
+     DELIMITER_DESCRIPTION,
      with_default(","s)
     )
     (
      either("h", HELP_KEYWORD),
-     "Print usage"
+     HELP_DESCRIPTION
     )
     (
      BENCHMARK_KEYWORD,
-     "Output benchmark information"
+     BENCHMARK_DESCRIPTION
     )
     (
      VERBOSE_KEYWORD,
-     "Output more information"
+     VERBOSE_DESCRIPTION
     )
     (
      DEBUG_KEYWORD,
-     "Output debug information"
+     DEBUG_DESCRIPTION
     )
     (
      either("m", METHOD_KEYWORD),
