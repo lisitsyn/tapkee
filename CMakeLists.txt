@@ -177,7 +177,7 @@ option(BUILD_NANOBIND "Build nanobind Python extension" OFF)
 # BUILD_CLI, or so, maybe if there's a CMake command to
 # configure not building tapkee inside the if BUILD_NANOBIND.
 if (BUILD_NANOBIND)
-  message(STATUS "Detecting and configuring nanobind")
+	message(STATUS "Detecting and configuring nanobind")
 	find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 	# Detect the installed nanobind package and import it into CMake
 	execute_process(
