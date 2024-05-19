@@ -10,6 +10,7 @@
 #include <ostream>
 
 #include <tapkee/defines.hpp>
+#include <tapkee/utils/logging.hpp>
 
 using namespace std;
 
@@ -20,6 +21,38 @@ inline bool is_wrong_char(char c)
         return true;
     }
     return false;
+}
+
+int levenshtein_distance(const std::string& s1, const std::string& s2)
+{
+    const auto len1 = s1.size();
+    const auto len2 = s2.size();
+
+    std::vector<std::vector<unsigned int>> d(len1 + 1, std::vector<unsigned int>(len2 + 1));
+
+    d[0][0] = 0;
+    for (unsigned int i = 1; i <= len1; ++i)
+    {
+        d[i][0] = i;
+    }
+    for (unsigned int j = 1; j <= len2; ++j)
+    {
+        d[0][j] = j;
+    }
+
+    for (unsigned int i = 1; i <= len1; ++i)
+    {
+        for (unsigned int j = 1; j <= len2; ++j)
+            {
+                d[i][j] = std::min({
+                        d[i - 1][j] + 1,
+                        d[i][j - 1] + 1,
+                        d[i - 1][j - 1] + (s1[i - 1] == s2[j - 1] ? 0 : 1)
+                });
+            }
+    }
+
+    return d[len1][len2];
 }
 
 template <typename Iterator>
@@ -109,7 +142,7 @@ void write_vector(tapkee::DenseVector* matrix, ofstream& of)
     }
 }
 
-static const std::map<const char*, tapkee::DimensionReductionMethod> DIMENSION_REDUCTION_METHODS = {
+static const std::map<std::string, tapkee::DimensionReductionMethod> DIMENSION_REDUCTION_METHODS = {
     {"local_tangent_space_alignment", tapkee::KernelLocalTangentSpaceAlignment},
     {"ltsa", tapkee::KernelLocalTangentSpaceAlignment},
     {"locally_linear_embedding", tapkee::KernelLocallyLinearEmbedding},
@@ -148,12 +181,7 @@ static const std::map<const char*, tapkee::DimensionReductionMethod> DIMENSION_R
     {"manifold_sculpting", tapkee::ManifoldSculpting},
 };
 
-tapkee::DimensionReductionMethod parse_reduction_method(const char* str)
-{
-    return DIMENSION_REDUCTION_METHODS.at(str);
-}
-
-static const std::map<const char*, tapkee::NeighborsMethod> NEIGHBORS_METHODS = {
+static const std::map<std::string, tapkee::NeighborsMethod> NEIGHBORS_METHODS = {
     {"brute", tapkee::Brute},
     {"vptree", tapkee::VpTree},
 #ifdef TAPKEE_USE_LGPL_COVERTREE
@@ -161,12 +189,7 @@ static const std::map<const char*, tapkee::NeighborsMethod> NEIGHBORS_METHODS = 
 #endif
 };
 
-tapkee::NeighborsMethod parse_neighbors_method(const char* str)
-{
-    return NEIGHBORS_METHODS.at(str);
-}
-
-static const std::map<const char*, tapkee::EigenMethod> EIGEN_METHODS = {
+static const std::map<std::string, tapkee::EigenMethod> EIGEN_METHODS = {
     {"dense", tapkee::Dense},
     {"randomized", tapkee::Randomized},
 #ifdef TAPKEE_WITH_ARPACK
@@ -174,21 +197,32 @@ static const std::map<const char*, tapkee::EigenMethod> EIGEN_METHODS = {
 #endif
 };
 
-tapkee::EigenMethod parse_eigen_method(const char* str)
-{
-    return EIGEN_METHODS.at(str);
-}
-
-static const std::map<const char*, tapkee::ComputationStrategy> COMPUTATION_STRATEGIES = {
+static const std::map<std::string, tapkee::ComputationStrategy> COMPUTATION_STRATEGIES = {
     {"cpu", tapkee::HomogeneousCPUStrategy},
 #ifdef TAPKEE_WITH_VIENNACL
     {"opencl", tapkee::HeterogeneousOpenCLStrategy},
 #endif
 };
 
-tapkee::ComputationStrategy parse_computation_strategy(const char* str)
+template <class Mapping>
+typename Mapping::mapped_type parse_multiple(Mapping mapping, const std::string& str)
 {
-    return COMPUTATION_STRATEGIES.at(str);
+    auto it = mapping.find(str);
+    if (it != mapping.end())
+    {
+        return it->second;
+    }
+
+    auto closest = std::min_element(mapping.begin(), mapping.end(),
+        [&str] (const auto &a, const auto &b) {
+            return levenshtein_distance(str, a.first) < levenshtein_distance(str, b.first);
+        });
+    if (closest != mapping.end())
+    {
+        tapkee::Logging::instance().message_info(fmt::format("Unknown parameter value `{}`. Did you mean `{}`?", str, closest->first));
+    }
+
+    throw std::logic_error(str);
 }
 
 template <class PairwiseCallback>

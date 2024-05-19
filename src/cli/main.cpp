@@ -282,9 +282,9 @@ int run(int argc, const char **argv)
         string method = opt[METHOD_KEYWORD].as<std::string>();
         try
         {
-            tapkee_method = parse_reduction_method(method.c_str());
+            tapkee_method = parse_multiple(DIMENSION_REDUCTION_METHODS, method);
         }
-        catch (const std::exception &)
+        catch (const std::exception & ex)
         {
             tapkee::Logging::instance().message_error(string("Unknown method ") + method);
             return 1;
@@ -296,7 +296,7 @@ int run(int argc, const char **argv)
         string method = opt[NEIGHBORS_METHOD_KEYWORD].as<std::string>();
         try
         {
-            tapkee_neighbors_method = parse_neighbors_method(method.c_str());
+            tapkee_neighbors_method = parse_multiple(NEIGHBORS_METHODS, method);
         }
         catch (const std::exception &)
         {
@@ -309,7 +309,7 @@ int run(int argc, const char **argv)
         string method = opt[EIGEN_METHOD_KEYWORD].as<std::string>();
         try
         {
-            tapkee_eigen_method = parse_eigen_method(method.c_str());
+            tapkee_eigen_method = parse_multiple(EIGEN_METHODS, method);
         }
         catch (const std::exception &)
         {
@@ -322,7 +322,7 @@ int run(int argc, const char **argv)
         string method = opt[COMPUTATION_STRATEGY_KEYWORD].as<std::string>();
         try
         {
-            tapkee_computation_strategy = parse_computation_strategy(method.c_str());
+            tapkee_computation_strategy = parse_multiple(COMPUTATION_STRATEGIES, method);
         }
         catch (const std::exception &)
         {
