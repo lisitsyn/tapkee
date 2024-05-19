@@ -35,6 +35,18 @@ def generate_data(type, N=1000, random_state=None):
 		tt += 0.1 * rng.normal(size=tt.shape)
 		X = np.vstack([X.T, tt])
 		return X, tt
+	if type=='klein':
+		u = rng.uniform(0, 2 * np.pi, N)
+		v = rng.uniform(0, 2 * np.pi, N)
+		x = (2 + np.cos(u / 2) * np.sin(v) - np.sin(u / 2) * np.sin(2 * v)) * np.cos(u)
+		y = (2 + np.cos(u / 2) * np.sin(v) - np.sin(u / 2) * np.sin(2 * v)) * np.sin(u)
+		z = np.sin(u / 2) * np.sin(v) + np.cos(u / 2) * np.sin(2 * v)
+
+		noise = 0.01
+		x += noise * rng.normal(size=x.shape)
+		y += noise * rng.normal(size=y.shape)
+		z += noise * rng.normal(size=z.shape)
+		return np.vstack((x, y, z)), u
 
 	raise Exception('Dataset is not supported')
 
@@ -47,6 +59,9 @@ def embed(data,method):
 	runner_string = '%s -i %s -o %s -m %s -k 20 --precompute --debug --verbose --transpose-output --benchmark' % (tapkee_binary, input_file, output_file, method)
 	print('-- To reproduce this use the following command', runner_string)
 	process = subprocess.run(runner_string, shell=True, capture_output=True, text=True)
+	print(process.stderr)
+	if process.returncode != 0:
+		raise Exception('Failed to embed')
 
 	if match := re.search(r'Parameter dimension reduction method = \[([a-zA-Z0-9() ]+)\]', process.stderr):
 		used_method = match.group(1)
