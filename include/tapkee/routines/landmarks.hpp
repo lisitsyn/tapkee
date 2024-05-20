@@ -36,8 +36,7 @@ DenseMatrix triangulate(RandomAccessIterator begin, RandomAccessIterator end, Pa
     const IndexType n_vectors = end - begin;
     const IndexType n_landmarks = landmarks.size();
 
-    bool* to_process = new bool[n_vectors];
-    std::fill(to_process, to_process + n_vectors, true);
+    std::vector<bool> to_process(n_vectors, true);
 
     DenseMatrix embedding(n_vectors, target_dimension);
 
@@ -71,8 +70,6 @@ DenseMatrix triangulate(RandomAccessIterator begin, RandomAccessIterator end, Pa
             embedding.row(index_iter).noalias() = -0.5 * landmarks_embedding.first.transpose() * distances_to_landmarks;
         }
     }
-
-    delete[] to_process;
 
     return embedding;
 }
