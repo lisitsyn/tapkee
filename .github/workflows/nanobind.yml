@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libarpack2-dev libcxxopts-dev libeigen3-dev libfmt-dev python3.11-dev 
-        python -m pip install nanobind
+        python -m pip install nanobind numpy
 
     - name: Configure
       run: cmake -B ${{github.workspace}}/build -DBUILD_NANOBIND=ON
