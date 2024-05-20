@@ -50,7 +50,6 @@ def generate_data(type, N=1000, random_state=None):
 
 	raise Exception('Dataset is not supported')
 
-=======
 supported_methods = {
 	'lle': 'Locally Linear Embedding',
 	'ltsa': 'Local Tangent Space Alignment',
