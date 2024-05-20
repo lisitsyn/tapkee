@@ -43,5 +43,6 @@ NB_MODULE(tapkee, m) {
         .def_rw("name", &DimensionReductionMethod::name_);
 
     nb::class_<Parameter>(m, "Parameter")
-        .def_static("create", &Parameter::create<DimensionReductionMethod>);
+        .def_static("create", &Parameter::create<DimensionReductionMethod>)
+        .def_static("create", &Parameter::create<int>);
 }

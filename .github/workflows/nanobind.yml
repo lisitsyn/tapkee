@@ -31,3 +31,7 @@ jobs:
     - name: Build
       # TODO there are A LOT of warnings in the logs from nanobind (-pedantic, -Wshadow).
       run: cmake --build ${{github.workspace}}/build
+
+    - name: Test
+      working-directory: ${{github.workspace}}
+      run: PYTHONPATH=. python test/test_nanobind_extension.py
