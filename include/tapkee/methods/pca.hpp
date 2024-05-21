@@ -15,6 +15,10 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(PrincipalComponentAnalysis)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
         DenseVector mean_vector = compute_mean(begin, end, features, current_dimension);

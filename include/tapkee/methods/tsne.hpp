@@ -15,11 +15,14 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(tDistributedStochasticNeighborEmbedding)
-    TapkeeOutput embed()
+    void validate()
     {
         parameters[sne_perplexity].checked().satisfies(InClosedRange<ScalarType>(0.0, (n_vectors - 1) / 3.0)).orThrow();
         parameters[sne_theta].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
+    }
 
+    TapkeeOutput embed()
+    {
         DenseMatrix data = dense_matrix_from_features(features, current_dimension, begin, end);
 
         DenseMatrix embedding(static_cast<IndexType>(parameters[target_dimension]), n_vectors);

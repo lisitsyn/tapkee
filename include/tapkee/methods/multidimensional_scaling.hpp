@@ -15,6 +15,10 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(MultidimensionalScaling)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
         DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin, end, distance);

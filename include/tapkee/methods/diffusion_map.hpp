@@ -15,11 +15,14 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(DiffusionMap)
-    TapkeeOutput embed()
+    void validate()
     {
         parameters[diffusion_map_timesteps].checked().satisfies(Positivity<IndexType>()).orThrow();
         parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>()).orThrow();
+    }
 
+    TapkeeOutput embed()
+    {
         IndexType target_dimension_value = static_cast<IndexType>(parameters[target_dimension]);
         Parameter target_dimension_add = Parameter::create("target_dimension", target_dimension_value + 1);
         DenseSymmetricMatrix diffusion_matrix =

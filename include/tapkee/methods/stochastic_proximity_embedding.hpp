@@ -15,10 +15,14 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(StochasticProximityEmbedding)
-    TapkeeOutput embed()
+    void validate()
     {
         parameters[spe_tolerance].checked().satisfies(Positivity<ScalarType>()).orThrow();
         parameters[spe_num_updates].checked().satisfies(Positivity<IndexType>()).orThrow();
+    }
+
+    TapkeeOutput embed()
+    {
         Neighbors neighbors;
         if (parameters[spe_global_strategy].is(false))
         {

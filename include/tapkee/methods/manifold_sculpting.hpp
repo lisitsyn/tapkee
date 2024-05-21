@@ -15,9 +15,13 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(ManifoldSculpting)
-    TapkeeOutput embed()
+    void validate()
     {
         parameters[squishing_rate].checked().satisfies(InRange<ScalarType>(0.0, 1.0)).orThrow();
+    }
+
+    TapkeeOutput embed()
+    {
 
         DenseMatrix embedding = dense_matrix_from_features(features, current_dimension, begin, end);
 
