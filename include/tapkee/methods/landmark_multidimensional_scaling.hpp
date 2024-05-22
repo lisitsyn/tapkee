@@ -16,9 +16,13 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(LandmarkMultidimensionalScaling)
-    TapkeeOutput embed()
+    void validate()
     {
         parameters[landmark_ratio].checked().satisfies(InClosedRange<ScalarType>(3.0 / n_vectors, 1.0)).orThrow();
+    }
+
+    TapkeeOutput embed()
+    {
 
         Landmarks landmarks = select_landmarks_random(begin, end, parameters[landmark_ratio]);
         DenseSymmetricMatrix distance_matrix = compute_distance_matrix(begin, end, landmarks, distance);

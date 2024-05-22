@@ -15,6 +15,10 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(RandomProjection)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
         DenseMatrix projection_matrix = gaussian_projection_matrix(current_dimension, parameters[target_dimension]);

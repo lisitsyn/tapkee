@@ -15,6 +15,10 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(KernelPrincipalComponentAnalysis)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
         DenseSymmetricMatrix centered_kernel_matrix = compute_centered_kernel_matrix(begin, end, kernel);

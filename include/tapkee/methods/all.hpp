@@ -33,6 +33,10 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(PassThru)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
         DenseMatrix feature_matrix = dense_matrix_from_features(this->features, this->current_dimension, this->begin, this->end);

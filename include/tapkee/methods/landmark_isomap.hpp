@@ -17,9 +17,13 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(LandmarkIsomap)
-    TapkeeOutput embed()
+    void validate()
     {
         parameters[landmark_ratio].checked().satisfies(InClosedRange<ScalarType>(3.0 / n_vectors, 1.0)).orThrow();
+    }
+
+    TapkeeOutput embed()
+    {
 
         Neighbors neighbors = find_neighbors_with(plain_distance);
         Landmarks landmarks = select_landmarks_random(begin, end, parameters[landmark_ratio]);

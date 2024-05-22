@@ -16,6 +16,10 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(Isomap)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
         Neighbors neighbors = find_neighbors_with(plain_distance);

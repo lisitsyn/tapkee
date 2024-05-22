@@ -17,10 +17,13 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(LocalityPreservingProjections)
-    TapkeeOutput embed()
+    void validate()
     {
         parameters[gaussian_kernel_width].checked().satisfies(Positivity<ScalarType>()).orThrow();
+    }
 
+    TapkeeOutput embed()
+    {
         Neighbors neighbors = find_neighbors_with(plain_distance);
         Laplacian laplacian = compute_laplacian(begin, end, neighbors, distance, parameters[gaussian_kernel_width]);
         DenseSymmetricMatrixPair eigenproblem_matrices = construct_locality_preserving_eigenproblem(
