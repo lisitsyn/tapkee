@@ -33,9 +33,9 @@ int main(int argc, const char **argv)
 
     MatchKernelCallback kernel;
 
-    TapkeeOutput result = .with((method = KernelLocallyLinearEmbedding, num_neighbors = 30))
-                              .withKernel(kernel)
-                              .embedUsing(rnas);
+    TapkeeOutput result = with((method = KernelLocallyLinearEmbedding, num_neighbors = 30))
+                         .with(kernel)
+                         .embedUsing(rnas);
 
     cout << result.embedding.transpose() << endl;
 

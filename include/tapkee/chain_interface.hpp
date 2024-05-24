@@ -69,7 +69,8 @@ template <class KernelCallback, class DistanceCallback> class KernelAndDistanceI
      *        first argument.
      */
     template <class FeaturesCallback>
-    CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> withFeatures(
+        requires requires(FeaturesCallback callback) { callback.dimension(); }
+    CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> with(
         const FeaturesCallback& features) const
     {
         return CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback>(parameters, kernel,
@@ -86,7 +87,7 @@ template <class KernelCallback, class DistanceCallback> class KernelAndDistanceI
     TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
     {
         return (*this)
-            .withFeatures(dummy_features_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_features_callback<typename RandomAccessIterator::value_type>())
             .embedRange(begin, end);
     }
 
@@ -122,7 +123,9 @@ template <class KernelCallback, class FeaturesCallback> class KernelAndFeaturesI
      *        pointed by the first and the second arguments.
      */
     template <class DistanceCallback>
-    CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> withDistance(
+        requires requires(DistanceCallback callback, ScalarType a, ScalarType b) { callback.distance(a, b); } ||
+                 requires(DistanceCallback callback) { callback.distance_matrix; }
+    CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> with(
         const DistanceCallback& distance) const
     {
         return CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback>(parameters, kernel,
@@ -139,7 +142,7 @@ template <class KernelCallback, class FeaturesCallback> class KernelAndFeaturesI
     TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
     {
         return (*this)
-            .withDistance(dummy_distance_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_distance_callback<typename RandomAccessIterator::value_type>())
             .embedRange(begin, end);
     }
 
@@ -181,7 +184,10 @@ template <class DistanceCallback, class FeaturesCallback> class DistanceAndFeatu
      *        pointed by the first and the second arguments.
      */
     template <class KernelCallback>
-    CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> withKernel(
+        requires requires(KernelCallback callback, ScalarType a, ScalarType b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback, const std::string& a, const std::string& b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback) { callback.kernel_matrix; }
+    CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback> with(
         const KernelCallback& kernel) const
     {
         return CallbacksInitializedState<KernelCallback, DistanceCallback, FeaturesCallback>(parameters, kernel,
@@ -198,7 +204,7 @@ template <class DistanceCallback, class FeaturesCallback> class DistanceAndFeatu
     TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
     {
         return (*this)
-            .withKernel(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
             .embedRange(begin, end);
     }
 
@@ -234,7 +240,9 @@ template <class KernelCallback> class KernelFirstInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class DistanceCallback>
-    KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> withDistance(
+        requires requires(DistanceCallback callback, ScalarType a, ScalarType b) { callback.distance(a, b); } ||
+                 requires(DistanceCallback callback) { callback.distance_matrix; }
+    KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> with(
         const DistanceCallback& callback) const
     {
         return KernelAndDistanceInitializedState<KernelCallback, DistanceCallback>(parameters, kernel, callback);
@@ -248,7 +256,8 @@ template <class KernelCallback> class KernelFirstInitializedState
      *        first argument.
      */
     template <class FeaturesCallback>
-    KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback> withFeatures(
+        requires requires(FeaturesCallback callback) { callback.dimension(); }
+    KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback> with(
         const FeaturesCallback& callback) const
     {
         return KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback>(parameters, kernel, callback);
@@ -264,8 +273,8 @@ template <class KernelCallback> class KernelFirstInitializedState
     TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
     {
         return (*this)
-            .withDistance(dummy_distance_callback<typename RandomAccessIterator::value_type>())
-            .withFeatures(dummy_features_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_distance_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_features_callback<typename RandomAccessIterator::value_type>())
             .embedRange(begin, end);
     }
 
@@ -300,7 +309,10 @@ template <class DistanceCallback> class DistanceFirstInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class KernelCallback>
-    KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> withKernel(const KernelCallback& callback) const
+        requires requires(KernelCallback callback, ScalarType a, ScalarType b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback, const std::string& a, const std::string& b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback) { callback.kernel_matrix; }
+    KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> with(const KernelCallback& callback) const
     {
         return KernelAndDistanceInitializedState<KernelCallback, DistanceCallback>(parameters, callback, distance);
     }
@@ -313,7 +325,8 @@ template <class DistanceCallback> class DistanceFirstInitializedState
      *        first argument.
      */
     template <class FeaturesCallback>
-    DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback> withFeatures(
+        requires requires(FeaturesCallback callback) { callback.dimension(); }
+    DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback> with(
         const FeaturesCallback& callback) const
     {
         return DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback>(parameters, distance, callback);
@@ -329,8 +342,8 @@ template <class DistanceCallback> class DistanceFirstInitializedState
     TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
     {
         return (*this)
-            .withKernel(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
-            .withFeatures(dummy_features_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_features_callback<typename RandomAccessIterator::value_type>())
             .embedRange(begin, end);
     }
 
@@ -365,7 +378,10 @@ template <class FeaturesCallback> class FeaturesFirstInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class KernelCallback>
-    KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback> withKernel(const KernelCallback& callback) const
+        requires requires(KernelCallback callback, ScalarType a, ScalarType b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback, const std::string& a, const std::string& b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback) { callback.kernel_matrix; }
+    KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback> with(const KernelCallback& callback) const
     {
         return KernelAndFeaturesInitializedState<KernelCallback, FeaturesCallback>(parameters, callback, features);
     }
@@ -378,7 +394,9 @@ template <class FeaturesCallback> class FeaturesFirstInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class DistanceCallback>
-    DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback> withDistance(
+        requires requires(DistanceCallback callback, ScalarType a, ScalarType b) { callback.distance(a, b); } ||
+                 requires(DistanceCallback callback) { callback.distance_matrix; }
+    DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback> with(
         const DistanceCallback& callback) const
     {
         return DistanceAndFeaturesInitializedState<DistanceCallback, FeaturesCallback>(parameters, callback, features);
@@ -394,8 +412,8 @@ template <class FeaturesCallback> class FeaturesFirstInitializedState
     TapkeeOutput embedRange(RandomAccessIterator begin, RandomAccessIterator end) const
     {
         return (*this)
-            .withKernel(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
-            .withDistance(dummy_distance_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_kernel_callback<typename RandomAccessIterator::value_type>())
+            .with(dummy_distance_callback<typename RandomAccessIterator::value_type>())
             .embedRange(begin, end);
     }
 
@@ -431,7 +449,10 @@ class ParametersInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class KernelCallback>
-    KernelFirstInitializedState<KernelCallback> withKernel(const KernelCallback& callback) const
+        requires requires(KernelCallback callback, ScalarType a, ScalarType b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback, const std::string& a, const std::string& b) { callback.kernel(a, b); } ||
+                 requires(KernelCallback callback) { callback.kernel_matrix; }
+    KernelFirstInitializedState<KernelCallback> with(const KernelCallback& callback) const
     {
         return KernelFirstInitializedState<KernelCallback>(parameters, callback);
     }
@@ -444,7 +465,9 @@ class ParametersInitializedState
      *        pointed by the first and the second arguments.
      */
     template <class DistanceCallback>
-    DistanceFirstInitializedState<DistanceCallback> withDistance(const DistanceCallback& callback) const
+        requires requires(DistanceCallback callback, ScalarType a, ScalarType b) { callback.distance(a, b); } ||
+                 requires(DistanceCallback callback) { callback.distance_matrix; }
+    DistanceFirstInitializedState<DistanceCallback> with(const DistanceCallback& callback) const
     {
         return DistanceFirstInitializedState<DistanceCallback>(parameters, callback);
     }
@@ -457,7 +480,8 @@ class ParametersInitializedState
      *        first argument.
      */
     template <class FeaturesCallback>
-    FeaturesFirstInitializedState<FeaturesCallback> withFeatures(const FeaturesCallback& callback) const
+        requires requires(FeaturesCallback callback) { callback.dimension(); }
+    FeaturesFirstInitializedState<FeaturesCallback> with(const FeaturesCallback& callback) const
     {
         return FeaturesFirstInitializedState<FeaturesCallback>(parameters, callback);
     }
@@ -488,9 +512,9 @@ class ParametersInitializedState
  *
  * In the chain this method's call is followed by any of
  * @ref tapkee_internal::ParametersInitializedState::embedUsing
- * @ref tapkee_internal::ParametersInitializedState::withKernel
- * @ref tapkee_internal::ParametersInitializedState::withDistance
- * @ref tapkee_internal::ParametersInitializedState::withFeatures
+ * @ref tapkee_internal::ParametersInitializedState::with(const KernelCallback&)
+ * @ref tapkee_internal::ParametersInitializedState::with(const DistanceCallback&)
+ * @ref tapkee_internal::ParametersInitializedState::with(const FeaturesCallback&)
  *
  * @param parameters a set of parameters formed by keywords assigned to values
  */

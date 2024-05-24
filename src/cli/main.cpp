@@ -513,9 +513,9 @@ int run(int argc, const char **argv)
         tapkee::eigen_features_callback fcb(input_data);
 
         output = tapkee::with(parameters)
-                    .withKernel(kcb)
-                    .withDistance(dcb)
-                    .withFeatures(fcb)
+                    .with(kcb)
+                    .with(dcb)
+                    .with(fcb)
                     .embedRange(indices.begin(), indices.end());
     }
     else

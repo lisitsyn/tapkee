@@ -21,81 +21,81 @@ TEST(Interface, ChainInterfaceOrder)
     TapkeeOutput output;
 
     ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
-                                 .withKernel(kcb)
-                                 .withFeatures(fcb)
-                                 .withDistance(dcb)
+                                 .with(kcb)
+                                 .with(fcb)
+                                 .with(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
-                                 .withKernel(kcb)
-                                 .withDistance(dcb)
-                                 .withFeatures(fcb)
+                                 .with(kcb)
+                                 .with(dcb)
+                                 .with(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
-                                 .withDistance(dcb)
-                                 .withKernel(kcb)
-                                 .withFeatures(fcb)
+                                 .with(dcb)
+                                 .with(kcb)
+                                 .with(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
-                                 .withDistance(dcb)
-                                 .withFeatures(fcb)
-                                 .withKernel(kcb)
+                                 .with(dcb)
+                                 .with(fcb)
+                                 .with(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
-                                 .withFeatures(fcb)
-                                 .withDistance(dcb)
-                                 .withKernel(kcb)
+                                 .with(fcb)
+                                 .with(dcb)
+                                 .with(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
-                                 .withFeatures(fcb)
-                                 .withKernel(kcb)
-                                 .withDistance(dcb)
+                                 .with(fcb)
+                                 .with(kcb)
+                                 .with(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
-                                 .withFeatures(fcb)
-                                 .withKernel(kcb)
+                                 .with(fcb)
+                                 .with(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
-                                 .withFeatures(fcb)
-                                 .withDistance(dcb)
+                                 .with(fcb)
+                                 .with(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
-                                 .withKernel(kcb)
-                                 .withDistance(dcb)
+                                 .with(kcb)
+                                 .with(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
-                                 .withKernel(kcb)
-                                 .withFeatures(fcb)
+                                 .with(kcb)
+                                 .with(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
-                                 .withDistance(dcb)
-                                 .withFeatures(fcb)
+                                 .with(dcb)
+                                 .with(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
-                                 .withDistance(dcb)
-                                 .withKernel(kcb)
+                                 .with(dcb)
+                                 .with(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
-                                 .withKernel(kcb)
+                                 .with(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
-                                 .withDistance(dcb)
+                                 .with(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
     ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
-                                 .withFeatures(fcb)
+                                 .with(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 }
 

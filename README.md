@@ -72,13 +72,13 @@ Next, you may either embed the provided matrix with:
 	tapkee::with((method=Isomap,num_neighbors=15)).embedUsing(matrix);
 
 Or provide callbacks (kernel, distance and features) using any combination
-of the `withKernel(KernelCallback)`, `withDistance(DistanceCallback)` and
-`withFeatures(FeaturesCallback)` member functions:
+of the `with(KernelCallback)`, `with(DistanceCallback)` and
+`with(FeaturesCallback)` member functions:
 
 	tapkee::with((method=Isomap,num_neighbors=15))
-	       .withKernel(kernel_callback)
-	       .withDistance(distance_callback)
-	       .withFeatures(features_callback)
+	       .with(kernel_callback)
+	       .with(distance_callback)
+	       .with(features_callback)
 
 Once callbacks are initialized you may either embed data using an
 STL-compatible sequence of indices or objects (that supports the
@@ -94,11 +94,11 @@ As a summary - a few examples:
 	    .embedUsing(matrix);
 
 	TapkeeOutput output = with((method=Isomap,num_neighbors=15))
-	    .withDistance(distance_callback)
+	    .with(distance_callback)
 	    .embedUsing(indices);
 
 	TapkeeOutput output = with((method=Isomap,num_neighbors=15))
-	    .withDistance(distance_callback)
+	    .with(distance_callback)
 	    .embedRange(indices.begin(),indices.end());
 
 Minimal example
@@ -126,7 +126,7 @@ A minimal working example of a program that uses the library is:
 		MyDistanceCallback d;
 
 		TapkeeOutput output = tapkee::with((method=MultidimensionalScaling,target_dimension=1))
-		   .withDistance(d)
+		   .with(d)
 		   .embedUsing(indices);
 
 		cout << output.embedding.transpose() << endl;

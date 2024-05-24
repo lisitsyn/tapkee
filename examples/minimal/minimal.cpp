@@ -21,7 +21,7 @@ int main(int argc, const char **argv)
     MyDistanceCallback distance;
 
     TapkeeOutput output = with((method = MultidimensionalScaling, target_dimension = 1))
-                              .withDistance(distance)
+                              .with(distance)
                               .embedUsing(indices);
 
     cout << output.embedding.transpose() << endl;
