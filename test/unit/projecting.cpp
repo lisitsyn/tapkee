@@ -13,7 +13,7 @@ TEST(Projecting, PrincipalComponentAnalysis)
 
     TapkeeOutput output;
 
-    ASSERT_NO_THROW(output = tapkee::initialize().withParameters((method = PrincipalComponentAnalysis, target_dimension = 2)).embedUsing(X));
+    ASSERT_NO_THROW(output = tapkee::with((method = PrincipalComponentAnalysis, target_dimension = 2)).embedUsing(X));
 
     auto projected = output.projection(X.col(0));
     ASSERT_EQ(2, projected.size());
@@ -26,7 +26,7 @@ TEST(Projecting, RandomProjection)
 
     TapkeeOutput output;
 
-    ASSERT_NO_THROW(output = tapkee::initialize().withParameters((method = RandomProjection, target_dimension = 2)).embedUsing(X));
+    ASSERT_NO_THROW(output = tapkee::with((method = RandomProjection, target_dimension = 2)).embedUsing(X));
 
     auto projected = output.projection(X.col(0));
     ASSERT_EQ(2, projected.size());

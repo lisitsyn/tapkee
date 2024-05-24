@@ -43,10 +43,9 @@ some examples of usage Tapkee in Shogun as
 API
 ---
 
-We provide an interface based on the method chaining technique. The chain starts from the call
-of the `initialize()` method and followed with the `withParameters(const ParametersSet&)` call
-which is used to provide parameters like the method to use and its settings. The provided
-argument is formed with the following syntax:
+We provide an interface based on the method chaining technique. The chain starts with the call
+of the `with(const ParametersSet&)` method, which is used to provide parameters like the method
+to use and its settings. The provided argument is formed with the following syntax:
 
 	(keyword1=value1, keyword2=value2)
 
@@ -63,24 +62,23 @@ are defined: `method`, `eigen_method`, `neighbors_method`, `num_neighbors`, `tar
 As an example of parameters setting, if you want to use the Isomap
 algorithm with the number of neighbors set to 15:
 
-	tapkee::initialize().withParameters((method=Isomap,num_neighbors=15))
+	tapkee::with((method=Isomap,num_neighbors=15))
 
 Please note that the inner parentheses are necessary as it uses the
 comma operator which appears to be ambiguous in this case.
 
-Next, with initialized parameters you may either embed the provided matrix with:
+Next, you may either embed the provided matrix with:
 
-	tapkee::initialize().withParameters((method=Isomap,num_neighbors=15)).
-	                    .embedUsing(matrix);
+	tapkee::with((method=Isomap,num_neighbors=15)).embedUsing(matrix);
 
 Or provide callbacks (kernel, distance and features) using any combination
 of the `withKernel(KernelCallback)`, `withDistance(DistanceCallback)` and
 `withFeatures(FeaturesCallback)` member functions:
 
-	tapkee::initialize().withParameters((method=Isomap,num_neighbors=15))
-	                    .withKernel(kernel_callback)
-	                    .withDistance(distance_callback)
-	                    .withFeatures(features_callback)
+	tapkee::with((method=Isomap,num_neighbors=15))
+	       .withKernel(kernel_callback)
+	       .withDistance(distance_callback)
+	       .withFeatures(features_callback)
 
 Once callbacks are initialized you may either embed data using an
 STL-compatible sequence of indices or objects (that supports the
@@ -92,17 +90,14 @@ member function.
 
 As a summary - a few examples:
 
-	TapkeeOutput output = initialize()
-	    .withParameters((method=Isomap,num_neighbors=15))
+	TapkeeOutput output = with((method=Isomap,num_neighbors=15))
 	    .embedUsing(matrix);
 
-	TapkeeOutput output = initialize()
-	    .withParameters((method=Isomap,num_neighbors=15))
+	TapkeeOutput output = with((method=Isomap,num_neighbors=15))
 	    .withDistance(distance_callback)
 	    .embedUsing(indices);
 
-	TapkeeOutput output = initialize()
-	    .withParameters((method=Isomap,num_neighbors=15))
+	TapkeeOutput output = with((method=Isomap,num_neighbors=15))
 	    .withDistance(distance_callback)
 	    .embedRange(indices.begin(),indices.end());
 
@@ -130,8 +125,7 @@ A minimal working example of a program that uses the library is:
 
 		MyDistanceCallback d;
 
-		TapkeeOutput output = tapkee::initialize()
-		   .withParameters((method=MultidimensionalScaling,target_dimension=1))
+		TapkeeOutput output = tapke::with((method=MultidimensionalScaling,target_dimension=1))
 		   .withDistance(d)
 		   .embedUsing(indices);
 

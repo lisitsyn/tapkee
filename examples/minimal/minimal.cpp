@@ -20,8 +20,7 @@ int main(int argc, const char **argv)
 
     MyDistanceCallback distance;
 
-    TapkeeOutput output = initialize()
-                              .withParameters((method = MultidimensionalScaling, target_dimension = 1))
+    TapkeeOutput output = with((method = MultidimensionalScaling, target_dimension = 1))
                               .withDistance(distance)
                               .embedUsing(indices);
 

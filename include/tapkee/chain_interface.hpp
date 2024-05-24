@@ -484,31 +484,19 @@ class ParametersInitializedState
 };
 } /* End of namespace tapkee_internal */
 
-struct initialize
+/** Returns an instance representing a state with initialized parameters.
+ *
+ * In the chain this method's call is followed by any of
+ * @ref tapkee_internal::ParametersInitializedState::embedUsing
+ * @ref tapkee_internal::ParametersInitializedState::withKernel
+ * @ref tapkee_internal::ParametersInitializedState::withDistance
+ * @ref tapkee_internal::ParametersInitializedState::withFeatures
+ *
+ * @param parameters a set of parameters formed by keywords assigned to values
+ */
+tapkee_internal::ParametersInitializedState with(const ParametersSet& parameters)
 {
-    /** Constructor that is the first required
-     * method in the call chain.
-     */
-    initialize()
-    {
-    }
-
-    /** The second required method in the call chain. Returns
-     * an instance representing a state with initialized parameters.
-     *
-     * In the chain this method's call is followed by any of
-     * * @ref tapkee_internal::ParametersInitializedState::embedUsing
-     * * @ref tapkee_internal::ParametersInitializedState::withKernel
-     * * @ref tapkee_internal::ParametersInitializedState::withDistance
-     * * @ref tapkee_internal::ParametersInitializedState::withFeatures
-     *
-     * @param parameters a set of parameters formed from keywords assigned
-     *                   to values
-     */
-    tapkee_internal::ParametersInitializedState withParameters(const ParametersSet& parameters) const
-    {
-        return tapkee_internal::ParametersInitializedState(parameters);
-    }
-};
+    return tapkee_internal::ParametersInitializedState(parameters);
+}
 
 } /* End of namespace tapkee */
