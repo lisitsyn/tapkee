@@ -33,7 +33,7 @@ int main(int argc, const char **argv)
 
     MatchKernelCallback kernel;
 
-    TapkeeOutput result = .with((method = KernelLocallyLinearEmbedding, num_neighbors = 30))
+    TapkeeOutput result = with((method = KernelLocallyLinearEmbedding, num_neighbors = 30))
                               .withKernel(kernel)
                               .embedUsing(rnas);
 
