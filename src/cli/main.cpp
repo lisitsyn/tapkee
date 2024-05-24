@@ -405,10 +405,10 @@ int run(int argc, const char **argv)
     }
 
     int target_dim = opt[TARGET_DIMENSION_KEYWORD].as<int>();
-    if (target_dim < 0)
+    if (target_dim <= 0)
     {
         tapkee::Logging::instance().message_error(
-            "Negative target dimensionality is not possible in current circumstances. "
+            "\"Only\" a positive target dimensionality larger than zero is possible in current circumstances. "
             "Please visit other universe");
         return 1;
     }
@@ -512,8 +512,7 @@ int run(int argc, const char **argv)
         tapkee::precomputed_kernel_callback kcb(kernel_matrix);
         tapkee::eigen_features_callback fcb(input_data);
 
-        output = tapkee::initialize()
-                    .withParameters(parameters)
+        output = tapkee::with(parameters)
                     .withKernel(kcb)
                     .withDistance(dcb)
                     .withFeatures(fcb)
@@ -521,7 +520,7 @@ int run(int argc, const char **argv)
     }
     else
     {
-        output = tapkee::initialize().withParameters(parameters).embedUsing(input_data);
+        output = tapkee::with(parameters).embedUsing(input_data);
     }
     // Save obtained data
     if (opt.count(TRANSPOSE_OUTPUT_KEYWORD))
