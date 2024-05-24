@@ -1,14 +1,14 @@
-#include <cli/util.hpp>                // for parse_reduction_method, TODO consider moving from src to include
+#include <cli/util.hpp>
 
-#include <stichwort/parameter.hpp>     // for Parameter::create
+#include <stichwort/parameter.hpp>
 
-#include <tapkee/chain_interface.hpp>  // for initialize, withParameters
-#include <tapkee/defines.hpp>          // for ParametersSet, TapkeeOutput
-#include <tapkee/defines/methods.hpp>  // for DimensionReductionMethod
+#include <tapkee/chain_interface.hpp>
+#include <tapkee/defines.hpp>
+#include <tapkee/defines/methods.hpp>
 
 #include <nanobind/nanobind.h>
-#include <nanobind/eigen/dense.h>      // for type caster embedUsing
-#include <nanobind/stl/string.h>       // for type caster calling stichwort::Parameter::create(const std::string&, ...
+#include <nanobind/eigen/dense.h>
+#include <nanobind/stl/string.h>
 
 namespace nb = nanobind;
 
@@ -19,7 +19,7 @@ using tapkee::DimensionReductionMethod;
 using tapkee::ParametersSet;
 using tapkee::TapkeeOutput;
 
-using tapkee::tapkee_internal::ParametersInitializedState;  // TODO consider making it part of the "external" API
+using tapkee::tapkee_internal::ParametersInitializedState;
 
 NB_MODULE(tapkee, m) {
     nb::class_<initialize>(m, "initialize")
@@ -37,7 +37,7 @@ NB_MODULE(tapkee, m) {
     nb::class_<TapkeeOutput>(m, "TapkeeOutput")
         .def_rw("embedding", &TapkeeOutput::embedding);
 
-    m.def("parse_reduction_method", &parse_reduction_method);
+    m.def("parse_multiple", &parse_multiple);
 
     nb::class_<DimensionReductionMethod>(m, "DimensionReductionMethod")
         .def_rw("name", &DimensionReductionMethod::name_);
