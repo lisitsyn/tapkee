@@ -125,7 +125,7 @@ A minimal working example of a program that uses the library is:
 
 		MyDistanceCallback d;
 
-		TapkeeOutput output = tapke::with((method=MultidimensionalScaling,target_dimension=1))
+		TapkeeOutput output = tapkee::with((method=MultidimensionalScaling,target_dimension=1))
 		   .withDistance(d)
 		   .embedUsing(indices);
 
