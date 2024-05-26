@@ -1,6 +1,14 @@
-import numpy, datetime, json, subprocess, sys, os, glob
-from PIL import Image
+import numpy
+import datetime
+import json
+import subprocess
+import sys
+import os
+import glob
+import tempfile
+
 import scipy.misc
+from PIL import Image
 
 def load(dir):
 	images = []
@@ -12,15 +20,15 @@ def load(dir):
 	return numpy.vstack(vecs), images
 
 def embed(feature_matrix):
-	input_file = 'tmp_cbcl_input'
-	numpy.savetxt(input_file, feature_matrix, delimiter=',')
-	output_file = 'tmp_cbcl_output.dat'
-	runner_string = './bin/tapkee -i %s -o %s -m ltsa -k 80 --transpose-output --verbose --benchmark' % (input_file, output_file)
+	input_file = tempfile.NamedTemporaryFile(prefix='cbcl_input')
+	output_file = tempfile.NamedTemporaryFile(prefix='cbcl_output')
+	numpy.savetxt(input_file.name, feature_matrix, delimiter=',')
+	runner_string = './bin/tapkee -i %s -o %s -m ltsa -k 80 --transpose-output --verbose --benchmark' % (input_file.name, output_file.name)
 	process = subprocess.run(runner_string, shell=True, capture_output=True, text=True)
 	print(process.stderr)
 	if process.returncode != 0:
 		raise Exception('Failed to embed')
-	embedding = numpy.loadtxt(output_file, delimiter=',')
+	embedding = numpy.loadtxt(output_file.name, delimiter=',')
 	return embedding
 
 def export_json(outfile, embedding, images):
