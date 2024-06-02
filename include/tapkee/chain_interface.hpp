@@ -241,7 +241,10 @@ template <class KernelCallback> class KernelFirstInitializedState
      */
     template <class DistanceCallback>
         requires requires(DistanceCallback callback, ScalarType a, ScalarType b) { callback.distance(a, b); } ||
-                 requires(DistanceCallback callback) { callback.distance_matrix; }
+                 requires(DistanceCallback callback) { callback.distance_matrix; } ||
+                 requires(DistanceCallback callback,
+                          const typename DistanceCallback::ArgType& a,
+                          const typename DistanceCallback::ArgType& b) { callback.distance(a, b); }
     KernelAndDistanceInitializedState<KernelCallback, DistanceCallback> with(
         const DistanceCallback& callback) const
     {

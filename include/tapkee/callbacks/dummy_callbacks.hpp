@@ -26,6 +26,7 @@ template <class Data> struct dummy_features_callback
 template <class Data> struct dummy_kernel_callback
 {
     typedef int dummy;
+    typedef Data ArgType;
     inline tapkee::ScalarType kernel(const Data&, const Data&) const
     {
         throw tapkee::unsupported_method_error("Dummy kernel callback is set");
