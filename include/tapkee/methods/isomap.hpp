@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/isomap.hpp>
 #include <tapkee/routines/multidimensional_scaling.hpp>
 /* End of Tapkee includes */
@@ -17,20 +16,23 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(Isomap)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
-        Neighbors neighbors = this->findNeighborsWith(this->plain_distance);
+        Neighbors neighbors = find_neighbors_with(plain_distance);
         DenseSymmetricMatrix shortest_distances_matrix =
-            compute_shortest_distances_matrix(this->begin, this->end, neighbors, this->distance);
+            compute_shortest_distances_matrix(begin, end, neighbors, distance);
         shortest_distances_matrix = shortest_distances_matrix.array().square();
         centerMatrix(shortest_distances_matrix);
         shortest_distances_matrix.array() *= -0.5;
 
         EigendecompositionResult embedding =
-            eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy], LargestEigenvalues,
-                                shortest_distances_matrix, this->parameters[target_dimension]);
+            eigendecomposition_via(LargestEigenvalues, shortest_distances_matrix, parameters[target_dimension]);
 
-        for (IndexType i = 0; i < static_cast<IndexType>(this->parameters[target_dimension]); i++)
+        for (IndexType i = 0; i < static_cast<IndexType>(parameters[target_dimension]); i++)
             embedding.first.col(i).array() *= sqrt(embedding.second(i));
 
         return TapkeeOutput(embedding.first, unimplementedProjectingFunction());

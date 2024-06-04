@@ -10,6 +10,7 @@
 #include <ostream>
 
 #include <tapkee/defines.hpp>
+#include <tapkee/utils/logging.hpp>
 
 using namespace std;
 
@@ -20,6 +21,52 @@ inline bool is_wrong_char(char c)
         return true;
     }
     return false;
+}
+
+int levenshtein_distance(const std::string& s1, const std::string& s2)
+{
+    const auto len1 = s1.size();
+    const auto len2 = s2.size();
+
+    std::vector<std::vector<unsigned int>> d(len1 + 1, std::vector<unsigned int>(len2 + 1));
+
+    d[0][0] = 0;
+    for (unsigned int i = 1; i <= len1; ++i)
+    {
+        d[i][0] = i;
+    }
+    for (unsigned int j = 1; j <= len2; ++j)
+    {
+        d[0][j] = j;
+    }
+
+    for (unsigned int i = 1; i <= len1; ++i)
+    {
+        for (unsigned int j = 1; j <= len2; ++j)
+            {
+                d[i][j] = std::min({
+                        d[i - 1][j] + 1,
+                        d[i][j - 1] + 1,
+                        d[i - 1][j - 1] + (s1[i - 1] == s2[j - 1] ? 0 : 1)
+                });
+            }
+    }
+
+    return d[len1][len2];
+}
+
+template <typename Iterator>
+std::string comma_separated_keys(Iterator begin, Iterator end) {
+    std::ostringstream oss;
+    for (Iterator it = begin; it != end; ++it)
+    {
+        oss << it->first;
+        if (std::next(it) != end)
+        {
+            oss << ", ";
+        }
+    }
+    return oss.str();
 }
 
 tapkee::DenseMatrix read_data(ifstream& ifs, char delimiter)
@@ -95,92 +142,87 @@ void write_vector(tapkee::DenseVector* matrix, ofstream& of)
     }
 }
 
-tapkee::DimensionReductionMethod parse_reduction_method(const char* str)
-{
-    if (!strcmp(str, "local_tangent_space_alignment") || !strcmp(str, "ltsa"))
-        return tapkee::KernelLocalTangentSpaceAlignment;
-    if (!strcmp(str, "locally_linear_embedding") || !strcmp(str, "lle"))
-        return tapkee::KernelLocallyLinearEmbedding;
-    if (!strcmp(str, "hessian_locally_linear_embedding") || !strcmp(str, "hlle"))
-        return tapkee::HessianLocallyLinearEmbedding;
-    if (!strcmp(str, "multidimensional_scaling") || !strcmp(str, "mds"))
-        return tapkee::MultidimensionalScaling;
-    if (!strcmp(str, "landmark_multidimensional_scaling") || !strcmp(str, "l-mds"))
-        return tapkee::LandmarkMultidimensionalScaling;
-    if (!strcmp(str, "isomap"))
-        return tapkee::Isomap;
-    if (!strcmp(str, "landmark_isomap") || !strcmp(str, "l-isomap"))
-        return tapkee::LandmarkIsomap;
-    if (!strcmp(str, "diffusion_map") || !strcmp(str, "dm"))
-        return tapkee::DiffusionMap;
-    if (!strcmp(str, "kernel_pca") || !strcmp(str, "kpca"))
-        return tapkee::KernelPrincipalComponentAnalysis;
-    if (!strcmp(str, "pca"))
-        return tapkee::PrincipalComponentAnalysis;
-    if (!strcmp(str, "random_projection") || !strcmp(str, "ra"))
-        return tapkee::RandomProjection;
-    if (!strcmp(str, "laplacian_eigenmaps") || !strcmp(str, "la"))
-        return tapkee::LaplacianEigenmaps;
-    if (!strcmp(str, "locality_preserving_projections") || !strcmp(str, "lpp"))
-        return tapkee::LocalityPreservingProjections;
-    if (!strcmp(str, "neighborhood_preserving_embedding") || !strcmp(str, "npe"))
-        return tapkee::NeighborhoodPreservingEmbedding;
-    if (!strcmp(str, "linear_local_tangent_space_alignment") || !strcmp(str, "lltsa"))
-        return tapkee::LinearLocalTangentSpaceAlignment;
-    if (!strcmp(str, "stochastic_proximity_embedding") || !strcmp(str, "spe"))
-        return tapkee::StochasticProximityEmbedding;
-    if (!strcmp(str, "passthru"))
-        return tapkee::PassThru;
-    if (!strcmp(str, "factor_analysis") || !strcmp(str, "fa"))
-        return tapkee::FactorAnalysis;
-    if (!strcmp(str, "t-stochastic_neighbor_embedding") || !strcmp(str, "t-sne"))
-        return tapkee::tDistributedStochasticNeighborEmbedding;
-    if (!strcmp(str, "manifold_sculpting") || !strcmp(str, "ms"))
-        return tapkee::ManifoldSculpting;
+static const std::map<std::string, tapkee::DimensionReductionMethod> DIMENSION_REDUCTION_METHODS = {
+    {"local_tangent_space_alignment", tapkee::KernelLocalTangentSpaceAlignment},
+    {"ltsa", tapkee::KernelLocalTangentSpaceAlignment},
+    {"locally_linear_embedding", tapkee::KernelLocallyLinearEmbedding},
+    {"lle", tapkee::KernelLocallyLinearEmbedding},
+    {"hessian_locally_linear_embedding", tapkee::HessianLocallyLinearEmbedding},
+    {"hlle", tapkee::HessianLocallyLinearEmbedding},
+    {"multidimensional_scaling", tapkee::MultidimensionalScaling},
+    {"mds", tapkee::MultidimensionalScaling},
+    {"landmark_multidimensional_scaling", tapkee::LandmarkMultidimensionalScaling},
+    {"l-mds", tapkee::LandmarkMultidimensionalScaling},
+    {"isomap", tapkee::Isomap},
+    {"landmark_isomap", tapkee::LandmarkIsomap},
+    {"l-isomap", tapkee::LandmarkIsomap},
+    {"diffusion_map", tapkee::DiffusionMap},
+    {"dm", tapkee::DiffusionMap},
+    {"kernel_pca", tapkee::KernelPrincipalComponentAnalysis},
+    {"kpca", tapkee::KernelPrincipalComponentAnalysis},
+    {"pca", tapkee::PrincipalComponentAnalysis},
+    {"random_projection", tapkee::RandomProjection},
+    {"ra", tapkee::RandomProjection},
+    {"laplacian_eigenmaps", tapkee::LaplacianEigenmaps},
+    {"la", tapkee::LaplacianEigenmaps},
+    {"locality_preserving_projections", tapkee::LocalityPreservingProjections},
+    {"lpp", tapkee::LocalityPreservingProjections},
+    {"neighborhood_preserving_embedding", tapkee::NeighborhoodPreservingEmbedding},
+    {"npe", tapkee::NeighborhoodPreservingEmbedding},
+    {"linear_local_tangent_space_alignment", tapkee::LinearLocalTangentSpaceAlignment},
+    {"lltsa", tapkee::LinearLocalTangentSpaceAlignment},
+    {"stochastic_proximity_embedding", tapkee::StochasticProximityEmbedding},
+    {"spe", tapkee::StochasticProximityEmbedding},
+    {"passthru", tapkee::PassThru},
+    {"factor_analysis", tapkee::FactorAnalysis},
+    {"fa", tapkee::FactorAnalysis},
+    {"t-stochastic_proximity_embedding", tapkee::tDistributedStochasticNeighborEmbedding},
+    {"t-sne", tapkee::tDistributedStochasticNeighborEmbedding},
+    {"manifold_sculpting", tapkee::ManifoldSculpting},
+};
 
-    throw std::exception();
-    return tapkee::PassThru;
-}
-
-tapkee::NeighborsMethod parse_neighbors_method(const char* str)
-{
-    if (!strcmp(str, "brute"))
-        return tapkee::Brute;
-    if (!strcmp(str, "vptree"))
-        return tapkee::VpTree;
+static const std::map<std::string, tapkee::NeighborsMethod> NEIGHBORS_METHODS = {
+    {"brute", tapkee::Brute},
+    {"vptree", tapkee::VpTree},
 #ifdef TAPKEE_USE_LGPL_COVERTREE
-    if (!strcmp(str, "covertree"))
-        return tapkee::CoverTree;
+    {"covertree", tapkee::CoverTree},
 #endif
+};
 
-    throw std::exception();
-    return tapkee::Brute;
-}
-
-tapkee::EigenMethod parse_eigen_method(const char* str)
-{
+static const std::map<std::string, tapkee::EigenMethod> EIGEN_METHODS = {
+    {"dense", tapkee::Dense},
+    {"randomized", tapkee::Randomized},
 #ifdef TAPKEE_WITH_ARPACK
-    if (!strcmp(str, "arpack"))
-        return tapkee::Arpack;
+    {"arpack", tapkee::Arpack},
 #endif
-    if (!strcmp(str, "randomized"))
-        return tapkee::Randomized;
-    if (!strcmp(str, "dense"))
-        return tapkee::Dense;
+};
 
-    throw std::exception();
-    return tapkee::Dense;
-}
-
-tapkee::ComputationStrategy parse_computation_strategy(const char* str)
-{
-    if (!strcmp(str, "cpu"))
-        return tapkee::HomogeneousCPUStrategy;
+static const std::map<std::string, tapkee::ComputationStrategy> COMPUTATION_STRATEGIES = {
+    {"cpu", tapkee::HomogeneousCPUStrategy},
 #ifdef TAPKEE_WITH_VIENNACL
-    if (!strcmp(str, "opencl"))
-        return tapkee::HeterogeneousOpenCLStrategy;
+    {"opencl", tapkee::HeterogeneousOpenCLStrategy},
 #endif
-    return tapkee::HomogeneousCPUStrategy;
+};
+
+template <class Mapping>
+typename Mapping::mapped_type parse_multiple(Mapping mapping, const std::string& str)
+{
+    auto it = mapping.find(str);
+    if (it != mapping.end())
+    {
+        return it->second;
+    }
+
+    auto closest = std::min_element(mapping.begin(), mapping.end(),
+        [&str] (const auto &a, const auto &b) {
+            return levenshtein_distance(str, a.first) < levenshtein_distance(str, b.first);
+        });
+    if (closest != mapping.end())
+    {
+        tapkee::Logging::instance().message_info(fmt::format("Unknown parameter value `{}`. Did you mean `{}`?", str, closest->first));
+    }
+
+    throw std::logic_error(str);
 }
 
 template <class PairwiseCallback>

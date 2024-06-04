@@ -48,6 +48,7 @@ public:
     if (method == X) {                                                                                                 \
         auto implementation =                                                                                          \
                 X ## Implementation<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(self);   \
+        implementation.validate();                                                                                     \
         return implementation.embed();                                                                                 \
     }
         tapkee_method_handle(KernelLocallyLinearEmbedding);

@@ -6,7 +6,6 @@
 
 /* Tapkee includes */
 #include <tapkee/methods/base.hpp>
-#include <tapkee/routines/eigendecomposition.hpp>
 #include <tapkee/routines/pca.hpp>
 /* End of Tapkee includes */
 
@@ -16,17 +15,20 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(PrincipalComponentAnalysis)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
-        DenseVector mean_vector = compute_mean(this->begin, this->end, this->features, this->current_dimension);
+        DenseVector mean_vector = compute_mean(begin, end, features, current_dimension);
         DenseSymmetricMatrix centered_covariance_matrix =
-            compute_covariance_matrix(this->begin, this->end, mean_vector, this->features, this->current_dimension);
+            compute_covariance_matrix(begin, end, mean_vector, features, current_dimension);
         EigendecompositionResult projection_result =
-            eigendecomposition(this->parameters[eigen_method], this->parameters[computation_strategy], LargestEigenvalues,
-                               centered_covariance_matrix, this->parameters[target_dimension]);
+            eigendecomposition_via(LargestEigenvalues, centered_covariance_matrix, parameters[target_dimension]);
         tapkee::ProjectingFunction projecting_function(
             new tapkee::MatrixProjectionImplementation(projection_result.first, mean_vector));
-        return TapkeeOutput(project(projection_result.first, mean_vector, this->begin, this->end, this->features, this->current_dimension),
+        return TapkeeOutput(project(projection_result.first, mean_vector, begin, end, features, current_dimension),
                             projecting_function);
     }
 __TAPKEE_END_IMPLEMENTATION()

@@ -15,17 +15,20 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(tDistributedStochasticNeighborEmbedding)
+    void validate()
+    {
+        parameters[sne_perplexity].checked().satisfies(InClosedRange<ScalarType>(0.0, (n_vectors - 1) / 3.0)).orThrow();
+        parameters[sne_theta].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
+    }
+
     TapkeeOutput embed()
     {
-        this->parameters[sne_perplexity].checked().satisfies(InClosedRange<ScalarType>(0.0, (this->n_vectors - 1) / 3.0)).orThrow();
-        this->parameters[sne_theta].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
+        DenseMatrix data = dense_matrix_from_features(features, current_dimension, begin, end);
 
-        DenseMatrix data = dense_matrix_from_features(this->features, this->current_dimension, this->begin, this->end);
-
-        DenseMatrix embedding(static_cast<IndexType>(this->parameters[target_dimension]), this->n_vectors);
+        DenseMatrix embedding(static_cast<IndexType>(parameters[target_dimension]), n_vectors);
         tsne::TSNE tsne;
-        tsne.run(data, data.cols(), data.rows(), embedding.data(), this->parameters[target_dimension],
-                 this->parameters[sne_perplexity], this->parameters[sne_theta]);
+        tsne.run(data, data.cols(), data.rows(), embedding.data(), parameters[target_dimension],
+                 parameters[sne_perplexity], parameters[sne_theta]);
 
         return TapkeeOutput(embedding.transpose(), unimplementedProjectingFunction());
     }

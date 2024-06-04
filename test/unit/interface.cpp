@@ -20,96 +20,81 @@ TEST(Interface, ChainInterfaceOrder)
 
     TapkeeOutput output;
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = MultidimensionalScaling))
+    ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
                                  .withKernel(kcb)
                                  .withFeatures(fcb)
                                  .withDistance(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = MultidimensionalScaling))
+    ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
                                  .withKernel(kcb)
                                  .withDistance(dcb)
                                  .withFeatures(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPrincipalComponentAnalysis))
+    ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
                                  .withDistance(dcb)
                                  .withKernel(kcb)
                                  .withFeatures(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = PassThru))
+    ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
                                  .withDistance(dcb)
                                  .withFeatures(fcb)
                                  .withKernel(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = MultidimensionalScaling))
+    ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
                                  .withFeatures(fcb)
                                  .withDistance(dcb)
                                  .withKernel(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = MultidimensionalScaling))
+    ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
                                  .withFeatures(fcb)
                                  .withKernel(kcb)
                                  .withDistance(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = PassThru))
+    ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
                                  .withFeatures(fcb)
                                  .withKernel(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = PassThru))
+    ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
                                  .withFeatures(fcb)
                                  .withDistance(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPrincipalComponentAnalysis))
+    ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
                                  .withKernel(kcb)
                                  .withDistance(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPrincipalComponentAnalysis))
+    ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
                                  .withKernel(kcb)
                                  .withFeatures(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = MultidimensionalScaling))
+    ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
                                  .withDistance(dcb)
                                  .withFeatures(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = MultidimensionalScaling))
+    ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
                                  .withDistance(dcb)
                                  .withKernel(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = KernelPrincipalComponentAnalysis))
+    ASSERT_NO_THROW(output = tapkee::with((method = KernelPrincipalComponentAnalysis))
                                  .withKernel(kcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = MultidimensionalScaling))
+    ASSERT_NO_THROW(output = tapkee::with((method = MultidimensionalScaling))
                                  .withDistance(dcb)
                                  .embedRange(indices.begin(), indices.end()));
 
-    ASSERT_NO_THROW(output = tapkee::initialize()
-                                 .withParameters((method = PassThru))
+    ASSERT_NO_THROW(output = tapkee::with((method = PassThru))
                                  .withFeatures(fcb)
                                  .embedRange(indices.begin(), indices.end()));
 }

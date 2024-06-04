@@ -16,20 +16,24 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(LinearLocalTangentSpaceAlignment)
+    void validate()
+    {
+    }
+
     TapkeeOutput embed()
     {
-        Neighbors neighbors = this->findNeighborsWith(this->kernel_distance);
+        Neighbors neighbors = find_neighbors_with(kernel_distance);
         SparseWeightMatrix weight_matrix = tangent_weight_matrix(
-            this->begin, this->end, neighbors, this->kernel, this->parameters[target_dimension], this->parameters[nullspace_shift]);
+            begin, end, neighbors, kernel, parameters[target_dimension], parameters[nullspace_shift]);
         DenseSymmetricMatrixPair eig_matrices =
-            construct_lltsa_eigenproblem(weight_matrix, this->begin, this->end, this->features, this->current_dimension);
+            construct_lltsa_eigenproblem(weight_matrix, begin, end, features, current_dimension);
         EigendecompositionResult projection_result = generalized_eigendecomposition(
-            this->parameters[eigen_method], this->parameters[computation_strategy], SmallestEigenvalues, eig_matrices.first,
-            eig_matrices.second, this->parameters[target_dimension]);
-        DenseVector mean_vector = compute_mean(this->begin, this->end, this->features, this->current_dimension);
+            parameters[eigen_method], parameters[computation_strategy], SmallestEigenvalues, eig_matrices.first,
+            eig_matrices.second, parameters[target_dimension]);
+        DenseVector mean_vector = compute_mean(begin, end, features, current_dimension);
         tapkee::ProjectingFunction projecting_function(
             new tapkee::MatrixProjectionImplementation(projection_result.first, mean_vector));
-        return TapkeeOutput(project(projection_result.first, mean_vector, this->begin, this->end, this->features, this->current_dimension),
+        return TapkeeOutput(project(projection_result.first, mean_vector, begin, end, features, current_dimension),
                             projecting_function);
     }
 __TAPKEE_END_IMPLEMENTATION()

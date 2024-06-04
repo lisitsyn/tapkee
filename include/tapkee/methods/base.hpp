@@ -62,7 +62,7 @@ class ImplementationBase
 
     }
 
-  public:
+  protected:
     ParametersSet parameters;
     Context context;
     KernelCallback kernel;
@@ -78,20 +78,49 @@ class ImplementationBase
     IndexType current_dimension;
 
   protected:
-    template <class Distance> Neighbors findNeighborsWith(Distance d)
+    template <class Distance>
+    Neighbors find_neighbors_with(Distance d)
     {
         parameters[num_neighbors].checked().satisfies(InRange<IndexType>(3, n_vectors)).orThrow();
         return find_neighbors(parameters[neighbors_method], begin, end, d, parameters[num_neighbors],
                               parameters[check_connectivity]);
     }
 
+    template <class MatrixType>
+    EigendecompositionResult eigendecomposition_via(const EigendecompositionStrategy& eigen_strategy, const MatrixType& m, IndexType target_dimension)
+    {
+        return eigendecomposition(
+            parameters[eigen_method],
+            parameters[computation_strategy],
+            eigen_strategy,
+            m,
+            target_dimension
+        );
+    }
+
+
 };
 
+// TODO can we avoid these using things?
 #define __TAPKEE_IMPLEMENTATION(Method)                                                                                                           \
     template <class RandomAccessIterator, class KernelCallback, class DistanceCallback, class FeaturesCallback>                                   \
     class Method ## Implementation : public ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>          \
     {                                                                                                                                             \
     public:                                                                                                                                       \
+        typedef ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback> Base;                                \
+        using Base::parameters;                                                                                                                   \
+        using Base::context;                                                                                                                      \
+        using Base::kernel;                                                                                                                       \
+        using Base::distance;                                                                                                                     \
+        using Base::features;                                                                                                                     \
+        using Base::plain_distance;                                                                                                               \
+        using Base::kernel_distance;                                                                                                              \
+        using Base::begin;                                                                                                                        \
+        using Base::end;                                                                                                                          \
+        using Base::n_vectors;                                                                                                                    \
+        using Base::current_dimension;                                                                                                            \
+        using Base::find_neighbors_with;                                                                                                          \
+        using Base::eigendecomposition_via;                                                                                                       \
         Method ## Implementation(const ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>& other) :     \
             ImplementationBase<RandomAccessIterator, KernelCallback, DistanceCallback, FeaturesCallback>(other)                                   \
         {                                                                                                                                         \

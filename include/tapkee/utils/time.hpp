@@ -37,7 +37,7 @@ struct timed_context
     {
         std::string message =
             fmt::format("{} took {} seconds.", operation_name, double(CLOCK_GET - start_clock) / CLOCK_DIVISOR);
-        LoggingSingleton::instance().message_benchmark(message);
+        Logging::instance().message_benchmark(message);
     }
 };
 } // namespace tapkee_internal

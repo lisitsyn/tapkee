@@ -15,13 +15,16 @@ namespace tapkee_internal
 {
 
 __TAPKEE_IMPLEMENTATION(FactorAnalysis)
+    void validate()
+    {
+        parameters[fa_epsilon].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
+    }
+
     TapkeeOutput embed()
     {
-        this->parameters[fa_epsilon].checked().satisfies(NonNegativity<ScalarType>()).orThrow();
-
-        DenseVector mean_vector = compute_mean(this->begin, this->end, this->features, this->current_dimension);
-        return TapkeeOutput(project(this->begin, this->end, this->features, this->current_dimension, this->parameters[max_iteration],
-                                    this->parameters[fa_epsilon], this->parameters[target_dimension], mean_vector),
+        DenseVector mean_vector = compute_mean(begin, end, features, current_dimension);
+        return TapkeeOutput(project(begin, end, features, current_dimension, parameters[max_iteration],
+                                    parameters[fa_epsilon], parameters[target_dimension], mean_vector),
                             unimplementedProjectingFunction());
     }
 __TAPKEE_END_IMPLEMENTATION()
