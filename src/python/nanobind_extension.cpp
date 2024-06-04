@@ -1,8 +1,8 @@
-#include <cli/util.hpp>                // for parse_reduction_method, TODO consider moving from src to include
+#include <cli/util.hpp>
 
 #include <stichwort/parameter.hpp>     // for Parameter::create
 
-#include <tapkee/chain_interface.hpp>  // for initialize, withParameters
+#include <tapkee/chain_interface.hpp>
 #include <tapkee/defines.hpp>          // for ParametersSet, TapkeeOutput
 #include <tapkee/defines/methods.hpp>  // for DimensionReductionMethod
 
@@ -14,17 +14,15 @@ namespace nb = nanobind;
 
 using stichwort::Parameter;
 
-using tapkee::initialize;
 using tapkee::DimensionReductionMethod;
 using tapkee::ParametersSet;
 using tapkee::TapkeeOutput;
+using tapkee::with;
 
 using tapkee::tapkee_internal::ParametersInitializedState;  // TODO consider making it part of the "external" API
 
 NB_MODULE(tapkee, m) {
-    nb::class_<initialize>(m, "initialize")
-        .def(nb::init<>())
-        .def("withParameters", &initialize::withParameters);
+    m.def("withParameters", &with);
 
     nb::class_<ParametersSet>(m, "ParametersSet")
         .def(nb::init<>())

@@ -225,6 +225,11 @@ typename Mapping::mapped_type parse_multiple(Mapping mapping, const std::string&
     throw std::logic_error(str);
 }
 
+auto parse_reduction_method(const std::string& str)
+{
+    return parse_multiple(DIMENSION_REDUCTION_METHODS, str);
+}
+
 template <class PairwiseCallback>
 tapkee::DenseMatrix matrix_from_callback(const tapkee::IndexType N, PairwiseCallback callback)
 {
