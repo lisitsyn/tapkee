@@ -123,8 +123,12 @@ if (MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
+# Part of nanobind's setting up the build system, configuring optimized build
+# unless otherwise specified, to avoid slow binding code and large binaries.
+# https://nanobind.readthedocs.io/en/latest/building.html#preliminaries
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
@@ -162,6 +166,69 @@ if (BUILD_TESTS)
 			COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_${exe}"
 			--gtest_color=yes)
 	endforeach()
+endif()
+
+option(BUILD_NANOBIND "Build nanobind Python extension" OFF)
+
+# https://nanobind.readthedocs.io/en/latest/building.html
+# TODO for faster nanobind build, I tried removing the
+# add_executable tapkee and that quickly didn't work. It would
+# be nice if it could be done without requiring a new option
+# BUILD_CLI, or so, maybe if there's a CMake command to
+# configure not building tapkee inside the if BUILD_NANOBIND.
+if (BUILD_NANOBIND)
+	message(STATUS "Detecting and configuring nanobind")
+	find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+	# Detect the installed nanobind package and import it into CMake
+	execute_process(
+		COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+		OUTPUT_VARIABLE NB_DIR OUTPUT_STRIP_TRAILING_WHITESPACE
+		ERROR_VARIABLE NB_DIR)
+	list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
+	find_package(nanobind CONFIG REQUIRED)
+
+	# Build extension (the library that'll be imported from the Python interpreter)
+	include_directories("${TAPKEE_SRC_DIR}") # about TODO in nanobind_extension.cpp including src/utils.hpp
+	nanobind_add_module(pytapkee src/python/nanobind_extension.cpp) # TODO fix paths.
+	target_link_libraries(pytapkee PRIVATE "${EIGEN3_LIBRARY_TO_LINK}")
+	target_link_libraries(pytapkee PRIVATE arpack) # TODO ARPACK guard; TODO without ARPACK(?)
+	target_link_libraries(pytapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
+
+	# Rename so that it can be imported as tapkee iso pytapkee.
+	# TODO can this go into a separate CMake file?
+	add_custom_command(TARGET pytapkee POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/rename_pytapkee.cmake
+		COMMENT "Renaming nanobind's extension pytapkee*.so to tapkee*.so")
+	# Create the custom script to rename the file
+	file(WRITE ${CMAKE_BINARY_DIR}/rename_pytapkee.cmake
+		" # Find the file that starts with 'pytapkee' and ends with '.so' in the lib directory
+file(GLOB PYLIBRARY_FILE \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pytapkee*.so\")
+
+# Ensure exactly one file is found
+list(LENGTH PYLIBRARY_FILE FILE_COUNT)
+if(NOT FILE_COUNT EQUAL 1)
+	message(FATAL_ERROR \"Expected exactly one file starting with 'pytapkee' in lib, but found \${FILE_COUNT}\")
+endif()
+
+# Get the first (and only) matched file
+list(GET PYLIBRARY_FILE 0 SOURCE_FILE)
+
+# Extract the filename from the full path
+get_filename_component(FILENAME \${SOURCE_FILE} NAME)
+
+string(REPLACE \"pytapkee\" \"tapkee\" DEST_FILENAME \${FILENAME})
+
+# Construct the full destination path
+set(DEST_FILE \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/\${DEST_FILENAME}\")
+
+file(RENAME \${SOURCE_FILE} \${DEST_FILE})
+
+if(EXISTS \${DEST_FILE} AND NOT EXISTS \${SOURCE_FILE})
+	message(STATUS \"File renamed from \${SOURCE_FILE} to \${DEST_FILE}\")
+else()
+	message(FATAL_ERROR \"Error renaming file from \${SOURCE_FILE} to \${DEST_FILE}\")
+endif()")
+  message(STATUS "Detecting and configuring nanobind - done")
 endif()
 
 export(
