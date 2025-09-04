@@ -1,10 +1,8 @@
 .PHONY: help deps build static-html clean terraform-init terraform-plan terraform-deploy terraform-destroy terraform-output
 
 # Variables
-APP_PORT ?= 21600
 OUTPUT_DIR = static
 LEIN = lein
-CURL = curl
 TERRAFORM_DIR = terraform
 TERRAFORM = terraform
 
@@ -13,7 +11,7 @@ help:
 	@echo "Available targets:"
 	@echo "  deps             - Install dependencies"
 	@echo "  build            - Compile the application"
-	@echo "  static-html      - Generate static HTML files with guaranteed server cleanup"
+	@echo "  static-html      - Generate static HTML files"
 	@echo "  clean            - Clean generated files and build artifacts"
 	@echo "  terraform-init   - Initialize Terraform"
 	@echo "  terraform-plan   - Plan Terraform deployment"
@@ -23,7 +21,6 @@ help:
 	@echo "  help             - Show this help message"
 	@echo ""
 	@echo "Variables:"
-	@echo "  APP_PORT    - Port for the application (default: 21600)"
 	@echo "  OUTPUT_DIR  - Directory for static files (default: static)"
 	@echo "  TERRAFORM_DIR - Directory containing Terraform files (default: terraform)"
 
@@ -35,56 +32,24 @@ deps:
 build: deps
 	$(LEIN) compile
 
-# Generate static HTML files with guaranteed server cleanup
+# Generate static HTML files
 static-html: build
 	@echo "Starting static HTML generation..."
-	@( \
-		set -e; \
-		echo "Starting server on port $(APP_PORT)..."; \
-		PORT=$(APP_PORT) $(LEIN) run & \
-		SERVER_PID=$$!; \
-		echo "Server started with PID $$SERVER_PID"; \
-		echo "Waiting for server to start (timeout: 30s)..."; \
-		for i in $$(seq 1 30); do \
-			if curl -s --connect-timeout 1 http://localhost:$(APP_PORT) > /dev/null 2>&1; then \
-				echo "Server ready after $$i seconds"; \
-				break; \
-			fi; \
-			if [ $$i -eq 30 ]; then \
-				echo "Server failed to start within 30 seconds"; \
-				kill $$SERVER_PID 2>/dev/null || true; \
-				exit 1; \
-			fi; \
-			sleep 1; \
-		done; \
-		echo "Cleaning and creating output directory: $(OUTPUT_DIR)"; \
-		rm -rf $(OUTPUT_DIR); \
-		mkdir -p $(OUTPUT_DIR); \
-		echo "Generating static HTML files..."; \
-		echo "  - Downloading index.html"; \
-		if ! curl -s --max-time 10 http://localhost:$(APP_PORT)/ -o $(OUTPUT_DIR)/index.html; then \
-			echo "Failed to download index.html"; \
-			kill $$SERVER_PID 2>/dev/null || true; \
-			exit 1; \
-		fi; \
-		echo "  - Copying static resources"; \
-		cp -r resources/public/* $(OUTPUT_DIR)/; \
-		echo "Static HTML generation complete!"; \
-		echo "Files generated in: $(OUTPUT_DIR)/"; \
-		echo "Stopping server..."; \
-		kill $$SERVER_PID; \
-		wait $$SERVER_PID 2>/dev/null || true; \
-		echo "Server stopped"; \
-	)
+	@echo "Cleaning and creating output directory: $(OUTPUT_DIR)"
+	@rm -rf $(OUTPUT_DIR)
+	@mkdir -p $(OUTPUT_DIR)
+	@echo "Generating index.html..."
+	@$(LEIN) run > $(OUTPUT_DIR)/index.html
+	@echo "Copying static resources..."
+	@cp -r resources/public/* $(OUTPUT_DIR)/
+	@echo "Static HTML generation complete!"
+	@echo "Files generated in: $(OUTPUT_DIR)/"
 
 # Clean generated files and build artifacts
 clean:
 	@echo "Cleaning up..."
 	@rm -rf $(OUTPUT_DIR)
 	@rm -rf target
-	@rm -f .server.pid
-	@echo "Killing any remaining lein processes..."
-	@pkill -f "lein.*run" 2>/dev/null || true
 	@echo "Clean complete"
 
 # Initialize Terraform

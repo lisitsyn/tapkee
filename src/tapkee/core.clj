@@ -1,8 +1,5 @@
 (ns tapkee.core
-  (:use [compojure.core :only (defroutes GET)]
-        [compojure.route :as route]
-        [ring.adapter.jetty :as ring]
-        [hiccup.core :only (html)]
+  (:use [hiccup.core :only (html)]
         [hiccup.page :only (html5 include-css include-js)]))
 
 (def all-methods [
@@ -237,11 +234,5 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     ]
   ))
 
-(defroutes routes
-  (GET "/" [] (index))
-  (route/resources "/")
-  (route/not-found "/"))
-
 (defn -main []
-  (let [port (Integer/parseInt (or (System/getenv "PORT") "8080"))]
-    (run-jetty routes {:port port :join? false})))
+  (println (index)))
