@@ -64,6 +64,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
    [:iframe {:src "https://www.googletagmanager.com/ns.html?id=GTM-KNTD3JMZ" :height 0 :width 0 :style "display:none;visibility:hidden"}]
   ])
 
+(defn social-media-meta []
+  [
+   ;; Open Graph meta tags
+   [:meta {:property "og:title" :content "Tapkee - Efficient Dimension Reduction Library"}]
+   [:meta {:property "og:description" :content "Tapkee is a C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more. Fast, efficient, and easy to use."}]
+   [:meta {:property "og:type" :content "website"}]
+   [:meta {:property "og:url" :content "https://tapkee.lisitsyn.me"}]
+   [:meta {:property "og:image" :content "https://tapkee.lisitsyn.me/img/tapkee-preview.png"}]
+   [:meta {:property "og:image:width" :content "1200"}]
+   [:meta {:property "og:image:height" :content "630"}]
+   [:meta {:property "og:site_name" :content "Tapkee"}]
+   [:meta {:property "og:locale" :content "en_US"}]
+   
+   ;; Twitter Card meta tags
+   [:meta {:name "twitter:card" :content "summary_large_image"}]
+   [:meta {:name "twitter:title" :content "Tapkee - Efficient Dimension Reduction Library"}]
+   [:meta {:name "twitter:description" :content "C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more."}]
+   [:meta {:name "twitter:image" :content "https://tapkee.lisitsyn.me/img/tapkee-preview.png"}]
+   [:meta {:name "twitter:image:alt" :content "Tapkee dimension reduction library visualization"}]
+   
+   ;; Additional meta tags
+   [:meta {:name "description" :content "Tapkee is a C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more. Fast, efficient, and easy to use."}]
+   [:meta {:name "keywords" :content "dimension reduction, machine learning, C++, t-SNE, PCA, Isomap, LLE, data visualization, manifold learning"}]
+   [:meta {:name "author" :content "Sergey Lisitsyn"}]
+   ])
+
 (defn navbar [& elements]
   [:div {:class "navbar navbar-inverse navbar-fixed-top"}
    [:div {:class "navbar-inner"}
@@ -176,6 +202,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     [:head
       (tag-manager-head)
       [:title "Tapkee"]
+      ;;;
+      ;; Social media meta tags
+      (social-media-meta)
       ;;;
       (include-css "css/bootstrap.min.css") (include-css "css/bootstrap-modal.css")
       (include-css "css/bootstrap-responsive.css")
