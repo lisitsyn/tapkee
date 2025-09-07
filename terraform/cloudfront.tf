@@ -138,6 +138,16 @@ resource "aws_cloudfront_distribution" "website" {
     response_page_path = "/index.html"
   }
 
+  # CloudFront access logging configuration
+  dynamic "logging_config" {
+    for_each = var.enable_cloudfront_logging ? [1] : []
+    content {
+      bucket          = aws_s3_bucket.cloudfront_logs[0].bucket_domain_name
+      prefix          = var.cloudfront_log_prefix
+      include_cookies = false
+    }
+  }
+
   tags = local.common_tags
 }
 

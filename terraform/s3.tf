@@ -70,7 +70,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
 # Optional: S3 bucket for access logs
 resource "aws_s3_bucket" "logs" {
   count  = var.enable_logging ? 1 : 0
-  bucket = "${local.bucket_name}-logs"
+  bucket = local.logs_bucket_name
   tags   = local.common_tags
 }
 
@@ -102,4 +102,80 @@ resource "aws_s3_bucket_logging" "website" {
 
   target_bucket = aws_s3_bucket.logs[0].id
   target_prefix = "access-logs/"
+}
+
+# S3 bucket for CloudFront access logs
+resource "aws_s3_bucket" "cloudfront_logs" {
+  count  = var.enable_cloudfront_logging && var.create_cloudfront ? 1 : 0
+  bucket = "${local.logs_bucket_name}-cloudfront"
+  tags   = local.common_tags
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront_logs" {
+  count  = var.enable_cloudfront_logging && var.create_cloudfront ? 1 : 0
+  bucket = aws_s3_bucket.cloudfront_logs[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "cloudfront_logs" {
+  count  = var.enable_cloudfront_logging && var.create_cloudfront ? 1 : 0
+  bucket = aws_s3_bucket.cloudfront_logs[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Enable ACL for CloudFront logs bucket
+resource "aws_s3_bucket_acl" "cloudfront_logs" {
+  count      = var.enable_cloudfront_logging && var.create_cloudfront ? 1 : 0
+  bucket     = aws_s3_bucket.cloudfront_logs[0].id
+  acl        = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.cloudfront_logs]
+}
+
+# S3 bucket ownership controls for CloudFront logs
+resource "aws_s3_bucket_ownership_controls" "cloudfront_logs" {
+  count  = var.enable_cloudfront_logging && var.create_cloudfront ? 1 : 0
+  bucket = aws_s3_bucket.cloudfront_logs[0].id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+# CloudFront logs bucket policy to allow CloudFront to write logs
+resource "aws_s3_bucket_policy" "cloudfront_logs" {
+  count  = var.enable_cloudfront_logging && var.create_cloudfront ? 1 : 0
+  bucket = aws_s3_bucket.cloudfront_logs[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs[0].arn}/*"
+      },
+      {
+        Sid    = "AllowCloudFrontGetBucketAcl"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cloudfront_logs[0].arn
+      }
+    ]
+  })
 }

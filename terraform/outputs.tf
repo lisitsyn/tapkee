@@ -69,3 +69,19 @@ output "cloudfront_invalidation_command" {
   description = "AWS CLI command to invalidate CloudFront cache"
   value       = var.create_cloudfront ? "aws cloudfront create-invalidation --distribution-id ${aws_cloudfront_distribution.website[0].id} --paths '/*'" : null
 }
+
+# CloudFront logging outputs
+output "cloudfront_logs_bucket_name" {
+  description = "Name of the CloudFront logs S3 bucket"
+  value       = var.enable_cloudfront_logging && var.create_cloudfront ? aws_s3_bucket.cloudfront_logs[0].bucket : null
+}
+
+output "cloudfront_logs_bucket_arn" {
+  description = "ARN of the CloudFront logs S3 bucket"
+  value       = var.enable_cloudfront_logging && var.create_cloudfront ? aws_s3_bucket.cloudfront_logs[0].arn : null
+}
+
+output "cloudfront_logs_enabled" {
+  description = "Whether CloudFront logging is enabled"
+  value       = var.enable_cloudfront_logging && var.create_cloudfront
+}

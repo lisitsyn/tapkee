@@ -8,6 +8,7 @@ The infrastructure includes:
 
 - **S3 Bucket**: Hosts the static website files
 - **CloudFront Distribution**: CDN for global content delivery and HTTPS
+- **CloudFront Logging**: Access logs stored in dedicated S3 bucket (optional)
 - **Route53 Records**: Custom domain support (optional)
 - **ACM Certificate**: SSL/TLS certificate for HTTPS (optional)
 
@@ -59,8 +60,10 @@ environment       = "prod"
 aws_region        = "us-east-1"
 domain_name       = "tapkee.example.com"  # Optional
 create_cloudfront = true
-enable_versioning = true
-enable_logging    = true
+enable_versioning        = true
+enable_logging           = true
+enable_cloudfront_logging = true
+cloudfront_log_prefix    = "cloudfront-logs/"
 
 tags = {
   Project     = "tapkee"
@@ -75,7 +78,9 @@ tags = {
 - `domain_name`: Your custom domain (leave empty for CloudFront/S3 URLs only)
 - `create_cloudfront`: Set to `false` to use S3 website hosting only
 - `enable_versioning`: Enable S3 object versioning
-- `enable_logging`: Create separate S3 bucket for access logs
+- `enable_logging`: Create separate S3 bucket for S3 access logs
+- `enable_cloudfront_logging`: Enable CloudFront access logging to S3
+- `cloudfront_log_prefix`: Prefix for CloudFront log files in S3
 
 ## Deployment Scenarios
 
@@ -159,6 +164,7 @@ After deployment, Terraform provides useful outputs:
 terraform output website_url
 terraform output s3_bucket_name
 terraform output cloudfront_domain_name
+terraform output cloudfront_logs_bucket_name
 terraform output s3_sync_command
 terraform output cloudfront_invalidation_command
 ```

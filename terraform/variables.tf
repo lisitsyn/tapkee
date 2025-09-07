@@ -40,6 +40,18 @@ variable "enable_logging" {
   default     = true
 }
 
+variable "enable_cloudfront_logging" {
+  description = "Enable CloudFront access logging"
+  type        = bool
+  default     = true
+}
+
+variable "cloudfront_log_prefix" {
+  description = "Prefix for CloudFront access logs"
+  type        = string
+  default     = "cloudfront-logs/"
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

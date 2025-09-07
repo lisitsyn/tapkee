@@ -36,7 +36,8 @@ resource "random_string" "bucket_suffix" {
 }
 
 locals {
-  bucket_name = "${var.project_name}-${var.environment}-${random_string.bucket_suffix.result}"
+  bucket_name = "tapkee-lisitsyn-me"
+  logs_bucket_name = "tapkee-lisitsyn-me-logs"
 
   # Common tags
   common_tags = merge(var.tags, {

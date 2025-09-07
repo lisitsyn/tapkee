@@ -65,7 +65,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   ])
 
 (defn social-media-meta []
-  [
+  (list
    ;; Open Graph meta tags
    [:meta {:property "og:title" :content "Tapkee - Efficient Dimension Reduction Library"}]
    [:meta {:property "og:description" :content "Tapkee is a C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more. Fast, efficient, and easy to use."}]
@@ -88,7 +88,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
    [:meta {:name "description" :content "Tapkee is a C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more. Fast, efficient, and easy to use."}]
    [:meta {:name "keywords" :content "dimension reduction, machine learning, C++, t-SNE, PCA, Isomap, LLE, data visualization, manifold learning"}]
    [:meta {:name "author" :content "Sergey Lisitsyn"}]
-   ])
+   ))
 
 (defn navbar [& elements]
   [:div {:class "navbar navbar-inverse navbar-fixed-top"}
@@ -148,10 +148,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 (defn more-dropdown []
   (dropdown "more" "More"
-            [{:shortname "doxygen" :longname "API documentation" :href "doxygen/html/index.html"}
-             {:shortname "travis" :longname "Tapkee on Travis" :href "https://travis-ci.org/lisitsyn/tapkee"}
-             {:shortname "tests" :longname "Test coverage" :href "lcov/index.html"}
-             {:shortname "bench" :longname "Benchmarks" :href "http://lisitsyn.github.io/tapkee_jmlr_benchmarks"}]))
+            [{:shortname "bench" :longname "Benchmarks" :href "http://lisitsyn.github.io/tapkee_jmlr_benchmarks"}]))
 
 (defn header []
   [:header {:class "jumbotron subhead"}
