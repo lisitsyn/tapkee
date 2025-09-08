@@ -45,6 +45,9 @@ static-html: build
 	@echo "Static HTML generation complete!"
 	@echo "Files generated in: $(OUTPUT_DIR)/"
 
+local: static-html
+	cd $(OUTPUT_DIR) && python3 -m http.server
+
 # Clean generated files and build artifacts
 clean:
 	@echo "Cleaning up..."
