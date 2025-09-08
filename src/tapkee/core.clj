@@ -216,10 +216,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       (include-js "//cdn.jsdelivr.net/npm/d3@3.5.17/d3.min.js") 
       (include-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js")
       (include-js "//cdn.jsdelivr.net/npm/marked@16.2.1/lib/marked.umd.min.js")
+      (include-js "//cdn.jsdelivr.net/npm/jquery.tipsy@1.0.3/src/jquery.tipsy.min.js") 
       (include-js "js/bootstrap.min.js")
       (include-js "js/bootstrap-modalmanager.js") 
-      (include-js "js/bootstrap-modal.js") 
-      (include-js "js/jquery.tipsy.js") 
+      (include-js "js/bootstrap-modal.js")
       ;;;
       (mathjax-config)
       (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
