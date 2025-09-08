@@ -163,7 +163,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
      [:script """
         jQuery.get('md/README.markdown',
                    function(data) {
-                      var output = markdown.toHTML(data);
+                      var output = marked.parse(data);
                       $(\"#readme\").html(output);
                    });
       """]]]])
@@ -172,7 +172,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   (str """
       $(document).ready(function () {
          jQuery.get('" file "', function (d) {
-              $('"id"').html(markdown.toHTML(d));
+              $('"id"').html(marked.parse(d));
               $('"id"').each(function(i,e){
                 MathJax.typeset([e]);
               });
@@ -203,21 +203,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       ;; Social media meta tags
       (social-media-meta)
       ;;;
-      (include-css "css/bootstrap.min.css") (include-css "css/bootstrap-modal.css")
+      (include-css "css/bootstrap.min.css") 
+      (include-css "css/bootstrap-modal.css")
       (include-css "css/bootstrap-responsive.css")
       (include-css "css/tipsy.css") 
       (include-css "css/docs.css")
-      (include-css "http://fonts.googleapis.com/css?family=Nunito") (include-css "css/override.css") 
+      (include-css "css/override.css") 
+      (include-css "//fonts.googleapis.com/css?family=Nunito") 
       (include-css "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/default.min.css")
       ;;;
-      (include-js "js/d3.v3.min.js") 
       (include-js "//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js") 
-      (include-js "js/jquery.tipsy.js") 
-      (include-js "js/bootstrap.min.js") 
-      (include-js "js/markdown.js") 
+      (include-js "//cdn.jsdelivr.net/npm/d3@3.5.17/d3.min.js") 
+      (include-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js")
+      (include-js "//cdn.jsdelivr.net/npm/marked@16.2.1/lib/marked.umd.min.js")
+      (include-js "js/bootstrap.min.js")
       (include-js "js/bootstrap-modalmanager.js") 
       (include-js "js/bootstrap-modal.js") 
-      (include-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js")
+      (include-js "js/jquery.tipsy.js") 
       ;;;
       (mathjax-config)
       (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
