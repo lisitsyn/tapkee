@@ -1,46 +1,64 @@
-d3.json("data/promoters.json", function(json) {
-    var width  = 400,
-        height = 400,
-        margin = 50;
+d3.json('data/promoters.json', (json) => {
+  const width = 400;
+  const height = 400;
+  const margin = 50;
 
-    var color = d3.scale.category10();
-    var letters = ['A', 'C', 'T', 'G'];
+  const color = d3.scale.category10();
+  const letters = ['A', 'C', 'T', 'G'];
 
-    var svg = d3.select("#promotersPlot").append("svg:svg")
-                .attr("width", width)
-                .attr("height", height);
+  const svg = d3.select('#promotersPlot').append('svg:svg')
+    .attr('width', width)
+    .attr('height', height);
 
-    var x_extent = d3.extent(json.data, function(d) { return d.cx });
-    var y_extent = d3.extent(json.data, function(d) { return d.cy });
-    var gc_extent = d3.extent(json.data, function(d) { return d.gc });
-    var x_scale = d3.scale.linear().range([margin, width-margin])
-                          .domain(x_extent);
-    var y_scale = d3.scale.linear().range([height-margin, margin])
-                          .domain(y_extent);
-    var gc_scale = d3.scale.linear().range([0,1])
-                          .domain(gc_extent);
-    var node = svg.selectAll("circle")
-                  .data(json.data)
-                  .enter().append("svg:circle")
-                  .attr("cx", function(d) { return x_scale(d.cx) })
-                  .attr("cy", function(d) { return y_scale(d.cy) })
-                  .attr("r", function(d) { return 5 })
-                  .style("stroke", "black")
-                  .style("fill", function(d,i) { return d3.hsl(200,0.5,gc_scale(d.gc)) });
+  const xExtent = d3.extent(json.data, (d) => d.cx);
+  const yExtent = d3.extent(json.data, (d) => d.cy);
+  const gcExtent = d3.extent(json.data, (d) => d.gc);
+  const xScale = d3.scale.linear().range([margin, width - margin])
+    .domain(xExtent);
+  const yScale = d3.scale.linear().range([height - margin, margin])
+    .domain(yExtent);
+  const gcScale = d3.scale.linear().range([0, 1])
+    .domain(gcExtent);
+  
+  const node = svg.selectAll('circle')
+    .data(json.data)
+    .enter().append('svg:circle')
+    .attr('cx', (d) => xScale(d.cx))
+    .attr('cy', (d) => yScale(d.cy))
+    .attr('r', () => 5)
+    .style('stroke', 'black')
+    .style('fill', (d) => d3.hsl(200, 0.5, gcScale(d.gc)));
 
-    $('svg circle').tipsy({
-      gravity: 'w',
-      html: true,
-      title: function() {
-        var d = this.__data__;
-            string = d.string;
-        var text = string.substring(0,6) + " ... " + string.substring(string.length-6);
-        for (var i=0; i<4; i++) {
-          text = text.replace(new RegExp(letters[i],"g"),'<span style="color: ' + color(i) + ';">' + letters[i] + '</span>');
-        }
-        return text;
-      }
+  // Add Bootstrap tooltip data attributes to circles
+  $('#promotersPlot svg circle').each(function() {
+    const d = this.__data__;
+    const string = d.string;
+    let text = `${string.substring(0, 6)} ... ${string.substring(string.length - 6)}`;
+    
+    for (let i = 0; i < 4; i++) {
+      text = text.replace(new RegExp(letters[i], 'g'), `<span style="color: ${color(i)};">${letters[i]}</span>`);
+    }
+    
+    $(this).attr({
+      'data-bs-toggle': 'tooltip',
+      'data-bs-placement': 'right',
+      'data-bs-html': 'true',
+      'title': text
     });
-
+  });
+  
+  // Initialize Bootstrap tooltips with better performance
+  // Only create instances for elements that don't already have them
+  const container = document.getElementById('promotersPlot');
+  const tooltipElements = container.querySelectorAll('[data-bs-toggle="tooltip"]');
+  
+  tooltipElements.forEach((element) => {
+    if (!bootstrap.Tooltip.getInstance(element)) {
+      new bootstrap.Tooltip(element, {
+        boundary: container,
+        sanitize: false // Since we control the content
+      });
+    }
+  });
 });
 

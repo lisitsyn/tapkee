@@ -91,43 +91,50 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
    ))
 
 (defn navbar [& elements]
-  [:div {:class "navbar navbar-inverse navbar-fixed-top"}
-   [:div {:class "navbar-inner"}
-    [:div {:class "container"}
-     [:a {:class "brand" :href "#"}]
-     [:ul {:class "nav" :role "navigation"}
+  [:nav {:class "navbar fixed-top navbar-expand-lg navbar-light bg-white shadow"}
+   [:div {:class "container"}
+    [:a {:class "navbar-brand" :href "#"} ""]
+    [:button {:class "navbar-toggler" :type "button" :data-bs-toggle "collapse" 
+              :data-bs-target "#navbarNav" :aria-controls "navbarNav" 
+              :aria-expanded "false" :aria-label "Toggle navigation"}
+     [:span {:class "navbar-toggler-icon"}]]
+    [:div {:class "collapse navbar-collapse" :id "navbarNav"}
+     [:ul {:class "navbar-nav mx-auto"}
       elements]]]])
 
 (defn dropdown [id name elements]
-  [:li {:class "dropdown"}
-    [:a {:id id :href "#" :role "button" :class "dropdown-toggle" :data-toggle "dropdown"}
-      [:span name]
-      [:b {:class "caret"}]]
-    [:ul {:class "dropdown-menu" :role "menu" :aria-labelledby id}
-      (concat (map (fn [dropdown-element] 
-             [:li
-              [:a {:tabindex "-1" 
-                   :href (get dropdown-element :href (str "#" (get dropdown-element :shortname)))
-                   :data-toggle "modal"}
-               (get dropdown-element :longname)]
-             ])
-            elements))
+  [:li {:class "nav-item dropdown"}
+    [:a {:id id :href "#" :role "button" :class "nav-link dropdown-toggle" 
+         :data-bs-toggle "dropdown" :aria-expanded "false"}
+      name]
+    [:ul {:class "dropdown-menu" :aria-labelledby id}
+      (map (fn [dropdown-element] 
+             (let [has-external-href (contains? dropdown-element :href)]
+               [:li
+                [:a (merge {:class "dropdown-item"}
+                           (if has-external-href
+                             {:href (:href dropdown-element) :target "_blank"}
+                             {:href "#"
+                              :data-bs-toggle "modal"
+                              :data-bs-target (str "#" (:shortname dropdown-element))}))
+                 (:longname dropdown-element)]
+               ]))
+            elements)
     ]
   ])
 
 (defn modal [id header description javascript]
-  [:div {:id id :class "modal hide fade" :tabindex "-1" :role "dialog" 
+  [:div {:id id :class "modal fade" :tabindex "-1" :role "dialog" 
          :aria-labelledby (str id "Label") :aria-hidden "true"}
-      [:div {:class "modal-header"}
-        [:button {:type "button" :class "close" :data-dismiss "modal" :aria-hidden "true"}
-         "close"]
-        [:h3 {:id (str id "Label")}
-         header]]
-      [:div {:class "modal-body"}
-       description
-       [:div {:align "center" :id (str id "Plot")}
-        javascript]]
-      ])
+    [:div {:class "modal-dialog modal-lg"}
+      [:div {:class "modal-content"}
+        [:div {:class "modal-header"}
+          [:h5 {:class "modal-title" :id (str id "Label")} header]
+          [:button {:type "button" :class "btn-close" :data-bs-dismiss "modal" :aria-label "Close"}]]
+        [:div {:class "modal-body"}
+         description
+         [:div {:class "text-center" :id (str id "Plot")}
+          javascript]]]]])
 
 (defn techniques-dropdown []
   (dropdown "methods" "Dimension reduction techniques"
@@ -151,13 +158,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             [{:shortname "bench" :longname "Benchmarks" :href "http://lisitsyn.github.io/tapkee_jmlr_benchmarks"}]))
 
 (defn header []
-  [:header {:class "jumbotron subhead"}
+  [:header {:class "gradient-header py-5 text-left"}
     [:div {:class "container"}
     [:h1 "Tapkee"]
     [:p "an efficient dimension reduction library"]]])
 
 (defn readme []
-  [:div {:class "container" :data-offset "15" :data-target ".nav-collapse"}
+  [:div {:class "container py-5"}
    [:section 
     [:p {:id "readme"}
      [:script """
@@ -165,6 +172,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                    function(data) {
                       var output = marked.parse(data);
                       $(\"#readme\").html(output);
+                      $(\"#readme pre\").each(function() {
+                        if (!$(this).parent().hasClass('code-block-container')) {
+                          var container = $('<div class=\"code-block-container\"></div>');
+                          var copyBtn = $('<button class=\"copy-code-btn\" onclick=\"copyToClipboard(this)\">Copy</button>');
+                          $(this).wrap(container);
+                          $(this).parent().append(copyBtn);
+                        }
+                      });
                    });
       """]]]])
 
@@ -175,6 +190,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               $('"id"').html(marked.parse(d));
               $('"id"').each(function(i,e){
                 MathJax.typeset([e]);
+                // Enhance code blocks in markdown
+                $(e).find('pre code').each(function() {
+                  hljs.highlightElement(this);
+                });
+                $(e).find('pre').each(function() {
+                  if (!$(this).parent().hasClass('code-block-container')) {
+                    var container = $('<div class=\"code-block-container\"></div>');
+                    var copyBtn = $('<button class=\"copy-code-btn\" onclick=\"copyToClipboard(this)\">Copy</button>');
+                    $(this).wrap(container);
+                    $(this).parent().append(copyBtn);
+                  }
+                });
               });
          });
       })"""))
@@ -186,6 +213,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               $('"id"').text(d);
               $('"id"').each(function(i,e){
                 hljs.highlightElement(e);
+                // Wrap in container and add copy button
+                var container = $('<div class=\"code-block-container\"></div>');
+                var copyBtn = $('<button class=\"copy-code-btn\" onclick=\"copyToClipboard(this)\">Copy</button>');
+                $(e).wrap(container);
+                $(e).parent().append(copyBtn);
               });
          });
         })"""))
@@ -203,27 +235,60 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       ;; Social media meta tags
       (social-media-meta)
       ;;;
-      (include-css "css/bootstrap.min.css") 
-      (include-css "css/bootstrap-modal.css")
-      (include-css "css/bootstrap-responsive.css")
-      (include-css "css/tipsy.css") 
-      (include-css "css/docs.css")
-      (include-css "css/override.css") 
-      (include-css "//fonts.googleapis.com/css?family=Nunito") 
-      (include-css "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/default.min.css")
+      (include-css "//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
+      (include-css "//fonts.googleapis.com/css?family=Nunito")
+      (include-css "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css")
+      (include-css "css/styles.css")
       ;;;
-      (include-js "//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js") 
+      (include-js "//cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js") 
       (include-js "//cdn.jsdelivr.net/npm/d3@3.5.17/d3.min.js") 
       (include-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js")
       (include-js "//cdn.jsdelivr.net/npm/marked@16.2.1/lib/marked.umd.min.js")
-      (include-js "//cdn.jsdelivr.net/npm/jquery.tipsy@1.0.3/src/jquery.tipsy.min.js") 
-      (include-js "js/bootstrap.min.js")
-      (include-js "js/bootstrap-modalmanager.js") 
-      (include-js "js/bootstrap-modal.js")
+      (include-js "//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
       ;;;
       (mathjax-config)
       (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
       ;;;
+      [:script """
+        function copyToClipboard(button) {
+          const codeBlock = button.parentElement.querySelector('pre code, pre');
+          const text = codeBlock.textContent || codeBlock.innerText;
+          
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+              button.textContent = 'Copied!';
+              button.style.backgroundColor = '#28a745';
+              setTimeout(function() {
+                button.textContent = 'Copy';
+                button.style.backgroundColor = '#6c757d';
+              }, 2000);
+            });
+          } else {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+              document.execCommand('copy');
+              button.textContent = 'Copied!';
+              button.style.backgroundColor = '#28a745';
+              setTimeout(function() {
+                button.textContent = 'Copy';
+                button.style.backgroundColor = '#6c757d';
+              }, 2000);
+            } catch (err) {
+              console.error('Failed to copy text: ', err);
+            }
+            
+            document.body.removeChild(textArea);
+          }
+        }
+      """]
     ]
     [:body
      (tag-manager-body)
@@ -238,9 +303,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       (readme)]
       (concat (map (fn [method] 
                 (modal (:shortname method) 
-                       (:longname method)
-                       ""
-                       [:script (htmlize-markdown (str "#" (:shortname method)) (:markdown method))]))
+                       (:longname " ")
+                       [:div {:class "method-content"} 
+                        [:div {:id (str (:shortname method) "Content")}]]
+                       [:script (htmlize-markdown (str "#" (:shortname method) "Content") (:markdown method))]))
               all-methods))
       (concat (map (fn [example]
                 (modal (:shortname example)
