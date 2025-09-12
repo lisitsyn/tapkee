@@ -1,0 +1,15 @@
+{
+  "name": "tapkee-preview-renderer",
+  "version": "1.0.0",
+  "description": "Script to render Tapkee promoters visualization as social media preview image",
+  "main": "render_preview.js",
+  "scripts": {
+    "render": "node render_preview.js",
+    "install-deps": "npm install puppeteer"
+  },
+  "dependencies": {
+    "puppeteer": "24.20.0"
+  },
+  "author": "Tapkee",
+  "license": "MIT"
+}

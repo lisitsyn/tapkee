@@ -2,6 +2,36 @@
   (:use [hiccup.core :only (html)]
         [hiccup.page :only (html5 include-css include-js)]))
 
+;; Configuration constants
+(def site-config
+  {:title "Tapkee - Efficient Dimension Reduction Library"
+   :description "Tapkee is a C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more. Fast, efficient, and easy to use."
+   :short-description "C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more."
+   :url "https://tapkee.lisitsyn.me"
+   :image "https://tapkee.lisitsyn.me/img/tapkee-preview.png"
+   :author "Sergey Lisitsyn"
+   :gtm-id "GTM-KNTD3JMZ"
+   :github-url "https://github.com/lisitsyn/tapkee"
+   :benchmark-url "http://lisitsyn.github.io/tapkee_jmlr_benchmarks"})
+
+(def cdn-urls
+  {:bootstrap-css "//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+   :bootstrap-js "//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+   :google-fonts "//fonts.googleapis.com/css?family=Nunito"
+   :highlight-css "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css"
+   :highlight-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"
+   :jquery "//cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+   :d3 "//cdn.jsdelivr.net/npm/d3@3.5.17/d3.min.js"
+   :marked "//cdn.jsdelivr.net/npm/marked@16.2.1/lib/marked.umd.min.js"
+   :mathjax "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+   :download-zip "https://github.com/lisitsyn/tapkee/archive/master.zip"
+   :download-targz "https://github.com/lisitsyn/tapkee/archive/master.tar.gz"})
+
+(def local-resources
+  {:clipboard-js "js/clipboard.js"
+   :loaders-js "js/loaders.js"
+   :styles-css "css/styles.css"})
+
 (def all-methods [
   {:shortname "lle" :longname "Kernel Locally Linear Embedding" :markdown "md/lle.markdown"}
   {:shortname "npe" :longname "Neighborhood Preserving Embedding" :markdown "md/npe.markdown"}
@@ -51,77 +81,71 @@
   """])
 
 (defn tag-manager-head []
-  [:script """
+  [:script (str "
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KNTD3JMZ');
-   """])
+})(window,document,'script','dataLayer','" (:gtm-id site-config) "');")])
 
 (defn tag-manager-body []
   [:noscript
-   [:iframe {:src "https://www.googletagmanager.com/ns.html?id=GTM-KNTD3JMZ" :height 0 :width 0 :style "display:none;visibility:hidden"}]
-  ])
+   [:iframe {:src (str "https://www.googletagmanager.com/ns.html?id=" (:gtm-id site-config)) 
+             :height 0 :width 0 :style "display:none;visibility:hidden"}]])
 
 (defn social-media-meta []
-  (list
-   ;; Open Graph meta tags
-   [:meta {:property "og:title" :content "Tapkee - Efficient Dimension Reduction Library"}]
-   [:meta {:property "og:description" :content "Tapkee is a C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more. Fast, efficient, and easy to use."}]
-   [:meta {:property "og:type" :content "website"}]
-   [:meta {:property "og:url" :content "https://tapkee.lisitsyn.me"}]
-   [:meta {:property "og:image" :content "https://tapkee.lisitsyn.me/img/tapkee-preview.png"}]
-   [:meta {:property "og:image:width" :content "1200"}]
-   [:meta {:property "og:image:height" :content "630"}]
-   [:meta {:property "og:site_name" :content "Tapkee"}]
-   [:meta {:property "og:locale" :content "en_US"}]
-   
-   ;; Twitter Card meta tags
-   [:meta {:name "twitter:card" :content "summary_large_image"}]
-   [:meta {:name "twitter:title" :content "Tapkee - Efficient Dimension Reduction Library"}]
-   [:meta {:name "twitter:description" :content "C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more."}]
-   [:meta {:name "twitter:image" :content "https://tapkee.lisitsyn.me/img/tapkee-preview.png"}]
-   [:meta {:name "twitter:image:alt" :content "Tapkee dimension reduction library visualization"}]
-   
-   ;; Additional meta tags
-   [:meta {:name "description" :content "Tapkee is a C++ template library for dimension reduction with 18+ algorithms including t-SNE, Isomap, LLE, PCA and more. Fast, efficient, and easy to use."}]
-   [:meta {:name "keywords" :content "dimension reduction, machine learning, C++, t-SNE, PCA, Isomap, LLE, data visualization, manifold learning"}]
-   [:meta {:name "author" :content "Sergey Lisitsyn"}]
-   ))
+  (let [{:keys [title description short-description url image author]} site-config]
+    (list
+     ;; Open Graph meta tags
+     [:meta {:property "og:title" :content title}]
+     [:meta {:property "og:description" :content description}]
+     [:meta {:property "og:type" :content "website"}]
+     [:meta {:property "og:url" :content url}]
+     [:meta {:property "og:image" :content image}]
+     [:meta {:property "og:image:width" :content "1200"}]
+     [:meta {:property "og:image:height" :content "630"}]
+     [:meta {:property "og:site_name" :content "Tapkee"}]
+     [:meta {:property "og:locale" :content "en_US"}]
+     
+     ;; Twitter Card meta tags
+     [:meta {:name "twitter:card" :content "summary_large_image"}]
+     [:meta {:name "twitter:title" :content title}]
+     [:meta {:name "twitter:description" :content short-description}]
+     [:meta {:name "twitter:image" :content image}]
+     [:meta {:name "twitter:image:alt" :content "Tapkee dimension reduction library visualization"}]
+     
+     ;; Additional meta tags
+     [:meta {:name "description" :content description}]
+     [:meta {:name "keywords" :content "dimension reduction, machine learning, C++, t-SNE, PCA, Isomap, LLE, data visualization, manifold learning"}]
+     [:meta {:name "author" :content author}]
+     )))
 
 (defn navbar [& elements]
   [:nav {:class "navbar fixed-top navbar-expand-lg navbar-light bg-white shadow"}
    [:div {:class "container"}
     [:a {:class "navbar-brand" :href "#"} ""]
-    [:button {:class "navbar-toggler" :type "button" :data-bs-toggle "collapse" 
-              :data-bs-target "#navbarNav" :aria-controls "navbarNav" 
-              :aria-expanded "false" :aria-label "Toggle navigation"}
-     [:span {:class "navbar-toggler-icon"}]]
     [:div {:class "collapse navbar-collapse" :id "navbarNav"}
      [:ul {:class "navbar-nav mx-auto"}
       elements]]]])
 
+(defn dropdown-link [element]
+  (let [has-external-href (contains? element :href)]
+    [:li
+     [:a (merge {:class "dropdown-item"}
+                (if has-external-href
+                  {:href (:href element) :target "_blank"}
+                  {:href "#"
+                   :data-bs-toggle "modal"
+                   :data-bs-target (str "#" (:shortname element))}))
+      (:longname element)]]))
+
 (defn dropdown [id name elements]
   [:li {:class "nav-item dropdown"}
-    [:a {:id id :href "#" :role "button" :class "nav-link dropdown-toggle" 
-         :data-bs-toggle "dropdown" :aria-expanded "false"}
-      name]
-    [:ul {:class "dropdown-menu" :aria-labelledby id}
-      (map (fn [dropdown-element] 
-             (let [has-external-href (contains? dropdown-element :href)]
-               [:li
-                [:a (merge {:class "dropdown-item"}
-                           (if has-external-href
-                             {:href (:href dropdown-element) :target "_blank"}
-                             {:href "#"
-                              :data-bs-toggle "modal"
-                              :data-bs-target (str "#" (:shortname dropdown-element))}))
-                 (:longname dropdown-element)]
-               ]))
-            elements)
-    ]
-  ])
+   [:a {:id id :href "#" :role "button" :class "nav-link dropdown-toggle" 
+        :data-bs-toggle "dropdown" :aria-expanded "false"}
+    name]
+   [:ul {:class "dropdown-menu" :aria-labelledby id}
+    (map dropdown-link elements)]])
 
 (defn modal [id header description javascript]
   [:div {:id id :class "modal fade" :tabindex "-1" :role "dialog" 
@@ -135,6 +159,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
          description
          [:div {:class "text-center" :id (str id "Plot")}
           javascript]]]]])
+
+(defn github-button []
+  [:li {:class "nav-item"}
+   [:a {:class "nav-link" :href (:github-url site-config) :target "_blank"} "GitHub"]])
 
 (defn techniques-dropdown []
   (dropdown "methods" "Dimension reduction techniques"
@@ -150,12 +178,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 (defn downloads-dropdown []
   (dropdown "downloads" "Download"
-            [{:shortname "zip" :longname "as .zip" :href "https://github.com/lisitsyn/tapkee/archive/master.zip"}
-             {:shortname "targz" :longname "as .tar.gz" :href "https://github.com/lisitsyn/tapkee/archive/master.tar.gz"}]))
+            [{:shortname "zip" :longname "as .zip" :href (:download-zip cdn-urls)}
+             {:shortname "targz" :longname "as .tar.gz" :href (:download-targz cdn-urls)}]))
 
 (defn more-dropdown []
   (dropdown "more" "More"
-            [{:shortname "bench" :longname "Benchmarks" :href "http://lisitsyn.github.io/tapkee_jmlr_benchmarks"}]))
+            [{:shortname "bench" :longname "Benchmarks" :href (:benchmark-url site-config)}]))
 
 (defn header []
   [:header {:class "gradient-header py-5 text-left"}
@@ -166,129 +194,71 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 (defn readme []
   [:div {:class "container py-5"}
    [:section 
-    [:p {:id "readme"}
-     [:script """
-        jQuery.get('md/README.markdown',
-                   function(data) {
-                      var output = marked.parse(data);
-                      $(\"#readme\").html(output);
-                      $(\"#readme pre\").each(function() {
-                        if (!$(this).parent().hasClass('code-block-container')) {
-                          var container = $('<div class=\"code-block-container\"></div>');
-                          var copyBtn = $('<button class=\"copy-code-btn\" onclick=\"copyToClipboard(this)\">Copy</button>');
-                          $(this).wrap(container);
-                          $(this).parent().append(copyBtn);
-                        }
-                      });
-                   });
-      """]]]])
+    [:div {:id "readme"}]
+    [:script "loadReadmeContent();"]]])
 
 (defn htmlize-markdown [id file]
-  (str """
-      $(document).ready(function () {
-         jQuery.get('" file "', function (d) {
-              $('"id"').html(marked.parse(d));
-              $('"id"').each(function(i,e){
-                MathJax.typeset([e]);
-                // Enhance code blocks in markdown
-                $(e).find('pre code').each(function() {
-                  hljs.highlightElement(this);
-                });
-                $(e).find('pre').each(function() {
-                  if (!$(this).parent().hasClass('code-block-container')) {
-                    var container = $('<div class=\"code-block-container\"></div>');
-                    var copyBtn = $('<button class=\"copy-code-btn\" onclick=\"copyToClipboard(this)\">Copy</button>');
-                    $(this).wrap(container);
-                    $(this).parent().append(copyBtn);
-                  }
-                });
-              });
-         });
-      })"""))
+  (str "loadMarkdownContent('" id "', '" file "');"))
 
 (defn load-sources [id file]
-  (str """
-       $(document).ready(function () {
-         jQuery.get('" file "', function (d) {
-              $('"id"').text(d);
-              $('"id"').each(function(i,e){
-                hljs.highlightElement(e);
-                // Wrap in container and add copy button
-                var container = $('<div class=\"code-block-container\"></div>');
-                var copyBtn = $('<button class=\"copy-code-btn\" onclick=\"copyToClipboard(this)\">Copy</button>');
-                $(e).wrap(container);
-                $(e).parent().append(copyBtn);
-              });
-         });
-        })"""))
+  (str "loadSourceCode('" id "', '" file "');"))
+
+;; Modal helper functions
+(defn method-modal [method]
+  (modal (:shortname method) 
+         (:longname method)
+         [:div {:class "method-content"} 
+          [:div {:id (str (:shortname method) "Content")}
+           [:script (htmlize-markdown (str "#" (:shortname method) "Content") (:markdown method))]]]
+         ""))
+
+(defn graphical-example-modal [example]
+  (let [dsc-id (str (:shortname example) "Dsc")]
+    (modal (:shortname example)
+           (:longname example)
+           [:div {:id dsc-id} 
+            [:script (htmlize-markdown (str "#" dsc-id) (:description example))]]
+           (include-js (:script example)))))
+
+(defn usage-example-modal [example]
+  (let [dsc-id (str (:shortname example) "Dsc") 
+        src-id (str (:shortname example) "Src")]
+    (modal (:shortname example)
+           (:longname example)
+           [:div
+            [:div {:id dsc-id} 
+             [:script (htmlize-markdown (str "#" dsc-id) (:description example))]]
+            [:br]
+            [:pre {:id src-id}
+             [:script (load-sources (str "#" src-id) (:source example))]]]
+           "")))
 
 
-(defn script [& operations]
-  (str operations))
 
 (defn index []
   (html5
     [:head
       (tag-manager-head)
-      [:title "Tapkee"]
-      ;;;
+      [:title (:title site-config)]
       ;; Social media meta tags
       (social-media-meta)
-      ;;;
-      (include-css "//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
-      (include-css "//fonts.googleapis.com/css?family=Nunito")
-      (include-css "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css")
-      (include-css "css/styles.css")
-      ;;;
-      (include-js "//cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js") 
-      (include-js "//cdn.jsdelivr.net/npm/d3@3.5.17/d3.min.js") 
-      (include-js "//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js")
-      (include-js "//cdn.jsdelivr.net/npm/marked@16.2.1/lib/marked.umd.min.js")
-      (include-js "//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
-      ;;;
+      ;; CSS includes
+      (include-css (:bootstrap-css cdn-urls))
+      (include-css (:google-fonts cdn-urls))
+      (include-css (:highlight-css cdn-urls))
+      (include-css (:styles-css local-resources))
+      ;; JavaScript includes
+      (include-js (:jquery cdn-urls)) 
+      (include-js (:d3 cdn-urls)) 
+      (include-js (:highlight-js cdn-urls))
+      (include-js (:marked cdn-urls))
+      (include-js (:bootstrap-js cdn-urls))
+      ;; MathJax configuration and script
       (mathjax-config)
-      (include-js "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
-      ;;;
-      [:script """
-        function copyToClipboard(button) {
-          const codeBlock = button.parentElement.querySelector('pre code, pre');
-          const text = codeBlock.textContent || codeBlock.innerText;
-          
-          if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(function() {
-              button.textContent = 'Copied!';
-              button.style.backgroundColor = '#28a745';
-              setTimeout(function() {
-                button.textContent = 'Copy';
-                button.style.backgroundColor = '#6c757d';
-              }, 2000);
-            });
-          } else {
-            // Fallback for older browsers
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.opacity = '0';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-              document.execCommand('copy');
-              button.textContent = 'Copied!';
-              button.style.backgroundColor = '#28a745';
-              setTimeout(function() {
-                button.textContent = 'Copy';
-                button.style.backgroundColor = '#6c757d';
-              }, 2000);
-            } catch (err) {
-              console.error('Failed to copy text: ', err);
-            }
-            
-            document.body.removeChild(textArea);
-          }
-        }
-      """]
+      (include-js (:mathjax cdn-urls))
+      ;; Local scripts
+      [:script {:src (:clipboard-js local-resources)}]
+      [:script {:src (:loaders-js local-resources)}]
     ]
     [:body
      (tag-manager-body)
@@ -298,35 +268,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
          (code-examples-dropdown)
          (graphical-examples-dropdown)
          (downloads-dropdown)
-         (more-dropdown))
+         (more-dropdown)
+         (github-button)
+      )
       (header)
       (readme)]
-      (concat (map (fn [method] 
-                (modal (:shortname method) 
-                       (:longname " ")
-                       [:div {:class "method-content"} 
-                        [:div {:id (str (:shortname method) "Content")}]]
-                       [:script (htmlize-markdown (str "#" (:shortname method) "Content") (:markdown method))]))
-              all-methods))
-      (concat (map (fn [example]
-                (modal (:shortname example)
-                       (:longname example)
-                       (let [dsc-id (str (:shortname example) "Dsc")]
-                        [:div {:id dsc-id} 
-                         [:script (htmlize-markdown (str "#" dsc-id) (:description example))]])
-                       (include-js (:script example))))
-              all-graphical-examples))
-      (concat (map (fn [example]
-                (modal (:shortname example)
-                       (:longname example)
-                       (let [dsc-id (str (:shortname example) "Dsc") src-id (str (:shortname example) "Src")]
-                         (concat [
-                            [:div {:id dsc-id} 
-                              [:script (htmlize-markdown (str "#" dsc-id) (:description example))]][:br]
-                            [:pre {:id (str src-id)}
-                              [:script (str (load-sources (str "#" src-id) (:source example)))]]]))
-                       ""))
-              all-usage-examples))
+      ;; Method modals
+      (map method-modal all-methods)
+      ;; Graphical example modals  
+      (map graphical-example-modal all-graphical-examples)
+      ;; Usage example modals
+      (map usage-example-modal all-usage-examples)
     ]
   ))
 

@@ -75,15 +75,15 @@ resource "aws_cloudfront_distribution" "website" {
 
     forwarded_values {
       query_string = false
-      headers      = ["Origin"]
+      headers      = ["Origin", "ETag", "Last-Modified"]
       cookies {
         forward = "none"
       }
     }
 
     min_ttl                = 0
-    default_ttl            = 86400
-    max_ttl                = 31536000
+    default_ttl            = 3600    # Reduced from 86400 (24h) to 3600 (1h)
+    max_ttl                = 86400   # Reduced from 31536000 (1y) to 86400 (24h)
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
   }
