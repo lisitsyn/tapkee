@@ -93,6 +93,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
    [:iframe {:src (str "https://www.googletagmanager.com/ns.html?id=" (:gtm-id site-config)) 
              :height 0 :width 0 :style "display:none;visibility:hidden"}]])
 
+(defn favicon-and-manifest-meta []
+  (list
+   ;; Favicon and manifest - Safari-compatible order and configuration
+   [:link {:rel "shortcut icon" :type "image/x-icon" :href "/img/favicon.ico"}]
+   [:link {:rel "icon" :type "image/x-icon" :href "/img/favicon.ico"}]
+   [:link {:rel "icon" :type "image/png" :sizes "16x16" :href "/img/favicon-16x16.png"}]
+   [:link {:rel "icon" :type "image/png" :sizes "32x32" :href "/img/favicon-32x32.png"}]
+   [:link {:rel "apple-touch-icon" :sizes "180x180" :href "/img/apple-touch-icon.png"}]
+   [:link {:rel "apple-touch-icon-precomposed" :sizes "180x180" :href "/img/apple-touch-icon.png"}]
+   [:meta {:name "msapplication-TileImage" :content "/img/apple-touch-icon.png"}]
+   [:meta {:name "msapplication-TileColor" :content "#ffffff"}]
+   [:link {:rel "manifest" :href "/manifest.json"}]))
+
 (defn social-media-meta []
   (let [{:keys [title description short-description url image author]} site-config]
     (list
@@ -240,12 +253,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     [:head
       (tag-manager-head)
       [:title (:title site-config)]
-      ;; Favicon and manifest
-      [:link {:rel "icon" :type "image/x-icon" :href "/img/favicon.ico"}]
-      [:link {:rel "icon" :type "image/png" :sizes "16x16" :href "/img/favicon-16x16.png"}]
-      [:link {:rel "icon" :type "image/png" :sizes "32x32" :href "/img/favicon-32x32.png"}]
-      [:link {:rel "apple-touch-icon" :sizes "180x180" :href "/img/apple-touch-icon.png"}]
-      [:link {:rel "manifest" :href "/manifest.json"}]
+      ;; Favicon and manifest meta tags
+      (favicon-and-manifest-meta)
       ;; Social media meta tags
       (social-media-meta)
       ;; CSS includes

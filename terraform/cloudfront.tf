@@ -8,6 +8,50 @@ resource "aws_cloudfront_origin_access_control" "website" {
   signing_protocol                  = "sigv4"
 }
 
+# CloudFront Response Headers Policy for Security
+resource "aws_cloudfront_response_headers_policy" "security_headers" {
+  count = var.create_cloudfront ? 1 : 0
+  name  = "${var.project_name}-${var.environment}-security-headers"
+
+  security_headers_config {
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+
+    content_security_policy {
+      content_security_policy = join("; ", [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' abt.s3.yandex.net cdn.jsdelivr.net www.googletagmanager.com www.google-analytics.com mc.yandex.ru yastatic.net",
+        "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com",
+        "font-src 'self' fonts.gstatic.com cdn.jsdelivr.net",
+        "img-src 'self' data: abt.s3.yandex.net mc.yandex.ru yandex.ru www.googletagmanager.com",
+        "connect-src 'self' www.google-analytics.com abt.s3.yandex.net mc.yandex.ru uaas.yandex.ru",
+        "frame-src 'none'",
+        "object-src 'none'",
+        "base-uri 'self'"
+      ])
+      override = true
+    }
+  }
+}
+
 # CloudFront distribution
 resource "aws_cloudfront_distribution" "website" {
   count = var.create_cloudfront ? 1 : 0
@@ -38,11 +82,12 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-    compress               = true
+    viewer_protocol_policy     = "redirect-to-https"
+    min_ttl                    = 0
+    default_ttl                = 3600
+    max_ttl                    = 86400
+    compress                   = true
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers[0].id
   }
 
   # Additional cache behavior for static assets
@@ -60,11 +105,12 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    min_ttl                = 0
-    default_ttl            = 86400
-    max_ttl                = 31536000
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                    = 0
+    default_ttl                = 86400
+    max_ttl                    = 31536000
+    compress                   = true
+    viewer_protocol_policy     = "redirect-to-https"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers[0].id
   }
 
   ordered_cache_behavior {
@@ -81,11 +127,12 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    min_ttl                = 0
-    default_ttl            = 3600    # Reduced from 86400 (24h) to 3600 (1h)
-    max_ttl                = 86400   # Reduced from 31536000 (1y) to 86400 (24h)
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                    = 0
+    default_ttl                = 3600    # Reduced from 86400 (24h) to 3600 (1h)
+    max_ttl                    = 86400   # Reduced from 31536000 (1y) to 86400 (24h)
+    compress                   = true
+    viewer_protocol_policy     = "redirect-to-https"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers[0].id
   }
 
   ordered_cache_behavior {
@@ -102,11 +149,12 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
 
-    min_ttl                = 0
-    default_ttl            = 86400
-    max_ttl                = 31536000
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                    = 0
+    default_ttl                = 86400
+    max_ttl                    = 31536000
+    compress                   = true
+    viewer_protocol_policy     = "redirect-to-https"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers[0].id
   }
 
   price_class = "PriceClass_100"

@@ -134,3 +134,40 @@ pre.hljs code {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+/* Modal backdrop blur effect */
+.modal-backdrop {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: backdrop-filter 0.3s ease, opacity 0.15s linear;
+}
+
+.modal-backdrop.show {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Modal fade transition enhancement */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    transform: translate(0, -50px) scale(0.95);
+}
+
+.modal.show .modal-dialog {
+    transform: translate(0, 0) scale(1);
+}
+
+/* Additional blur effect for content behind modal */
+body.modal-open {
+    overflow: hidden;
+}
+
+body.modal-open .page-container {
+    filter: blur(2px);
+    transition: filter 0.3s ease;
+}
+
+body:not(.modal-open) .page-container {
+    filter: blur(0px);
+    transition: filter 0.3s ease;
+}
