@@ -30,7 +30,7 @@ jobs:
         Invoke-WebRequest -Uri "https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.zip" -OutFile "eigen-5.0.0.zip"
         Expand-Archive -Path "eigen-5.0.0.zip" -DestinationPath "."
         cd eigen-5.0.0
-        cmake -B build
+        cmake -B build -DBUILD_TESTING=OFF -DEIGEN_BUILD_DOC=OFF -DEIGEN_BUILD_BLAS=OFF -DEIGEN_BUILD_LAPACK=OFF
         cmake --install build --prefix "${{github.workspace}}/eigen-install"
 
     - name: Configure
