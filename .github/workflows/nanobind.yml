@@ -22,8 +22,16 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get install -y libarpack2-dev libcxxopts-dev libeigen3-dev libfmt-dev python3.11-dev 
+        sudo apt-get install -y libarpack2-dev libcxxopts-dev libfmt-dev python3.11-dev
         python -m pip install nanobind numpy
+
+    - name: Install Eigen 5
+      run: |
+        wget https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.tar.gz
+        tar xzf eigen-5.0.0.tar.gz
+        cd eigen-5.0.0
+        cmake -B build
+        sudo cmake --install build
 
     - name: Configure
       run: cmake -B ${{github.workspace}}/build -DBUILD_NANOBIND=ON

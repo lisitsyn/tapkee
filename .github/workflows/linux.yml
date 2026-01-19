@@ -18,7 +18,15 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: sudo apt-get install -y libeigen3-dev libarpack2-dev libgtest-dev libfmt-dev libcxxopts-dev
+      run: sudo apt-get install -y libarpack2-dev libgtest-dev libfmt-dev libcxxopts-dev
+
+    - name: Install Eigen 5
+      run: |
+        wget https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.tar.gz
+        tar xzf eigen-5.0.0.tar.gz
+        cd eigen-5.0.0
+        cmake -B build
+        sudo cmake --install build
 
     - name: Configure
       run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
