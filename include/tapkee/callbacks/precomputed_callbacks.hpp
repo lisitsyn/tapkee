@@ -11,7 +11,7 @@
 namespace tapkee
 {
 // Here we provide basic but still full set of callbacks
-// based on the Eigen3 template matrix library
+// based on the Eigen template matrix library
 
 // Kernel function callback that computes
 // similarity function values on vectors

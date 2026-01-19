@@ -61,16 +61,8 @@ Laplacian compute_laplacian(RandomAccessIterator begin, RandomAccessIterator end
     for (IndexType i = 0; i < static_cast<IndexType>(end - begin); ++i)
         sparse_triplets.push_back(SparseTriplet(i, i, D(i)));
 
-#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-    Eigen::DynamicSparseMatrix<ScalarType> dynamic_weight_matrix(end - begin, end - begin);
-    dynamic_weight_matrix.reserve(sparse_triplets.size());
-    for (SparseTriplets::const_iterator it = sparse_triplets.begin(); it != sparse_triplets.end(); ++it)
-        dynamic_weight_matrix.coeffRef(it->col(), it->row()) += it->value();
-    SparseWeightMatrix weight_matrix(dynamic_weight_matrix);
-#else
     SparseWeightMatrix weight_matrix(end - begin, end - begin);
     weight_matrix.setFromTriplets(sparse_triplets.begin(), sparse_triplets.end());
-#endif
 
     return Laplacian(weight_matrix, DenseDiagonalMatrix(D));
 }

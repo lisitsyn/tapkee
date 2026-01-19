@@ -94,9 +94,8 @@ TapkeeOutput embed(RandomAccessIterator begin, RandomAccessIterator end, KernelC
                    DistanceCallback distance_callback, FeaturesCallback features_callback,
                    stichwort::ParametersSet parameters)
 {
-#if EIGEN_VERSION_AT_LEAST(3, 1, 0)
-    Eigen::initParallel();
-#endif
+    // Note: Eigen::initParallel() was deprecated and removed in Eigen 5.
+    // With C++11+ compliant compilers, thread-safe static initialization is automatic.
     TapkeeOutput output;
 
     try

@@ -1,6 +1,6 @@
 /* This software is distributed under BSD 3-clause license (see LICENSE file).
  *
- * This code is based on Eigen3 ARPACK wrapper
+ * This code is based on Eigen ARPACK wrapper
  * Copyright (c) 2012 David Harmon
  *
  * The code is relicensed under BSD 3-clause with the permission of its
@@ -15,12 +15,10 @@
 using Eigen::ComputationInfo;
 using Eigen::ComputeEigenvectors;
 using Eigen::Dynamic;
+using Eigen::InvalidInput;
 using Eigen::Matrix;
 using Eigen::NoConvergence;
 using Eigen::NumericalIssue;
-#ifndef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-using Eigen::InvalidInput;
-#endif
 using Eigen::NumTraits;
 using Eigen::Success;
 
@@ -493,11 +491,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
     else if (cinfo < 0)
     {
         // std::cout << "FAILED WITH INVALID INPUT " << info << "\n";
-#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-        m_info = NoConvergence;
-#else
         m_info = InvalidInput;
-#endif
     }
     else if (cinfo != 0)
         eigen_assert(false && "Unknown ARPACK return value!");
@@ -522,11 +516,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
         if (cinfo == -14)
             m_info = NoConvergence;
         else if (cinfo != 0)
-#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-            m_info = NoConvergence;
-#else
             m_info = InvalidInput;
-#endif
         else
         {
             if (rvec)

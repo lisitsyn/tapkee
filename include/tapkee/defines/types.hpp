@@ -33,16 +33,10 @@ typedef Eigen::SparseMatrix<tapkee::ScalarType> SparseMatrix;
 typedef Eigen::SelfAdjointEigenSolver<tapkee::DenseMatrix> DenseSelfAdjointEigenSolver;
 //! dense solver (non-overridable)
 typedef Eigen::LDLT<tapkee::DenseMatrix> DenseSolver;
-#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-//! sparse solver (it is Eigen::SimplicialCholesky in case of eigen version <3.1.0,
-//! in case of TAPKEE_USE_SUPERLU being defined it is Eigen::SuperLU, by default
-//! it is Eigen::SimplicialLDLT)
-typedef Eigen::SimplicialCholesky<tapkee::SparseWeightMatrix> SparseSolver;
-#else
+//! sparse solver (Eigen::SuperLU if TAPKEE_USE_SUPERLU is defined, otherwise Eigen::SimplicialLDLT)
 #if defined(TAPKEE_SUPERLU_AVAILABLE) && defined(TAPKEE_USE_SUPERLU)
 typedef Eigen::SuperLU<tapkee::SparseWeightMatrix> SparseSolver;
 #else
 typedef Eigen::SimplicialLDLT<tapkee::SparseWeightMatrix> SparseSolver;
-#endif
 #endif
 } // namespace tapkee

@@ -1,6 +1,6 @@
 #pragma once
 
-//// Eigen 3 library includes
+//// Eigen 5 library includes
 #ifdef TAPKEE_EIGEN_INCLUDE_FILE
 #include TAPKEE_EIGEN_INCLUDE_FILE
 #else
@@ -10,14 +10,9 @@
 #define EIGEN_RUNTIME_NO_MALLOC
 #include <Eigen/Dense>
 #include <Eigen/Eigen>
-#if EIGEN_VERSION_AT_LEAST(3, 0, 93)
 #include <Eigen/Sparse>
 #if defined(TAPKEE_SUPERLU_AVAILABLE) && defined(TAPKEE_USE_SUPERLU)
 #include <Eigen/SuperLUSupport>
-#endif
-#else
-#define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-#include <unsupported/Eigen/SparseExtra>
 #endif
 #endif
 
@@ -28,4 +23,4 @@
 #define RESTRICT_ALLOC
 #define UNRESTRICT_ALLOC
 #endif
-//// end of Eigen 3 library includes
+//// end of Eigen library includes
