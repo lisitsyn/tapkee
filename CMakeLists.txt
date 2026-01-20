@@ -14,7 +14,10 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Eigen detection (supports Eigen 3.4+ and Eigen 5.x)
-find_package(Eigen3 3.4 REQUIRED NO_MODULE)
+find_package(Eigen3 REQUIRED NO_MODULE)
+if(Eigen3_VERSION VERSION_LESS "3.4")
+    message(FATAL_ERROR "Tapkee requires Eigen 3.4 or later. Found: ${Eigen3_VERSION}")
+endif()
 set (EIGEN3_LIBRARY_TO_LINK "Eigen3::Eigen")
 message(STATUS "Found Eigen version: ${Eigen3_VERSION}")
 
