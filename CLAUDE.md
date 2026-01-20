@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Tapkee is a C++ header-only template library for dimensionality reduction with focus on spectral methods. It integrates with Eigen 5 for linear algebra and optionally ARPACK for eigendecomposition.
+Tapkee is a C++ header-only template library for dimensionality reduction with focus on spectral methods. It integrates with Eigen for linear algebra and optionally ARPACK for eigendecomposition.
 
 ## Build Commands
 
@@ -90,7 +90,7 @@ Other: MDS, Landmark MDS, Manifold Sculpting
 
 ## Dependencies
 
-- **Eigen** (5.0+) - Required
+- **Eigen** (3.4+) - Required
 - **ARPACK** - Optional but recommended for large-scale eigenproblems
 - **fmt, cxxopts** - For CLI application
 - **GTest** - For tests

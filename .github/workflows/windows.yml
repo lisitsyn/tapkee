@@ -23,18 +23,10 @@ jobs:
          channels: conda-forge
 
     - name: Install conda packages
-      run: conda install gtest fmt cxxopts
-
-    - name: Install Eigen 5
-      run: |
-        Invoke-WebRequest -Uri "https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.zip" -OutFile "eigen-5.0.0.zip"
-        Expand-Archive -Path "eigen-5.0.0.zip" -DestinationPath "."
-        cd eigen-5.0.0
-        cmake -B build -DBUILD_TESTING=OFF -DEIGEN_BUILD_DOC=OFF -DEIGEN_BUILD_BLAS=OFF -DEIGEN_BUILD_LAPACK=OFF
-        cmake --install build --prefix "${{github.workspace}}/eigen-install"
+      run: conda install gtest eigen fmt cxxopts
 
     - name: Configure
-      run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_PREFIX_PATH="${{github.workspace}}/eigen-install"
+      run: cmake -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{matrix.build_type}}

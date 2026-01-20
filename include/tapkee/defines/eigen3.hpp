@@ -1,6 +1,6 @@
 #pragma once
 
-//// Eigen 5 library includes
+//// Eigen library includes (supports Eigen 3.4+ and Eigen 5.x)
 #ifdef TAPKEE_EIGEN_INCLUDE_FILE
 #include TAPKEE_EIGEN_INCLUDE_FILE
 #else

@@ -227,7 +227,7 @@ There are a few cases when you'd want to put some definitions:
 
 - To build application without parts licensed by LGPLv3 use `-DGPL_FREE=1` definition.
 
-The library requires Eigen 5 to be available in your path. The ARPACK library is also highly
+The library requires Eigen 3.4+ to be available in your path. The ARPACK library is also highly
 recommended to achieve best performance. On Debian/Ubuntu these packages can be installed with
 
 	sudo apt-get install libeigen3-dev libarpack2-dev
