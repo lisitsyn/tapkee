@@ -4,7 +4,7 @@ spectral methods. The Tapkee origins from the code developed during
 the part of the [Shogun machine learning toolbox](https://github.com/shogun-toolbox/shogun).
 The project aim is to provide efficient and flexible standalone library for
 dimensionality reduction which can be easily integrated to existing codebases.
-Tapkee leverages capabilities of effective [Eigen3 linear algebra library](http://eigen.tuxfamily.org) and
+Tapkee leverages capabilities of effective [Eigen linear algebra library](http://eigen.tuxfamily.org) and
 optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/).
 The library uses CoverTree and VP-tree data structures to compute nearest neighbors. To achieve
 greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
@@ -140,13 +140,13 @@ Integration
 -----------
 
 There are a few issues related to including the Tapkee library to your code. First, if your library
-already includes Eigen3 (and only if) - you might need to let Tapkee
+already includes Eigen (and only if) - you might need to let Tapkee
 know about that with the following define:
 
 `#define TAPKEE_EIGEN_INCLUDE_FILE <path/to/your/eigen/include/file.h>`
 
-Please note that if you don't include Eigen3 in your project there is no need to define that variable -
-in this case Eigen3 will be included by Tapkee. This issue comes from the need of including the Eigen3 library
+Please note that if you don't include Eigen in your project there is no need to define that variable -
+in this case Eigen will be included by Tapkee. This issue comes from the need of including the Eigen library
 only once when using some specific parameters (like debug and extensions).
 
 If you are able to use less restrictive licenses (such as LGPLv3) you may define
@@ -154,7 +154,7 @@ the following variable:
 
 - `TAPKEE_USE_LGPL_COVERTREE` to use Covertree code by John Langford.
 
-When compiling your software that includes Tapkee be sure Eigen3 headers are in include path and your code
+When compiling your software that includes Tapkee be sure Eigen headers are in include path and your code
 is linked against ARPACK library (-larpack key for g++ and clang++).
 
 For an example of integration you may check
@@ -227,14 +227,14 @@ There are a few cases when you'd want to put some definitions:
 
 - To build application without parts licensed by LGPLv3 use `-DGPL_FREE=1` definition.
 
-The library requires Eigen3 to be available in your path. The ARPACK library is also highly
+The library requires Eigen 3.4+ to be available in your path. The ARPACK library is also highly
 recommended to achieve best performance. On Debian/Ubuntu these packages can be installed with
 
 	sudo apt-get install libeigen3-dev libarpack2-dev
 
-If you are using Mac OS X and Macports you can install these packages with
+If you are using Mac OS X and Homebrew you can install these packages with
 
-	sudo port install eigen3 && sudo port install arpack`
+	brew install eigen arpack
 
 In case you want to use some non-default
 compiler use `CC=your-C-compiler CXX=your-C++-compiler cmake [definitions] ..` when running cmake.

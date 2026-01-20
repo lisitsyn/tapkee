@@ -14,32 +14,7 @@ namespace tapkee
 namespace tapkee_internal
 {
 
-#ifdef EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
-template <typename T> struct Triplet
-{
-    Triplet(IndexType colIndex, IndexType rowIndex, T valueT) : col_(colIndex), row_(rowIndex), value_(valueT)
-    {
-    }
-    IndexType col() const
-    {
-        return col_;
-    };
-    IndexType row() const
-    {
-        return row_;
-    };
-    T value() const
-    {
-        return value_;
-    };
-    IndexType col_;
-    IndexType row_;
-    T value_;
-};
-typedef Triplet<tapkee::ScalarType> SparseTriplet;
-#else  // EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 typedef Eigen::Triplet<tapkee::ScalarType> SparseTriplet;
-#endif // EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
 typedef TAPKEE_INTERNAL_VECTOR<tapkee::tapkee_internal::SparseTriplet> SparseTriplets;
 typedef TAPKEE_INTERNAL_VECTOR<tapkee::IndexType> LocalNeighbors;
