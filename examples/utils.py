@@ -1,6 +1,21 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+def _setup_tapkee():
+	"""Add tapkee lib directory to path if needed."""
+	import sys
+	import os
+	repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+	lib_path = os.path.join(repo_root, 'lib')
+	if lib_path not in sys.path:
+		sys.path.insert(0, lib_path)
+
+# Setup path on import
+_setup_tapkee()
+
+# Re-export tapkee.embed for convenience
+from tapkee import embed
+
 def generate_data(type, N=1000, random_state=None):
 	rng = np.random.RandomState(random_state)
 	if type=='swissroll':
