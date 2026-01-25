@@ -18,6 +18,8 @@
 #include <tapkee/routines/matrix_operations.hpp>
 /* End of Tapkee includes */
 
+#include <cassert>
+
 namespace tapkee
 {
 namespace tapkee_internal
