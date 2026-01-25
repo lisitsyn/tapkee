@@ -5,6 +5,7 @@
 #pragma once
 
 /* Tapkee includes */
+#include <tapkee/callbacks/dummy_callbacks.hpp>
 #include <tapkee/defines.hpp>
 #include <tapkee/parameters/context.hpp>
 #include <tapkee/parameters/defaults.hpp>
