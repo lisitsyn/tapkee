@@ -6,6 +6,7 @@
 #pragma once
 
 /* Tapkee includes */
+#include <tapkee/callbacks/dummy_callbacks.hpp>
 #include <tapkee/defines.hpp>
 #include <tapkee/neighbors/neighbors.hpp>
 #include <tapkee/parameters/context.hpp>

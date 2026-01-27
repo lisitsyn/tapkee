@@ -4,12 +4,22 @@
  */
 #pragma once
 
+#include <concepts>
+#include <type_traits>
+
 /* Tapkee includes */
 #include <tapkee/defines.hpp>
 /* End of Tapkee includes */
 
 namespace tapkee
 {
+
+template <class T>
+concept has_dummy = requires { typename T::dummy; };
+
+template <class T>
+struct is_dummy : std::bool_constant<has_dummy<T>> {};
+
 template <class Data> struct dummy_features_callback
 {
     typedef int dummy;
