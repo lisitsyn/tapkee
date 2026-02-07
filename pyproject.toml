@@ -56,4 +56,6 @@ before-all = "brew install eigen arpack fmt"
 
 [tool.cibuildwheel.windows]
 before-all = "vcpkg install eigen3 arpack-ng fmt --triplet x64-windows"
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path C:/vcpkg/installed/x64-windows/bin"
 environment = { CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" }
