@@ -32,7 +32,7 @@ jobs:
         include:
           - os: ubuntu-latest
             arch: x86_64
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             arch: aarch64
           - os: macos-latest
             arch: arm64
@@ -43,11 +43,12 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Set up QEMU
-      if: matrix.arch == 'aarch64'
-      uses: docker/setup-qemu-action@v3
+    - name: Set up vcpkg cache
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
       with:
-        platforms: arm64
+        path: C:\vcpkg\installed
+        key: vcpkg-${{ matrix.arch }}-${{ hashFiles('pyproject.toml') }}
 
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.22

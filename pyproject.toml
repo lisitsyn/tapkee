@@ -7,7 +7,7 @@ name = "tapkee"
 version = "0.1.0"
 description = "C++ library for dimensionality reduction"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = "BSD-3-Clause"
 authors = [
     { name = "Sergey Lisitsyn", email = "lisitsyn@hey.com" },
@@ -32,7 +32,7 @@ wheel.install-dir = "."
 install.components = ["python"]
 
 [tool.cibuildwheel]
-skip = ["pp*", "*-musllinux*", "*-win32", "*_i686"]
+skip = ["pp*", "*-musllinux*", "*-win32", "*_i686", "cp*t-*"]
 test-requires = ["numpy"]
 test-command = '''python -c "import tapkee; import numpy as np; r = tapkee.embed(np.random.randn(3, 50), method='pca'); assert r.shape == (50, 2)"'''
 
