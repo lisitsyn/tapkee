@@ -34,9 +34,6 @@ jobs:
             arch: x86_64
           - os: ubuntu-latest
             arch: aarch64
-          - os: macos-13
-            arch: x86_64
-            macos_target: "13.0"
           - os: macos-latest
             arch: arm64
             macos_target: "15.0"
