@@ -41,10 +41,14 @@ manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
 before-all = [
     "dnf install -y epel-release",
-    "dnf install -y arpack-devel fmt-devel cmake",
+    "dnf install -y arpack-devel cmake",
     "curl -L https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.bz2 | tar xj -C /tmp",
     "cmake -S /tmp/eigen-3.4.0 -B /tmp/eigen-build -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=OFF",
     "cmake --install /tmp/eigen-build",
+    "curl -L https://github.com/fmtlib/fmt/archive/refs/tags/10.2.1.tar.gz | tar xz -C /tmp",
+    "cmake -S /tmp/fmt-10.2.1 -B /tmp/fmt-build -DCMAKE_INSTALL_PREFIX=/usr/local -DFMT_TEST=OFF",
+    "cmake --build /tmp/fmt-build",
+    "cmake --install /tmp/fmt-build",
 ]
 
 [tool.cibuildwheel.macos]
