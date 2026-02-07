@@ -1,0 +1,51 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "nanobind>=2.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "tapkee"
+version = "0.1.0"
+description = "C++ library for dimensionality reduction"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "BSD-3-Clause"
+authors = [
+    { name = "Sergey Lisitsyn", email = "lisitsyn@hey.com" },
+    { name = "Fernando José", email = "fernando.iglesiasg@gmail.com" },
+]
+dependencies = ["numpy"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+
+[project.urls]
+Homepage = "https://github.com/lisitsyn/tapkee"
+
+[tool.scikit-build]
+cmake.args = ["-DBUILD_NANOBIND=ON", "-DBUILD_CLI=OFF"]
+wheel.packages = []
+wheel.install-dir = "."
+install.components = ["python"]
+
+[tool.cibuildwheel]
+skip = ["pp*", "*-musllinux*", "*-win32", "*_i686"]
+test-requires = ["numpy"]
+test-command = '''python -c "import tapkee; import numpy as np; r = tapkee.embed(np.random.randn(3, 50), method='pca'); assert r.shape == (50, 2)"'''
+
+[tool.cibuildwheel.linux]
+before-all = [
+    "yum install -y epel-release",
+    "yum config-manager --set-enabled powertools || yum config-manager --set-enabled crb || true",
+    "yum install -y eigen3-devel arpack-devel fmt-devel",
+]
+
+[tool.cibuildwheel.macos]
+before-all = "brew install eigen arpack fmt"
+
+[tool.cibuildwheel.windows]
+before-all = "vcpkg install eigen3 arpack-ng fmt --triplet x64-windows"
+environment = { CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" }

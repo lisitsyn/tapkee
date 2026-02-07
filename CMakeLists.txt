@@ -25,9 +25,6 @@ message(STATUS "Found Eigen version: ${Eigen3_VERSION}")
 find_package(fmt REQUIRED)
 set (FMT_LIBRARY_TO_LINK "fmt::fmt-header-only")
 
-# cxxopts
-find_package(cxxopts REQUIRED)
-
 # ARPACK detection
 find_package(Arpack)
 if (ARPACK_FOUND)
@@ -55,8 +52,14 @@ if (OPENCL_FOUND)
 endif()
 
 include_directories("${TAPKEE_INCLUDE_DIR}")
+
 # CLI executable
-add_executable(tapkee "${TAPKEE_SRC_DIR}/cli/main.cpp")
+option(BUILD_CLI "Build CLI application" ON)
+if (BUILD_CLI)
+	find_package(cxxopts REQUIRED)
+	add_executable(tapkee "${TAPKEE_SRC_DIR}/cli/main.cpp")
+endif()
+
 # Examples
 option(BUILD_EXAMPLES "Whether to build examples or not" OFF)
 if (BUILD_EXAMPLES)
@@ -69,20 +72,26 @@ add_library(tapkee_library INTERFACE)
 target_include_directories(tapkee_library INTERFACE "${TAPKEE_INCLUDE_DIR}")
 
 if (ARPACK_FOUND)
-	target_link_libraries(tapkee PUBLIC arpack)
+	if (BUILD_CLI)
+		target_link_libraries(tapkee PUBLIC arpack)
+	endif()
 	target_link_libraries(tapkee_library INTERFACE arpack)
 	add_definitions(-DTAPKEE_WITH_ARPACK)
 endif()
 
 if (VIENNACL_FOUND)
-	target_link_libraries(tapkee PUBLIC OpenCL)
+	if (BUILD_CLI)
+		target_link_libraries(tapkee PUBLIC OpenCL)
+	endif()
 	target_link_libraries(tapkee_library INTERFACE OpenCL)
 	add_definitions(-DTAPKEE_WITH_VIENNACL)
 endif()
 
-target_link_libraries(tapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
+if (BUILD_CLI)
+	target_link_libraries(tapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
+	target_link_libraries(tapkee PRIVATE "${EIGEN3_LIBRARY_TO_LINK}")
+endif()
 target_link_libraries(tapkee_library INTERFACE "${FMT_LIBRARY_TO_LINK}")
-target_link_libraries(tapkee PRIVATE "${EIGEN3_LIBRARY_TO_LINK}")
 target_link_libraries(tapkee_library INTERFACE "${EIGEN3_LIBRARY_TO_LINK}")
 
 if (TAPKEE_CUSTOM_INSTALL_DIR)
@@ -108,7 +117,7 @@ option(USE_GCOV "Use gcov to analyze test coverage" OFF)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-long-long -Wshadow")
-	if (USE_GCOV)
+	if (USE_GCOV AND BUILD_CLI)
 		set(CMAKE_BUILD_TYPE Debug)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
@@ -175,11 +184,6 @@ endif()
 option(BUILD_NANOBIND "Build nanobind Python extension" OFF)
 
 # https://nanobind.readthedocs.io/en/latest/building.html
-# TODO for faster nanobind build, I tried removing the
-# add_executable tapkee and that quickly didn't work. It would
-# be nice if it could be done without requiring a new option
-# BUILD_CLI, or so, maybe if there's a CMake command to
-# configure not building tapkee inside the if BUILD_NANOBIND.
 if (BUILD_NANOBIND)
 	message(STATUS "Detecting and configuring nanobind")
 	find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
@@ -191,48 +195,19 @@ if (BUILD_NANOBIND)
 	list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
 	find_package(nanobind CONFIG REQUIRED)
 
+	if (NOT ARPACK_FOUND)
+		message(FATAL_ERROR "ARPACK is required for the Python extension. Install ARPACK and try again.")
+	endif()
+
 	# Build extension (the library that'll be imported from the Python interpreter)
-	include_directories("${TAPKEE_SRC_DIR}") # about TODO in nanobind_extension.cpp including src/utils.hpp
-	nanobind_add_module(pytapkee src/python/nanobind_extension.cpp) # TODO fix paths.
+	include_directories("${TAPKEE_SRC_DIR}")
+	nanobind_add_module(pytapkee src/python/nanobind_extension.cpp)
+	set_target_properties(pytapkee PROPERTIES OUTPUT_NAME tapkee)
 	target_link_libraries(pytapkee PRIVATE "${EIGEN3_LIBRARY_TO_LINK}")
-	target_link_libraries(pytapkee PRIVATE arpack) # TODO ARPACK guard; TODO without ARPACK(?)
+	target_link_libraries(pytapkee PRIVATE arpack)
 	target_link_libraries(pytapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
-
-	# Rename so that it can be imported as tapkee iso pytapkee.
-	# TODO can this go into a separate CMake file?
-	add_custom_command(TARGET pytapkee POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/rename_pytapkee.cmake
-		COMMENT "Renaming nanobind's extension pytapkee*.so to tapkee*.so")
-	# Create the custom script to rename the file
-	file(WRITE ${CMAKE_BINARY_DIR}/rename_pytapkee.cmake
-		" # Find the file that starts with 'pytapkee' and ends with '.so' in the lib directory
-file(GLOB PYLIBRARY_FILE \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pytapkee*.so\")
-
-# Ensure exactly one file is found
-list(LENGTH PYLIBRARY_FILE FILE_COUNT)
-if(NOT FILE_COUNT EQUAL 1)
-	message(FATAL_ERROR \"Expected exactly one file starting with 'pytapkee' in lib, but found \${FILE_COUNT}\")
-endif()
-
-# Get the first (and only) matched file
-list(GET PYLIBRARY_FILE 0 SOURCE_FILE)
-
-# Extract the filename from the full path
-get_filename_component(FILENAME \${SOURCE_FILE} NAME)
-
-string(REPLACE \"pytapkee\" \"tapkee\" DEST_FILENAME \${FILENAME})
-
-# Construct the full destination path
-set(DEST_FILE \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/\${DEST_FILENAME}\")
-
-file(RENAME \${SOURCE_FILE} \${DEST_FILE})
-
-if(EXISTS \${DEST_FILE} AND NOT EXISTS \${SOURCE_FILE})
-	message(STATUS \"File renamed from \${SOURCE_FILE} to \${DEST_FILE}\")
-else()
-	message(FATAL_ERROR \"Error renaming file from \${SOURCE_FILE} to \${DEST_FILE}\")
-endif()")
-  message(STATUS "Detecting and configuring nanobind - done")
+	install(TARGETS pytapkee LIBRARY DESTINATION . COMPONENT python)
+	message(STATUS "Detecting and configuring nanobind - done")
 endif()
 
 export(
