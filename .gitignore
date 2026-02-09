@@ -6,5 +6,5 @@ lib/
 *.gcno
 *.*~
 dist/
-.venv-test/
+.venv-*/
 .sdist-work/
