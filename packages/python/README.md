@@ -15,10 +15,21 @@ pip install tapkee
 
 ```python
 import numpy as np
+from matplotlib import pyplot as plt
 import tapkee
 
-data = np.random.randn(3, 100)  # 3 features, 100 samples
-embedding = tapkee.embed(data, method="isomap", num_neighbors=15)
+# Generate a Swiss roll dataset
+n = 2000
+t = 1.5 * np.pi * (1 + 2 * np.random.rand(n))
+x, y, z = t * np.cos(t), 30 * np.random.rand(n), t * np.sin(t)
+data = np.vstack([x, y, z])  # 3 features, n samples
+
+# Unroll with Locally Linear Embedding
+embedding = tapkee.embed(data, method="lle", num_neighbors=12)
+
+plt.scatter(embedding[:, 0], embedding[:, 1], c=t, cmap="Spectral", s=5)
+plt.title("Swiss roll unrolled with LLE")
+plt.show()
 ```
 
 ## Supported methods
