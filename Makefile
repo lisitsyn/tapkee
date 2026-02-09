@@ -1,5 +1,5 @@
-python_plotter := python -c 'from pylab import*;X=loadtxt(sys.stdin);scatter(X[0],X[1]);title("Embedding");grid();show()'
-plotter := $(python_plotter)
+PYTHON ?= python
+plotter := $(PYTHON) -c 'from pylab import*;X=loadtxt(sys.stdin);scatter(X[0],X[1]);title("Embedding");grid();show()'
 
 default:
 	@(git submodule update --init)
@@ -44,14 +44,14 @@ precomputed: default
 	  ./bin/precomputed)
 
 langs:
-	@(if (python -c 'from modshogun import LocallyLinearEmbedding' > /dev/null 2>&1); \
+	@(if ($(PYTHON) -c 'from modshogun import LocallyLinearEmbedding' > /dev/null 2>&1); \
 	  then                                         \
 	    echo '--- Description ---';                \
 	    cat ./examples/langs/langs.md;     \
 	    echo '--- Python example ---';  \
 	    cat examples/langs/lle.py;    \
 	    echo '--- Running ---';      \
-	    python examples/langs/lle.py;    \
+	    $(PYTHON) examples/langs/lle.py;    \
 	    echo '--- Octave example ---';  \
 	    cat examples/langs/ltsa.m;    \
 	    echo '--- Running ---';      \
@@ -62,12 +62,12 @@ langs:
 	  fi;)
 
 promoters:
-	@(if (python -c 'from modshogun import LocallyLinearEmbedding' > /dev/null 2>&1); \
+	@(if ($(PYTHON) -c 'from modshogun import LocallyLinearEmbedding' > /dev/null 2>&1); \
 	  then                                         \
 	    echo '--- Description ---';                \
 	    cat ./examples/promoters/promoters.md;     \
 	    echo '--- Embedding and plotting (please wait, a window will appear in a minute) ---';  \
-	    python examples/promoters/promoters.py data/mml.txt;    \
+	    $(PYTHON) examples/promoters/promoters.py data/mml.txt;    \
 	  else                                         \
 	    echo 'Shogun machine learning toolbox is not installed or compiled without Tapkee (may lack some dependencies)' \
 	         ' (https://github.com/shogun-toolbox/shogun)';     \
@@ -77,18 +77,18 @@ mnist: default
 	@(echo '--- Description ---';               \
 	  cat ./examples/mnist/mnist.md;            \
 	  echo '--- Embedding and plotting (please wait, a window will appear in a minute) ---';    \
-	  python examples/mnist/mnist.py data/mnist.json)
+	  $(PYTHON) examples/mnist/mnist.py data/mnist.json)
 
 faces: default
 	@(echo '--- Description ---';               \
 	  cat ./examples/faces/faces.md;              \
 	  echo '--- Embedding and plotting (please wait, a window will appear in a few seconds) ---';    \
-	  python examples/faces/faces.py data/faces)
+	  $(PYTHON) examples/faces/faces.py data/faces)
 
 format: default
 	@(find . -iname *.hpp -o -iname *.cpp -iname *.h | xargs clang-format -i)
 
 pip-package:
-	pip wheel packages/python -w dist
+	$(PYTHON) -m pip wheel packages/python -w dist
 
 .PHONY: test minimal rna precomputed promoters mnist faces pip-package
