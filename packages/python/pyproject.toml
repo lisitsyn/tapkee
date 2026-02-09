@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "tapkee"
-version = "0.1.0"
+version = "1.3"
 description = "C++ library for dimensionality reduction"
 requires-python = ">=3.11"
 license = "BSD-3-Clause"
