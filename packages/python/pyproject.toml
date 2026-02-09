@@ -42,7 +42,6 @@ test-command = '''python -c "import tapkee; import numpy as np; r = tapkee.embed
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux_2_28"
-manylinux-aarch64-image = "manylinux_2_28"
 before-all = [
     "dnf install -y epel-release",
     "dnf install -y arpack-devel cmake",
