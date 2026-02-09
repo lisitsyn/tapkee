@@ -28,7 +28,7 @@ Repository = "https://github.com/lisitsyn/tapkee"
 Issues = "https://github.com/lisitsyn/tapkee/issues"
 
 [tool.scikit-build]
-cmake.source-dir = "../.."
+cmake.source-dir = "."
 cmake.args = ["-DBUILD_NANOBIND=ON", "-DBUILD_CLI=OFF"]
 wheel.packages = []
 wheel.install-dir = "."

@@ -97,4 +97,18 @@ test-pip-package: pip-package
 	.venv-test/bin/python -c "import tapkee; import numpy as np; r = tapkee.embed(np.random.randn(3, 50), method='pca'); assert r.shape == (50, 2); print('OK')"
 	rm -rf .venv-test
 
-.PHONY: test minimal rna precomputed promoters mnist faces pip-package test-pip-package
+pip-sdist:
+	rm -rf .sdist-work dist/tapkee-*.tar.gz
+	cp -rL packages/python .sdist-work
+	$(PYTHON) -m venv .sdist-work/.venv
+	.sdist-work/.venv/bin/pip install -q build
+	cd .sdist-work && .venv/bin/python -m build --sdist -o ../dist
+	rm -rf .sdist-work
+
+test-pip-sdist: pip-sdist
+	$(PYTHON) -m venv .venv-test
+	.venv-test/bin/pip install dist/tapkee-*.tar.gz
+	.venv-test/bin/python -c "import tapkee; import numpy as np; r = tapkee.embed(np.random.randn(3, 50), method='pca'); assert r.shape == (50, 2); print('OK')"
+	rm -rf .venv-test
+
+.PHONY: test minimal rna precomputed promoters mnist faces pip-package test-pip-package pip-sdist test-pip-sdist

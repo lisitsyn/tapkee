@@ -68,7 +68,10 @@ jobs:
     - uses: actions/checkout@v6
 
     - name: Build sdist
-      run: pipx run build --sdist packages/python -o dist
+      run: |
+        cp -rL packages/python .sdist-work
+        cd .sdist-work && pipx run build --sdist -o ../dist
+        rm -rf .sdist-work
 
     - uses: actions/upload-artifact@v4
       with:
@@ -117,14 +120,14 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: [build_wheels]
+    needs: [build_sdist, build_wheels]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
     steps:
     - uses: actions/download-artifact@v4
       with:
-        pattern: wheels-*
+        pattern: '{sdist,wheels-*}'
         path: dist
         merge-multiple: true
 

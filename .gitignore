@@ -7,3 +7,4 @@ lib/
 *.*~
 dist/
 .venv-test/
+.sdist-work/
