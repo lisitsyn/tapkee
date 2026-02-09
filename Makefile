@@ -88,4 +88,7 @@ faces: default
 format: default
 	@(find . -iname *.hpp -o -iname *.cpp -iname *.h | xargs clang-format -i)
 
-.PHONY: test minimal rna precomputed promoters mnist faces
+pip-package:
+	pip wheel packages/python -w dist
+
+.PHONY: test minimal rna precomputed promoters mnist faces pip-package

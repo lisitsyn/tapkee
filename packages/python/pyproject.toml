@@ -6,7 +6,6 @@ build-backend = "scikit_build_core.build"
 name = "tapkee"
 version = "0.1.0"
 description = "C++ library for dimensionality reduction"
-readme = "README.md"
 requires-python = ">=3.11"
 license = "BSD-3-Clause"
 authors = [
@@ -23,9 +22,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/lisitsyn/tapkee"
+Homepage = "https://tapkee.lisitsyn.me"
 
 [tool.scikit-build]
+cmake.source-dir = "../.."
 cmake.args = ["-DBUILD_NANOBIND=ON", "-DBUILD_CLI=OFF"]
 wheel.packages = []
 wheel.install-dir = "."
