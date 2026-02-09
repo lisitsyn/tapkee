@@ -117,14 +117,14 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: [build_sdist, build_wheels]
+    needs: [build_wheels]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
     steps:
     - uses: actions/download-artifact@v4
       with:
-        pattern: '{sdist,wheels-*}'
+        pattern: wheels-*
         path: dist
         merge-multiple: true
 
