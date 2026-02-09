@@ -1,0 +1,149 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build_cli:
+    name: CLI ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: tapkee-linux-x86_64
+            binary: bin/tapkee
+          - os: macos-latest
+            artifact: tapkee-macos-arm64
+            binary: bin/tapkee
+          - os: windows-latest
+            artifact: tapkee-windows-x86_64
+            binary: bin/Release/tapkee.exe
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y libeigen3-dev libarpack2-dev libfmt-dev libcxxopts-dev
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: brew install arpack eigen fmt cxxopts
+
+    - name: Install dependencies (Windows)
+      if: runner.os == 'Windows'
+      uses: conda-incubator/setup-miniconda@v3.3.0
+      with:
+        channels: conda-forge
+
+    - name: Install conda packages (Windows)
+      if: runner.os == 'Windows'
+      run: conda install eigen fmt cxxopts
+
+    - name: Build
+      run: |
+        cmake -B build -DBUILD_CLI=ON -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release
+
+    - name: Package
+      shell: bash
+      run: |
+        mkdir -p staging
+        cp ${{ matrix.binary }} staging/
+        cp LICENSE staging/
+        cd staging && tar czf ../${{ matrix.artifact }}.tar.gz *
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact }}
+        path: ${{ matrix.artifact }}.tar.gz
+
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Build sdist
+      run: pipx run build --sdist packages/python -o dist
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: sdist
+        path: dist/*.tar.gz
+
+  build_wheels:
+    name: Wheels ${{ matrix.os }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x86_64
+          - os: ubuntu-24.04-arm
+            arch: aarch64
+          - os: macos-latest
+            arch: arm64
+            macos_target: "15.0"
+          - os: windows-latest
+            arch: AMD64
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up vcpkg cache
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: C:\vcpkg\installed
+        key: vcpkg-${{ matrix.arch }}-${{ hashFiles('packages/python/pyproject.toml') }}
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.22
+      with:
+        package-dir: packages/python
+      env:
+        CIBW_ARCHS: ${{ matrix.arch }}
+        CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_target }}"
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: wheels-${{ matrix.os }}-${{ matrix.arch }}
+        path: ./wheelhouse/*.whl
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_sdist, build_wheels]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: '{sdist,wheels-*}'
+        path: dist
+        merge-multiple: true
+
+    - uses: pypa/gh-action-pypi-publish@release/v1
+
+  release:
+    name: GitHub Release
+    needs: [build_cli, build_sdist, build_wheels]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        merge-multiple: true
+
+    - name: Create release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TAG: ${{ github.ref_name }}
+      run: gh release create "$TAG" artifacts/* --repo "$GITHUB_REPOSITORY" --generate-notes
