@@ -91,4 +91,10 @@ format: default
 pip-package:
 	$(PYTHON) -m pip wheel packages/python -w dist
 
-.PHONY: test minimal rna precomputed promoters mnist faces pip-package
+test-pip-package: pip-package
+	$(PYTHON) -m venv .venv-test
+	.venv-test/bin/python -m pip install --no-index --find-links dist tapkee
+	.venv-test/bin/python -c "import tapkee; import numpy as np; r = tapkee.embed(np.random.randn(3, 50), method='pca'); assert r.shape == (50, 2); print('OK')"
+	rm -rf .venv-test
+
+.PHONY: test minimal rna precomputed promoters mnist faces pip-package test-pip-package

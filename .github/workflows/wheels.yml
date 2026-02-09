@@ -9,6 +9,18 @@ on:
   workflow_dispatch:
 
 jobs:
+  test_pip_package:
+    name: Test pip package
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Install system dependencies
+      run: sudo apt-get update && sudo apt-get install -y libarpack2-dev libeigen3-dev libfmt-dev
+
+    - name: Build, install and smoke-test in venv
+      run: make test-pip-package
+
   build_sdist:
     name: Build sdist
     runs-on: ubuntu-latest
@@ -65,7 +77,7 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: [build_sdist, build_wheels]
+    needs: [test_pip_package, build_sdist, build_wheels]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     permissions:
