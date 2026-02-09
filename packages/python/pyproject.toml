@@ -8,7 +8,6 @@ version = "1.3"
 description = "C++ library for dimensionality reduction"
 requires-python = ">=3.11"
 license = "BSD-3-Clause"
-license-files = ["../../LICENSE"]
 authors = [
     { name = "Sergey Lisitsyn", email = "lisitsyn@hey.com" },
     { name = "Fernando José", email = "fernando.iglesiasg@gmail.com" },
@@ -17,7 +16,6 @@ dependencies = ["numpy"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Programming Language :: C++",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering",
