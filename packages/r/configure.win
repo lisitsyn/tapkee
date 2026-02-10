@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Windows: fmt must be available (e.g. via Rtools or MSYS2).
+# ARPACK is not expected on Windows.
+
+FMT_INCLUDE_DIR=""
+
+# Check common Rtools/MSYS2 locations
+for dir in "${MSYS2_ROOT}/mingw64/include" "${RTOOLS44_HOME}/x86_64-w64-mingw32.static.posix/include" /mingw64/include; do
+    if [ -f "${dir}/fmt/core.h" ] || [ -f "${dir}/fmt/base.h" ]; then
+        FMT_INCLUDE_DIR="${dir}"
+        break
+    fi
+done
+
+if [ -n "${FMT_INCLUDE_DIR}" ]; then
+    echo "* Found fmt headers at ${FMT_INCLUDE_DIR}/fmt"
+    mkdir -p inst/include/fmt
+    cp "${FMT_INCLUDE_DIR}"/fmt/*.h inst/include/fmt/
+    echo "* Copied fmt headers to inst/include/fmt/"
+else
+    echo "WARNING: fmt not found. Build may fail."
+    echo "  Install fmt via: pacman -S mingw-w64-x86_64-fmt"
+fi
+
+cp src/Makevars.win.in src/Makevars.win 2>/dev/null || true
+
+echo "* Configuration complete"

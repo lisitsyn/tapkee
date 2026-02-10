@@ -119,4 +119,18 @@ test-pip-sdist: pip-sdist $(VENV_TEST)
 clean-venvs:
 	rm -rf $(VENV_BUILD) $(VENV_TEST)
 
-.PHONY: test minimal rna precomputed promoters mnist faces pip-package test-pip-package pip-sdist test-pip-sdist clean-venvs
+R_SMOKE_TEST = library(tapkee); X <- matrix(rnorm(300), 3, 100); r <- tapkee_embed(X, method='pca'); stopifnot(dim(r) == c(100, 2)); cat('OK\n')
+
+r-package:
+	R CMD build packages/r
+
+r-check: r-package
+	R CMD check --as-cran tapkee_*.tar.gz
+
+r-install:
+	R CMD INSTALL packages/r
+
+test-r-package: r-install
+	Rscript -e "$(R_SMOKE_TEST)"
+
+.PHONY: test minimal rna precomputed promoters mnist faces pip-package test-pip-package pip-sdist test-pip-sdist clean-venvs r-package r-check r-install test-r-package
