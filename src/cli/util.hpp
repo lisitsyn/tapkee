@@ -10,6 +10,7 @@
 #include <ostream>
 
 #include <tapkee/defines.hpp>
+#include <tapkee/defines/method_names.hpp>
 #include <tapkee/utils/logging.hpp>
 
 using namespace std;
@@ -142,44 +143,7 @@ void write_vector(tapkee::DenseVector* matrix, ofstream& of)
     }
 }
 
-static const std::map<std::string, tapkee::DimensionReductionMethod> DIMENSION_REDUCTION_METHODS = {
-    {"local_tangent_space_alignment", tapkee::KernelLocalTangentSpaceAlignment},
-    {"ltsa", tapkee::KernelLocalTangentSpaceAlignment},
-    {"locally_linear_embedding", tapkee::KernelLocallyLinearEmbedding},
-    {"lle", tapkee::KernelLocallyLinearEmbedding},
-    {"hessian_locally_linear_embedding", tapkee::HessianLocallyLinearEmbedding},
-    {"hlle", tapkee::HessianLocallyLinearEmbedding},
-    {"multidimensional_scaling", tapkee::MultidimensionalScaling},
-    {"mds", tapkee::MultidimensionalScaling},
-    {"landmark_multidimensional_scaling", tapkee::LandmarkMultidimensionalScaling},
-    {"l-mds", tapkee::LandmarkMultidimensionalScaling},
-    {"isomap", tapkee::Isomap},
-    {"landmark_isomap", tapkee::LandmarkIsomap},
-    {"l-isomap", tapkee::LandmarkIsomap},
-    {"diffusion_map", tapkee::DiffusionMap},
-    {"dm", tapkee::DiffusionMap},
-    {"kernel_pca", tapkee::KernelPrincipalComponentAnalysis},
-    {"kpca", tapkee::KernelPrincipalComponentAnalysis},
-    {"pca", tapkee::PrincipalComponentAnalysis},
-    {"random_projection", tapkee::RandomProjection},
-    {"ra", tapkee::RandomProjection},
-    {"laplacian_eigenmaps", tapkee::LaplacianEigenmaps},
-    {"la", tapkee::LaplacianEigenmaps},
-    {"locality_preserving_projections", tapkee::LocalityPreservingProjections},
-    {"lpp", tapkee::LocalityPreservingProjections},
-    {"neighborhood_preserving_embedding", tapkee::NeighborhoodPreservingEmbedding},
-    {"npe", tapkee::NeighborhoodPreservingEmbedding},
-    {"linear_local_tangent_space_alignment", tapkee::LinearLocalTangentSpaceAlignment},
-    {"lltsa", tapkee::LinearLocalTangentSpaceAlignment},
-    {"stochastic_proximity_embedding", tapkee::StochasticProximityEmbedding},
-    {"spe", tapkee::StochasticProximityEmbedding},
-    {"passthru", tapkee::PassThru},
-    {"factor_analysis", tapkee::FactorAnalysis},
-    {"fa", tapkee::FactorAnalysis},
-    {"t-stochastic_proximity_embedding", tapkee::tDistributedStochasticNeighborEmbedding},
-    {"t-sne", tapkee::tDistributedStochasticNeighborEmbedding},
-    {"manifold_sculpting", tapkee::ManifoldSculpting},
-};
+static const auto& DIMENSION_REDUCTION_METHODS = tapkee::dimension_reduction_methods();
 
 static const std::map<std::string, tapkee::NeighborsMethod> NEIGHBORS_METHODS = {
     {"brute", tapkee::Brute},

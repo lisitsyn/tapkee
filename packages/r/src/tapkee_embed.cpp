@@ -13,10 +13,9 @@
 #include <stichwort/parameter.hpp>
 #include <tapkee/chain_interface.hpp>
 #include <tapkee/defines.hpp>
-#include <tapkee/defines/methods.hpp>
+#include <tapkee/defines/method_names.hpp>
 #include <tapkee/defines/keywords.hpp>
 
-#include <map>
 #include <string>
 
 using stichwort::Parameter;
@@ -45,49 +44,10 @@ static void ensure_r_logger() {
     }
 }
 
-// Self-contained method name parser (avoids pulling in cli/util.hpp)
-static const std::map<std::string, DimensionReductionMethod> METHODS = {
-    {"ltsa", tapkee::KernelLocalTangentSpaceAlignment},
-    {"local_tangent_space_alignment", tapkee::KernelLocalTangentSpaceAlignment},
-    {"lle", tapkee::KernelLocallyLinearEmbedding},
-    {"locally_linear_embedding", tapkee::KernelLocallyLinearEmbedding},
-    {"hlle", tapkee::HessianLocallyLinearEmbedding},
-    {"hessian_locally_linear_embedding", tapkee::HessianLocallyLinearEmbedding},
-    {"mds", tapkee::MultidimensionalScaling},
-    {"multidimensional_scaling", tapkee::MultidimensionalScaling},
-    {"l-mds", tapkee::LandmarkMultidimensionalScaling},
-    {"landmark_multidimensional_scaling", tapkee::LandmarkMultidimensionalScaling},
-    {"isomap", tapkee::Isomap},
-    {"l-isomap", tapkee::LandmarkIsomap},
-    {"landmark_isomap", tapkee::LandmarkIsomap},
-    {"dm", tapkee::DiffusionMap},
-    {"diffusion_map", tapkee::DiffusionMap},
-    {"kpca", tapkee::KernelPrincipalComponentAnalysis},
-    {"kernel_pca", tapkee::KernelPrincipalComponentAnalysis},
-    {"pca", tapkee::PrincipalComponentAnalysis},
-    {"random_projection", tapkee::RandomProjection},
-    {"ra", tapkee::RandomProjection},
-    {"la", tapkee::LaplacianEigenmaps},
-    {"laplacian_eigenmaps", tapkee::LaplacianEigenmaps},
-    {"lpp", tapkee::LocalityPreservingProjections},
-    {"locality_preserving_projections", tapkee::LocalityPreservingProjections},
-    {"npe", tapkee::NeighborhoodPreservingEmbedding},
-    {"neighborhood_preserving_embedding", tapkee::NeighborhoodPreservingEmbedding},
-    {"lltsa", tapkee::LinearLocalTangentSpaceAlignment},
-    {"linear_local_tangent_space_alignment", tapkee::LinearLocalTangentSpaceAlignment},
-    {"spe", tapkee::StochasticProximityEmbedding},
-    {"stochastic_proximity_embedding", tapkee::StochasticProximityEmbedding},
-    {"fa", tapkee::FactorAnalysis},
-    {"factor_analysis", tapkee::FactorAnalysis},
-    {"t-sne", tapkee::tDistributedStochasticNeighborEmbedding},
-    {"t-stochastic_proximity_embedding", tapkee::tDistributedStochasticNeighborEmbedding},
-    {"manifold_sculpting", tapkee::ManifoldSculpting},
-    {"passthru", tapkee::PassThru},
-};
-
 static DimensionReductionMethod parse_method(const std::string& name) {
-    auto it = METHODS.find(name);
-    if (it != METHODS.end()) {
+    const auto& methods = tapkee::dimension_reduction_methods();
+    auto it = methods.find(name);
+    if (it != methods.end()) {
         return it->second;
     }
     Rcpp::stop("Unknown method: '%s'. Use one of: lle, isomap, pca, t-sne, mds, "
