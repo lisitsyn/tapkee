@@ -40,7 +40,7 @@
 #include <cstring>
 #include <float.h>
 #include <math.h>
-#include <stdio.h>
+#include <stdexcept>
 #include <stdlib.h>
 #include <time.h>
 
@@ -215,8 +215,7 @@ class TSNE
         int* row_counts = (int*)calloc(N, sizeof(int));
         if (row_counts == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         for (int n = 0; n < N; n++)
         {
@@ -248,8 +247,7 @@ class TSNE
         ScalarType* sym_val_P = (ScalarType*)malloc(no_elem * sizeof(ScalarType));
         if (sym_row_P == NULL || sym_col_P == NULL || sym_val_P == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
 
         // Construct new row indices for symmetric matrix
@@ -261,8 +259,7 @@ class TSNE
         int* offset = (int*)calloc(N, sizeof(int));
         if (offset == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         for (int n = 0; n < N; n++)
         {
@@ -337,8 +334,7 @@ class TSNE
         ScalarType* neg_f = (ScalarType*)calloc(static_cast<size_t>(N) * D, sizeof(ScalarType));
         if (pos_f == NULL || neg_f == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         tree->computeEdgeForces(inp_row_P, inp_col_P, inp_val_P, N, pos_f);
         for (int n = 0; n < N; n++)
@@ -364,8 +360,7 @@ class TSNE
         ScalarType* DD = (ScalarType*)malloc(static_cast<size_t>(N) * N * sizeof(ScalarType));
         if (DD == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         computeSquaredEuclideanDistance(Y, N, D, DD);
 
@@ -373,8 +368,7 @@ class TSNE
         ScalarType* Q = (ScalarType*)malloc(static_cast<size_t>(N) * N * sizeof(ScalarType));
         if (Q == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         ScalarType sum_Q = .0;
         for (int n = 0; n < N; n++)
@@ -419,8 +413,7 @@ class TSNE
         ScalarType* Q = (ScalarType*)malloc(static_cast<size_t>(N) * N * sizeof(ScalarType));
         if (DD == NULL || Q == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         computeSquaredEuclideanDistance(Y, N, 2, DD);
 
@@ -498,8 +491,7 @@ class TSNE
         ScalarType* mean = (ScalarType*)calloc(D, sizeof(ScalarType));
         if (mean == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         for (int n = 0; n < N; n++)
         {
@@ -531,8 +523,7 @@ class TSNE
         ScalarType* DD = (ScalarType*)malloc(static_cast<size_t>(N) * N * sizeof(ScalarType));
         if (DD == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         computeSquaredEuclideanDistance(X, N, D, DD);
 
@@ -611,7 +602,7 @@ class TSNE
                                    ScalarType perplexity, int K)
     {
         if (perplexity > K)
-            printf("Perplexity should be lower than K!\n");
+            tapkee::Logging::instance().message_warning("Perplexity should be lower than K!");
 
         // Allocate the memory we need
         *_row_P = (int*)malloc((N + 1) * sizeof(int));
@@ -619,8 +610,7 @@ class TSNE
         *_val_P = (ScalarType*)calloc(static_cast<size_t>(N) * K, sizeof(ScalarType));
         if (*_row_P == NULL || *_col_P == NULL || *_val_P == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         int* row_P = *_row_P;
         int* col_P = *_col_P;
@@ -628,8 +618,7 @@ class TSNE
         ScalarType* cur_P = (ScalarType*)malloc((N - 1) * sizeof(ScalarType));
         if (cur_P == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         row_P[0] = 0;
         for (int n = 0; n < N; n++)
@@ -737,8 +726,7 @@ class TSNE
         ScalarType* cur_P = (ScalarType*)malloc(static_cast<size_t>(N) * sizeof(ScalarType));
         if (buff == NULL || DD == NULL || cur_P == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
 
         // Compute the Gaussian kernel row by row (to find number of elements in sparse P)
@@ -834,8 +822,7 @@ class TSNE
         ScalarType* val_P = *_val_P;
         if (row_P == NULL || col_P == NULL || val_P == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         row_P[0] = 0;
 
@@ -942,8 +929,7 @@ class TSNE
         ScalarType* dataSums = (ScalarType*)calloc(N, sizeof(ScalarType));
         if (dataSums == NULL)
         {
-            printf("Memory allocation failed!\n");
-            exit(1);
+            throw std::runtime_error("Memory allocation failed!");
         }
         for (int n = 0; n < N; n++)
         {
