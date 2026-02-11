@@ -35,6 +35,16 @@ jobs:
       with:
         r-version: release
 
+    - name: Install Miniconda (Windows)
+      if: runner.os == 'Windows'
+      uses: conda-incubator/setup-miniconda@v3.3.0
+      with:
+        channels: conda-forge
+
+    - name: Install system dependencies (Windows)
+      if: runner.os == 'Windows'
+      run: conda install fmt
+
     - uses: r-lib/actions/setup-r-dependencies@v2
       with:
         working-directory: packages/r

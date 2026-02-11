@@ -5,8 +5,15 @@
 
 FMT_INCLUDE_DIR=""
 
-# Check common Rtools/MSYS2 locations
-for dir in "${MSYS2_ROOT}/mingw64/include" "${RTOOLS44_HOME}/x86_64-w64-mingw32.static.posix/include" /mingw64/include; do
+# Check common Rtools/MSYS2/Conda locations
+for dir in \
+    "${CONDA_PREFIX}/Library/include" \
+    "${RTOOLS45_HOME}/x86_64-w64-mingw32.static.posix/include" \
+    "${RTOOLS44_HOME}/x86_64-w64-mingw32.static.posix/include" \
+    "${MSYS2_ROOT}/mingw64/include" \
+    /c/rtools45/x86_64-w64-mingw32.static.posix/include \
+    /c/rtools44/x86_64-w64-mingw32.static.posix/include \
+    /mingw64/include; do
     if [ -f "${dir}/fmt/core.h" ] || [ -f "${dir}/fmt/base.h" ]; then
         FMT_INCLUDE_DIR="${dir}"
         break
