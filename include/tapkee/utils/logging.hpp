@@ -5,7 +5,9 @@
 #pragma once
 
 #include <fmt/core.h>
+#ifndef TAPKEE_NO_DEFAULT_LOGGER
 #include <iostream>
+#endif
 #include <string>
 
 #define LEVEL_ENABLED_FIELD(X) bool X##_enabled
@@ -56,6 +58,7 @@ class LoggerImplementation
     LoggerImplementation(const LoggerImplementation&);
 };
 
+#ifndef TAPKEE_NO_DEFAULT_LOGGER
 //! Default std::cout implementation of @ref LoggerImplementation
 class DefaultLoggerImplementation : public LoggerImplementation
 {
@@ -78,6 +81,7 @@ class DefaultLoggerImplementation : public LoggerImplementation
     std::ostream* sout;
     std::ostream* serr;
 };
+#endif
 
 //! Main logging singleton used by the library. Can use provided
 //! @ref LoggerImplementation if necessary. By default uses
@@ -86,7 +90,13 @@ class Logging
 {
   private:
     Logging()
-        : impl(new DefaultLoggerImplementation), LEVEL_ENABLED_FIELD_INITIALIZER(info, false),
+        : impl(
+#ifndef TAPKEE_NO_DEFAULT_LOGGER
+              new DefaultLoggerImplementation
+#else
+              nullptr
+#endif
+          ), LEVEL_ENABLED_FIELD_INITIALIZER(info, false),
           LEVEL_ENABLED_FIELD_INITIALIZER(warning, true), LEVEL_ENABLED_FIELD_INITIALIZER(debug, false),
           LEVEL_ENABLED_FIELD_INITIALIZER(error, true), LEVEL_ENABLED_FIELD_INITIALIZER(benchmark, false){};
     ~Logging()

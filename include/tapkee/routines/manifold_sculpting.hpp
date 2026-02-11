@@ -285,7 +285,7 @@ void manifold_sculpting_embed(RandomAccessIterator begin, RandomAccessIterator e
          * data points in first target_dimension dimensions.
          */
         /* Start adjusting from a random point */
-        IndexType start_point_index = std::rand() % data.cols();
+        IndexType start_point_index = uniform_random_index() % data.cols();
         std::deque<IndexType> points_to_adjust;
         points_to_adjust.push_back(start_point_index);
         ScalarType steps_made = 0;

@@ -1,0 +1,55 @@
+name: R Package
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  check:
+    name: "R CMD check / ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+          - name: macOS
+            os: macos-latest
+          - name: Windows
+            os: windows-latest
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: Install system dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y libfmt-dev libarpack2-dev
+
+    - name: Install system dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: brew install fmt arpack
+
+    - uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: release
+
+    - name: Install Miniconda (Windows)
+      if: runner.os == 'Windows'
+      uses: conda-incubator/setup-miniconda@v3.3.0
+      with:
+        channels: conda-forge
+
+    - name: Install system dependencies (Windows)
+      if: runner.os == 'Windows'
+      run: conda install fmt
+
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        working-directory: packages/r
+        extra-packages: any::rcmdcheck
+
+    - uses: r-lib/actions/check-r-package@v2
+      with:
+        working-directory: packages/r

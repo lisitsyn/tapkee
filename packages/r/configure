@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# Detect fmt headers and copy them into the package build tree.
+# Detect ARPACK and enable it if available.
+
+FMT_CFLAGS=""
+FMT_INCLUDE_DIR=""
+ARPACK_LIBS=""
+ARPACK_FLAG=""
+
+# --- fmt detection ---
+if pkg-config --exists fmt 2>/dev/null; then
+    FMT_INCLUDE_DIR=$(pkg-config --variable=includedir fmt)
+    if [ -d "${FMT_INCLUDE_DIR}/fmt" ]; then
+        echo "* Found fmt headers at ${FMT_INCLUDE_DIR}/fmt"
+        mkdir -p inst/include/fmt
+        cp "${FMT_INCLUDE_DIR}"/fmt/*.h inst/include/fmt/
+        echo "* Copied fmt headers to inst/include/fmt/"
+    else
+        echo "ERROR: pkg-config found fmt but headers not at ${FMT_INCLUDE_DIR}/fmt"
+        exit 1
+    fi
+else
+    # Fallback: check common locations
+    for dir in /usr/include /usr/local/include /opt/homebrew/include; do
+        if [ -f "${dir}/fmt/core.h" ] || [ -f "${dir}/fmt/base.h" ]; then
+            FMT_INCLUDE_DIR="${dir}"
+            echo "* Found fmt headers at ${dir}/fmt"
+            mkdir -p inst/include/fmt
+            cp "${dir}"/fmt/*.h inst/include/fmt/
+            echo "* Copied fmt headers to inst/include/fmt/"
+            break
+        fi
+    done
+    if [ -z "${FMT_INCLUDE_DIR}" ]; then
+        echo "ERROR: fmt library not found. Please install fmt:"
+        echo "  macOS:  brew install fmt"
+        echo "  Ubuntu: sudo apt-get install libfmt-dev"
+        echo "  Fedora: sudo dnf install fmt-devel"
+        exit 1
+    fi
+fi
+
+# --- ARPACK detection ---
+if pkg-config --exists arpack 2>/dev/null; then
+    ARPACK_LIBS=$(pkg-config --libs arpack)
+    ARPACK_FLAG="-DTAPKEE_WITH_ARPACK"
+    echo "* Found ARPACK: ${ARPACK_LIBS}"
+else
+    echo "* ARPACK not found (optional). Dense eigendecomposition will be used."
+fi
+
+# --- Write Makevars from template ---
+sed \
+    -e "s|@ARPACK_LIBS@|${ARPACK_LIBS}|g" \
+    -e "s|@ARPACK_FLAG@|${ARPACK_FLAG}|g" \
+    src/Makevars.in > src/Makevars
+
+echo "* Wrote src/Makevars"

@@ -1,4 +1,10 @@
 PYTHON ?= python
+R ?= R
+RSCRIPT ?= Rscript
+VENV_BUILD = .venv-build
+VENV_TEST = .venv-test
+SMOKE_TEST = import tapkee; import numpy as np; r = tapkee.embed(np.random.randn(3, 50), method='pca'); assert r.shape == (50, 2); print('OK')
+R_SMOKE_TEST = library(tapkee); X <- matrix(rnorm(300), 3, 100); r <- tapkee_embed(X, method='pca'); stopifnot(dim(r) == c(100, 2)); cat('OK\n')
 plotter := $(PYTHON) -c 'from pylab import*;X=loadtxt(sys.stdin);scatter(X[0],X[1]);title("Embedding");grid();show()'
 
 default:
@@ -88,10 +94,6 @@ faces: default
 format: default
 	@(find . -iname *.hpp -o -iname *.cpp -iname *.h | xargs clang-format -i)
 
-VENV_BUILD = .venv-build
-VENV_TEST = .venv-test
-SMOKE_TEST = import tapkee; import numpy as np; r = tapkee.embed(np.random.randn(3, 50), method='pca'); assert r.shape == (50, 2); print('OK')
-
 $(VENV_BUILD):
 	$(PYTHON) -m venv $(VENV_BUILD)
 	$(VENV_BUILD)/bin/pip install -q build
@@ -119,4 +121,16 @@ test-pip-sdist: pip-sdist $(VENV_TEST)
 clean-venvs:
 	rm -rf $(VENV_BUILD) $(VENV_TEST)
 
-.PHONY: test minimal rna precomputed promoters mnist faces pip-package test-pip-package pip-sdist test-pip-sdist clean-venvs
+r-package:
+	$(R) CMD build packages/r
+
+r-check: r-package
+	$(R) CMD check --as-cran tapkee_*.tar.gz
+
+r-install:
+	$(R) CMD INSTALL packages/r
+
+test-r-package: r-install
+	$(RSCRIPT) -e "$(R_SMOKE_TEST)"
+
+.PHONY: test minimal rna precomputed promoters mnist faces pip-package test-pip-package pip-sdist test-pip-sdist clean-venvs r-package r-check r-install test-r-package

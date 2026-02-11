@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rm -f src/Makevars
+rm -rf inst/include/fmt

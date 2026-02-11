@@ -1,0 +1,5 @@
+src/Makevars
+src/Makevars.win
+src/*.o
+src/*.so
+inst/include/fmt/

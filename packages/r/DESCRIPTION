@@ -1,0 +1,28 @@
+Package: tapkee
+Type: Package
+Title: Dimensionality Reduction with Tapkee
+Version: 1.3.3
+Authors@R: c(
+    person("Sergey", "Lisitsyn", email = "lisitsyn@hey.com",
+           role = c("aut", "cre")),
+    person("Fernando José", email = "fernando.iglesiasg@gmail.com",
+           role = "aut"))
+Description: Provides an R interface to the Tapkee C++ library for
+    dimensionality reduction. Implements over 20 algorithms including Isomap,
+    Locally Linear Embedding (LLE), t-SNE, PCA, Kernel PCA, Multidimensional
+    Scaling (MDS), Diffusion Maps, Laplacian Eigenmaps, Factor Analysis,
+    and more. All algorithms are implemented in C++ and accessed through
+    a single function.
+License: BSD_3_clause + file LICENSE
+URL: https://tapkee.lisitsyn.me, https://github.com/lisitsyn/tapkee
+BugReports: https://github.com/lisitsyn/tapkee/issues
+Depends: R (>= 4.3.0)
+Imports: Rcpp (>= 1.0.12)
+LinkingTo: Rcpp, RcppEigen
+SystemRequirements: C++20, fmt (>= 9.0, https://fmt.dev),
+    GNU make; optionally ARPACK for large-scale eigenproblems
+Encoding: UTF-8
+RoxygenNote: 7.3.3
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
+NeedsCompilation: yes
