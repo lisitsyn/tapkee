@@ -28,10 +28,8 @@ jobs:
       if: runner.os == 'Windows'
       shell: bash
       run: |
-        for f in packages/r/src/tapkee_embed.cpp packages/r/src/tapkee_eigen_rcpp.h; do
-          target=$(cat "$f")
-          cp "packages/r/src/${target}" "$f"
-        done
+        cp src/R/tapkee_embed.cpp packages/r/src/tapkee_embed.cpp
+        cp src/R/tapkee_eigen_rcpp.h packages/r/src/tapkee_eigen_rcpp.h
 
     - name: Install system dependencies (Linux)
       if: runner.os == 'Linux'
