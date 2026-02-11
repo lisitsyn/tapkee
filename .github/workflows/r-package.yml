@@ -18,9 +18,20 @@ jobs:
             os: ubuntu-latest
           - name: macOS
             os: macos-latest
+          - name: Windows
+            os: windows-latest
 
     steps:
     - uses: actions/checkout@v6
+
+    - name: Resolve symlinks (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        for f in packages/r/src/tapkee_embed.cpp packages/r/src/tapkee_eigen_rcpp.h; do
+          target=$(cat "$f")
+          cp "packages/r/src/${target}" "$f"
+        done
 
     - name: Install system dependencies (Linux)
       if: runner.os == 'Linux'
@@ -29,6 +40,11 @@ jobs:
     - name: Install system dependencies (macOS)
       if: runner.os == 'macOS'
       run: brew install fmt arpack
+
+    - name: Install system dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: pacman -Sy --noconfirm mingw-w64-x86_64-fmt
 
     - uses: r-lib/actions/setup-r@v2
       with:
