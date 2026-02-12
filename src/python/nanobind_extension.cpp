@@ -28,6 +28,8 @@ using tapkee::tapkee_internal::ParametersInitializedState;
 DenseMatrix embed(
     const DenseMatrix& data,
     const std::string& method,
+    std::optional<std::string> neighbors_method,
+    std::optional<std::string> eigen_method,
     std::optional<int> num_neighbors,
     std::optional<int> target_dimension,
     std::optional<double> gaussian_kernel_width,
@@ -49,6 +51,12 @@ DenseMatrix embed(
 
     // Required: method
     params.add(Parameter::create("dimension reduction method", parse_reduction_method(method)));
+
+    // Optional: neighbors and eigen methods
+    if (neighbors_method)
+        params.add(Parameter::create("nearest neighbors method", parse_multiple(NEIGHBORS_METHODS, *neighbors_method)));
+    if (eigen_method)
+        params.add(Parameter::create("eigendecomposition method", parse_multiple(EIGEN_METHODS, *eigen_method)));
 
     // Optional parameters - only add if provided
     if (num_neighbors)
@@ -94,6 +102,8 @@ NB_MODULE(tapkee, m) {
     m.def("embed", &embed,
         nb::arg("data"),
         nb::arg("method") = "lle",
+        nb::arg("neighbors_method") = nb::none(),
+        nb::arg("eigen_method") = nb::none(),
         nb::arg("num_neighbors") = nb::none(),
         nb::arg("target_dimension") = nb::none(),
         nb::arg("gaussian_kernel_width") = nb::none(),
@@ -116,6 +126,8 @@ NB_MODULE(tapkee, m) {
         Args:
             data: Input matrix (features x samples)
             method: Reduction method ('lle', 'isomap', 'pca', 't-sne', etc.)
+            neighbors_method: Neighbor search method ('brute', 'vptree', 'covertree')
+            eigen_method: Eigendecomposition method ('dense', 'randomized', 'arpack')
             num_neighbors: Number of neighbors for local methods (default: 5)
             target_dimension: Output dimensionality (default: 2)
             gaussian_kernel_width: Kernel width for Laplacian Eigenmaps, DM, LPP
