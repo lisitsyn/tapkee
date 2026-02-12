@@ -53,6 +53,56 @@ test_that("Factor Analysis works", {
   expect_equal(dim(result), c(100, 2))
 })
 
+test_that("neighbors_method brute works", {
+  set.seed(42)
+  X <- matrix(rnorm(300), nrow = 3, ncol = 100)
+  result <- tapkee_embed(X, method = "isomap",
+                         neighbors_method = "brute",
+                         num_neighbors = 15L, target_dimension = 2L)
+  expect_equal(dim(result), c(100, 2))
+})
+
+test_that("neighbors_method vptree works", {
+  set.seed(42)
+  X <- matrix(rnorm(300), nrow = 3, ncol = 100)
+  result <- tapkee_embed(X, method = "isomap",
+                         neighbors_method = "vptree",
+                         num_neighbors = 15L, target_dimension = 2L)
+  expect_equal(dim(result), c(100, 2))
+})
+
+test_that("eigen_method dense works", {
+  set.seed(42)
+  X <- matrix(rnorm(300), nrow = 3, ncol = 100)
+  result <- tapkee_embed(X, method = "pca",
+                         eigen_method = "dense",
+                         target_dimension = 2L)
+  expect_equal(dim(result), c(100, 2))
+})
+
+test_that("eigen_method randomized works", {
+  set.seed(42)
+  X <- matrix(rnorm(300), nrow = 3, ncol = 100)
+  result <- tapkee_embed(X, method = "pca",
+                         eigen_method = "randomized",
+                         target_dimension = 2L)
+  expect_equal(dim(result), c(100, 2))
+})
+
+test_that("unknown neighbors_method raises error", {
+  X <- matrix(rnorm(30), nrow = 3, ncol = 10)
+  expect_error(tapkee_embed(X, method = "isomap",
+                            neighbors_method = "nonexistent"),
+               "Unknown neighbors method")
+})
+
+test_that("unknown eigen_method raises error", {
+  X <- matrix(rnorm(30), nrow = 3, ncol = 10)
+  expect_error(tapkee_embed(X, method = "pca",
+                            eigen_method = "nonexistent"),
+               "Unknown eigen method")
+})
+
 test_that("unknown method raises error", {
   X <- matrix(rnorm(30), nrow = 3, ncol = 10)
   expect_error(tapkee_embed(X, method = "nonexistent"), "Unknown method")

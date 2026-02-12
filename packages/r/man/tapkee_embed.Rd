@@ -7,6 +7,8 @@
 tapkee_embed(
   data,
   method = "lle",
+  neighbors_method = NULL,
+  eigen_method = NULL,
   num_neighbors = NULL,
   target_dimension = NULL,
   gaussian_kernel_width = NULL,
@@ -35,6 +37,14 @@ samples. Each column is one data point.}
 \code{"npe"}, \code{"ltsa"}, \code{"lltsa"}, \code{"hlle"},
 \code{"l-mds"}, \code{"l-isomap"}, \code{"spe"}, \code{"fa"},
 \code{"random_projection"}, \code{"manifold_sculpting"}, \code{"passthru"}.}
+
+\item{neighbors_method}{Character string specifying the neighbor search method:
+\code{"brute"} (brute-force), \code{"vptree"} (vantage point tree),
+\code{"covertree"} (cover tree, if available). Default: library default.}
+
+\item{eigen_method}{Character string specifying the eigendecomposition method:
+\code{"dense"}, \code{"randomized"}, \code{"arpack"} (if available).
+Default: library default.}
 
 \item{num_neighbors}{Integer. Number of nearest neighbors for local methods.
 Default in Tapkee: 5.}
