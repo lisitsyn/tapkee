@@ -12,13 +12,15 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // tapkee_embed_cpp
-Eigen::MatrixXd tapkee_embed_cpp(const Eigen::MatrixXd& data, const std::string& method, Rcpp::Nullable<int> num_neighbors, Rcpp::Nullable<int> target_dimension, Rcpp::Nullable<double> gaussian_kernel_width, Rcpp::Nullable<double> landmark_ratio, Rcpp::Nullable<int> max_iteration, Rcpp::Nullable<int> diffusion_map_timesteps, Rcpp::Nullable<double> sne_perplexity, Rcpp::Nullable<double> sne_theta, Rcpp::Nullable<double> squishing_rate, Rcpp::Nullable<bool> spe_global_strategy, Rcpp::Nullable<int> spe_num_updates, Rcpp::Nullable<double> spe_tolerance, Rcpp::Nullable<double> nullspace_shift, Rcpp::Nullable<double> klle_shift, Rcpp::Nullable<double> fa_epsilon, Rcpp::Nullable<bool> check_connectivity);
-RcppExport SEXP _tapkee_tapkee_embed_cpp(SEXP dataSEXP, SEXP methodSEXP, SEXP num_neighborsSEXP, SEXP target_dimensionSEXP, SEXP gaussian_kernel_widthSEXP, SEXP landmark_ratioSEXP, SEXP max_iterationSEXP, SEXP diffusion_map_timestepsSEXP, SEXP sne_perplexitySEXP, SEXP sne_thetaSEXP, SEXP squishing_rateSEXP, SEXP spe_global_strategySEXP, SEXP spe_num_updatesSEXP, SEXP spe_toleranceSEXP, SEXP nullspace_shiftSEXP, SEXP klle_shiftSEXP, SEXP fa_epsilonSEXP, SEXP check_connectivitySEXP) {
+Eigen::MatrixXd tapkee_embed_cpp(const Eigen::MatrixXd& data, const std::string& method, Rcpp::Nullable<std::string> neighbors_method, Rcpp::Nullable<std::string> eigen_method, Rcpp::Nullable<int> num_neighbors, Rcpp::Nullable<int> target_dimension, Rcpp::Nullable<double> gaussian_kernel_width, Rcpp::Nullable<double> landmark_ratio, Rcpp::Nullable<int> max_iteration, Rcpp::Nullable<int> diffusion_map_timesteps, Rcpp::Nullable<double> sne_perplexity, Rcpp::Nullable<double> sne_theta, Rcpp::Nullable<double> squishing_rate, Rcpp::Nullable<bool> spe_global_strategy, Rcpp::Nullable<int> spe_num_updates, Rcpp::Nullable<double> spe_tolerance, Rcpp::Nullable<double> nullspace_shift, Rcpp::Nullable<double> klle_shift, Rcpp::Nullable<double> fa_epsilon, Rcpp::Nullable<bool> check_connectivity);
+RcppExport SEXP _tapkee_tapkee_embed_cpp(SEXP dataSEXP, SEXP methodSEXP, SEXP neighbors_methodSEXP, SEXP eigen_methodSEXP, SEXP num_neighborsSEXP, SEXP target_dimensionSEXP, SEXP gaussian_kernel_widthSEXP, SEXP landmark_ratioSEXP, SEXP max_iterationSEXP, SEXP diffusion_map_timestepsSEXP, SEXP sne_perplexitySEXP, SEXP sne_thetaSEXP, SEXP squishing_rateSEXP, SEXP spe_global_strategySEXP, SEXP spe_num_updatesSEXP, SEXP spe_toleranceSEXP, SEXP nullspace_shiftSEXP, SEXP klle_shiftSEXP, SEXP fa_epsilonSEXP, SEXP check_connectivitySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type data(dataSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type neighbors_method(neighbors_methodSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type eigen_method(eigen_methodSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<int> >::type num_neighbors(num_neighborsSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<int> >::type target_dimension(target_dimensionSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type gaussian_kernel_width(gaussian_kernel_widthSEXP);
@@ -35,13 +37,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type klle_shift(klle_shiftSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type fa_epsilon(fa_epsilonSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<bool> >::type check_connectivity(check_connectivitySEXP);
-    rcpp_result_gen = Rcpp::wrap(tapkee_embed_cpp(data, method, num_neighbors, target_dimension, gaussian_kernel_width, landmark_ratio, max_iteration, diffusion_map_timesteps, sne_perplexity, sne_theta, squishing_rate, spe_global_strategy, spe_num_updates, spe_tolerance, nullspace_shift, klle_shift, fa_epsilon, check_connectivity));
+    rcpp_result_gen = Rcpp::wrap(tapkee_embed_cpp(data, method, neighbors_method, eigen_method, num_neighbors, target_dimension, gaussian_kernel_width, landmark_ratio, max_iteration, diffusion_map_timesteps, sne_perplexity, sne_theta, squishing_rate, spe_global_strategy, spe_num_updates, spe_tolerance, nullspace_shift, klle_shift, fa_epsilon, check_connectivity));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_tapkee_tapkee_embed_cpp", (DL_FUNC) &_tapkee_tapkee_embed_cpp, 18},
+    {"_tapkee_tapkee_embed_cpp", (DL_FUNC) &_tapkee_tapkee_embed_cpp, 20},
     {NULL, NULL, 0}
 };
 
