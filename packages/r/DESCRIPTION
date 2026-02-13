@@ -1,7 +1,7 @@
 Package: tapkee
 Type: Package
 Title: Dimensionality Reduction with Tapkee
-Version: 1.3.3
+Version: 1.3.4
 Authors@R: c(
     person("Sergey", "Lisitsyn", email = "lisitsyn@hey.com",
            role = c("aut", "cre")),
