@@ -24,8 +24,8 @@
    :d3 "//cdn.jsdelivr.net/npm/d3@3.5.17/d3.min.js"
    :marked "//cdn.jsdelivr.net/npm/marked@16.2.1/lib/marked.umd.min.js"
    :mathjax "//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-   :download-zip "https://github.com/lisitsyn/tapkee/archive/master.zip"
-   :download-targz "https://github.com/lisitsyn/tapkee/archive/master.tar.gz"})
+   :pypi "https://pypi.org/project/tapkee/"
+   :github-releases "https://github.com/lisitsyn/tapkee/releases/latest"})
 
 (def local-resources
   {:clipboard-js "js/clipboard.js"
@@ -51,6 +51,7 @@
   {:shortname "fa" :longname "Factor Analysis" :markdown "md/fa.markdown"}
   {:shortname "tsne" :longname "t-SNE" :markdown "md/tsne.markdown"}
   {:shortname "bhsne" :longname "Barnes-Hut-SNE" :markdown "md/tsne.markdown"}
+  {:shortname "ms" :longname "Manifold Sculpting" :markdown "md/ms.markdown"}
   ])
 
 (def all-graphical-examples [
@@ -62,9 +63,18 @@
   ])
 
 (def all-usage-examples [
-  {:shortname "minimal" :longname "Minimal C++ example" :description "code/minimal.md" :source "code/minimal.cpp"}
-  {:shortname "rna" :longname "RNA C++ example" :description "code/rna.md" :source "code/rna.cpp"}
-  {:shortname "precomputed" :longname "Precomputed distance C++ example" :description "code/precomputed.md" :source "code/precomputed.cpp"}
+  {:shortname "minimal" :longname "Minimal example" :description "code/minimal.md"
+   :sources [{:lang "C++" :id "cpp" :file "code/minimal.cpp"}
+             {:lang "Python" :id "py" :file "code/minimal.py"}
+             {:lang "R" :id "r" :file "code/minimal.r"}]}
+  {:shortname "rna" :longname "RNA example" :description "code/rna.md"
+   :sources [{:lang "C++" :id "cpp" :file "code/rna.cpp"}
+             {:lang "Python" :id "py" :file "code/rna.py"}
+             {:lang "R" :id "r" :file "code/rna.r"}]}
+  {:shortname "precomputed" :longname "Precomputed distance example" :description "code/precomputed.md"
+   :sources [{:lang "C++" :id "cpp" :file "code/precomputed.cpp"}
+             {:lang "Python" :id "py" :file "code/precomputed.py"}
+             {:lang "R" :id "r" :file "code/precomputed.r"}]}
   ])
 
 (defn mathjax-config []
@@ -90,7 +100,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 (defn tag-manager-body []
   [:noscript
-   [:iframe {:src (str "https://www.googletagmanager.com/ns.html?id=" (:gtm-id site-config)) 
+   [:iframe {:src (str "https://www.googletagmanager.com/ns.html?id=" (:gtm-id site-config))
              :height 0 :width 0 :style "display:none;visibility:hidden"}]])
 
 (defn favicon-and-manifest-meta []
@@ -119,14 +129,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
      [:meta {:property "og:image:height" :content "630"}]
      [:meta {:property "og:site_name" :content "Tapkee"}]
      [:meta {:property "og:locale" :content "en_US"}]
-     
+
      ;; Twitter Card meta tags
      [:meta {:name "twitter:card" :content "summary_large_image"}]
      [:meta {:name "twitter:title" :content title}]
      [:meta {:name "twitter:description" :content short-description}]
      [:meta {:name "twitter:image" :content image}]
      [:meta {:name "twitter:image:alt" :content "Tapkee dimension reduction library visualization"}]
-     
+
      ;; Additional meta tags
      [:meta {:name "description" :content description}]
      [:meta {:name "keywords" :content "dimension reduction, machine learning, C++, t-SNE, PCA, Isomap, LLE, data visualization, manifold learning"}]
@@ -154,14 +164,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 (defn dropdown [id name elements]
   [:li {:class "nav-item dropdown"}
-   [:a {:id id :href "#" :role "button" :class "nav-link dropdown-toggle" 
+   [:a {:id id :href "#" :role "button" :class "nav-link dropdown-toggle"
         :data-bs-toggle "dropdown" :aria-expanded "false"}
     name]
    [:ul {:class "dropdown-menu" :aria-labelledby id}
     (map dropdown-link elements)]])
 
 (defn modal [id header description javascript]
-  [:div {:id id :class "modal fade" :tabindex "-1" :role "dialog" 
+  [:div {:id id :class "modal fade" :tabindex "-1" :role "dialog"
          :aria-labelledby (str id "Label") :aria-hidden "true"}
     [:div {:class "modal-dialog modal-lg"}
       [:div {:class "modal-content"}
@@ -189,10 +199,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   (dropdown "code_examples" "Usage examples"
             all-usage-examples))
 
-(defn downloads-dropdown []
-  (dropdown "downloads" "Download"
-            [{:shortname "zip" :longname "as .zip" :href (:download-zip cdn-urls)}
-             {:shortname "targz" :longname "as .tar.gz" :href (:download-targz cdn-urls)}]))
+(defn install-dropdown []
+  (dropdown "install" "Install"
+            [{:shortname "pypi" :longname "Python (PyPI)" :href (:pypi cdn-urls)}
+             {:shortname "github-release" :longname "Latest GitHub release" :href (:github-releases cdn-urls)}]))
 
 (defn more-dropdown []
   (dropdown "more" "More"
@@ -206,7 +216,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 (defn readme []
   [:div {:class "container py-5"}
-   [:section 
+   [:section
     [:div {:id "readme"}]
     [:script "loadReadmeContent();"]]])
 
@@ -218,9 +228,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 ;; Modal helper functions
 (defn method-modal [method]
-  (modal (:shortname method) 
+  (modal (:shortname method)
          (:longname method)
-         [:div {:class "method-content"} 
+         [:div {:class "method-content"}
           [:div {:id (str (:shortname method) "Content")}
            [:script (htmlize-markdown (str "#" (:shortname method) "Content") (:markdown method))]]]
          ""))
@@ -229,21 +239,42 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   (let [dsc-id (str (:shortname example) "Dsc")]
     (modal (:shortname example)
            (:longname example)
-           [:div {:id dsc-id} 
+           [:div {:id dsc-id}
             [:script (htmlize-markdown (str "#" dsc-id) (:description example))]]
            (include-js (:script example)))))
 
 (defn usage-example-modal [example]
-  (let [dsc-id (str (:shortname example) "Dsc") 
-        src-id (str (:shortname example) "Src")]
-    (modal (:shortname example)
+  (let [dsc-id (str (:shortname example) "Dsc")
+        base-id (:shortname example)
+        sources (:sources example)]
+    (modal base-id
            (:longname example)
            [:div
-            [:div {:id dsc-id} 
+            [:div {:id dsc-id}
              [:script (htmlize-markdown (str "#" dsc-id) (:description example))]]
             [:br]
-            [:pre {:id src-id}
-             [:script (load-sources (str "#" src-id) (:source example))]]]
+            [:ul {:class "nav nav-tabs" :id (str base-id "-tabs") :role "tablist"}
+             (map-indexed
+               (fn [idx source]
+                 [:li {:class "nav-item" :role "presentation"}
+                  [:button {:class (str "nav-link" (when (zero? idx) " active"))
+                            :id (str base-id "-" (:id source) "-tab")
+                            :data-bs-toggle "tab"
+                            :data-bs-target (str "#" base-id "-" (:id source))
+                            :type "button"
+                            :role "tab"}
+                   (:lang source)]])
+               sources)]
+            [:div {:class "tab-content pt-3" :id (str base-id "-tab-content")}
+             (map-indexed
+               (fn [idx source]
+                 (let [src-id (str base-id "-" (:id source) "-src")]
+                   [:div {:class (str "tab-pane fade" (when (zero? idx) " show active"))
+                          :id (str base-id "-" (:id source))
+                          :role "tabpanel"}
+                    [:pre {:id src-id}
+                     [:script (load-sources (str "#" src-id) (:file source))]]]))
+               sources)]]
            "")))
 
 
@@ -263,8 +294,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       (include-css (:highlight-css cdn-urls))
       (include-css (:styles-css local-resources))
       ;; JavaScript includes
-      (include-js (:jquery cdn-urls)) 
-      (include-js (:d3 cdn-urls)) 
+      (include-js (:jquery cdn-urls))
+      (include-js (:d3 cdn-urls))
       (include-js (:highlight-js cdn-urls))
       (include-js (:marked cdn-urls))
       (include-js (:bootstrap-js cdn-urls))
@@ -282,7 +313,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
          (techniques-dropdown)
          (code-examples-dropdown)
          (graphical-examples-dropdown)
-         (downloads-dropdown)
+         (install-dropdown)
          (more-dropdown)
          (github-button)
       )
@@ -290,7 +321,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       (readme)]
       ;; Method modals
       (map method-modal all-methods)
-      ;; Graphical example modals  
+      ;; Graphical example modals
       (map graphical-example-modal all-graphical-examples)
       ;; Usage example modals
       (map usage-example-modal all-usage-examples)

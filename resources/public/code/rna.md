@@ -1,6 +1,5 @@
-In this example RNA sequencies are embedded using the match kernel 
-`MatchKernelCallback` (that is essentially an inverse of a Hamming distance). 
-RNA sequencies are supposed to be read from the file provided via a command line 
-argument (one sequence per line). As the Kernel Locally Linear Embedding algorithm 
-requires only a kernel callback we just pass only the kernel callback using
-the `withKernel` member function. 
+In this example RNA sequences are embedded using dimensionality reduction.
+RNA sequences are read from a file (one sequence per line). The C++ version
+uses a custom match kernel callback (essentially an inverse Hamming distance)
+with Kernel Locally Linear Embedding. The Python and R versions one-hot
+encode the sequences and use Locally Linear Embedding.
