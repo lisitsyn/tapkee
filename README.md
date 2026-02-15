@@ -1,11 +1,11 @@
 Tapkee is a C++ template library for dimensionality reduction with some bias on
 spectral methods. The Tapkee origins from the code developed during
-[GSoC 2011](http://www.google-melange.com/gsoc/homepage/google/gsoc2011) as
+[GSoC 2011](https://developers.google.com/open-source/gsoc/past-summers) as
 the part of the [Shogun machine learning toolbox](https://github.com/shogun-toolbox/shogun).
 The project aim is to provide efficient and flexible standalone library for
 dimensionality reduction which can be easily integrated to existing codebases.
 Tapkee leverages capabilities of effective [Eigen linear algebra library](http://eigen.tuxfamily.org) and
-optionally makes use of the [ARPACK eigensolver](http://www.caam.rice.edu/software/ARPACK/).
+optionally makes use of the [ARPACK eigensolver](https://github.com/opencollab/arpack-ng).
 The library uses CoverTree and VP-tree data structures to compute nearest neighbors. To achieve
 greater flexibility we provide a callback interface which decouples dimension reduction algorithms from
 the data representation and storage schemes.
