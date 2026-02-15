@@ -34,4 +34,4 @@ References
 ----------
 
 * Donoho, D., & Grimes, C. (2003). 
-[Hessian eigenmaps: new locally linear embedding techniques for high-dimensional data](http://www-stat.stanford.edu/~donoho/Reports/2003/HessianEigenmaps.pdf)
+[Hessian eigenmaps: new locally linear embedding techniques for high-dimensional data](https://www.pnas.org/doi/10.1073/pnas.1031596100)

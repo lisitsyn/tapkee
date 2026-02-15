@@ -29,4 +29,4 @@ References
 ----------
 
 * Agrafiotis, D. K. (2002). 
-  [Stochastic Proximity Embedding](http://www.dimitris-agrafiotis.com/Papers/jcc20078.pdf)
+  [Stochastic Proximity Embedding](https://pubmed.ncbi.nlm.nih.gov/12820129/)

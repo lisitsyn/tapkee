@@ -17,5 +17,5 @@ References
 ----------
 
 * He, X., & Niyogi, P. (2003). 
-  [Locality Preserving Projections](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.85.7147&rep=rep1&type=pdf)
+  [Locality Preserving Projections](https://papers.nips.cc/paper/2003/hash/d69116f8b0140cdeb1f99a4d5096ffe4-Abstract.html)
 

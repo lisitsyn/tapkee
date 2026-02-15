@@ -28,5 +28,5 @@ References
 ----------
 
 * Belkin, M., & Niyogi, P. (2002). 
-  [Laplacian Eigenmaps and Spectral Techniques for Embedding and Clustering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.9400&rep=rep1&type=pdf)
+  [Laplacian Eigenmaps and Spectral Techniques for Embedding and Clustering](https://www2.imm.dtu.dk/projects/manifold/Papers/Laplacian.pdf)
 

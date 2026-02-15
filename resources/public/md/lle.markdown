@@ -62,7 +62,7 @@ adding the grand mean of all elements of $ K $ to $ K $.
 References
 ----------
 
-* [Sam Roweis' page on LLE](http://www.cs.nyu.edu/~roweis/lle/)
-* Saul, L. K., Ave, P., Park, F., & Roweis, S. T. (2001). 
-  [An introduction to Locally Linear Embedding](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.123.7319&rep=rep1&type=pdf)
+* [Sam Roweis' page on LLE](https://web.archive.org/web/2023/https://cs.nyu.edu/~roweis/lle/)
+* Saul, L. K., Ave, P., Park, F., & Roweis, S. T. (2001).
+  [An introduction to Locally Linear Embedding](https://cs.nyu.edu/~roweis/lle/papers/lleintro.pdf)
 * Zhao, D. (2006) [Formulating LLE using alignment technique](http://linkinghub.elsevier.com/retrieve/pii/S0031320306002160)

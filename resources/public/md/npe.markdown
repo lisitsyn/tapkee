@@ -21,5 +21,5 @@ coordinate of projected $i$-th vector.
 References
 
 * He, X., Cai, D., Yan, S., & Zhang, H.-J. (2005). 
-  [Neighborhood preserving embedding](http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=1544858)
+  [Neighborhood preserving embedding](https://ieeexplore.ieee.org/document/1544858)
 
