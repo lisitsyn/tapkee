@@ -41,4 +41,4 @@ References
 ----------
 
 * Gashler, M. S., Ventura, D., & Martinez, T. (2007).
-  [Manifold Sculpting](https://axon.cs.byu.edu/papers/gashler2007icml.pdf)
+  [Iterative Non-linear Dimensionality Reduction by Manifold Sculpting](https://papers.nips.cc/paper_files/paper/2007/file/c06d06da9666a219db15cf575aff2824-Paper.pdf)
