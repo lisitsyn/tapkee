@@ -59,7 +59,7 @@ jobs:
         cp LICENSE staging/
         cd staging && tar czf ../${{ matrix.artifact }}.tar.gz *
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.artifact }}
         path: ${{ matrix.artifact }}.tar.gz
@@ -76,7 +76,7 @@ jobs:
         cd .sdist-work && pipx run build --sdist -o ../dist
         rm -rf .sdist-work
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: sdist
         path: dist/*.tar.gz
@@ -117,7 +117,7 @@ jobs:
         CIBW_ARCHS: ${{ matrix.arch }}
         CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_target }}"
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: wheels-${{ matrix.name }}
         path: ./wheelhouse/*.whl
