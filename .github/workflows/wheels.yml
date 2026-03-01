@@ -60,7 +60,7 @@ jobs:
 
     - name: Set up vcpkg cache
       if: runner.os == 'Windows'
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: C:\vcpkg\installed
         key: vcpkg-${{ matrix.arch }}-${{ hashFiles('packages/python/pyproject.toml') }}
