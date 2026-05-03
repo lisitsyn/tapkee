@@ -37,7 +37,7 @@ jobs:
 
     - name: Install Miniconda (Windows)
       if: runner.os == 'Windows'
-      uses: conda-incubator/setup-miniconda@v3.3.0
+      uses: conda-incubator/setup-miniconda@v4.0.1
       with:
         channels: conda-forge
 
