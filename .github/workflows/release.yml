@@ -94,7 +94,7 @@ jobs:
           - name: macOS
             os: macos-latest
             arch: arm64
-            macos_target: "15.0"
+            macos_target: "26.0"
           - name: Windows
             os: windows-latest
             arch: AMD64
