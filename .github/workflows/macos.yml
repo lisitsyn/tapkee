@@ -15,7 +15,7 @@ jobs:
         build_type: [Debug, Release]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Install dependencies
       run: brew install arpack eigen googletest fmt cxxopts
