@@ -52,7 +52,7 @@ jobs:
             arch: arm64
             macos_target: "26.0"
           - name: Windows
-            os: windows-latest
+            os: windows-2022
             arch: AMD64
 
     steps:
