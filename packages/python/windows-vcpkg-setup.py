@@ -27,6 +27,7 @@ removal = r"""
 # which VS 2026 flang cannot resolve. Remove files and strip from CMakeLists.txt.
 file(REMOVE "${SOURCE_PATH}/SRC/sgedmd.f90" "${SOURCE_PATH}/SRC/sgedmdq.f90")
 file(READ "${SOURCE_PATH}/SRC/CMakeLists.txt" _lapack_src_cmake)
+string(REPLACE "\r\n" "\n" _lapack_src_cmake "${_lapack_src_cmake}")
 string(REGEX REPLACE "[ \t]*sgedmd\\.f90[ \t]*\n" "" _lapack_src_cmake "${_lapack_src_cmake}")
 string(REGEX REPLACE "[ \t]*sgedmdq\\.f90[ \t]*\n" "" _lapack_src_cmake "${_lapack_src_cmake}")
 file(WRITE "${SOURCE_PATH}/SRC/CMakeLists.txt" "${_lapack_src_cmake}")
