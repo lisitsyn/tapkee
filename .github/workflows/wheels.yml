@@ -48,7 +48,7 @@ jobs:
             os: ubuntu-latest
             arch: x86_64
           - name: macOS
-            os: macos-26-arm64
+            os: macos-latest
             arch: arm64
             macos_target: "26.0"
           - name: Windows
