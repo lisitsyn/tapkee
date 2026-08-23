@@ -28,88 +28,80 @@
 #pragma once
 
 #include <stichwort/exceptions.hpp>
-#include <stichwort/policy.hpp>
+
+#include <any>
+#include <sstream>
+#include <string>
 
 namespace stichwort
 {
 namespace stichwort_internal
 {
 
-struct EmptyType
-{
-};
-
 class ValueKeeper
 {
 
   public:
-    template <typename T> explicit ValueKeeper(const T& value) : policy(getPolicy<T>()), value_ptr(NULL)
-    {
-        policy->copyFromValue(&value, &value_ptr);
-    }
-
-    ValueKeeper() : policy(getPolicy<EmptyType>()), value_ptr(NULL)
+    template <typename T> explicit ValueKeeper(const T& v) : value(v), repr_fn(&reprImpl<T>)
     {
     }
 
-    ~ValueKeeper()
+    ValueKeeper() : value(), repr_fn(nullptr)
     {
-        policy->free(&value_ptr);
-    }
-
-    ValueKeeper(const ValueKeeper& v) : policy(v.policy), value_ptr(NULL)
-    {
-        policy->clone(&(v.value_ptr), &value_ptr);
-    }
-
-    ValueKeeper& operator=(const ValueKeeper& v)
-    {
-        policy->free(&value_ptr);
-        policy = v.policy;
-        policy->clone(&(v.value_ptr), &value_ptr);
-        return *this;
     }
 
     template <typename T> inline T getValue() const
     {
-        T* v;
         if (!isInitialized())
             throw missed_parameter_error("Parameter is missed");
 
-        if (isTypeCorrect<T>())
+        try
         {
-            void* vv = policy->getValue(const_cast<void**>(&value_ptr));
-            v = reinterpret_cast<T*>(vv);
+            return std::any_cast<T>(value);
         }
-        else
+        catch (const std::bad_any_cast&)
+        {
             throw wrong_parameter_type_error("Wrong value type");
-        return *v;
+        }
     }
 
     template <typename T> inline bool isTypeCorrect() const
     {
-        return getPolicy<T>() == policy;
+        return value.type() == typeid(T);
     }
 
     inline bool isInitialized() const
     {
-        return getPolicy<EmptyType>() != policy;
+        return value.has_value();
     }
 
     template <template <class> class F, class Q> inline bool isCondition(F<Q> cond) const
     {
-        Q value = getValue<Q>();
-        return cond(value);
+        return cond(getValue<Q>());
     }
 
     inline std::string repr() const
     {
-        return policy->repr(const_cast<void**>(&value_ptr));
+        return isInitialized() ? repr_fn(value) : "uninitialized";
     }
 
   private:
-    TypePolicyBase* policy;
-    void* value_ptr;
+    template <typename T> static std::string reprImpl(const std::any& v)
+    {
+        if constexpr (requires(std::stringstream& ss, const T& t) { ss << t; })
+        {
+            std::stringstream ss;
+            ss << std::any_cast<const T&>(v);
+            return ss.str();
+        }
+        else
+        {
+            return "(can't obtain value)";
+        }
+    }
+
+    std::any value;
+    std::string (*repr_fn)(const std::any&);
 };
 
 } // namespace stichwort_internal
