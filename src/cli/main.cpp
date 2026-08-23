@@ -155,8 +155,6 @@ static const char* PRECOMPUTE_DESCRIPTION = "Whether distance and kernel matrice
 
 int run(int argc, const char **argv)
 {
-    srand(static_cast<unsigned int>(time(NULL)));
-
     cxxopts::Options options("tapkee", "Tapkee: a tool for dimensionality reduction.");
 
     using namespace std::string_literals;
