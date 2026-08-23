@@ -21,12 +21,15 @@ jobs:
       uses: mymindstorm/setup-emsdk@v14
 
     - name: Configure
+      # fmt_DIR: Ubuntu's fmt CMake config lives in an architecture-specific
+      # path that the Emscripten toolchain does not search on its own
       run: >
         emcmake cmake -B ${{github.workspace}}/build
         -DBUILD_JS=ON -DBUILD_CLI=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE
+        -Dfmt_DIR=/usr/lib/x86_64-linux-gnu/cmake/fmt
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --target tapkee_js
