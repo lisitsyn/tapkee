@@ -13,6 +13,13 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
+# Emscripten (WebAssembly) builds: dependencies here are header-only
+# (Eigen, fmt), so allow find_package to locate them on the host.
+if (EMSCRIPTEN)
+	set (CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+	set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
+endif()
+
 # Eigen detection (supports Eigen 3.4+ and Eigen 5.x)
 find_package(Eigen3 REQUIRED NO_MODULE)
 if(Eigen3_VERSION VERSION_LESS "3.4")
@@ -22,39 +29,59 @@ set (EIGEN3_LIBRARY_TO_LINK "Eigen3::Eigen")
 message(STATUS "Found Eigen version: ${Eigen3_VERSION}")
 
 # fmt
-find_package(fmt REQUIRED)
+if (EMSCRIPTEN)
+	# fmt is used header-only, but the host package's config-version file
+	# rejects the 32-bit wasm target; skip its architecture check
+	set (_TAPKEE_SIZEOF_VOID_P "${CMAKE_SIZEOF_VOID_P}")
+	unset (CMAKE_SIZEOF_VOID_P)
+	find_package(fmt REQUIRED)
+	set (CMAKE_SIZEOF_VOID_P "${_TAPKEE_SIZEOF_VOID_P}")
+else()
+	find_package(fmt REQUIRED)
+endif()
 set (FMT_LIBRARY_TO_LINK "fmt::fmt-header-only")
 
-# ARPACK detection
-find_package(Arpack)
-if (ARPACK_FOUND)
-	link_directories("${ARPACK_PATH}")
-endif()
+# Native-only dependencies: ARPACK is Fortran and OpenMP/OpenCL target the
+# host, none of them can be linked into a WebAssembly module. Without ARPACK
+# tapkee falls back to the Dense/Randomized eigensolvers.
+if (NOT EMSCRIPTEN)
+	# ARPACK detection
+	find_package(Arpack)
+	if (ARPACK_FOUND)
+		link_directories("${ARPACK_PATH}")
+	endif()
 
-# OpenMP detection
-find_package(OpenMP)
-if (OPENMP_FOUND)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif()
+	# OpenMP detection
+	find_package(OpenMP)
+	if (OPENMP_FOUND)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+	endif()
 
-# ViennaCL detection
-find_package(OpenCL)
-if (OPENCL_FOUND)
-	find_package(ViennaCL)
-	if (VIENNACL_FOUND)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPENCL_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENCL_CXX_FLAGS}")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OPENCL_EXE_LINKER_FLAGS}")
-		include_directories("${VIENNACL_INCLUDE_DIRS}")
+	# ViennaCL detection
+	find_package(OpenCL)
+	if (OPENCL_FOUND)
+		find_package(ViennaCL)
+		if (VIENNACL_FOUND)
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPENCL_C_FLAGS}")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENCL_CXX_FLAGS}")
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OPENCL_EXE_LINKER_FLAGS}")
+			include_directories("${VIENNACL_INCLUDE_DIRS}")
+		endif()
 	endif()
 endif()
 
 include_directories("${TAPKEE_INCLUDE_DIR}")
 
-# CLI executable
-option(BUILD_CLI "Build CLI application" ON)
+# CLI executable (off by default under Emscripten: its .js output
+# would collide with the WebAssembly module's)
+if (EMSCRIPTEN)
+	set (BUILD_CLI_DEFAULT OFF)
+else()
+	set (BUILD_CLI_DEFAULT ON)
+endif()
+option(BUILD_CLI "Build CLI application" ${BUILD_CLI_DEFAULT})
 if (BUILD_CLI)
 	find_package(cxxopts REQUIRED)
 	add_executable(tapkee "${TAPKEE_SRC_DIR}/cli/main.cpp")
@@ -208,6 +235,36 @@ if (BUILD_NANOBIND)
 	target_link_libraries(pytapkee PRIVATE "${FMT_LIBRARY_TO_LINK}")
 	install(TARGETS pytapkee LIBRARY DESTINATION . COMPONENT python)
 	message(STATUS "Detecting and configuring nanobind - done")
+endif()
+
+option(BUILD_JS "Build JavaScript/WebAssembly module (requires the Emscripten toolchain)" OFF)
+
+if (BUILD_JS)
+	if (NOT EMSCRIPTEN)
+		message(FATAL_ERROR "BUILD_JS requires the Emscripten toolchain; configure with 'emcmake cmake -DBUILD_JS=ON ..'")
+	endif()
+
+	add_executable(tapkee_js "${TAPKEE_SRC_DIR}/js/tapkee_js.cpp")
+	target_include_directories(tapkee_js PRIVATE "${TAPKEE_SRC_DIR}")
+	target_link_libraries(tapkee_js PRIVATE "${EIGEN3_LIBRARY_TO_LINK}")
+	target_link_libraries(tapkee_js PRIVATE "${FMT_LIBRARY_TO_LINK}")
+	target_compile_options(tapkee_js PRIVATE -fexceptions)
+	target_link_options(tapkee_js PRIVATE
+		--bind
+		-fexceptions
+		-sNO_DISABLE_EXCEPTION_CATCHING
+		-sMODULARIZE=1
+		-sEXPORT_NAME=createTapkee
+		-sALLOW_MEMORY_GROWTH=1
+		-sSTACK_SIZE=5242880)
+	set_target_properties(tapkee_js PROPERTIES OUTPUT_NAME tapkee SUFFIX ".js")
+
+	# ship the swiss roll demo page next to the module so the output
+	# directory can be served as-is
+	add_custom_command(TARGET tapkee_js POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_CURRENT_SOURCE_DIR}/examples/javascript/index.html"
+			"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html")
 endif()
 
 export(

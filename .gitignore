@@ -8,3 +8,4 @@ lib/
 dist/
 .venv-*/
 .sdist-work/
+build-js/

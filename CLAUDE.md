@@ -22,6 +22,10 @@ make
 cmake -DBUILD_NANOBIND=ON ..
 make
 
+# Build JavaScript/WebAssembly module (requires Emscripten)
+emcmake cmake -DBUILD_JS=ON ..
+cmake --build . --target tapkee_js
+
 # Build without GPL-licensed components (CoverTree)
 cmake -DGPL_FREE=1 ..
 ```
@@ -30,6 +34,7 @@ cmake -DGPL_FREE=1 ..
 - `BUILD_EXAMPLES` - Build example applications
 - `BUILD_TESTS` - Build unit tests (requires GTest)
 - `BUILD_NANOBIND` - Build Python extension
+- `BUILD_JS` - Build JavaScript/WebAssembly module (Emscripten only; ARPACK is skipped, Dense/Randomized eigensolvers are used)
 - `USE_GCOV` - Generate code coverage (GCC only)
 - `GPL_FREE` - Exclude LGPLv3-licensed CoverTree
 

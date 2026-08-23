@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>tapkee.wasm — swiss roll demo</title>
+<style>
+  body { font-family: -apple-system, sans-serif; margin: 24px; background: #16181d; color: #e8e8e8; }
+  h1 { font-size: 20px; } h1 code { color: #7fd4a0; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .panel { background: #1f232b; border-radius: 10px; padding: 16px; }
+  canvas { background: #14161a; border-radius: 6px; display: block; }
+  .caption { font-size: 13px; color: #9aa; margin-top: 8px; text-align: center; }
+  .controls { margin: 16px 0; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  select, button { font-size: 14px; padding: 6px 12px; border-radius: 6px; border: 1px solid #444; background: #2a2f3a; color: #e8e8e8; }
+  button { cursor: pointer; background: #2f6b4f; border-color: #3a8562; }
+  button:disabled { opacity: 0.5; cursor: wait; }
+  #status { font-size: 13px; color: #9aa; }
+</style>
+</head>
+<body>
+<h1>tapkee compiled to WebAssembly — <code id="title-method">LLE</code> on the swiss roll, in your browser</h1>
+<div class="controls">
+  <label>method
+    <select id="method">
+      <option value="lle" selected>LLE (KLLE)</option>
+      <option value="isomap">Isomap</option>
+      <option value="hlle">Hessian LLE</option>
+      <option value="lltsa">Linear LTSA</option>
+      <option value="la">Laplacian Eigenmaps</option>
+      <option value="pca">PCA</option>
+      <option value="mds">MDS</option>
+      <option value="dm">Diffusion Map</option>
+    </select>
+  </label>
+  <label>points
+    <select id="npoints">
+      <option>400</option><option selected>800</option><option>1500</option>
+    </select>
+  </label>
+  <label>neighbors
+    <select id="neighbors">
+      <option>8</option><option selected>12</option><option>20</option>
+    </select>
+  </label>
+  <button id="run">Run embedding</button>
+  <span id="status">loading wasm…</span>
+</div>
+<div class="row">
+  <div class="panel">
+    <canvas id="c3d" width="440" height="400"></canvas>
+    <div class="caption">input: swiss roll in ℝ³ (drag to rotate)</div>
+  </div>
+  <div class="panel">
+    <canvas id="c2d" width="440" height="400"></canvas>
+    <div class="caption" id="cap2d">2D embedding</div>
+  </div>
+</div>
+<script src="tapkee.js"></script>
+<script>
+let mod = null, points = [], colors = [], emb = null;
+let rotX = -0.4, rotY = 0.7;
+
+function turbo(t) { // simple rainbow-ish colormap on [0,1]
+  const r = Math.round(255 * Math.min(1, Math.max(0, 1.6 - Math.abs(4 * t - 3.2))));
+  const g = Math.round(255 * Math.min(1, Math.max(0, 1.6 - Math.abs(4 * t - 1.8))));
+  const b = Math.round(255 * Math.min(1, Math.max(0, 1.6 - Math.abs(4 * t - 0.6))));
+  return `rgb(${r},${g},${b})`;
+}
+
+function makeSwissRoll(n) {
+  points = []; colors = [];
+  for (let i = 0; i < n; i++) {
+    const u = Math.random();
+    const t = 1.5 * Math.PI * (1 + 2 * u);
+    const h = 20 * Math.random();
+    points.push([t * Math.cos(t), h, t * Math.sin(t)]);
+    colors.push(turbo(u));
+  }
+}
+
+function draw3d() {
+  const cv = document.getElementById('c3d'), ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  const cx = cv.width / 2, cy = cv.height / 2, scale = 11;
+  const cX = Math.cos(rotX), sX = Math.sin(rotX), cY = Math.cos(rotY), sY = Math.sin(rotY);
+  const proj = points.map((p, i) => {
+    let [x, y, z] = [p[0], p[1] - 10, p[2]];
+    let x1 = x * cY + z * sY, z1 = -x * sY + z * cY;
+    let y1 = y * cX - z1 * sX, z2 = y * sX + z1 * cX;
+    return [cx + x1 * scale, cy - y1 * scale, z2, i];
+  }).sort((a, b) => a[2] - b[2]);
+  for (const [sx, sy, , i] of proj) {
+    ctx.fillStyle = colors[i];
+    ctx.beginPath(); ctx.arc(sx, sy, 3, 0, 7); ctx.fill();
+  }
+}
+
+function draw2d() {
+  const cv = document.getElementById('c2d'), ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  if (!emb) return;
+  const n = points.length;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (let i = 0; i < n; i++) {
+    minX = Math.min(minX, emb[2 * i]); maxX = Math.max(maxX, emb[2 * i]);
+    minY = Math.min(minY, emb[2 * i + 1]); maxY = Math.max(maxY, emb[2 * i + 1]);
+  }
+  const pad = 24;
+  const sc = Math.min((cv.width - 2 * pad) / (maxX - minX), (cv.height - 2 * pad) / (maxY - minY));
+  for (let i = 0; i < n; i++) {
+    const sx = pad + (emb[2 * i] - minX) * sc + (cv.width - 2 * pad - (maxX - minX) * sc) / 2;
+    const sy = cv.height - pad - (emb[2 * i + 1] - minY) * sc - (cv.height - 2 * pad - (maxY - minY) * sc) / 2;
+    ctx.fillStyle = colors[i];
+    ctx.beginPath(); ctx.arc(sx, sy, 3, 0, 7); ctx.fill();
+  }
+}
+
+function run() {
+  const method = document.getElementById('method').value;
+  const n = parseInt(document.getElementById('npoints').value);
+  const k = parseInt(document.getElementById('neighbors').value);
+  makeSwissRoll(n);
+  draw3d();
+  const btn = document.getElementById('run'), st = document.getElementById('status');
+  btn.disabled = true; st.textContent = 'running ' + method + '…';
+  document.getElementById('title-method').textContent = document.getElementById('method').selectedOptions[0].text;
+  setTimeout(() => {
+    const t0 = performance.now();
+    try {
+      const result = mod.embed(points.flat(), n, 3, { method: method, numNeighbors: k, targetDimension: 2 });
+      emb = result.embedding;
+      const dt = (performance.now() - t0).toFixed(0);
+      draw2d();
+      st.textContent = `done in ${dt} ms (n=${n}, k=${k})`;
+      document.getElementById('cap2d').textContent = `2D embedding — ${method}, ${dt} ms in wasm`;
+    } catch (e) {
+      st.textContent = 'error: ' + (e.message || e);
+    }
+    btn.disabled = false;
+  }, 30);
+}
+
+let dragging = false, lastX = 0, lastY = 0;
+const c3d = document.getElementById('c3d');
+c3d.addEventListener('mousedown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; });
+window.addEventListener('mouseup', () => dragging = false);
+window.addEventListener('mousemove', (e) => {
+  if (!dragging) return;
+  rotY += (e.clientX - lastX) * 0.01; rotX += (e.clientY - lastY) * 0.01;
+  lastX = e.clientX; lastY = e.clientY; draw3d();
+});
+
+document.getElementById('run').addEventListener('click', run);
+
+createTapkee().then((m) => {
+  mod = m;
+  document.getElementById('status').textContent = 'wasm ready';
+  run();
+});
+</script>
+</body>
+</html>
