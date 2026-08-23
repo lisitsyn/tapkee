@@ -376,11 +376,11 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
     int ncv = std::min(std::max(2 * nev, 20), n);
 
     // The working n x ncv matrix, also store the final eigenvectors (if computed)
-    std::vector<Scalar> v(n * ncv);
+    std::vector<Scalar> v(static_cast<std::size_t>(n) * ncv);
     int ldv = n;
 
     // Working space
-    std::vector<Scalar> workd(3 * n);
+    std::vector<Scalar> workd(3 * static_cast<std::size_t>(n));
     int lworkl = ncv * ncv + 8 * ncv; // Must be at least this length
     std::vector<Scalar> workl(lworkl);
 
@@ -528,7 +528,7 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
                 m_eivec.resize(A.rows(), nev);
                 for (int i = 0; i < nev; i++)
                     for (int j = 0; j < n; j++)
-                        m_eivec(j, i) = v[i * n + j] / scale;
+                        m_eivec(j, i) = v[static_cast<std::size_t>(i) * n + j] / scale;
 
                 // TODO if (mode == 1 && !isBempty && BisSPD)
                 //  internal::OP<MatrixSolver, MatrixType, Scalar, BisSPD>::project(OP, n, nev, m_eivec.data());
