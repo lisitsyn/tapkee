@@ -157,6 +157,70 @@ TEST(Interface, WrongParameterValueKernelLocallyLinearEmbedding)
                  wrong_parameter_error);
 }
 
+TEST(Interface, WrongParameterTypeKernelLocallyLinearEmbedding)
+{
+    std::vector<float> data;
+    for (int i = 0; i < 10; i++)
+        data.push_back(i);
+    float_kernel_callback kcb;
+    tapkee::dummy_distance_callback<float> dcb;
+    tapkee::dummy_features_callback<float> fcb;
+
+    TapkeeOutput output;
+    // fails as the number of neighbors is expected to be of IndexType, not float
+    ASSERT_THROW(output = embed(data.begin(), data.end(), kcb, dcb, fcb,
+                                tapkee::kwargs[(method = KernelLocallyLinearEmbedding,
+                                                tapkee::Parameter::create("number of neighbors", 5.5f))]),
+                 wrong_parameter_type_error);
+}
+
+TEST(Interface, ParameterWrongTypeCast)
+{
+    tapkee::Parameter p = tapkee::Parameter::create("p", 3);
+    ASSERT_THROW(static_cast<double>(p), stichwort::wrong_parameter_type_error);
+}
+
+TEST(Interface, UninitializedParameterCast)
+{
+    tapkee::Parameter p;
+    ASSERT_THROW(static_cast<int>(p), stichwort::missed_parameter_error);
+}
+
+struct NonStreamableValue
+{
+    int value;
+};
+
+TEST(Interface, ParameterRepresentation)
+{
+    tapkee::Parameter streamable = tapkee::Parameter::create("streamable", 3);
+    ASSERT_EQ("3", streamable.repr());
+
+    tapkee::Parameter non_streamable = tapkee::Parameter::create("non-streamable", NonStreamableValue{3});
+    ASSERT_EQ("(can't obtain value)", non_streamable.repr());
+
+    tapkee::Parameter uninitialized;
+    ASSERT_EQ("uninitialized", uninitialized.repr());
+}
+
+TEST(Interface, ParameterWithDefault)
+{
+    tapkee::Parameter uninitialized;
+    ASSERT_EQ(42, static_cast<int>(uninitialized.withDefault(42)));
+
+    tapkee::Parameter initialized = tapkee::Parameter::create("initialized", 3);
+    ASSERT_EQ(3, static_cast<int>(initialized.withDefault(42)));
+}
+
+TEST(Interface, ParameterEquality)
+{
+    tapkee::Parameter p = tapkee::Parameter::create("p", 5);
+    ASSERT_TRUE(p.is(5));
+    ASSERT_FALSE(p.is(6));
+    // same value of a different type is not equal
+    ASSERT_FALSE(p.is(5.0));
+}
+
 TEST(Interface, MultipleParameterKernelLocallyLinearEmbedding)
 {
     std::vector<int> data;
