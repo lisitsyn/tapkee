@@ -15,21 +15,28 @@ jobs:
     - uses: actions/checkout@v7
 
     - name: Install dependencies
-      run: sudo apt-get install -y libeigen3-dev libfmt-dev
+      run: sudo apt-get install -y libeigen3-dev
+
+    # Ubuntu's libfmt-dev advertises /usr/include as its interface include
+    # directory, which would drag the host glibc headers into the wasm
+    # compile; install fmt into its own prefix instead (used header-only)
+    - name: Install fmt
+      run: |
+        git clone --depth 1 --branch 12.2.0 https://github.com/fmtlib/fmt.git
+        cmake -B fmt/build -S fmt -DFMT_TEST=OFF -DFMT_DOC=OFF -DCMAKE_INSTALL_PREFIX=$HOME/fmt-install
+        cmake --build fmt/build --target install -j
 
     - name: Setup Emscripten
       uses: mymindstorm/setup-emsdk@v14
 
     - name: Configure
-      # fmt_DIR: Ubuntu's fmt CMake config lives in an architecture-specific
-      # path that the Emscripten toolchain does not search on its own
       run: >
         emcmake cmake -B ${{github.workspace}}/build
         -DBUILD_JS=ON -DBUILD_CLI=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE
-        -Dfmt_DIR=/usr/lib/x86_64-linux-gnu/cmake/fmt
+        -Dfmt_DIR=$HOME/fmt-install/lib/cmake/fmt
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --target tapkee_js
