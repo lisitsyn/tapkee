@@ -1,0 +1,35 @@
+name: JavaScript
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: "Build and Test wasm module"
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Install dependencies
+      run: sudo apt-get install -y libeigen3-dev libfmt-dev
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+
+    - name: Configure
+      run: >
+        emcmake cmake -B ${{github.workspace}}/build
+        -DBUILD_JS=ON -DBUILD_CLI=OFF
+        -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --target tapkee_js
+
+    - name: Test
+      run: node ${{github.workspace}}/test/javascript/smoke.js
