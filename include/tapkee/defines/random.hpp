@@ -5,25 +5,36 @@
 #pragma once
 
 #include <algorithm>
-#include <cstdlib>
 #include <limits>
 #include <random>
 
 namespace tapkee
 {
 
+inline std::mt19937_64& random_generator()
+{
+    static thread_local std::mt19937_64 generator(std::random_device{}());
+    return generator;
+}
+
 inline IndexType uniform_random_index()
 {
 #ifdef CUSTOM_UNIFORM_RANDOM_INDEX_FUNCTION
     return CUSTOM_UNIFORM_RANDOM_INDEX_FUNCTION % std::numeric_limits<IndexType>::max();
 #else
-    return std::rand();
+    std::uniform_int_distribution<IndexType> distribution(0, std::numeric_limits<IndexType>::max() - 1);
+    return distribution(random_generator());
 #endif
 }
 
 inline IndexType uniform_random_index_bounded(IndexType upper)
 {
+#ifdef CUSTOM_UNIFORM_RANDOM_INDEX_FUNCTION
     return uniform_random_index() % upper;
+#else
+    std::uniform_int_distribution<IndexType> distribution(0, upper - 1);
+    return distribution(random_generator());
+#endif
 }
 
 inline ScalarType uniform_random()
@@ -31,7 +42,8 @@ inline ScalarType uniform_random()
 #ifdef CUSTOM_UNIFORM_RANDOM_FUNCTION
     return CUSTOM_UNIFORM_RANDOM_FUNCTION;
 #else
-    return std::rand() / ((double)RAND_MAX + 1);
+    std::uniform_real_distribution<ScalarType> distribution(0.0, 1.0);
+    return distribution(random_generator());
 #endif
 }
 
@@ -40,24 +52,14 @@ inline ScalarType gaussian_random()
 #ifdef CUSTOM_GAUSSIAN_RANDOM_FUNCTION
     return CUSTOM_GAUSSIAN_RANDOM_FUNCTION;
 #else
-    ScalarType x, y, radius;
-    do
-    {
-        x = 2 * (std::rand() / ((double)RAND_MAX + 1)) - 1;
-        y = 2 * (std::rand() / ((double)RAND_MAX + 1)) - 1;
-        radius = (x * x) + (y * y);
-    } while ((radius >= 1.0) || (radius == 0.0));
-    radius = std::sqrt(-2 * std::log(radius) / radius);
-    x *= radius;
-    return x;
+    std::normal_distribution<ScalarType> distribution(0.0, 1.0);
+    return distribution(random_generator());
 #endif
 }
 
 template <class RAI> inline void random_shuffle(RAI first, RAI last)
 {
-    std::random_device rng;
-    std::mt19937 urng(rng());
-    std::shuffle(first, last, urng);
+    std::shuffle(first, last, random_generator());
 }
 
 } // namespace tapkee
