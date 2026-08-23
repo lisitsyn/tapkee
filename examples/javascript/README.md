@@ -9,9 +9,16 @@ to its Dense (exact, Eigen) and Randomized eigensolvers.
 
 ## Build
 
+Native-only components (the CLI application, ARPACK, OpenMP, OpenCL) are
+incompatible with the wasm target and must be excluded explicitly — the
+configure step fails with instructions if any of them is picked up:
+
 ```bash
 mkdir build-js && cd build-js
-emcmake cmake -DBUILD_JS=ON ..
+emcmake cmake -DBUILD_JS=ON -DBUILD_CLI=OFF \
+    -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE \
+    -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE \
+    -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE ..
 cmake --build . --target tapkee_js
 ```
 
