@@ -12,6 +12,8 @@
 #include <tapkee/defines.hpp>
 /* End of Tapkee includes */
 
+#include <vector>
+
 using Eigen::ComputationInfo;
 using Eigen::ComputeEigenvectors;
 using Eigen::Dynamic;
@@ -366,29 +368,29 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
 
     // The user-specified number of eigenvalues/vectors to compute
     int nev = (int)nbrEigenvalues;
-    // Allocate space for ARPACK to store the residual
-    Scalar* resid = new Scalar[n];
+    // Space for ARPACK to store the residual
+    std::vector<Scalar> resid(n);
     // Number of Lanczos vectors, must satisfy nev < ncv <= n
     // Note that this indicates that nev != n, and we cannot compute
     // all eigenvalues of a mtrix
     int ncv = std::min(std::max(2 * nev, 20), n);
 
     // The working n x ncv matrix, also store the final eigenvectors (if computed)
-    Scalar* v = new Scalar[n * ncv];
+    std::vector<Scalar> v(n * ncv);
     int ldv = n;
 
     // Working space
-    Scalar* workd = new Scalar[3 * n];
+    std::vector<Scalar> workd(3 * n);
     int lworkl = ncv * ncv + 8 * ncv; // Must be at least this length
-    Scalar* workl = new Scalar[lworkl];
+    std::vector<Scalar> workl(lworkl);
 
-    int* iparam = new int[11];
+    std::vector<int> iparam(11);
     iparam[0] = 1; // 1 means we let ARPACK perform the shifts, 0 means we'd have to do it
     iparam[2] = std::max(300, static_cast<int>(std::ceil(static_cast<double>(2 * n / std::max(ncv, 1)))));
     iparam[6] = mode; // The mode, 1 is standard ev problem, 2 for generalized ev, 3 for shift-and-invert
 
     // Used during reverse communicate to notify where arrays start
-    int* ipntr = new int[11];
+    std::vector<int> ipntr(11);
 
     // Error codes are returned in here, initial value of 0 indicates a random initial
     // residual vector is used, any other values means resid contains the initial residual
@@ -415,21 +417,22 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
     do
     {
         // std::cout << "Entering main loop\n";
-        arpack_internal::arpack_wrapper<Scalar, RealScalar>::saupd(&ido, bmat, &n, whch, &nev, &tol, resid, &ncv, v,
-                                                                   &ldv, iparam, ipntr, workd, workl, &lworkl, &cinfo);
+        arpack_internal::arpack_wrapper<Scalar, RealScalar>::saupd(&ido, bmat, &n, whch, &nev, &tol, resid.data(), &ncv,
+                                                                   v.data(), &ldv, iparam.data(), ipntr.data(),
+                                                                   workd.data(), workl.data(), &lworkl, &cinfo);
         if (ido == -1 || ido == 1)
         {
-            Scalar* in = workd + ipntr[0] - 1;
-            Scalar* out = workd + ipntr[1] - 1;
+            Scalar* in = workd.data() + ipntr[0] - 1;
+            Scalar* out = workd.data() + ipntr[1] - 1;
 
             if (ido == 1 && mode != 2)
             {
-                Scalar* out2 = workd + ipntr[2] - 1;
+                Scalar* out2 = workd.data() + ipntr[2] - 1;
                 if (isBempty || mode == 1)
                     Matrix<Scalar, Dynamic, 1>::Map(out2, n) = Matrix<Scalar, Dynamic, 1>::Map(in, n);
                 else
                     Matrix<Scalar, Dynamic, 1>::Map(out2, n) = B * Matrix<Scalar, Dynamic, 1>::Map(in, n);
-                in = workd + ipntr[2] - 1;
+                in = workd.data() + ipntr[2] - 1;
             }
 
             if (mode == 1)
@@ -464,8 +467,8 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
         }
         else if (ido == 2)
         {
-            Scalar* in = workd + ipntr[0] - 1;
-            Scalar* out = workd + ipntr[1] - 1;
+            Scalar* in = workd.data() + ipntr[0] - 1;
+            Scalar* out = workd.data() + ipntr[1] - 1;
 
             if (isBempty || mode == 1)
                 Matrix<Scalar, Dynamic, 1>::Map(out, n) = Matrix<Scalar, Dynamic, 1>::Map(in, n);
@@ -504,14 +507,15 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
         char howmny[2] = "A";
 
         // if howmny == "S", specifies the eigenvalues to compute (not implemented in ARPACK)
-        int* select = new int[ncv];
+        std::vector<int> select(ncv);
 
         // Final eigenvalues
         m_eivalues.resize(nev, 1);
 
-        arpack_internal::arpack_wrapper<Scalar, RealScalar>::seupd(&rvec, howmny, select, m_eivalues.data(), v, &ldv,
-                                                                   &sigma, bmat, &n, whch, &nev, &tol, resid, &ncv, v,
-                                                                   &ldv, iparam, ipntr, workd, workl, &lworkl, &cinfo);
+        arpack_internal::arpack_wrapper<Scalar, RealScalar>::seupd(
+            &rvec, howmny, select.data(), m_eivalues.data(), v.data(), &ldv, &sigma, bmat, &n, whch, &nev, &tol,
+            resid.data(), &ncv, v.data(), &ldv, iparam.data(), ipntr.data(), workd.data(), workl.data(), &lworkl,
+            &cinfo);
 
         if (cinfo == -14)
             m_info = NoConvergence;
@@ -536,15 +540,8 @@ ArpackGeneralizedSelfAdjointEigenSolver<LMatrixType, RMatrixType, MatrixOperatio
             m_nbrConverged = iparam[4];
             m_info = Success;
         }
-        delete[] select;
     }
 
-    delete[] v;
-    delete[] iparam;
-    delete[] ipntr;
-    delete[] workd;
-    delete[] workl;
-    delete[] resid;
     m_isInitialized = true;
     return *this;
 }
