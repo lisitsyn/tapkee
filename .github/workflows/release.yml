@@ -122,6 +122,53 @@ jobs:
         name: wheels-${{ matrix.name }}
         path: ./wheelhouse/*.whl
 
+  build_js:
+    name: Build wasm module
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Install dependencies
+      run: sudo apt-get install -y libeigen3-dev
+
+    # Ubuntu's libfmt-dev advertises /usr/include as its interface include
+    # directory, which would drag the host glibc headers into the wasm compile
+    - name: Install fmt
+      run: |
+        git clone --depth 1 --branch 12.2.0 https://github.com/fmtlib/fmt.git
+        cmake -B fmt/build -S fmt -DFMT_TEST=OFF -DFMT_DOC=OFF -DCMAKE_INSTALL_PREFIX=$HOME/fmt-install
+        cmake --build fmt/build --target install -j
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+
+    # GPL_FREE excludes the LGPLv3 CoverTree so the published package stays
+    # BSD-3-Clause; VpTree remains available via neighborsMethod: 'vptree'
+    - name: Build
+      run: >
+        emcmake cmake -B build
+        -DBUILD_JS=ON -DBUILD_CLI=OFF -DGPL_FREE=ON
+        -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE
+        -Dfmt_DIR=$HOME/fmt-install/lib/cmake/fmt
+        && cmake --build build --target tapkee_js
+
+    - name: Test
+      run: node test/javascript/smoke.js
+
+    - name: Package
+      run: |
+        mkdir -p packages/js/dist
+        cp bin/tapkee.js bin/tapkee.wasm packages/js/dist/
+        cp LICENSE packages/js/
+        tar czf tapkee-js.tar.gz -C packages/js .
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: tapkee-js
+        path: tapkee-js.tar.gz
+
   publish:
     name: Publish to PyPI
     needs: [build_sdist, build_wheels]
@@ -137,9 +184,43 @@ jobs:
 
     - uses: pypa/gh-action-pypi-publish@release/v1
 
+  publish_npm:
+    name: Publish to npm
+    needs: build_js
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        name: tapkee-js
+
+    - uses: actions/setup-node@v5
+      with:
+        node-version: '22'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Unpack package
+      run: mkdir -p package && tar xzf tapkee-js.tar.gz -C package
+
+    - name: Set version from tag
+      working-directory: package
+      run: npm --no-git-tag-version --allow-same-version version "${GITHUB_REF_NAME#v}"
+
+    - name: Publish
+      working-directory: package
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        if [ -z "$NODE_AUTH_TOKEN" ]; then
+          echo "NPM_TOKEN secret is not set, skipping npm publish"
+          exit 0
+        fi
+        npm publish --provenance --access public
+
   release:
     name: GitHub Release
-    needs: [build_cli, build_sdist, build_wheels]
+    needs: [build_cli, build_sdist, build_wheels, build_js]
     runs-on: ubuntu-latest
     permissions:
       contents: write

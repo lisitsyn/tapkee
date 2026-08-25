@@ -9,3 +9,5 @@ dist/
 .venv-*/
 .sdist-work/
 build-js/
+packages/js/dist/
+packages/js/LICENSE

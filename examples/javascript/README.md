@@ -7,6 +7,18 @@ wrapper in `src/js/tapkee_js.cpp`, and copies this demo page next to them.
 ARPACK is not available in WebAssembly builds; tapkee automatically falls back
 to its Dense (exact, Eigen) and Randomized eigensolvers.
 
+## Install from npm
+
+The built module is published to npm, so a page can use it without building
+anything:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/tapkee/dist/tapkee.js"></script>
+```
+
+See `packages/js` for the published package. The rest of this document covers
+building the module from source.
+
 ## Build
 
 Native-only components (the CLI application, ARPACK, OpenMP, OpenCL) are
