@@ -29,10 +29,11 @@ jobs:
     - name: Setup Emscripten
       uses: mymindstorm/setup-emsdk@v14
 
+    # GPL_FREE matches the configuration published to npm by release.yml
     - name: Configure
       run: >
         emcmake cmake -B ${{github.workspace}}/build
-        -DBUILD_JS=ON -DBUILD_CLI=OFF
+        -DBUILD_JS=ON -DBUILD_CLI=OFF -DGPL_FREE=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE
@@ -43,3 +44,21 @@ jobs:
 
     - name: Test
       run: node ${{github.workspace}}/test/javascript/smoke.js
+
+    - name: Check npm package contents
+      run: |
+        mkdir -p packages/js/dist
+        cp bin/tapkee.js bin/tapkee.wasm packages/js/dist/
+        cp LICENSE packages/js/
+        cd packages/js
+        npm pack --dry-run --json > pack.json
+        node -e "
+          const files = require('./pack.json')[0].files.map((f) => f.path);
+          console.log(files.join('\n'));
+          for (const required of ['dist/tapkee.js', 'dist/tapkee.wasm', 'LICENSE']) {
+            if (!files.includes(required)) {
+              console.error('missing from npm package: ' + required);
+              process.exit(1);
+            }
+          }
+        "

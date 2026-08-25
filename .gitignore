@@ -11,3 +11,4 @@ dist/
 build-js/
 packages/js/dist/
 packages/js/LICENSE
+packages/js/pack.json
