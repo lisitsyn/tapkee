@@ -33,6 +33,10 @@ All these files must show the same version number, `X.Y.Z`:
   this macro only for a breaking change or a new epoch. This macro has
   stayed at `1` since the start of the project.
 
+The JavaScript package `packages/js/package.json` also has a version
+number. You do not update this file. The release workflow sets this version
+from the git tag before it publishes to npm.
+
 Search the repository for the old version number. This search can find
 other files with the old version number, for example README.md:
 
@@ -58,8 +62,12 @@ grep -rn "<old-version>" --include="*.toml" --include="DESCRIPTION" --include="*
 The file `.github/workflows/release.yml` starts the release process. This
 process starts when you push a tag with the format `v*`. The process builds
 the CLI binaries. The process builds the sdist package. The process builds
-the wheels. The process publishes the package to PyPI. The process creates
-the GitHub release.
+the wheels. The process builds the WebAssembly module. The process publishes
+the package to PyPI. The process publishes the WebAssembly module to npm. The
+process creates the GitHub release.
+
+The npm publish step needs the `NPM_TOKEN` secret in the repository settings.
+The step does nothing and does not fail when this secret is not set.
 
 Do this after the version-update commit reaches the `main` branch:
 
@@ -70,4 +78,5 @@ git push origin vX.Y.Z
 
 Ask the user before you push the tag. This action starts a real publish
 process. This action is not reversible. The action publishes the package to
-PyPI. The action creates a GitHub release.
+PyPI. The action publishes the package to npm. The action creates a GitHub
+release.

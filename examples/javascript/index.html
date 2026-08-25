@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tapkee</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #fff; color: #16181d;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 28px 24px; }
+  h1 { margin: 0 0 14px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; color: #5c6470; }
+  select, button {
+    font: inherit; color: #16181d; background: #fff;
+    border: 1px solid #dfe3e8; border-radius: 8px; padding: 5px 9px;
+  }
+  button { cursor: pointer; }
+  button:hover, select:hover { border-color: #b6bec9; }
+  label { display: flex; align-items: center; gap: 6px; }
+  input[type="range"] { accent-color: #16181d; width: 100px; }
+  output { font-variant-numeric: tabular-nums; color: #16181d; min-width: 2ch; }
+  .views { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 8px; margin-top: 18px; }
+  #status { margin-top: 10px; text-align: left; font-size: 13px; color: #5c6470; font-variant-numeric: tabular-nums; min-height: 18px; }
+  #status.err { color: #b3261e; }
+  pre {
+    margin: 14px 0 0; padding: 14px 16px; background: #f6f7f8; border-radius: 10px;
+    font: 12.5px/1.55 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color: #16181d; overflow-x: auto;
+  }
+  canvas { display: block; width: 100%; aspect-ratio: 1; touch-action: none; }
+  #c3d { cursor: grab; }
+  #c3d.dragging { cursor: grabbing; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tapkee</h1>
+  <div class="bar">
+    <select id="method"></select>
+    <select id="npoints">
+      <option value="400">400 points</option>
+      <option value="800" selected>800 points</option>
+      <option value="1500">1500 points</option>
+    </select>
+    <label>k
+      <input type="range" id="kslider" min="5" max="30" value="12">
+      <output id="kval">12</output>
+    </label>
+    <button id="reroll">new roll</button>
+  </div>
+  <div class="views">
+    <canvas id="c3d"></canvas>
+    <canvas id="c2d"></canvas>
+  </div>
+  <div id="status">loading…</div>
+  <pre id="code"></pre>
+</div>
+
+<script>
+'use strict';
+
+const METHODS = [
+  ['lle', 'Locally Linear Embedding'],
+  ['ltsa', 'Local Tangent Space Alignment'],
+  ['hlle', 'Hessian Locally Linear Embedding'],
+  ['lltsa', 'Linear Local Tangent Space Alignment'],
+  ['npe', 'Neighborhood Preserving Embedding'],
+  ['lpp', 'Locality Preserving Projections'],
+  ['isomap', 'Isomap'],
+  ['l-isomap', 'Landmark Isomap'],
+  ['mds', 'Multidimensional Scaling'],
+  ['l-mds', 'Landmark Multidimensional Scaling'],
+  ['dm', 'Diffusion Map'],
+  ['la', 'Laplacian Eigenmaps'],
+  ['pca', 'PCA'],
+  ['kpca', 'Kernel PCA'],
+  ['ra', 'Random Projection'],
+  ['fa', 'Factor Analysis'],
+  ['spe', 'Stochastic Proximity Embedding'],
+  ['t-sne', 't-SNE'],
+  ['manifold_sculpting', 'Manifold Sculpting'],
+];
+
+const state = {
+  method: 'lle', n: 800, k: 12,
+  points: [], raw: [], colors: [],
+  emb: null, prevEmb: null, morph: 1,
+  running: false, rotX: 0, rotY: 0.52, dragging: false, // 30 degrees off the spiral face
+  hover: null, proj3d: [], proj2d: [],
+};
+
+function turbo(t) {
+  t = Math.min(1, Math.max(0, t));
+  const r = 34.61 + t * (1172.33 + t * (-10793.56 + t * (33300.12 + t * (-38394.49 + t * 14825.05))));
+  const g = 23.31 + t * (557.33 + t * (1225.33 + t * (-3574.96 + t * (1073.77 + t * 707.56))));
+  const b = 27.2 + t * (3211.1 + t * (-15327.97 + t * (27814.0 + t * (-22569.18 + t * 6838.66))));
+  return [r, g, b].map((v) => Math.round(Math.min(255, Math.max(0, v))));
+}
+
+function makeSwissRoll(n) {
+  const pts = [], raw = [], colors = [];
+  for (let i = 0; i < n; i++) {
+    const u = Math.random();
+    const t = 1.5 * Math.PI * (1 + 2 * u);
+    const h = 20 * Math.random();
+    raw.push(t * Math.cos(t), h, t * Math.sin(t));
+    // display coordinates: spiral in the screen plane, roll length into depth
+    pts.push([t * Math.cos(t) / 14.2, t * Math.sin(t) / 14.2, (h - 10) / 14.2]);
+    colors.push(turbo(u * 0.92 + 0.04));
+  }
+  state.points = pts; state.raw = raw; state.colors = colors;
+}
+
+const c3d = document.getElementById('c3d');
+const c2d = document.getElementById('c2d');
+
+function fitCanvas(cv) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.round(cv.clientWidth * dpr), h = Math.round(cv.clientHeight * dpr);
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+}
+new ResizeObserver(() => { draw3d(); draw2d(); }).observe(document.querySelector('.views'));
+
+function draw3d() {
+  fitCanvas(c3d);
+  const ctx = c3d.getContext('2d');
+  const w = c3d.width, h = c3d.height;
+  ctx.clearRect(0, 0, w, h);
+  const cX = Math.cos(state.rotX), sX = Math.sin(state.rotX);
+  const cY = Math.cos(state.rotY), sY = Math.sin(state.rotY);
+  const f = 3.2, base = Math.min(w, h) * 0.42;
+  const order = [];
+  state.proj3d = new Array(state.points.length);
+  for (let i = 0; i < state.points.length; i++) {
+    const [x, y, z] = state.points[i];
+    const x1 = x * cY + z * sY, z1 = -x * sY + z * cY;
+    const y1 = y * cX - z1 * sX, z2 = y * sX + z1 * cX;
+    const s = f / (f + z2);
+    const px = w / 2 + x1 * s * base, py = h / 2 - y1 * s * base;
+    state.proj3d[i] = [px, py];
+    order.push([px, py, z2, s, i]);
+  }
+  order.sort((a, b) => b[2] - a[2]);
+  const dpr = window.devicePixelRatio || 1;
+  ctx.lineWidth = 0.8 * dpr;
+  for (const [px, py, z, s, i] of order) {
+    const c = state.colors[i];
+    const fade = Math.min(1, Math.max(0, (z + 1.4) / 2.4));
+    const mix = 0.55 * fade;
+    ctx.fillStyle = `rgb(${Math.round(c[0] + (255 - c[0]) * mix)},${Math.round(c[1] + (255 - c[1]) * mix)},${Math.round(c[2] + (255 - c[2]) * mix)})`;
+    ctx.strokeStyle = `rgba(0,0,0,${0.35 * (1 - fade)})`;
+    ctx.beginPath();
+    ctx.arc(px, py, (3.4 - 1.4 * fade) * s * dpr, 0, 6.2832);
+    ctx.fill();
+    ctx.stroke();
+  }
+  if (state.hover !== null && state.proj3d[state.hover])
+    drawHighlight(ctx, state.proj3d[state.hover], state.colors[state.hover], dpr);
+}
+
+function drawHighlight(ctx, [px, py], c, dpr) {
+  ctx.globalAlpha = 1;
+  ctx.beginPath();
+  ctx.arc(px, py, 6 * dpr, 0, 6.2832);
+  ctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`;
+  ctx.fill();
+  ctx.lineWidth = 2 * dpr;
+  ctx.strokeStyle = '#16181d';
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(px, py, 9.5 * dpr, 0, 6.2832);
+  ctx.lineWidth = 1 * dpr;
+  ctx.strokeStyle = 'rgba(22,24,29,0.35)';
+  ctx.stroke();
+}
+
+function normalizeEmbedding(flat, n) {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (let i = 0; i < n; i++) {
+    minX = Math.min(minX, flat[2 * i]); maxX = Math.max(maxX, flat[2 * i]);
+    minY = Math.min(minY, flat[2 * i + 1]); maxY = Math.max(maxY, flat[2 * i + 1]);
+  }
+  const sx = maxX - minX || 1, sy = maxY - minY || 1, s = Math.max(sx, sy);
+  const out = new Array(n);
+  for (let i = 0; i < n; i++)
+    out[i] = [(flat[2 * i] - minX - sx / 2) / s * 2, (flat[2 * i + 1] - minY - sy / 2) / s * 2];
+  return out;
+}
+
+function draw2d() {
+  fitCanvas(c2d);
+  const ctx = c2d.getContext('2d');
+  const w = c2d.width, h = c2d.height;
+  ctx.clearRect(0, 0, w, h);
+  if (!state.emb) return;
+  const dpr = window.devicePixelRatio || 1;
+  const base = Math.min(w, h) * 0.44;
+  const t = state.morph, e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const from = state.prevEmb && state.prevEmb.length === state.emb.length ? state.prevEmb : null;
+  ctx.globalAlpha = from ? 1 : 0.15 + 0.85 * e;
+  ctx.lineWidth = 0.8 * dpr;
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  state.proj2d = new Array(state.emb.length);
+  for (let i = 0; i < state.emb.length; i++) {
+    let [x, y] = state.emb[i];
+    if (from) {
+      x = from[i][0] + (x - from[i][0]) * e;
+      y = from[i][1] + (y - from[i][1]) * e;
+    }
+    const c = state.colors[i];
+    const px = w / 2 + x * base, py = h / 2 - y * base;
+    state.proj2d[i] = [px, py];
+    ctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`;
+    ctx.beginPath();
+    ctx.arc(px, py, 2.6 * dpr, 0, 6.2832);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  if (state.hover !== null && state.proj2d[state.hover])
+    drawHighlight(ctx, state.proj2d[state.hover], state.colors[state.hover], dpr);
+}
+
+function animateMorph() {
+  if (state.morph >= 1) return;
+  state.morph = Math.min(1, state.morph + 0.028);
+  draw2d();
+  requestAnimationFrame(animateMorph);
+}
+
+function hitTest(proj, cv, e) {
+  const dpr = window.devicePixelRatio || 1;
+  const r = cv.getBoundingClientRect();
+  const x = (e.clientX - r.left) * dpr, y = (e.clientY - r.top) * dpr;
+  const rr = (12 * dpr) ** 2;
+  let best = null, bestD = rr;
+  for (let i = 0; i < proj.length; i++) {
+    if (!proj[i]) continue;
+    const d = (proj[i][0] - x) ** 2 + (proj[i][1] - y) ** 2;
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  return best;
+}
+
+function setHover(i) {
+  if (state.hover === i) return;
+  state.hover = i;
+  draw3d(); draw2d();
+}
+
+let lastX = 0, lastY = 0;
+c3d.addEventListener('pointerdown', (e) => {
+  state.dragging = true; c3d.classList.add('dragging');
+  lastX = e.clientX; lastY = e.clientY;
+  c3d.setPointerCapture(e.pointerId);
+});
+c3d.addEventListener('pointermove', (e) => {
+  if (!state.dragging) { setHover(hitTest(state.proj3d, c3d, e)); return; }
+  state.rotY -= (e.clientX - lastX) * 0.008;
+  state.rotX = Math.max(-1.4, Math.min(1.4, state.rotX - (e.clientY - lastY) * 0.008));
+  lastX = e.clientX; lastY = e.clientY;
+  draw3d();
+});
+window.addEventListener('pointerup', () => { state.dragging = false; c3d.classList.remove('dragging'); });
+c3d.addEventListener('pointerleave', () => { if (!state.dragging) setHover(null); });
+c2d.addEventListener('pointermove', (e) => setHover(hitTest(state.proj2d, c2d, e)));
+c2d.addEventListener('pointerleave', () => setHover(null));
+
+const workerSrc = `
+  var moduleReady;
+  importScripts(${JSON.stringify(new URL('tapkee.js', location.href).href)});
+  moduleReady = createTapkee({ locateFile: (p) => new URL(p, ${JSON.stringify(location.href)}).href });
+  onmessage = async (e) => {
+    const mod = await moduleReady;
+    const { data, n, dims, options, id } = e.data;
+    try {
+      const t0 = performance.now();
+      const r = mod.embed(data, n, dims, options);
+      postMessage({ id, ok: true, embedding: r.embedding, ms: performance.now() - t0 });
+    } catch (err) {
+      postMessage({ id, ok: false, error: err && err.message ? err.message : String(err) });
+    }
+  };
+`;
+const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'application/javascript' })));
+let requestId = 0;
+
+const status = document.getElementById('status');
+worker.onmessage = (e) => {
+  if (e.data.id !== requestId) return;
+  state.running = false;
+  if (!e.data.ok) {
+    status.textContent = e.data.error;
+    status.classList.add('err');
+    return;
+  }
+  status.classList.remove('err');
+  status.textContent = `Computed in ${Math.round(e.data.ms)} ms`;
+  state.prevEmb = state.emb;
+  state.emb = normalizeEmbedding(e.data.embedding, state.n);
+  state.morph = 0;
+  animateMorph();
+};
+
+function run(regenerate) {
+  if (regenerate || state.points.length !== state.n) {
+    makeSwissRoll(state.n);
+    state.emb = null; state.prevEmb = null;
+    state.hover = null; state.proj2d = [];
+    draw3d(); draw2d();
+  }
+  state.running = true;
+  requestId++;
+  status.classList.remove('err');
+  status.textContent = 'Computing…';
+  const options = { method: state.method, numNeighbors: state.k, targetDimension: 2 };
+  if (state.method === 'manifold_sculpting')
+    options.maxIteration = 40; // the default budget takes minutes even on small rolls
+  showCode(options);
+  worker.postMessage({ id: requestId, data: state.raw, n: state.n, dims: 3, options });
+}
+
+function showCode(options) {
+  const opts = Object.entries(options)
+    .map(([k, v]) => `  ${k}: ${typeof v === 'string' ? `'${v}'` : v},`)
+    .join('\n');
+  document.getElementById('code').textContent =
+`const tapkee = await createTapkee();
+
+// data is a flat array, point-major: [x0, y0, z0, x1, y1, z1, ...]
+const result = tapkee.embed(data, ${state.n}, 3, {
+${opts}
+});
+// result.embedding — flat, ${state.n} x 2`;
+}
+
+const methodSel = document.getElementById('method');
+for (const [id, label] of METHODS) {
+  const o = document.createElement('option');
+  o.value = id; o.textContent = label;
+  methodSel.appendChild(o);
+}
+methodSel.addEventListener('change', () => { state.method = methodSel.value; run(false); });
+
+const npointsSel = document.getElementById('npoints');
+npointsSel.addEventListener('change', () => { state.n = parseInt(npointsSel.value); run(true); });
+
+const kslider = document.getElementById('kslider');
+kslider.addEventListener('input', () => { document.getElementById('kval').textContent = kslider.value; });
+kslider.addEventListener('change', () => { state.k = parseInt(kslider.value); run(false); });
+
+document.getElementById('reroll').addEventListener('click', () => run(true));
+
+makeSwissRoll(state.n);
+draw3d();
+run(false);
+</script>
+</body>
+</html>

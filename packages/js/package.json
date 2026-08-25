@@ -1,0 +1,32 @@
+{
+  "name": "tapkee",
+  "version": "1.3.4",
+  "description": "Dimensionality reduction library (Isomap, LLE, t-SNE, PCA and more) compiled to WebAssembly",
+  "license": "BSD-3-Clause",
+  "author": "Sergey Lisitsyn",
+  "homepage": "https://github.com/lisitsyn/tapkee",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lisitsyn/tapkee.git",
+    "directory": "packages/js"
+  },
+  "bugs": "https://github.com/lisitsyn/tapkee/issues",
+  "keywords": [
+    "dimensionality-reduction",
+    "manifold-learning",
+    "embedding",
+    "machine-learning",
+    "webassembly",
+    "wasm",
+    "isomap",
+    "lle",
+    "t-sne",
+    "pca"
+  ],
+  "main": "dist/tapkee.js",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
+}
