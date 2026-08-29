@@ -11,7 +11,7 @@ greater flexibility we provide a callback interface which decouples dimension re
 the data representation and storage schemes.
 
 The library is distributed under permissive
-[BSD 3-clause license](https://github.com/lisitsyn/tapkee/blob/master/include/LICENSE)
+[BSD 3-clause license](https://github.com/lisitsyn/tapkee/blob/main/LICENSE)
 (except a few rather optional parts that are distributed under other
 open sources licenses, see Licensing section of this document). If you use
 this software in any publication we would be happy if you cite the following paper:
@@ -211,7 +211,7 @@ Tapkee is designed to be highly customizable with preprocessor definitions.
 
 If you want to use float as internal numeric type (default is double) you may do
 that with definition of `#define TAPKEE_CUSTOM_NUMTYPE float`
-before including [defines header](https://github.com/lisitsyn/tapkee/blob/master/include/tapkee_defines.hpp).
+before including [defines header](https://github.com/lisitsyn/tapkee/blob/main/include/tapkee/defines.hpp).
 
 If you use some non-standard STL-compatible realization of vector, map and pair you may redefine them
 with `TAPKEE_INTERNAL_VECTOR`, `TAPKEE_INTERNAL_PAIR`, `TAPKEE_INTERNAL_MAP`
@@ -329,12 +329,12 @@ Tapkee provides implementations of the following dimension reduction methods:
 Licensing
 ---------
 
-The library is distributed under the [BSD 3-clause](https://github.com/lisitsyn/tapkee/blob/master/LICENSE) license.
+The library is distributed under the [BSD 3-clause](https://github.com/lisitsyn/tapkee/blob/main/LICENSE) license.
 
 Exceptions are:
 
-- [Barnes-Hut-SNE code](https://github.com/lisitsyn/tapkee/blob/master/include/external/barnes_hut_sne/) by Laurens van der Maaten which
+- [Barnes-Hut-SNE code](https://github.com/lisitsyn/tapkee/blob/main/include/tapkee/external/barnes_hut_sne/) by Laurens van der Maaten which
   is distributed under the BSD 4-clause license.
 
-- [Covertree code](https://github.com/lisitsyn/tapkee/blob/master/include/neighbors/covertree.hpp) by John Langford and Dinoj Surendran
-  which is distributed under the [LGPLv3 license](https://github.com/lisitsyn/tapkee/blob/master/LGPL-LICENSE).
+- [Covertree code](https://github.com/lisitsyn/tapkee/blob/main/include/tapkee/neighbors/covertree.hpp) by John Langford and Dinoj Surendran
+  which is distributed under the [LGPLv3 license](https://github.com/lisitsyn/tapkee/blob/main/LGPL-LICENSE).
