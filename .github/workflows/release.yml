@@ -140,7 +140,7 @@ jobs:
         cmake --build fmt/build --target install -j
 
     - name: Setup Emscripten
-      uses: mymindstorm/setup-emsdk@v14
+      uses: mymindstorm/setup-emsdk@v16
 
     # GPL_FREE excludes the LGPLv3 CoverTree so the published package stays
     # BSD-3-Clause; VpTree remains available via neighborsMethod: 'vptree'
