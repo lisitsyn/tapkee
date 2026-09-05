@@ -57,7 +57,7 @@
 (def all-graphical-examples [
   {:shortname "promoters" :longname "Promoters embedding" :script "js/promoters.js" :description "code/promoters.md"}
   {:shortname "words" :longname "Words embedding" :script "js/words.js" :description "code/words.md"}
-  {:shortname "cbcl" :longname "MIT-CBCL faces embedding" :script "js/cbcl.js" :description "code/cbcl.md"}
+  {:shortname "synthfaces" :longname "Synthetic faces embedding" :script "js/synthfaces.js" :description "code/synthfaces.md"}
   {:shortname "mnist" :longname "MNIST digits embedding" :script "js/mnist.js" :description "code/mnist.md"}
   {:shortname "faces" :longname "Faces embedding" :script "js/faces.js" :description "code/faces.md"}
   ])

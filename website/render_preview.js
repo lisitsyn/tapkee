@@ -100,9 +100,9 @@ async function renderPreview() {
             return {
                 hasD3: typeof d3 !== 'undefined',
                 hasJQuery: typeof $ !== 'undefined',
-                hasCbclPlot: !!document.querySelector('#cbclPlot'),
-                hasSvg: !!document.querySelector('#cbclPlot svg'),
-                circleCount: document.querySelectorAll('#cbclPlot svg circle').length,
+                hasSynthfacesPlot: !!document.querySelector('#synthfacesPlot'),
+                hasSvg: !!document.querySelector('#synthfacesPlot svg'),
+                circleCount: document.querySelectorAll('#synthfacesPlot svg circle').length,
                 errors: window.errors || []
             };
         });
@@ -114,8 +114,8 @@ async function renderPreview() {
         page.on('pageerror', error => console.log('PAGE ERROR:', error.message));
         
         await page.waitForFunction(() => {
-            const svg = document.querySelector('#cbclPlot svg');
-            const circles = document.querySelectorAll('#cbclPlot svg circle');
+            const svg = document.querySelector('#synthfacesPlot svg');
+            const circles = document.querySelectorAll('#synthfacesPlot svg circle');
             console.log('Checking:', { svg: !!svg, circles: circles.length });
             return svg && circles.length > 0;
         }, { timeout: 15000 });
@@ -126,7 +126,7 @@ async function renderPreview() {
         // Hover over a random datapoint to show tooltip
         console.log('Triggering hover on random datapoint...');
         await page.evaluate(() => {
-            const circles = document.querySelectorAll('#cbclPlot svg circle');
+            const circles = document.querySelectorAll('#synthfacesPlot svg circle');
             if (circles.length > 0) {
                 // Pick a random circle (but not too close to edges for better visibility)
                 const randomIndex = Math.floor(Math.random() * circles.length);

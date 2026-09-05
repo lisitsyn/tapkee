@@ -31,7 +31,7 @@ make terraform-plan     # Preview infrastructure changes
 Single Clojure file that generates the entire page. Key data structures:
 
 - **`all-methods`** — 18 dimension reduction algorithms, each with shortname, longname, and a markdown file in `resources/public/md/`
-- **`all-graphical-examples`** — 5 interactive D3.js visualizations (promoters, words, cbcl, mnist, faces)
+- **`all-graphical-examples`** — 5 interactive D3.js visualizations (promoters, words, synthfaces, mnist, faces)
 - **`all-usage-examples`** — 3 code examples, each with C++, Python, and R source variants displayed in Bootstrap nav-tabs
 
 The page is a single-page app: algorithm descriptions, graphical examples, and code examples all render inside Bootstrap 5 modals opened from navbar dropdowns.
@@ -51,6 +51,7 @@ The page is a single-page app: algorithm descriptions, graphical examples, and c
 - `js/` — D3.js visualization scripts (one per graphical example) + utility scripts
 - `css/styles.css` — Custom styles (gradient header, code block styling, modal blur)
 - `img/` — Favicons, face/MNIST images for visualization tooltips, generated preview image
+  - `img/synthfaces/` and `data/synthfaces.json` are procedurally generated (not redistributed third-party data) by `tools/generate_synthfaces.py`; see that script's docstring for why (the MIT-CBCL face database's license forbids redistributing its images) and how to regenerate.
 
 ### Preview Image Generation
 
