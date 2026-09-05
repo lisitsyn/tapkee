@@ -45,8 +45,9 @@ The page is a single-page app: algorithm descriptions, graphical examples, and c
 
 ### Static Resources (`resources/public/`)
 
-- `md/` — Algorithm documentation (markdown with LaTeX math) and `README.markdown` (main page content)
-- `code/` — Usage examples: `.cpp`, `.py`, `.r` source files and `.md` descriptions
+- `md/` — Algorithm documentation (markdown with LaTeX math) and `README.markdown` (main page content). Files that mirror repo-root content are symlinks into the canonical source (`../../../../doc/methods/*.markdown`, `../../../../README.md`) rather than hand-maintained copies, so the site can't drift out of sync with it. `ms.markdown` (Manifold Sculpting) has no `doc/methods/` counterpart and is a real file.
+- `code/` — Usage examples: `.cpp`, `.py`, `.r` source files and `.md` descriptions. The C++ sources and `.md` descriptions for `minimal`/`precomputed`/`rna`/`mnist`/`faces`/`promoters`/`words` are symlinks into `../../../../examples/`; `.py`/`.r` variants exist only here (no repo-root equivalent) and are real files.
+  - `make static-html` copies `resources/public/` with `cp -RL`, which dereferences these symlinks so the deployed `static/` output contains real files (required for S3 sync).
 - `data/` — Pre-computed embedding JSON files for D3.js visualizations
 - `js/` — D3.js visualization scripts (one per graphical example) + utility scripts
 - `css/styles.css` — Custom styles (gradient header, code block styling, modal blur)
