@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://tapkee.lisitsyn.me/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Allow access to CSS and JS files for better rendering
+Allow: /css/
+Allow: /js/
+Allow: /img/
+
+# Disallow any temporary or private directories if they exist
+Disallow: /tmp/
+Disallow: /private/

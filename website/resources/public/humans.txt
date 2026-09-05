@@ -1,0 +1,21 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Sergey Lisitsyn -- Developer -- @lisitsyn
+
+# THANKS
+
+    Contributors to the Tapkee project
+    Open source community
+
+# TECHNOLOGY COLOPHON
+
+    HTML5, CSS3, JavaScript
+    Bootstrap 5
+    D3.js
+    MathJax
+    Highlight.js
+    Clojure (for site generation)
+    jQuery
