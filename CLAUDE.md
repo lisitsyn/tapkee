@@ -113,6 +113,7 @@ Other: MDS, Landmark MDS, Manifold Sculpting
 - `src/python/` - Python nanobind bindings
 - `examples/` - Usage examples (minimal, mnist, faces, etc.)
 - `test/unit/` - Unit tests
+- `website/` - Static documentation website (Clojure/Hiccup site generator + Terraform AWS deploy), merged from the former standalone `tapkee_website` repo
 
 ## Customization
 
