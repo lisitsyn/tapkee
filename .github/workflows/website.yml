@@ -1,0 +1,72 @@
+name: Website
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: "Build website (static HTML + WASM demo)"
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Install dependencies
+      run: sudo apt-get install -y libeigen3-dev
+
+    # Ubuntu's libfmt-dev advertises /usr/include as its interface include
+    # directory, which would drag the host glibc headers into the wasm
+    # compile; install fmt into its own prefix instead (used header-only)
+    - name: Install fmt
+      run: |
+        git clone --depth 1 --branch 12.2.0 https://github.com/fmtlib/fmt.git
+        cmake -B fmt/build -S fmt -DFMT_TEST=OFF -DFMT_DOC=OFF -DCMAKE_INSTALL_PREFIX=$HOME/fmt-install
+        cmake --build fmt/build --target install -j
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+
+    # GPL_FREE matches the configuration published to npm by release.yml,
+    # so this validates the same module the live demo would ship.
+    - name: Configure wasm module
+      run: >
+        emcmake cmake -B ${{github.workspace}}/build-js
+        -DBUILD_JS=ON -DBUILD_CLI=OFF -DGPL_FREE=ON
+        -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE
+        -Dfmt_DIR=$HOME/fmt-install/lib/cmake/fmt
+
+    - name: Build wasm module
+      run: cmake --build ${{github.workspace}}/build-js --target tapkee_js
+
+    # website/Makefile's sync-js-demo step (a static-html prerequisite)
+    # expects the built module here; see website/CLAUDE.md.
+    - name: Stage wasm module for the website build
+      run: |
+        mkdir -p packages/js/dist
+        cp bin/tapkee.js bin/tapkee.wasm packages/js/dist/
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: 20
+
+    - name: Setup Clojure (Leiningen)
+      uses: DeLaGuardo/setup-clojure@3.7.0
+      with:
+        lein: latest
+
+    - name: Build website
+      working-directory: website
+      run: make static-html
+
+    - name: Upload built site
+      uses: actions/upload-artifact@v7
+      with:
+        name: website-static
+        path: website/static/
+        retention-days: 7
