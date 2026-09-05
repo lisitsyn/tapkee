@@ -35,6 +35,12 @@ pom.xml.asc
 # Static directory - ignore if present
 static/
 
+# WebAssembly demo module, copied in by `make sync-js-demo` (built separately,
+# see examples/javascript/README.md); the page itself (demo/index.html) is a
+# tracked symlink into examples/javascript/
+resources/public/demo/tapkee.js
+resources/public/demo/tapkee.wasm
+
 # OS generated files
 .DS_Store
 .DS_Store?
