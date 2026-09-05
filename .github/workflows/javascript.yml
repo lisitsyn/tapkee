@@ -27,7 +27,7 @@ jobs:
         cmake --build fmt/build --target install -j
 
     - name: Setup Emscripten
-      uses: mymindstorm/setup-emsdk@v14
+      uses: mymindstorm/setup-emsdk@v16
 
     # GPL_FREE matches the configuration published to npm by release.yml
     - name: Configure
