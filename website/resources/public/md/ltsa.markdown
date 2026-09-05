@@ -1,0 +1,1 @@
+../../../../doc/methods/ltsa.markdown

@@ -1,0 +1,31 @@
+# Cursor IDE ignore file
+# This file tells Cursor which files and directories to ignore when indexing
+
+# Static directory - don't index if present
+static/
+
+# Build outputs
+target/
+*.class
+*.jar
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large data directories that shouldn't be indexed
+node_modules/
+.git/
+
+# Any potential static assets or build outputs
+dist/
+build/
+out/

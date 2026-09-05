@@ -1,0 +1,1 @@
+../../../../examples/minimal/minimal.cpp

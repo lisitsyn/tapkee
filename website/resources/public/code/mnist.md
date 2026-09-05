@@ -1,0 +1,1 @@
+../../../../examples/mnist/mnist.md

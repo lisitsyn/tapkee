@@ -23,7 +23,7 @@ $$C = \sum\_{i} KL(P\_i \| Q\_i) = \sum\_{i} \sum\_{j} p\_{j|i} \log \frac{p\_{j
 
 Unfortunately, there exists no optimal value of the Gaussian variance for all the points in
 the data set since the data may vary considerably throughout the data set.
-SNE chooses the value of each $sigma\_i$ performing binary search so that a user specified
+SNE chooses the value of each $\sigma\_i$ performing binary search so that a user specified
 value for the Shannon entropy of $P\_i$ is achieved.
 
 t-Distributed Stochastic Neighbour Embedding
