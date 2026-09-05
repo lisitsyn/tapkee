@@ -1,10 +1,12 @@
-.PHONY: help deps build static-html generate-preview clean terraform-init terraform-plan terraform-deploy terraform-destroy terraform-output
+.PHONY: help deps build static-html sync-js-demo generate-preview clean terraform-init terraform-plan terraform-deploy terraform-destroy terraform-output
 
 # Variables
 OUTPUT_DIR = static
 LEIN = lein
 TERRAFORM_DIR = terraform
 TERRAFORM = terraform
+JS_DIST_DIR = ../packages/js/dist
+DEMO_DIR = resources/public/demo
 
 # Help target
 help:
@@ -12,6 +14,7 @@ help:
 	@echo "  deps             - Install dependencies"
 	@echo "  build            - Compile the application"
 	@echo "  static-html      - Generate static HTML files"
+	@echo "  sync-js-demo     - Copy the built WebAssembly demo into resources/public/demo/"
 	@echo "  generate-preview - Generate preview image for social media"
 	@echo "  clean            - Clean generated files and build artifacts"
 	@echo "  terraform-init   - Initialize Terraform"
@@ -33,8 +36,28 @@ deps:
 build: deps
 	$(LEIN) compile
 
+# Copy the built WebAssembly demo (tapkee.js + tapkee.wasm) next to its page.
+# The module itself is built separately -- see examples/javascript/README.md --
+# because it requires the Emscripten SDK, a much heavier dependency than the
+# rest of this static site build.
+sync-js-demo:
+	@if [ ! -f "$(JS_DIST_DIR)/tapkee.js" ] || [ ! -f "$(JS_DIST_DIR)/tapkee.wasm" ]; then \
+		echo "error: $(JS_DIST_DIR)/tapkee.js and/or tapkee.wasm not found."; \
+		echo "Build the WebAssembly module first (see examples/javascript/README.md):"; \
+		echo "  mkdir build-js && cd build-js"; \
+		echo "  emcmake cmake -DBUILD_JS=ON -DBUILD_CLI=OFF \\"; \
+		echo "      -DCMAKE_DISABLE_FIND_PACKAGE_Arpack=TRUE \\"; \
+		echo "      -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=TRUE \\"; \
+		echo "      -DCMAKE_DISABLE_FIND_PACKAGE_OpenCL=TRUE .."; \
+		echo "  cmake --build . --target tapkee_js"; \
+		echo "  cp bin/tapkee.js bin/tapkee.wasm $(JS_DIST_DIR)/"; \
+		exit 1; \
+	fi
+	@mkdir -p $(DEMO_DIR)
+	@cp $(JS_DIST_DIR)/tapkee.js $(JS_DIST_DIR)/tapkee.wasm $(DEMO_DIR)/
+
 # Generate static HTML files
-static-html: build
+static-html: build sync-js-demo
 	@echo "Starting static HTML generation..."
 	@echo "Cleaning and creating output directory: $(OUTPUT_DIR)"
 	@rm -rf $(OUTPUT_DIR)
@@ -77,6 +100,7 @@ clean:
 	@rm -rf target
 	@rm -rf node_modules
 	@rm -f resources/public/img/tapkee-preview.png
+	@rm -f $(DEMO_DIR)/tapkee.js $(DEMO_DIR)/tapkee.wasm
 	@echo "Clean complete"
 
 # Initialize Terraform

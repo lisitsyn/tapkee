@@ -192,6 +192,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   [:li {:class "nav-item"}
    [:a {:class "nav-link" :href (:github-url site-config) :target "_blank"} "GitHub"]])
 
+(defn live-demo-button []
+  [:li {:class "nav-item"}
+   [:a {:class "nav-link" :href "demo/index.html" :target "_blank"} "Live demo"]])
+
 (defn techniques-dropdown []
   (dropdown "methods" "Dimension reduction techniques"
             all-methods))
@@ -322,6 +326,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
          (graphical-examples-dropdown)
          (install-dropdown)
          (more-dropdown)
+         (live-demo-button)
          (github-button)
       )
       (header)

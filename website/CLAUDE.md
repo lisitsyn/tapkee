@@ -10,12 +10,12 @@ Static documentation website for the [Tapkee](https://github.com/lisitsyn/tapkee
 
 ```bash
 make build          # Compile Clojure (lein compile)
-make static-html    # Full build: compile → generate index.html → copy resources → render preview image
+make static-html    # Full build: compile → sync WASM demo → generate index.html → copy resources → render preview image
 make local          # Build + serve at http://localhost:8000
-make clean          # Remove static/, target/, node_modules/
+make clean          # Remove static/, target/, node_modules/, the copied WASM demo module
 ```
 
-The build runs `lein run` which prints the full HTML to stdout, captured into `static/index.html`. All files from `resources/public/` are copied into `static/`.
+The build runs `lein run` which prints the full HTML to stdout, captured into `static/index.html`. All files from `resources/public/` are copied into `static/`. `static-html` requires `packages/js/dist/tapkee.{js,wasm}` to already be built (see "Live WebAssembly Demo" below) — `make sync-js-demo` fails fast with build instructions if they're missing.
 
 ### Deployment (AWS)
 
@@ -45,7 +45,7 @@ The page is a single-page app: algorithm descriptions, graphical examples, and c
 
 ### Static Resources (`resources/public/`)
 
-- `md/` — Algorithm documentation (markdown with LaTeX math) and `README.markdown` (main page content). Files that mirror repo-root content are symlinks into the canonical source (`../../../../doc/methods/*.markdown`, `../../../../README.md`) rather than hand-maintained copies, so the site can't drift out of sync with it. `ms.markdown` (Manifold Sculpting) has no `doc/methods/` counterpart and is a real file.
+- `md/` — Algorithm documentation (markdown with LaTeX math) and `README.markdown` (main page content). All files are symlinks into the canonical source (`../../../../doc/methods/*.markdown`, `../../../../README.md`) rather than hand-maintained copies, so the site can't drift out of sync with it.
 - `code/` — Usage examples: `.cpp`, `.py`, `.r` source files and `.md` descriptions. The C++ sources and `.md` descriptions for `minimal`/`precomputed`/`rna`/`mnist`/`faces`/`promoters`/`words` are symlinks into `../../../../examples/`; `.py`/`.r` variants exist only here (no repo-root equivalent) and are real files.
   - `make static-html` copies `resources/public/` with `cp -RL`, which dereferences these symlinks so the deployed `static/` output contains real files (required for S3 sync).
 - `data/` — Pre-computed embedding JSON files for D3.js visualizations
@@ -57,6 +57,12 @@ The page is a single-page app: algorithm descriptions, graphical examples, and c
 ### Preview Image Generation
 
 `render_preview.js` uses Puppeteer to render `render_preview.html` (a standalone D3 visualization) and screenshot it to `img/tapkee-preview.png` (1200x630) for social media og:image tags.
+
+### Live WebAssembly Demo (`resources/public/demo/`)
+
+`demo/index.html` is a symlink into `../../../../examples/javascript/index.html` — a standalone page (not part of the Clojure SPA) that runs Tapkee compiled to WebAssembly directly in the browser: generates a swiss roll, embeds it with a chosen method (LLE, Isomap, t-SNE, ...) in a Web Worker, and renders 3D/2D views on canvas. Linked from the navbar ("Live demo").
+
+The module itself (`tapkee.js` + `tapkee.wasm`) is not source in this repo — it's built separately with Emscripten (see `examples/javascript/README.md`) into `packages/js/dist/`, since that toolchain is a much heavier dependency than the rest of this static site build. `make sync-js-demo` (a prerequisite of `static-html`) copies those two files from `packages/js/dist/` into `resources/public/demo/` and fails with build instructions if they're missing; they're gitignored, not committed.
 
 ### Infrastructure (`terraform/`)
 
