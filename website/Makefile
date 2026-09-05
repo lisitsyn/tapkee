@@ -42,7 +42,7 @@ static-html: build
 	@echo "Generating index.html..."
 	@$(LEIN) run > $(OUTPUT_DIR)/index.html
 	@echo "Copying static resources..."
-	@cp -r resources/public/* $(OUTPUT_DIR)/
+	@cp -RL resources/public/* $(OUTPUT_DIR)/
 	@echo "Generating preview image..."
 	@$(MAKE) generate-preview
 	@echo "Static HTML generation complete!"
