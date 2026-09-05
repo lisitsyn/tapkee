@@ -147,6 +147,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   [:nav {:class "navbar fixed-top navbar-expand-lg navbar-light bg-white shadow"}
    [:div {:class "container"}
     [:a {:class "navbar-brand" :href "#"} ""]
+    [:button {:class "navbar-toggler" :type "button"
+              :data-bs-toggle "collapse" :data-bs-target "#navbarNav"
+              :aria-controls "navbarNav" :aria-expanded "false"
+              :aria-label "Toggle navigation"}
+     [:span {:class "navbar-toggler-icon"}]]
     [:div {:class "collapse navbar-collapse" :id "navbarNav"}
      [:ul {:class "navbar-nav mx-auto"}
       elements]]]])
@@ -282,6 +287,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 (defn index []
   (html5
     [:head
+      [:meta {:charset "UTF-8"}]
+      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
       (tag-manager-head)
       [:title (:title site-config)]
       ;; Favicon and manifest meta tags
