@@ -1,10 +1,10 @@
-d3.json('data/mnist.json', (json) => {
+d3.json('data/digits.json', (json) => {
   const width = 400;
   const height = 400;
   const margin = 50;
   
   const color = d3.scale.category10();
-  const svg = d3.select('#mnistPlot').append('svg:svg')
+  const svg = d3.select('#digitsPlot').append('svg:svg')
     .attr('width', width)
     .attr('height', height);
 
@@ -25,10 +25,10 @@ d3.json('data/mnist.json', (json) => {
     .style('fill', () => color(0));
 
   // Add Bootstrap tooltip data attributes to circles
-  $('#mnistPlot svg circle').each(function() {
+  $('#digitsPlot svg circle').each(function() {
     const d = this.__data__;
     const string = d.fname;
-    const img = `<img src="img/mnist/${string}"/>`;
+    const img = `<img src="img/digits/${string}"/>`;
     
     $(this).attr({
       'data-bs-toggle': 'tooltip',
@@ -40,7 +40,7 @@ d3.json('data/mnist.json', (json) => {
   
   // Initialize Bootstrap tooltips with better performance
   // Only create instances for elements that don't already have them
-  const container = document.getElementById('mnistPlot');
+  const container = document.getElementById('digitsPlot');
   const tooltipElements = container.querySelectorAll('[data-bs-toggle="tooltip"]');
   
   tooltipElements.forEach((element) => {

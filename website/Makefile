@@ -1,4 +1,4 @@
-.PHONY: help deps build static-html sync-js-demo sync-synthfaces generate-preview clean terraform-init terraform-plan terraform-deploy terraform-destroy terraform-output
+.PHONY: help deps build static-html sync-js-demo sync-synthfaces sync-digits generate-preview clean terraform-init terraform-plan terraform-deploy terraform-destroy terraform-output
 
 # Variables
 OUTPUT_DIR = static
@@ -10,6 +10,8 @@ DEMO_DIR = resources/public/demo
 TAPKEE_CLI = ../bin/tapkee
 SYNTHFACES_IMG_DIR = resources/public/img/synthfaces
 SYNTHFACES_JSON = resources/public/data/synthfaces.json
+DIGITS_IMG_DIR = resources/public/img/digits
+DIGITS_JSON = resources/public/data/digits.json
 
 # Help target
 help:
@@ -19,6 +21,7 @@ help:
 	@echo "  static-html      - Generate static HTML files"
 	@echo "  sync-js-demo     - Copy the built WebAssembly demo into resources/public/demo/"
 	@echo "  sync-synthfaces  - Regenerate the synthfaces demo dataset and images"
+	@echo "  sync-digits      - Regenerate the digits demo dataset and images"
 	@echo "  generate-preview - Generate preview image for social media"
 	@echo "  clean            - Clean generated files and build artifacts"
 	@echo "  terraform-init   - Initialize Terraform"
@@ -75,8 +78,24 @@ sync-synthfaces:
 	@python3 tools/generate_synthfaces.py --tapkee-cli $(TAPKEE_CLI) \
 		--img-dir $(SYNTHFACES_IMG_DIR) --out-json $(SYNTHFACES_JSON) --neighbors 24
 
+# Regenerate the digits graphical-example dataset (images + t-SNE embedding
+# JSON). Fully procedural (see tools/generate_digits.py) rather than real
+# MNIST, so it isn't committed and doesn't need a network fetch at build time
+# -- only a native build of the tapkee CLI, not the Emscripten toolchain.
+sync-digits:
+	@if [ ! -x "$(TAPKEE_CLI)" ]; then \
+		echo "error: $(TAPKEE_CLI) not found."; \
+		echo "Build the tapkee CLI first, from the repository root:"; \
+		echo "  mkdir build && cd build"; \
+		echo "  cmake .."; \
+		echo "  cmake --build . --target tapkee"; \
+		exit 1; \
+	fi
+	@python3 tools/generate_digits.py --tapkee-cli $(TAPKEE_CLI) \
+		--img-dir $(DIGITS_IMG_DIR) --out-json $(DIGITS_JSON)
+
 # Generate static HTML files
-static-html: build sync-js-demo sync-synthfaces
+static-html: build sync-js-demo sync-synthfaces sync-digits
 	@echo "Starting static HTML generation..."
 	@echo "Cleaning and creating output directory: $(OUTPUT_DIR)"
 	@rm -rf $(OUTPUT_DIR)
@@ -122,6 +141,8 @@ clean:
 	@rm -f $(DEMO_DIR)/tapkee.js $(DEMO_DIR)/tapkee.wasm
 	@rm -rf $(SYNTHFACES_IMG_DIR)
 	@rm -f $(SYNTHFACES_JSON)
+	@rm -rf $(DIGITS_IMG_DIR)
+	@rm -f $(DIGITS_JSON)
 	@echo "Clean complete"
 
 # Initialize Terraform

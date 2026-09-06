@@ -10,14 +10,14 @@ Static documentation website for the [Tapkee](https://github.com/lisitsyn/tapkee
 
 ```bash
 make build          # Compile Clojure (lein compile)
-make static-html    # Full build: compile → sync WASM demo → sync synthfaces → generate index.html → copy resources → render preview image
+make static-html    # Full build: compile → sync WASM demo → sync synthfaces → sync digits → generate index.html → copy resources → render preview image
 make local          # Build + serve at http://localhost:8000
-make clean          # Remove static/, target/, node_modules/, the copied WASM demo module, the generated synthfaces dataset
+make clean          # Remove static/, target/, node_modules/, the copied WASM demo module, the generated synthfaces/digits datasets
 ```
 
 The build runs `lein run` which prints the full HTML to stdout, captured into `static/index.html`. All files from `resources/public/` are copied into `static/`. `static-html` requires two things to already be built, and fails fast with instructions if either is missing:
 - `packages/js/dist/tapkee.{js,wasm}` (see "Live WebAssembly Demo" below) — checked by `make sync-js-demo`
-- `../bin/tapkee`, the native CLI (see "Static Resources" below, `img/synthfaces/`) — checked by `make sync-synthfaces`
+- `../bin/tapkee`, the native CLI (see "Static Resources" below, `img/synthfaces/` and `img/digits/`) — checked by `make sync-synthfaces` and `make sync-digits`
 
 ### Deployment (AWS)
 
@@ -33,7 +33,7 @@ make terraform-plan     # Preview infrastructure changes
 Single Clojure file that generates the entire page. Key data structures:
 
 - **`all-methods`** — 18 dimension reduction algorithms, each with shortname, longname, and a markdown file in `resources/public/md/`
-- **`all-graphical-examples`** — 5 interactive D3.js visualizations (promoters, words, synthfaces, mnist, faces)
+- **`all-graphical-examples`** — 5 interactive D3.js visualizations (promoters, words, synthfaces, digits, faces)
 - **`all-usage-examples`** — 3 code examples, each with C++, Python, and R source variants displayed in Bootstrap nav-tabs
 
 The page is a single-page app: algorithm descriptions, graphical examples, and code examples all render inside Bootstrap 5 modals opened from navbar dropdowns.
@@ -48,13 +48,13 @@ The page is a single-page app: algorithm descriptions, graphical examples, and c
 ### Static Resources (`resources/public/`)
 
 - `md/` — Algorithm documentation (markdown with LaTeX math) and `README.markdown` (main page content). All files are symlinks into the canonical source (`../../../../doc/methods/*.markdown`, `../../../../README.md`) rather than hand-maintained copies, so the site can't drift out of sync with it.
-- `code/` — Usage examples: `.cpp`, `.py`, `.r` source files and `.md` descriptions. The C++ sources and `.md` descriptions for `minimal`/`precomputed`/`rna`/`mnist`/`faces`/`promoters`/`words` are symlinks into `../../../../examples/`; `.py`/`.r` variants exist only here (no repo-root equivalent) and are real files.
+- `code/` — Usage examples: `.cpp`, `.py`, `.r` source files and `.md` descriptions. The C++ sources and `.md` descriptions for `minimal`/`precomputed`/`rna`/`faces`/`promoters`/`words` are symlinks into `../../../../examples/`; `.py`/`.r` variants and `synthfaces.md`/`digits.md` (procedurally generated data, no repo-root equivalent — see `img/` below) exist only here as real files.
   - `make static-html` copies `resources/public/` with `cp -RL`, which dereferences these symlinks so the deployed `static/` output contains real files (required for S3 sync).
 - `data/` — Pre-computed embedding JSON files for D3.js visualizations
 - `js/` — D3.js visualization scripts (one per graphical example) + utility scripts
 - `css/styles.css` — Custom styles (gradient header, code block styling, modal blur)
-- `img/` — Favicons, face/MNIST images for visualization tooltips, generated preview image
-  - `img/synthfaces/` and `data/synthfaces.json` are procedurally generated (not redistributed third-party data, and not committed -- gitignored) by `tools/generate_synthfaces.py`; see that script's docstring for why (the MIT-CBCL face database's license forbids redistributing its images). `make sync-synthfaces` (a `static-html` prerequisite) regenerates them and fails with build instructions if `bin/tapkee` (a normal native build, no Emscripten needed) isn't there yet.
+- `img/` — Favicons, face/digit images for visualization tooltips, generated preview image
+  - `img/synthfaces/` + `data/synthfaces.json`, and `img/digits/` + `data/digits.json`, are procedurally generated (not redistributed third-party data, and not committed -- gitignored) by `tools/generate_synthfaces.py` and `tools/generate_digits.py` respectively; see each script's docstring for why (synthfaces: the MIT-CBCL face database's license forbids redistributing its images; digits: regenerating from real MNIST would mean downloading it from a third-party mirror at every build). `make sync-synthfaces` / `make sync-digits` (both `static-html` prerequisites) regenerate them and fail with build instructions if `bin/tapkee` (a normal native build, no Emscripten needed) isn't there yet.
 
 ### Preview Image Generation
 
