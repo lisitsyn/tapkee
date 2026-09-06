@@ -38,7 +38,8 @@ resource "aws_cloudfront_response_headers_policy" "security_headers" {
     content_security_policy {
       content_security_policy = join("; ", [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' abt.s3.yandex.net cdn.jsdelivr.net www.googletagmanager.com www.google-analytics.com mc.yandex.ru yastatic.net",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' abt.s3.yandex.net cdn.jsdelivr.net www.googletagmanager.com www.google-analytics.com mc.yandex.ru yastatic.net",
+        "worker-src 'self' blob:",
         "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com",
         "font-src 'self' fonts.gstatic.com cdn.jsdelivr.net",
         "img-src 'self' data: abt.s3.yandex.net mc.yandex.ru yandex.ru www.googletagmanager.com",
