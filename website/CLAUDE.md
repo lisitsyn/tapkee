@@ -10,12 +10,14 @@ Static documentation website for the [Tapkee](https://github.com/lisitsyn/tapkee
 
 ```bash
 make build          # Compile Clojure (lein compile)
-make static-html    # Full build: compile → sync WASM demo → generate index.html → copy resources → render preview image
+make static-html    # Full build: compile → sync WASM demo → sync synthfaces → generate index.html → copy resources → render preview image
 make local          # Build + serve at http://localhost:8000
-make clean          # Remove static/, target/, node_modules/, the copied WASM demo module
+make clean          # Remove static/, target/, node_modules/, the copied WASM demo module, the generated synthfaces dataset
 ```
 
-The build runs `lein run` which prints the full HTML to stdout, captured into `static/index.html`. All files from `resources/public/` are copied into `static/`. `static-html` requires `packages/js/dist/tapkee.{js,wasm}` to already be built (see "Live WebAssembly Demo" below) — `make sync-js-demo` fails fast with build instructions if they're missing.
+The build runs `lein run` which prints the full HTML to stdout, captured into `static/index.html`. All files from `resources/public/` are copied into `static/`. `static-html` requires two things to already be built, and fails fast with instructions if either is missing:
+- `packages/js/dist/tapkee.{js,wasm}` (see "Live WebAssembly Demo" below) — checked by `make sync-js-demo`
+- `../bin/tapkee`, the native CLI (see "Static Resources" below, `img/synthfaces/`) — checked by `make sync-synthfaces`
 
 ### Deployment (AWS)
 
@@ -52,7 +54,7 @@ The page is a single-page app: algorithm descriptions, graphical examples, and c
 - `js/` — D3.js visualization scripts (one per graphical example) + utility scripts
 - `css/styles.css` — Custom styles (gradient header, code block styling, modal blur)
 - `img/` — Favicons, face/MNIST images for visualization tooltips, generated preview image
-  - `img/synthfaces/` and `data/synthfaces.json` are procedurally generated (not redistributed third-party data) by `tools/generate_synthfaces.py`; see that script's docstring for why (the MIT-CBCL face database's license forbids redistributing its images) and how to regenerate.
+  - `img/synthfaces/` and `data/synthfaces.json` are procedurally generated (not redistributed third-party data, and not committed -- gitignored) by `tools/generate_synthfaces.py`; see that script's docstring for why (the MIT-CBCL face database's license forbids redistributing its images). `make sync-synthfaces` (a `static-html` prerequisite) regenerates them and fails with build instructions if `bin/tapkee` (a normal native build, no Emscripten needed) isn't there yet.
 
 ### Preview Image Generation
 

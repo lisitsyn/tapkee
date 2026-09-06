@@ -15,7 +15,15 @@ jobs:
     - uses: actions/checkout@v7
 
     - name: Install dependencies
-      run: sudo apt-get install -y libeigen3-dev
+      run: sudo apt-get install -y libeigen3-dev libfmt-dev libcxxopts-dev
+
+    # website/Makefile's sync-synthfaces step (a static-html prerequisite)
+    # needs a native tapkee CLI to regenerate the synthfaces demo dataset;
+    # build it with the plain host compiler, before Emscripten is on PATH.
+    - name: Build tapkee CLI
+      run: |
+        cmake -B ${{github.workspace}}/build
+        cmake --build ${{github.workspace}}/build --target tapkee
 
     # Ubuntu's libfmt-dev advertises /usr/include as its interface include
     # directory, which would drag the host glibc headers into the wasm

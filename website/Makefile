@@ -1,4 +1,4 @@
-.PHONY: help deps build static-html sync-js-demo generate-preview clean terraform-init terraform-plan terraform-deploy terraform-destroy terraform-output
+.PHONY: help deps build static-html sync-js-demo sync-synthfaces generate-preview clean terraform-init terraform-plan terraform-deploy terraform-destroy terraform-output
 
 # Variables
 OUTPUT_DIR = static
@@ -7,6 +7,9 @@ TERRAFORM_DIR = terraform
 TERRAFORM = terraform
 JS_DIST_DIR = ../packages/js/dist
 DEMO_DIR = resources/public/demo
+TAPKEE_CLI = ../bin/tapkee
+SYNTHFACES_IMG_DIR = resources/public/img/synthfaces
+SYNTHFACES_JSON = resources/public/data/synthfaces.json
 
 # Help target
 help:
@@ -15,6 +18,7 @@ help:
 	@echo "  build            - Compile the application"
 	@echo "  static-html      - Generate static HTML files"
 	@echo "  sync-js-demo     - Copy the built WebAssembly demo into resources/public/demo/"
+	@echo "  sync-synthfaces  - Regenerate the synthfaces demo dataset and images"
 	@echo "  generate-preview - Generate preview image for social media"
 	@echo "  clean            - Clean generated files and build artifacts"
 	@echo "  terraform-init   - Initialize Terraform"
@@ -56,8 +60,23 @@ sync-js-demo:
 	@mkdir -p $(DEMO_DIR)
 	@cp $(JS_DIST_DIR)/tapkee.js $(JS_DIST_DIR)/tapkee.wasm $(DEMO_DIR)/
 
+# Regenerate the synthfaces graphical-example dataset (images + embedding JSON).
+# Fully procedural (see tools/generate_synthfaces.py), so it isn't committed --
+# only needs a native build of the tapkee CLI, not the Emscripten toolchain.
+sync-synthfaces:
+	@if [ ! -x "$(TAPKEE_CLI)" ]; then \
+		echo "error: $(TAPKEE_CLI) not found."; \
+		echo "Build the tapkee CLI first, from the repository root:"; \
+		echo "  mkdir build && cd build"; \
+		echo "  cmake .."; \
+		echo "  cmake --build . --target tapkee"; \
+		exit 1; \
+	fi
+	@python3 tools/generate_synthfaces.py --tapkee-cli $(TAPKEE_CLI) \
+		--img-dir $(SYNTHFACES_IMG_DIR) --out-json $(SYNTHFACES_JSON) --neighbors 24
+
 # Generate static HTML files
-static-html: build sync-js-demo
+static-html: build sync-js-demo sync-synthfaces
 	@echo "Starting static HTML generation..."
 	@echo "Cleaning and creating output directory: $(OUTPUT_DIR)"
 	@rm -rf $(OUTPUT_DIR)
@@ -101,6 +120,8 @@ clean:
 	@rm -rf node_modules
 	@rm -f resources/public/img/tapkee-preview.png
 	@rm -f $(DEMO_DIR)/tapkee.js $(DEMO_DIR)/tapkee.wasm
+	@rm -rf $(SYNTHFACES_IMG_DIR)
+	@rm -f $(SYNTHFACES_JSON)
 	@echo "Clean complete"
 
 # Initialize Terraform
