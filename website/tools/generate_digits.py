@@ -37,7 +37,7 @@ SUPERSAMPLE = 4
 SAMPLES_PER_DIGIT = 200  # 10 digits x 200 = 2000, matching the original demo
 
 BG = (0, 0, 0, 0)
-INK = (20, 20, 20, 255)
+INK = (255, 255, 255, 255)
 
 # Seven-segment layout on a unit square (x, y in [0, 1], y grows downward).
 SEG_POINTS = {
