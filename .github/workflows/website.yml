@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: "Build website (static HTML + WASM demo)"
+    name: "Build"
     runs-on: ubuntu-latest
 
     steps:
