@@ -64,7 +64,7 @@ jobs:
         node-version: 20
 
     - name: Setup Clojure (Leiningen)
-      uses: DeLaGuardo/setup-clojure@3.7.0
+      uses: DeLaGuardo/setup-clojure@13.6.1
       with:
         lein: latest
 
