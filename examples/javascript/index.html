@@ -21,7 +21,6 @@
   button { cursor: pointer; }
   button:hover, select:hover { border-color: #b6bec9; }
   label { display: flex; align-items: center; gap: 6px; }
-  [hidden] { display: none !important; }
   input[type="range"] { accent-color: #16181d; width: 100px; }
   output { font-variant-numeric: tabular-nums; color: #16181d; min-width: 2ch; }
   .views { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 8px; margin-top: 18px; }
@@ -50,16 +49,6 @@
     <label>k
       <input type="range" id="kslider" min="5" max="30" value="12">
       <output id="kval">12</output>
-    </label>
-    <label id="iterations-control" hidden>max iterations
-      <select id="iterations">
-        <option value="20">20</option>
-        <option value="40">40</option>
-        <option value="60">60</option>
-        <option value="100" selected>100</option>
-        <option value="500">500</option>
-        <option value="1000">1000</option>
-      </select>
     </label>
     <button id="reroll">new roll</button>
   </div>
@@ -97,7 +86,7 @@ const METHODS = [
 ];
 
 const state = {
-  method: 'lle', n: 800, k: 12, maxIteration: 100,
+  method: 'lle', n: 800, k: 12,
   points: [], raw: [], colors: [],
   emb: null, prevEmb: null, morph: 1,
   running: false, rotX: 0, rotY: 0.52, dragging: false, // 30 degrees off the spiral face
@@ -348,8 +337,8 @@ function run(regenerate) {
   status.classList.remove('err');
   status.textContent = 'Computing…';
   const options = { method: state.method, numNeighbors: state.k, targetDimension: 2 };
-  document.getElementById('iterations-control').hidden = state.method !== 'manifold_sculpting';
-  if (state.method === 'manifold_sculpting') options.maxIteration = state.maxIteration;
+  if (state.method === 'manifold_sculpting')
+    options.maxIteration = 40; // keep the demo's existing iteration budget
   showCode(options);
   worker.postMessage({ id: requestId, data: state.raw, n: state.n, dims: 3, options });
 }
@@ -382,9 +371,6 @@ npointsSel.addEventListener('change', () => { state.n = parseInt(npointsSel.valu
 const kslider = document.getElementById('kslider');
 kslider.addEventListener('input', () => { document.getElementById('kval').textContent = kslider.value; });
 kslider.addEventListener('change', () => { state.k = parseInt(kslider.value); run(false); });
-
-const iterationsSel = document.getElementById('iterations');
-iterationsSel.addEventListener('change', () => { state.maxIteration = parseInt(iterationsSel.value); run(false); });
 
 document.getElementById('reroll').addEventListener('click', () => run(true));
 
