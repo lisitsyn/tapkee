@@ -45,7 +45,6 @@ jobs:
     - name: Test
       run: |
         node test/javascript/smoke.js
-        node test/javascript/manifold-sculpting.js
         node test/javascript/demo.js
 
     - name: Check npm package contents

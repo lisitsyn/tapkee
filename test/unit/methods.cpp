@@ -116,6 +116,11 @@ TEST(Methods, FactorAnalysisSmokeTest)
     smoketest(FactorAnalysis);
 }
 
+TEST(Methods, ManifoldSculptingSmokeTest)
+{
+    smoketest(ManifoldSculpting);
+}
+
 TEST(Methods, tDistributedStochasticNeighborEmbeddingSmokeTest)
 {
     smoketest(tDistributedStochasticNeighborEmbedding);
