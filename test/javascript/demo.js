@@ -64,11 +64,14 @@ const demo = startDemo();
 try {
     const first = demo.workers[0];
     assert.equal(first.messages.length, 1);
+    assert.equal(demo.elements.get('iterations-control').hidden, true);
     demo.change('method', 'manifold_sculpting');
     const second = demo.workers.at(-1);
     assert.notEqual(first, second, 'changing settings must replace a busy worker');
     assert(first.terminated, 'obsolete computation must be terminated');
     assert.equal(second.messages[0].options.method, 'manifold_sculpting');
+    assert.equal(second.messages[0].options.maxIteration, 100);
+    assert.equal(demo.elements.get('iterations-control').hidden, false);
 
     demo.change('npoints', '400');
     const latest = demo.workers.at(-1);
@@ -92,14 +95,30 @@ try {
     assert.notEqual(recovered, latest, 'the next request must recover from a worker failure');
     recovered.finish();
     assert.equal(demo.elements.get('status').textContent, 'Computed in 1 ms');
+    assert.equal(demo.elements.get('iterations-control').hidden, true);
+    assert.equal(recovered.messages.at(-1).options.maxIteration, undefined);
 
     demo.change('method', 'manifold_sculpting');
-    const failedRequest = recovered.messages.at(-1);
-    recovered.onmessage({ data: { id: failedRequest.id, ok: false, error: 'module failed to load' } });
-    assert.equal(demo.elements.get('status').textContent, 'module failed to load');
-    assert(recovered.terminated, 'a rejected initialization must not poison future requests');
+    const unchangedData = recovered.messages.at(-1).data;
+    demo.change('iterations', '40');
+    const withBudget = demo.workers.at(-1);
+    assert(recovered.terminated, 'changing iterations must cancel a busy computation');
+    assert.equal(withBudget.messages.at(-1).data, unchangedData, 'changing budget must preserve the input points');
+    assert.equal(withBudget.messages.at(-1).options.maxIteration, 40);
+    assert.match(demo.elements.get('code').textContent, /maxIteration: 40/);
+    withBudget.finish();
+
     demo.change('method', 'pca');
-    assert.notEqual(demo.workers.at(-1), recovered);
+    assert.equal(withBudget.messages.at(-1).options.maxIteration, undefined);
+    withBudget.finish();
+    demo.change('method', 'manifold_sculpting');
+    assert.equal(withBudget.messages.at(-1).options.maxIteration, 40, 'the chosen budget must persist');
+    const failedRequest = withBudget.messages.at(-1);
+    withBudget.onmessage({ data: { id: failedRequest.id, ok: false, error: 'module failed to load' } });
+    assert.equal(demo.elements.get('status').textContent, 'module failed to load');
+    assert(withBudget.terminated, 'a rejected initialization must not poison future requests');
+    demo.change('method', 'pca');
+    assert.notEqual(demo.workers.at(-1), withBudget);
     demo.workers.at(-1).finish();
     assert.equal(demo.elements.get('status').textContent, 'Computed in 1 ms');
     console.log('Demo cancellation, stale events, reuse, and recovery: passed');

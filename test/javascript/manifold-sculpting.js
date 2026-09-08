@@ -1,6 +1,6 @@
 // Regression test and reproducible benchmark for the WebAssembly optimizer.
 // node test/javascript/manifold-sculpting.js
-// node test/javascript/manifold-sculpting.js --run /absolute/path/tapkee.js 800 100 123456789
+// node test/javascript/manifold-sculpting.js --run /absolute/path/tapkee.js 800 100 123456789 [numNeighbors=12]
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
@@ -51,12 +51,12 @@ function quality(data, intrinsic, embedding, k) {
     };
 }
 
-async function run(modulePath, n, maxIteration, seed) {
+async function run(modulePath, n, maxIteration, seed, numNeighbors = 12) {
     const tapkee = await require(modulePath)();
     const { data, intrinsic } = swissRoll(n, seed);
     const start = performance.now();
     const result = tapkee.embed(data, n, 3, {
-        method: 'manifold_sculpting', numNeighbors: 12, targetDimension: 2, maxIteration,
+        method: 'manifold_sculpting', numNeighbors, targetDimension: 2, maxIteration,
     });
     const ms = performance.now() - start;
     assert.equal(result.rows, n);
@@ -64,11 +64,12 @@ async function run(modulePath, n, maxIteration, seed) {
     assert.equal(result.embedding.length, n * 2);
     assert(result.embedding.every(Number.isFinite), 'coordinates must be finite');
     assert(Math.max(...result.embedding) > Math.min(...result.embedding), 'embedding must not collapse');
-    return { n, maxIteration, seed, ms, ...quality(data, intrinsic, result.embedding, 12) };
+    return { n, numNeighbors, maxIteration, seed, ms, ...quality(data, intrinsic, result.embedding, numNeighbors) };
 }
 
 if (process.argv[2] === '--run') {
-    run(path.resolve(process.argv[3]), Number(process.argv[4]), Number(process.argv[5]), Number(process.argv[6]))
+    run(path.resolve(process.argv[3]), Number(process.argv[4]), Number(process.argv[5]), Number(process.argv[6]),
+        process.argv[7] === undefined ? 12 : Number(process.argv[7]))
         .then(result => console.log(JSON.stringify(result)))
         .catch(error => { console.error(error); process.exitCode = 1; });
 } else {
