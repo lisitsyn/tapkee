@@ -40,7 +40,8 @@ struct DataForErrorFunc
      * the most collinear neighbor of the neighbor. If
      * point's index is P, its neighbor's index is N1 and
      * the index of neighbor's neighbor is N2, then the
-     * angle between them should be stored at index (P, N2)
+     * angle between them is stored at index (P, N1). Different
+     * neighbors may share N2, but must retain separate angle targets.
      */
     const SparseMatrix& angles_matrix;
     /** a vector of vectors, where I'th
@@ -49,8 +50,8 @@ struct DataForErrorFunc
     const Neighbors& distance_neighbors;
     /** a vector of vectors,
      * where the vector at index I contains indices of
-     * neighbor's neighbor of the I'th point (so that
-     * we know, where to search for the angle value)
+     * neighbor's neighbor of the I'th point (the third
+     * vertex used to compute each current angle)
      */
     const Neighbors& angle_neighbors;
     /** a set of indices of points, that have been
@@ -129,7 +130,7 @@ inline SparseMatrixNeighborsPair angles_matrix_and_neighbors(const Neighbors& ne
                 }
             }
 
-            SparseTriplet triplet(i, most_collinear_current_neighbors[j], min_cos_value);
+            SparseTriplet triplet(i, current_neighbors[j], min_cos_value);
             sparse_triplets.push_back(triplet);
         }
         most_collinear_neighbors_of_neighbors.push_back(most_collinear_current_neighbors);
@@ -171,7 +172,7 @@ inline ScalarType compute_error_for_point(const IndexType index, const DenseMatr
         /* Find new distance */
         ScalarType current_distance = (data.col(index) - data.col(neighbor)).norm();
         /* Compute one component of error function's value*/
-        ScalarType diff_cos = current_cos_value - error_func_data.angles_matrix.coeff(index, neighbor_of_neighbor);
+        ScalarType diff_cos = current_cos_value - error_func_data.angles_matrix.coeff(index, neighbor);
         if (diff_cos < 0)
             diff_cos = 0;
         ScalarType diff_distance = current_distance - error_func_data.distance_matrix.coeff(index, neighbor);
@@ -200,8 +201,7 @@ inline ScalarType compute_error_for_point(const IndexType index, const DenseMatr
  * angles, etc.
  * @param point_error - will be set to the error function
  * value, calculated for the point
- * @return a number of steps it took to  adjust the
- * point
+ * @return the number of hill-climbing passes that improved the point
  */
 inline IndexType adjust_point_at_index(const IndexType index, DenseMatrix& data, const IndexType target_dimension,
                                        const ScalarType learning_rate, const DataForErrorFunc& error_func_data,
@@ -236,7 +236,11 @@ inline IndexType adjust_point_at_index(const IndexType index, DenseMatrix& data,
                 finish = false;
             }
         }
-        ++n_steps;
+        // Do not count the final unsuccessful pass as an adjustment. Otherwise
+        // a full sweep already costs N steps even when no point moves, making
+        // the adaptive learning rate grow whenever any point improves.
+        if (!finish)
+            ++n_steps;
     }
     point_error = compute_error_for_point(index, data, error_func_data);
     return n_steps;
@@ -301,8 +305,8 @@ void manifold_sculpting_embed(RandomAccessIterator begin, RandomAccessIterator e
                 DataForErrorFunc error_func_data = {
                     distances_to_neighbors, angles_and_neighbors.first, neighbors, angles_and_neighbors.second,
                     adjusted_points,        initial_average_distance};
-                adjust_point_at_index(current_point_index, data, target_dimension, learning_rate, error_func_data,
-                                      point_error);
+                steps_made += adjust_point_at_index(current_point_index, data, target_dimension, learning_rate,
+                                                    error_func_data, point_error);
                 current_error += point_error;
                 /* Insert all neighbors into deque */
                 std::copy(neighbors[current_point_index].begin(), neighbors[current_point_index].end(),

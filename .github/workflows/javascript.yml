@@ -43,7 +43,9 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --target tapkee_js
 
     - name: Test
-      run: node ${{github.workspace}}/test/javascript/smoke.js
+      run: |
+        node test/javascript/smoke.js
+        node test/javascript/demo.js
 
     - name: Check npm package contents
       run: |

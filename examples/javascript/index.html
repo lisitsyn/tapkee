@@ -275,9 +275,9 @@ const workerSrc = `
   importScripts(${JSON.stringify(new URL('tapkee.js', location.href).href)});
   moduleReady = createTapkee({ locateFile: (p) => new URL(p, ${JSON.stringify(location.href)}).href });
   onmessage = async (e) => {
-    const mod = await moduleReady;
     const { data, n, dims, options, id } = e.data;
     try {
+      const mod = await moduleReady;
       const t0 = performance.now();
       const r = mod.embed(data, n, dims, options);
       postMessage({ id, ok: true, embedding: r.embedding, ms: performance.now() - t0 });
@@ -286,25 +286,41 @@ const workerSrc = `
     }
   };
 `;
-const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'application/javascript' })));
+const workerURL = URL.createObjectURL(new Blob([workerSrc], { type: 'application/javascript' }));
+let worker = null;
 let requestId = 0;
 
 const status = document.getElementById('status');
-worker.onmessage = (e) => {
-  if (e.data.id !== requestId) return;
-  state.running = false;
-  if (!e.data.ok) {
-    status.textContent = e.data.error;
+function resetWorker() {
+  if (worker) worker.terminate();
+  const currentWorker = new Worker(workerURL);
+  worker = currentWorker;
+  currentWorker.onmessage = (e) => {
+    if (worker !== currentWorker || e.data.id !== requestId) return;
+    state.running = false;
+    if (!e.data.ok) {
+      status.textContent = e.data.error;
+      status.classList.add('err');
+      currentWorker.terminate();
+      worker = null;
+      return;
+    }
+    status.classList.remove('err');
+    status.textContent = `Computed in ${Math.round(e.data.ms)} ms`;
+    state.prevEmb = state.emb;
+    state.emb = normalizeEmbedding(e.data.embedding, state.n);
+    state.morph = 0;
+    animateMorph();
+  };
+  currentWorker.onerror = (e) => {
+    if (worker !== currentWorker) return;
+    state.running = false;
+    status.textContent = e.message || 'Computation failed';
     status.classList.add('err');
-    return;
-  }
-  status.classList.remove('err');
-  status.textContent = `Computed in ${Math.round(e.data.ms)} ms`;
-  state.prevEmb = state.emb;
-  state.emb = normalizeEmbedding(e.data.embedding, state.n);
-  state.morph = 0;
-  animateMorph();
-};
+    currentWorker.terminate();
+    worker = null;
+  };
+}
 
 function run(regenerate) {
   if (regenerate || state.points.length !== state.n) {
@@ -313,13 +329,16 @@ function run(regenerate) {
     state.hover = null; state.proj2d = [];
     draw3d(); draw2d();
   }
+  // WebAssembly runs synchronously in the worker. Terminate obsolete work
+  // so the newest settings do not wait behind previous computations.
+  if (state.running || !worker) resetWorker();
   state.running = true;
   requestId++;
   status.classList.remove('err');
   status.textContent = 'Computing…';
   const options = { method: state.method, numNeighbors: state.k, targetDimension: 2 };
   if (state.method === 'manifold_sculpting')
-    options.maxIteration = 40; // the default budget takes minutes even on small rolls
+    options.maxIteration = 40; // keep the demo's existing iteration budget
   showCode(options);
   worker.postMessage({ id: requestId, data: state.raw, n: state.n, dims: 3, options });
 }
